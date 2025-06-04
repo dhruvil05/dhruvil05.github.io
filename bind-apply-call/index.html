@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>call(), bind(), and apply() Methods</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
+        .method-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .output {
+            background-color: #27ae60;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+
+        .syntax {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .key-points {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .demo-section {
+            background-color: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 5px;
+            font-family: monospace;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>JavaScript call(), bind(), and apply() Methods</h1>
+
+        <div class="method-section">
+            <h2>1. call() Method</h2>
+            <div class="syntax">
+                Syntax: functionName.call(thisContext, arg1, arg2, ...)
+            </div>
+            <p><strong>Purpose:</strong> Calls a function immediately with a specific <code>this</code> context and
+                individual arguments.</p>
+
+            <div class="code-block">// Example 1: Basic call() usage
+                const person1 = {
+                name: "Alice",
+                age: 25
+                };
+
+                const person2 = {
+                name: "Bob",
+                age: 30
+                };
+
+                function introduce(greeting, profession) {
+                return `${greeting}! I'm ${this.name}, ${this.age} years old, and I'm a ${profession}.`;
+                }
+
+                // Using call() to set 'this' context
+                console.log(introduce.call(person1, "Hello", "Developer"));
+                // Output: "Hello! I'm Alice, 25 years old, and I'm a Developer."
+
+                console.log(introduce.call(person2, "Hi", "Designer"));
+                // Output: "Hi! I'm Bob, 30 years old, and I'm a Designer."</div>
+
+            <div class="key-points">
+                <strong>Key Points:</strong>
+                <ul>
+                    <li>Executes the function immediately</li>
+                    <li>First parameter sets the <code>this</code> context</li>
+                    <li>Remaining parameters are passed as individual arguments</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="method-section">
+            <h2>2. apply() Method</h2>
+            <div class="syntax">
+                Syntax: functionName.apply(thisContext, [arg1, arg2, ...])
+            </div>
+            <p><strong>Purpose:</strong> Similar to call(), but takes arguments as an array.</p>
+
+            <div class="code-block">// Example 2: apply() with array of arguments
+                function calculateSum(a, b, c) {
+                console.log(`${this.name} is calculating: ${a} + ${b} + ${c} = ${a + b + c}`);
+                return a + b + c;
+                }
+
+                const calculator = {
+                name: "SuperCalculator"
+                };
+
+                const numbers = [10, 20, 30];
+
+                // Using apply() with array of arguments
+                calculateSum.apply(calculator, numbers);
+                // Output: "SuperCalculator is calculating: 10 + 20 + 30 = 60"
+
+                // Practical use case: Finding max value in array
+                const nums = [5, 2, 9, 1, 7];
+                const maxValue = Math.max.apply(null, nums);
+                console.log("Max value:", maxValue); // Output: 9</div>
+
+            <div class="key-points">
+                <strong>Key Points:</strong>
+                <ul>
+                    <li>Executes the function immediately</li>
+                    <li>First parameter sets the <code>this</code> context</li>
+                    <li>Second parameter must be an array of arguments</li>
+                    <li>Useful when you have arguments in array form</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="method-section">
+            <h2>3. bind() Method</h2>
+            <div class="syntax">
+                Syntax: functionName.bind(thisContext, arg1, arg2, ...)
+            </div>
+            <p><strong>Purpose:</strong> Creates a new function with a permanently bound <code>this</code> context.</p>
+
+            <div class="code-block">// Example 3: bind() creates new function
+                const user = {
+                name: "John",
+                greet: function(message) {
+                return `${message}, I'm ${this.name}!`;
+                }
+                };
+
+                // Problem: losing 'this' context
+                const greetFunction = user.greet;
+                // console.log(greetFunction("Hello")); // Error: this.name is undefined
+
+                // Solution: using bind()
+                const boundGreet = user.greet.bind(user);
+                console.log(boundGreet("Hello")); // Output: "Hello, I'm John!"
+
+                // bind() with preset arguments (partial application)
+                function multiply(a, b, c) {
+                return `${this.name}: ${a} × ${b} × ${c} = ${a * b * c}`;
+                }
+
+                const mathTeacher = { name: "Ms. Smith" };
+                const multiplyByTwo = multiply.bind(mathTeacher, 2);
+
+                console.log(multiplyByTwo(3, 4)); // Output: "Ms. Smith: 2 × 3 × 4 = 24"</div>
+
+            <div class="key-points">
+                <strong>Key Points:</strong>
+                <ul>
+                    <li>Returns a new function (doesn't execute immediately)</li>
+                    <li>Permanently binds the <code>this</code> context</li>
+                    <li>Can preset some arguments (partial application)</li>
+                    <li>Useful for event handlers and callbacks</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Interactive Demo</h2>
+            <p>Click the buttons below to see these methods in action:</p>
+
+            <button onclick="demoCall()">Demo call()</button>
+            <button onclick="demoApply()">Demo apply()</button>
+            <button onclick="demoBind()">Demo bind()</button>
+            <button onclick="demoComparison()">Compare All Three</button>
+            <button onclick="clearOutput()">Clear Output</button>
+
+            <div id="output">Click a button above to see the output...</div>
+        </div>
+
+        <div class="method-section">
+            <h2>Key Differences Summary</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <tr style="background-color: #3498db; color: white;">
+                    <th style="padding: 12px; border: 1px solid #ddd;">Method</th>
+                    <th style="padding: 12px; border: 1px solid #ddd;">Execution</th>
+                    <th style="padding: 12px; border: 1px solid #ddd;">Arguments</th>
+                    <th style="padding: 12px; border: 1px solid #ddd;">Use Case</th>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>call()</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Immediate</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Individual arguments</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">When you know arguments beforehand</td>
+                </tr>
+                <tr style="background-color: #f8f9fa;">
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>apply()</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Immediate</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Array of arguments</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">When arguments are in array form</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>bind()</strong></td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Returns new function</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Individual arguments</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">Event handlers, callbacks, partial application
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Demo objects and functions
+        const demoObj1 = { name: "Alice", role: "Developer" };
+        const demoObj2 = { name: "Bob", role: "Designer" };
+
+        function demoFunction(greeting, task) {
+            return `${greeting}! I'm ${this.name}, a ${this.role}. I'm working on ${task}.`;
+        }
+
+        function addToOutput(text) {
+            const output = document.getElementById('output');
+            output.textContent += text + '\n\n';
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Output cleared. Click a button to see demos...\n\n';
+        }
+
+        function demoCall() {
+            addToOutput('=== call() Demo ===');
+            const result1 = demoFunction.call(demoObj1, "Hello", "a React app");
+            const result2 = demoFunction.call(demoObj2, "Hi", "a website design");
+            addToOutput('call() Result 1: ' + result1);
+            addToOutput('call() Result 2: ' + result2);
+        }
+
+        function demoApply() {
+            addToOutput('=== apply() Demo ===');
+            const args1 = ["Hello", "debugging code"];
+            const args2 = ["Hi", "creating mockups"];
+            const result1 = demoFunction.apply(demoObj1, args1);
+            const result2 = demoFunction.apply(demoObj2, args2);
+            addToOutput('apply() Result 1: ' + result1);
+            addToOutput('apply() Result 2: ' + result2);
+        }
+
+        function demoBind() {
+            addToOutput('=== bind() Demo ===');
+            const boundFunction1 = demoFunction.bind(demoObj1);
+            const boundFunction2 = demoFunction.bind(demoObj2, "Hey");
+
+            const result1 = boundFunction1("Hello", "testing features");
+            const result2 = boundFunction2("logo design"); // "Hey" is already bound
+
+            addToOutput('bind() Result 1: ' + result1);
+            addToOutput('bind() Result 2 (with preset arg): ' + result2);
+        }
+
+        function demoComparison() {
+            addToOutput('=== Comparison Demo ===');
+
+            // Same function, same context, same arguments - different methods
+            const context = { name: "Charlie", role: "Manager" };
+            const args = ["Greetings", "planning the project"];
+
+            const callResult = demoFunction.call(context, ...args);
+            const applyResult = demoFunction.apply(context, args);
+            const bindResult = demoFunction.bind(context)(...args);
+
+            addToOutput('call() result: ' + callResult);
+            addToOutput('apply() result: ' + applyResult);
+            addToOutput('bind() result: ' + bindResult);
+            addToOutput('All three produce the same result but work differently!');
+        }
+
+        // Initialize output
+        clearOutput();
+    </script>
+</body>
+
+</html>
