@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rectangle Dodge Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            border: 3px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: #1a1a2e;
+        }
+
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls {
+            margin-top: 15px;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .restart-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="score">Score: <span id="score">0</span></div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div class="controls">
+            Use ARROW KEYS or WASD to move • Dodge the falling rectangles!
+        </div>
+
+        <div class="game-over" id="gameOver">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button class="restart-btn" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+
+        let gameState = {
+            player: {
+                x: canvas.width / 2 - 25,
+                y: canvas.height - 60,
+                width: 50,
+                height: 40,
+                speed: 5,
+                color: '#00ff88'
+            },
+            obstacles: [],
+            score: 0,
+            gameRunning: true,
+            keys: {},
+            obstacleSpeed: 2,
+            spawnRate: 0.02
+        };
+
+        // Handle keyboard input
+        document.addEventListener('keydown', (e) => {
+            gameState.keys[e.key.toLowerCase()] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            gameState.keys[e.key.toLowerCase()] = false;
+        });
+
+        function drawRect(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+
+            // Add a subtle glow effect
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 10;
+            ctx.fillRect(x, y, width, height);
+            ctx.shadowBlur = 0;
+        }
+
+        function updatePlayer() {
+            const player = gameState.player;
+
+            // Movement controls
+            if (gameState.keys['arrowleft'] || gameState.keys['a']) {
+                player.x -= player.speed;
+            }
+            if (gameState.keys['arrowright'] || gameState.keys['d']) {
+                player.x += player.speed;
+            }
+            if (gameState.keys['arrowup'] || gameState.keys['w']) {
+                player.y -= player.speed;
+            }
+            if (gameState.keys['arrowdown'] || gameState.keys['s']) {
+                player.y += player.speed;
+            }
+
+            // Keep player within bounds
+            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+            player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+        }
+
+        function updateObstacles() {
+            // Spawn new obstacles
+            if (Math.random() < gameState.spawnRate) {
+                gameState.obstacles.push({
+                    x: Math.random() * (canvas.width - 40),
+                    y: -40,
+                    width: 40 + Math.random() * 60,
+                    height: 20 + Math.random() * 30,
+                    color: `hsl(${Math.random() * 360}, 70%, 60%)`
+                });
+            }
+
+            // Update obstacle positions
+            gameState.obstacles.forEach((obstacle, index) => {
+                obstacle.y += gameState.obstacleSpeed;
+
+                // Remove obstacles that are off screen
+                if (obstacle.y > canvas.height) {
+                    gameState.obstacles.splice(index, 1);
+                    gameState.score += 10;
+                    scoreElement.textContent = gameState.score;
+
+                    // Increase difficulty
+                    if (gameState.score % 100 === 0) {
+                        gameState.obstacleSpeed += 0.5;
+                        gameState.spawnRate += 0.005;
+                    }
+                }
+            });
+        }
+
+        function checkCollisions() {
+            const player = gameState.player;
+
+            gameState.obstacles.forEach(obstacle => {
+                if (player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y) {
+                    gameOver();
+                }
+            });
+        }
+
+        function gameOver() {
+            gameState.gameRunning = false;
+            finalScoreElement.textContent = gameState.score;
+            gameOverElement.style.display = 'block';
+        }
+
+        function restartGame() {
+            gameState = {
+                player: {
+                    x: canvas.width / 2 - 25,
+                    y: canvas.height - 60,
+                    width: 50,
+                    height: 40,
+                    speed: 5,
+                    color: '#00ff88'
+                },
+                obstacles: [],
+                score: 0,
+                gameRunning: true,
+                keys: {},
+                obstacleSpeed: 2,
+                spawnRate: 0.02
+            };
+
+            scoreElement.textContent = '0';
+            gameOverElement.style.display = 'none';
+            gameLoop();
+        }
+
+        function render() {
+            // Clear canvas with animated background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0f0f23');
+            gradient.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw player
+            drawRect(gameState.player.x, gameState.player.y,
+                gameState.player.width, gameState.player.height,
+                gameState.player.color);
+
+            // Draw obstacles
+            gameState.obstacles.forEach(obstacle => {
+                drawRect(obstacle.x, obstacle.y,
+                    obstacle.width, obstacle.height,
+                    obstacle.color);
+            });
+
+            // Draw particles for visual effect
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                ctx.fillRect(x, y, 2, 2);
+            }
+        }
+
+        function gameLoop() {
+            if (!gameState.gameRunning) return;
+
+            updatePlayer();
+            updateObstacles();
+            checkCollisions();
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+
+</html>
