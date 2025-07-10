@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dhruvil05</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Include the full CSS you provided earlier here */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --light-text-color: #666;
+            --white: #fff;
+            --dark-grey: #444;
+            --border-color: #eee;
+            --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .header {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-grey);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--dark-grey);
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            color: var(--dark-grey);
+            cursor: pointer;
+        }
+
+        .hero-section {
+            background: linear-gradient(to right, rgba(248, 249, 250, 0.9), rgba(255, 255, 255, 0.9)), url('https://via.placeholder.com/1500x800?text=Abstract+Background') no-repeat center center/cover;
+            height: 90vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-grey);
+            font-weight: 600;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: var(--light-text-color);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0.9rem 2rem;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .features-section,
+        .table-section,
+        .contact-section {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--white);
+        }
+
+        table th,
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        table th {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .action-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .footer {
+            background-color: var(--dark-grey);
+            color: var(--white);
+            text-align: center;
+            padding: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                background: var(--white);
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <a href="#" class="logo">DS</a>
+            <div class="nav-links" id="navLinks">
+                <a href="#hero">Home</a>
+                <a href="#features">Features</a>
+                <a href="#table-section">Services</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <button class="menu-toggle" id="menuToggle">&#9776;</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="hero-content">
+                <h1>Welcome to Our Creative Space</h1>
+                <p>Discover innovative solutions designed to elevate your experience. Simple, elegant, and powerful.</p>
+                <a href="#table-section" class="btn">Explore Our Services</a>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <h2>Why Choose Us?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h3>Sleek Design</h3>
+                    <p>Beautifully crafted interfaces that are a joy to use.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Fully Responsive</h3>
+                    <p>Works flawlessly on all devices, from desktop to mobile.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>User-Friendly</h3>
+                    <p>Intuitive controls and clear navigation for everyone.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Blazing Fast</h3>
+                    <p>Optimized for speed, ensuring a smooth Browse experience.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="table-section" class="table-section">
+            <h2>Our Services & Solutions</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Service/Solution</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Portfolio</td>
+                            <td><a href="https://dhruvil05.github.io/portfolio/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Promises & Async JS</td>
+                            <td><a href="https://dhruvil05.github.io/promises-async-await/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Bind, Apply and Call</td>
+                            <td><a href="https://dhruvil05.github.io/bind-apply-call/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Currying, Throttle and Promises</td>
+                            <td><a href="https://dhruvil05.github.io/currying-throttle-promises/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Deboucing & Throttling</td>
+                            <td><a href="https://dhruvil05.github.io/deboucing-throttling/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2">Game Section</td>
+                        </tr>
+
+                        <tr>
+                            <td>Battle Game</td>
+                            <td><a href="https://dhruvil05.github.io/battle-game/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Puzzle Game</td>
+                            <td><a href="https://dhruvil05.github.io/puzzle-game/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Snake Game</td>
+                            <td><a href="https://dhruvil05.github.io/snake-game/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                        <tr>
+                            <td>Dodge Game</td>
+                            <td><a href="https://dhruvil05.github.io/dodge-game/" class="action-btn" data-link="web-development.html">Link</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="contact" class="contact-section">
+            <h2>Get in Touch</h2>
+            <p>Have a project in mind or just want to say hello? We'd love to hear from you!</p>
+            <a href="mailto:your_email@example.com" class="btn contact-btn">Contact Us</a>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 DS. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+            const actionButtons = document.querySelectorAll('.action-btn');
+
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                    }
+                });
+            });
+
+            actionButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const targetLink = event.target.dataset.link;
+                    if (targetLink) {
+                        alert(`You would be redirected to: ${targetLink}`);
+                        // window.location.href = targetLink;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
