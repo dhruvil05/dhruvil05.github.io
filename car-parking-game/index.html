@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Parking Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .game-canvas {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: #333;
+            display: block;
+            margin: 0 auto;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .controls-desktop {
+            display: none;
+        }
+
+        .controls-mobile {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            user-select: none;
+        }
+
+        .control-btn:hover,
+        .control-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        .control-btn:nth-child(1) {
+            grid-column: 2;
+        }
+
+        .control-btn:nth-child(2) {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .control-btn:nth-child(3) {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .control-btn:nth-child(4) {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        .game-message {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .success {
+            color: #4CAF50;
+            animation: pulse 1s infinite;
+        }
+
+        .warning {
+            color: #FF9800;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .controls-desktop {
+                display: block;
+            }
+
+            .controls-mobile {
+                display: none;
+            }
+
+            .game-title {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 15px;
+            }
+
+            .game-title {
+                font-size: 2rem;
+            }
+
+            .game-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stat {
+                padding: 8px 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">🚗 Car Parking Challenge</h1>
+            <div class="game-stats">
+                <div class="stat">Level: <span id="level">1</span></div>
+                <div class="stat">Score: <span id="score">0</span></div>
+                <div class="stat">Time: <span id="time">0</span>s</div>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" class="game-canvas" width="600" height="400"></canvas>
+
+        <div class="controls">
+            <div class="controls-desktop">
+                <p>🎮 <strong>Controls:</strong></p>
+                <p>🔼 <strong>W/↑</strong> Forward • 🔽 <strong>S/↓</strong> Reverse • ◀️ <strong>A/←</strong> Left • ▶️
+                    <strong>D/→</strong> Right</p>
+                <p>🛑 <strong>Space</strong> Brake • 🔄 <strong>R</strong> Reset • 📯 <strong>H</strong> Horn</p>
+            </div>
+
+            <div class="controls-mobile">
+                <button class="control-btn" data-key="up">🔼</button>
+                <button class="control-btn" data-key="left">◀️</button>
+                <button class="control-btn" data-key="down">🔽</button>
+                <button class="control-btn" data-key="right">▶️</button>
+            </div>
+        </div>
+
+        <div class="game-message" id="gameMessage">Park your car in the green zone!</div>
+    </div>
+
+    <script>
+        class CarParkingGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.scoreElement = document.getElementById('score');
+                this.levelElement = document.getElementById('level');
+                this.timeElement = document.getElementById('time');
+                this.messageElement = document.getElementById('gameMessage');
+
+                this.setupResponsiveCanvas();
+                this.initGame();
+                this.bindEvents();
+                this.gameLoop();
+            }
+
+            setupResponsiveCanvas() {
+                const container = this.canvas.parentElement;
+                const maxWidth = Math.min(container.clientWidth - 40, 600);
+                const maxHeight = Math.min(window.innerHeight * 0.5, 400);
+
+                this.canvas.width = maxWidth;
+                this.canvas.height = maxHeight;
+
+                this.scale = maxWidth / 600;
+            }
+
+            initGame() {
+                this.car = {
+                    x: 50,
+                    y: 200,
+                    width: 40,
+                    height: 20,
+                    angle: 0,
+                    speed: 0,
+                    maxSpeed: 3,
+                    acceleration: 0.2,
+                    friction: 0.9,
+                    turnSpeed: 0.05
+                };
+
+                this.parkingSpot = {
+                    x: 500,
+                    y: 150,
+                    width: 80,
+                    height: 50
+                };
+
+                this.obstacles = [
+                    { x: 200, y: 100, width: 60, height: 30 },
+                    { x: 300, y: 300, width: 60, height: 30 },
+                    { x: 400, y: 50, width: 60, height: 30 }
+                ];
+
+                this.keys = {};
+                this.score = 0;
+                this.level = 1;
+                this.startTime = Date.now();
+                this.gameWon = false;
+                this.collided = false;
+
+                this.updateDisplay();
+            }
+
+            bindEvents() {
+                // Keyboard events
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.key] = true;
+
+                    // Additional key mappings for WASD
+                    if (e.key === 'w' || e.key === 'W') this.keys['ArrowUp'] = true;
+                    if (e.key === 's' || e.key === 'S') this.keys['ArrowDown'] = true;
+                    if (e.key === 'a' || e.key === 'A') this.keys['ArrowLeft'] = true;
+                    if (e.key === 'd' || e.key === 'D') this.keys['ArrowRight'] = true;
+
+                    // Space bar for brake/handbrake
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        this.keys['brake'] = true;
+                    }
+
+                    // R key to reset car position
+                    if (e.key === 'r' || e.key === 'R') {
+                        e.preventDefault();
+                        this.resetCarPosition();
+                    }
+
+                    // H key for horn sound effect
+                    if (e.key === 'h' || e.key === 'H') {
+                        e.preventDefault();
+                        this.playHorn();
+                    }
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.key] = false;
+
+                    // Additional key mappings for WASD
+                    if (e.key === 'w' || e.key === 'W') this.keys['ArrowUp'] = false;
+                    if (e.key === 's' || e.key === 'S') this.keys['ArrowDown'] = false;
+                    if (e.key === 'a' || e.key === 'A') this.keys['ArrowLeft'] = false;
+                    if (e.key === 'd' || e.key === 'D') this.keys['ArrowRight'] = false;
+
+                    // Space bar for brake/handbrake
+                    if (e.key === ' ') {
+                        this.keys['brake'] = false;
+                    }
+                });
+
+                // Mobile touch events
+                document.querySelectorAll('.control-btn').forEach(btn => {
+                    btn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        const key = btn.dataset.key;
+                        this.keys[key] = true;
+                    });
+
+                    btn.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        const key = btn.dataset.key;
+                        this.keys[key] = false;
+                    });
+
+                    btn.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        const key = btn.dataset.key;
+                        this.keys[key] = true;
+                    });
+
+                    btn.addEventListener('mouseup', (e) => {
+                        e.preventDefault();
+                        const key = btn.dataset.key;
+                        this.keys[key] = false;
+                    });
+                });
+
+                // Prevent context menu on mobile
+                document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+                // Resize event
+                window.addEventListener('resize', () => {
+                    this.setupResponsiveCanvas();
+                });
+            }
+
+            updateCar() {
+                if (this.gameWon) return;
+
+                let turning = 0;
+                let accelerating = 0;
+                let braking = false;
+
+                // Handle keyboard input
+                if (this.keys['ArrowUp'] || this.keys['up']) accelerating = 1;
+                if (this.keys['ArrowDown'] || this.keys['down']) accelerating = -1;
+                if (this.keys['ArrowLeft'] || this.keys['left']) turning = -1;
+                if (this.keys['ArrowRight'] || this.keys['right']) turning = 1;
+
+                // Handle brake
+                if (this.keys['brake']) braking = true;
+
+                // Apply acceleration
+                if (accelerating !== 0) {
+                    this.car.speed += accelerating * this.car.acceleration;
+                    this.car.speed = Math.max(-this.car.maxSpeed, Math.min(this.car.maxSpeed, this.car.speed));
+                }
+
+                // Apply braking
+                if (braking) {
+                    this.car.speed *= 0.8; // Stronger braking
+                } else {
+                    // Apply friction
+                    this.car.speed *= this.car.friction;
+                }
+
+                // Apply turning (only when moving)
+                if (Math.abs(this.car.speed) > 0.1) {
+                    this.car.angle += turning * this.car.turnSpeed * Math.abs(this.car.speed);
+                }
+
+                // Update position
+                this.car.x += Math.cos(this.car.angle) * this.car.speed;
+                this.car.y += Math.sin(this.car.angle) * this.car.speed;
+
+                // Keep car within bounds
+                this.car.x = Math.max(0, Math.min(this.canvas.width - this.car.width, this.car.x));
+                this.car.y = Math.max(0, Math.min(this.canvas.height - this.car.height, this.car.y));
+
+                // Check collisions
+                this.checkCollisions();
+
+                // Check parking
+                this.checkParking();
+            }
+
+            resetCarPosition() {
+                this.car.x = 50;
+                this.car.y = 200;
+                this.car.angle = 0;
+                this.car.speed = 0;
+                this.messageElement.textContent = "Car reset! Park in the green zone!";
+                this.messageElement.className = "game-message";
+            }
+
+            playHorn() {
+                // Create a simple beep sound using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'square';
+
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+
+            checkCollisions() {
+                this.collided = false;
+
+                for (let obstacle of this.obstacles) {
+                    if (this.car.x < obstacle.x + obstacle.width &&
+                        this.car.x + this.car.width > obstacle.x &&
+                        this.car.y < obstacle.y + obstacle.height &&
+                        this.car.y + this.car.height > obstacle.y) {
+
+                        this.collided = true;
+                        this.messageElement.textContent = "Collision! Be careful!";
+                        this.messageElement.className = "game-message warning";
+                        break;
+                    }
+                }
+
+                if (!this.collided && !this.gameWon) {
+                    this.messageElement.textContent = "Park your car in the green zone!";
+                    this.messageElement.className = "game-message";
+                }
+            }
+
+            checkParking() {
+                if (this.car.x > this.parkingSpot.x - 10 &&
+                    this.car.x + this.car.width < this.parkingSpot.x + this.parkingSpot.width + 10 &&
+                    this.car.y > this.parkingSpot.y - 10 &&
+                    this.car.y + this.car.height < this.parkingSpot.y + this.parkingSpot.height + 10 &&
+                    Math.abs(this.car.speed) < 0.5) {
+
+                    if (!this.gameWon) {
+                        this.gameWon = true;
+                        this.score += 100;
+                        this.messageElement.textContent = "Perfect Parking! 🎉";
+                        this.messageElement.className = "game-message success";
+
+                        setTimeout(() => {
+                            this.nextLevel();
+                        }, 2000);
+                    }
+                }
+            }
+
+            nextLevel() {
+                this.level++;
+                this.score += 50;
+                this.gameWon = false;
+
+                // Reset car position
+                this.car.x = 50;
+                this.car.y = 200;
+                this.car.angle = 0;
+                this.car.speed = 0;
+
+                // Add more obstacles
+                this.obstacles.push({
+                    x: Math.random() * (this.canvas.width - 60),
+                    y: Math.random() * (this.canvas.height - 30),
+                    width: 60,
+                    height: 30
+                });
+
+                this.messageElement.textContent = `Level ${this.level}! Park your car in the green zone!`;
+                this.messageElement.className = "game-message";
+
+                this.updateDisplay();
+            }
+
+            updateDisplay() {
+                this.scoreElement.textContent = this.score;
+                this.levelElement.textContent = this.level;
+                this.timeElement.textContent = Math.floor((Date.now() - this.startTime) / 1000);
+            }
+
+            draw() {
+                // Clear canvas
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw road
+                this.ctx.fillStyle = '#444';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw road lines
+                this.ctx.strokeStyle = '#fff';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([20, 10]);
+
+                // Horizontal lines
+                for (let y = 50; y < this.canvas.height; y += 100) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.canvas.width, y);
+                    this.ctx.stroke();
+                }
+
+                // Vertical lines
+                for (let x = 100; x < this.canvas.width; x += 120) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x, this.canvas.height);
+                    this.ctx.stroke();
+                }
+
+                this.ctx.setLineDash([]);
+
+                // Draw parking spot
+                this.ctx.fillStyle = this.gameWon ? '#4CAF50' : '#2E7D32';
+                this.ctx.fillRect(this.parkingSpot.x, this.parkingSpot.y, this.parkingSpot.width, this.parkingSpot.height);
+
+                this.ctx.strokeStyle = '#4CAF50';
+                this.ctx.lineWidth = 3;
+                this.ctx.strokeRect(this.parkingSpot.x, this.parkingSpot.y, this.parkingSpot.width, this.parkingSpot.height);
+
+                // Draw "P" in parking spot
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = '24px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('P', this.parkingSpot.x + this.parkingSpot.width / 2, this.parkingSpot.y + this.parkingSpot.height / 2 + 8);
+
+                // Draw obstacles
+                this.ctx.fillStyle = this.collided ? '#f44336' : '#666';
+                for (let obstacle of this.obstacles) {
+                    this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+                    // Draw car details on obstacles
+                    this.ctx.fillStyle = '#333';
+                    this.ctx.fillRect(obstacle.x + 5, obstacle.y + 5, obstacle.width - 10, obstacle.height - 10);
+                    this.ctx.fillStyle = this.collided ? '#f44336' : '#666';
+                }
+
+                // Draw car
+                this.ctx.save();
+                this.ctx.translate(this.car.x + this.car.width / 2, this.car.y + this.car.height / 2);
+                this.ctx.rotate(this.car.angle);
+
+                // Car body
+                this.ctx.fillStyle = this.collided ? '#f44336' : '#2196F3';
+                this.ctx.fillRect(-this.car.width / 2, -this.car.height / 2, this.car.width, this.car.height);
+
+                // Car windows
+                this.ctx.fillStyle = '#87CEEB';
+                this.ctx.fillRect(-this.car.width / 2 + 5, -this.car.height / 2 + 3, this.car.width - 10, this.car.height - 6);
+
+                // Car direction indicator
+                this.ctx.fillStyle = '#fff';
+                this.ctx.fillRect(this.car.width / 2 - 5, -3, 8, 6);
+
+                this.ctx.restore();
+            }
+
+            gameLoop() {
+                this.updateCar();
+                this.draw();
+                this.updateDisplay();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+        }
+
+        // Start game when page loads
+        window.addEventListener('load', () => {
+            new CarParkingGame();
+        });
+    </script>
+</body>
+
+</html>
