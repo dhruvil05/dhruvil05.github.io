@@ -11,7 +11,7 @@
             --bg: #111;
             --fg: #eee;
             --gap: .75rem;
-            --max-width: 1100px;
+            --max-width: 1100px
         }
 
         * {
@@ -28,7 +28,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: var(--gap);
+            gap: var(--gap)
         }
 
         h1 {
@@ -51,7 +51,8 @@
             gap: var(--gap)
         }
 
-        #signal button {
+        #signal button,
+        #startBtn {
             padding: .6rem 1rem;
             font-size: 1rem;
             border: none;
@@ -85,6 +86,11 @@
             touch-action: none
         }
 
+        #startBtn {
+            margin-top: var(--gap);
+            display: none
+        }
+
         @media(max-width:700px) {
             #main {
                 flex-direction: column
@@ -94,7 +100,7 @@
 </head>
 
 <body>
-    <h1>P2P Pong</h1>
+    <h1>Peer‑to‑Peer Pong (HTML + JS only)</h1>
     <div id="main">
         <div id="signal">
             <button id="createOffer">Create Offer (Player 1)</button>
@@ -105,12 +111,13 @@
         </div>
         <canvas id="game" width="600" height="400"></canvas>
     </div>
+    <button id="startBtn" disabled>Start Game</button>
 
     <script>
         const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-        let dataChannel, isInitiator = false;
+        let dataChannel, isInitiator = false, gameRunning = false;
         const $ = id => document.getElementById(id);
-        const createOfferBtn = $("createOffer"), createAnswerBtn = $("createAnswer"), setRemoteBtn = $("setRemote"), localSDP = $("localSDP"), remoteSDP = $("remoteSDP");
+        const createOfferBtn = $("createOffer"), createAnswerBtn = $("createAnswer"), setRemoteBtn = $("setRemote"), localSDP = $("localSDP"), remoteSDP = $("remoteSDP"), startBtn = $("startBtn");
 
         pc.onicecandidate = e => { if (!e.candidate) localSDP.value = JSON.stringify(pc.localDescription) };
         pc.ondatachannel = e => { dataChannel = e.channel; attachDataHandlers() };
@@ -118,6 +125,15 @@
         createOfferBtn.onclick = () => { isInitiator = true; dataChannel = pc.createDataChannel('game'); attachDataHandlers(); pc.createOffer().then(o => pc.setLocalDescription(o)) };
         createAnswerBtn.onclick = () => pc.createAnswer().then(a => pc.setLocalDescription(a));
         setRemoteBtn.onclick = () => { try { pc.setRemoteDescription(JSON.parse(remoteSDP.value)) } catch { alert('Invalid SDP JSON') } };
+
+        startBtn.onclick = () => {
+            if (startBtn.disabled) return;
+            gameRunning = true;
+            startBtn.style.display = 'none';
+            if (dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify({ type: 'start' }));
+            }
+        };
 
         const canvas = $("game"), ctx = canvas.getContext('2d');
         const W = canvas.width, H = canvas.height, pw = 10, ph = 60, br = 8;
@@ -128,26 +144,26 @@
         window.addEventListener('keyup', e => { if (blockKeys.includes(e.key)) e.preventDefault(); delete keys[e.key] }, { passive: false });
 
         function loop() {
-            if (isInitiator) updateBall();
-            updatePaddles();
+            if (gameRunning) {
+                if (isInitiator) updateBall();
+                updatePaddles();
+            }
             draw();
-            if (dataChannel && dataChannel.readyState === 'open') {
-                dataChannel.send(JSON.stringify({ type: 'state', paddles: state.paddles, ball: state.ball, scores: state.scores }))
+            if (gameRunning && dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify({ type: 'state', paddles: state.paddles, ball: state.ball, scores: state.scores }));
             }
             requestAnimationFrame(loop);
         }
 
         function updateBall() {
-            let b = state.ball;
+            const b = state.ball;
             b.x += b.vx; b.y += b.vy;
             if (b.y < br || b.y > H - br) b.vy *= -1;
             if (b.x < pw + br) {
-                if (b.y > state.paddles.left && b.y < state.paddles.left + ph) { b.vx *= -1; b.x = pw + br }
-                else score('right');
+                if (b.y > state.paddles.left && b.y < state.paddles.left + ph) { b.vx *= -1; b.x = pw + br; } else score('right');
             }
             if (b.x > W - pw - br) {
-                if (b.y > state.paddles.right && b.y < state.paddles.right + ph) { b.vx *= -1; b.x = W - pw - br }
-                else score('left');
+                if (b.y > state.paddles.right && b.y < state.paddles.right + ph) { b.vx *= -1; b.x = W - pw - br; } else score('left');
             }
         }
 
@@ -180,6 +196,10 @@
         }
 
         function attachDataHandlers() {
+            dataChannel.onopen = () => {
+                startBtn.disabled = false;
+                startBtn.style.display = 'inline-block';
+            };
             dataChannel.onmessage = e => {
                 const m = JSON.parse(e.data);
                 if (m.type === 'state') {
@@ -188,6 +208,9 @@
                     } else {
                         state.paddles.right = m.paddles.right;
                     }
+                } else if (m.type === 'start') {
+                    gameRunning = true;
+                    startBtn.style.display = 'none';
                 }
             };
         }
