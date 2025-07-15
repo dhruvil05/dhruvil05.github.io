@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peer‑to‑Peer Pong – Pure HTML/CSS/JS</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 1rem;
+            background: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h1 {
+            margin: 0.5rem 0;
+        }
+
+        #signal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        #signal button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: #2d8cf0;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #signal textarea {
+            width: 100%;
+            height: 10rem;
+            padding: 0.5rem;
+            background: #222;
+            color: #9f9;
+            border: 1px solid #444;
+            border-radius: 0.5rem;
+            resize: vertical;
+            grid-column: span 2;
+        }
+
+        canvas {
+            border: 4px solid #eee;
+            border-radius: 0.5rem;
+            background: #000;
+        }
+
+        @media (max-width: 700px) {
+            canvas {
+                width: 90vw;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>P2P Pong</h1>
+    <div id="signal">
+        <button id="createOffer">Create Offer (Player 1)</button>
+        <button id="createAnswer">Create Answer (Player 2)</button>
+        <textarea id="localSDP" placeholder="Local SDP will appear here – copy to the other peer"></textarea>
+        <textarea id="remoteSDP" placeholder="Paste remote SDP here, then click Set Remote"></textarea>
+        <button id="setRemote">Set Remote Description</button>
+    </div>
+
+    <canvas id="game" width="600" height="400"></canvas>
+
+    <script>
+        /*** === WebRTC setup === */
+        const pc = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        let dataChannel; // for game sync
+        let isInitiator = false;
+
+        // Get button references
+        const createOfferBtn = document.getElementById('createOffer');
+        const createAnswerBtn = document.getElementById('createAnswer');
+        const setRemoteBtn = document.getElementById('setRemote');
+        const localSDP = document.getElementById('localSDP');
+        const remoteSDP = document.getElementById('remoteSDP');
+
+        // ICE gathering handling
+        pc.onicecandidate = e => {
+            if (e.candidate) return; // Only output once gathering is complete
+            // Dump full SDP including ICE candidates
+            localSDP.value = JSON.stringify(pc.localDescription);
+        };
+
+        // Peer data channel events
+        pc.ondatachannel = e => {
+            dataChannel = e.channel;
+            attachDataHandlers();
+        };
+
+        function createOffer() {
+            isInitiator = true;
+            dataChannel = pc.createDataChannel('game');
+            attachDataHandlers();
+            pc.createOffer()
+                .then(offer => pc.setLocalDescription(offer));
+        }
+
+        function createAnswer() {
+            pc.createAnswer()
+                .then(ans => pc.setLocalDescription(ans));
+        }
+
+        function setRemote() {
+            try {
+                const desc = JSON.parse(remoteSDP.value);
+                pc.setRemoteDescription(desc);
+            } catch (err) {
+                alert('Invalid SDP JSON');
+            }
+        }
+
+        // Hook up buttons
+        createOfferBtn.onclick = createOffer;
+        createAnswerBtn.onclick = createAnswer;
+        setRemoteBtn.onclick = setRemote;
+
+        /*** === Game logic === */
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+
+        const W = canvas.width;
+        const H = canvas.height;
+        const paddleW = 10, paddleH = 60;
+        const ballR = 8;
+
+        // Game state
+        const state = {
+            paddles: { left: H / 2 - paddleH / 2, right: H / 2 - paddleH / 2 },
+            ball: { x: W / 2, y: H / 2, vx: 4, vy: 3 },
+            scores: { left: 0, right: 0 }
+        };
+
+        // Control flags
+        let keys = {};
+        window.addEventListener('keydown', e => keys[e.key] = true);
+        window.addEventListener('keyup', e => delete keys[e.key]);
+
+        function gameLoop() {
+            // Only initiator owns ball physics
+            if (isInitiator) {
+                updateBall();
+            }
+
+            updatePaddles();
+            draw();
+
+            // Send state at ~30 FPS
+            if (dataChannel && dataChannel.readyState === 'open') {
+                const payload = {
+                    type: 'state',
+                    paddles: state.paddles,
+                    ball: state.ball,
+                    scores: state.scores
+                };
+                dataChannel.send(JSON.stringify(payload));
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updateBall() {
+            let b = state.ball;
+            b.x += b.vx;
+            b.y += b.vy;
+
+            // Wall bounce
+            if (b.y < ballR || b.y > H - ballR) b.vy *= -1;
+
+            // Paddle collisions (simple AABB)
+            if (b.x < paddleW + ballR) {
+                if (b.y > state.paddles.left && b.y < state.paddles.left + paddleH) {
+                    b.vx *= -1;
+                    b.x = paddleW + ballR;
+                } else {
+                    score('right');
+                }
+            }
+            if (b.x > W - paddleW - ballR) {
+                if (b.y > state.paddles.right && b.y < state.paddles.right + paddleH) {
+                    b.vx *= -1;
+                    b.x = W - paddleW - ballR;
+                } else {
+                    score('left');
+                }
+            }
+        }
+
+        function score(side) {
+            state.scores[side]++;
+            Object.assign(state.ball, { x: W / 2, y: H / 2, vx: (Math.random() > 0.5 ? 4 : -4), vy: (Math.random() * 4 - 2) });
+        }
+
+        function updatePaddles() {
+            // Player mapping: Initiator controls left paddle (W/S); guest controls right (ArrowUp/Down)
+            if (isInitiator) {
+                if (keys['w'] || keys['W']) state.paddles.left -= 5;
+                if (keys['s'] || keys['S']) state.paddles.left += 5;
+            } else {
+                if (keys['ArrowUp']) state.paddles.right -= 5;
+                if (keys['ArrowDown']) state.paddles.right += 5;
+            }
+            // Clamp paddles
+            state.paddles.left = Math.max(0, Math.min(H - paddleH, state.paddles.left));
+            state.paddles.right = Math.max(0, Math.min(H - paddleH, state.paddles.right));
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            // Middle line
+            ctx.strokeStyle = '#444';
+            ctx.setLineDash([5, 15]);
+            ctx.beginPath();
+            ctx.moveTo(W / 2, 0);
+            ctx.lineTo(W / 2, H);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Paddles
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(0, state.paddles.left, paddleW, paddleH);
+            ctx.fillStyle = '#f00';
+            ctx.fillRect(W - paddleW, state.paddles.right, paddleW, paddleH);
+
+            // Ball
+            ctx.fillStyle = '#ff0';
+            ctx.beginPath();
+            ctx.arc(state.ball.x, state.ball.y, ballR, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Scoreboard
+            ctx.fillStyle = '#fff';
+            ctx.font = '32px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(state.scores.left, W / 4, 40);
+            ctx.fillText(state.scores.right, W * 3 / 4, 40);
+        }
+
+        function attachDataHandlers() {
+            dataChannel.onopen = () => console.log('DataChannel open');
+            dataChannel.onmessage = e => {
+                const msg = JSON.parse(e.data);
+                if (msg.type === 'state') {
+                    // Non‑owner updates local state from peer
+                    if (!isInitiator) {
+                        Object.assign(state, msg);
+                    } else {
+                        // Initiator receives remote paddle position only
+                        state.paddles.right = msg.paddles.right;
+                    }
+                }
+            };
+        }
+
+        // Kick off the loop
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+
+</html>
