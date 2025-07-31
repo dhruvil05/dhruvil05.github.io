@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA: Stacks and Queue Variants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #2c3e50;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 15px 25px;
+            background: #34495e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        .nav-tab.active {
+            background: #3498db;
+        }
+
+        .nav-tab:hover {
+            background: #2980b9;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .single-column {
+            grid-template-columns: 1fr;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .explanation {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls input,
+        .controls select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .controls button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .add-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .view-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .clear-btn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .visualization {
+            min-height: 200px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+            background: linear-gradient(to top, #ecf0f1, #ffffff);
+            margin-bottom: 15px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .queue-visualization {
+            align-items: center;
+            flex-direction: row;
+        }
+
+        .circular-visualization {
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        .stack-item,
+        .queue-item {
+            min-width: 50px;
+            height: 40px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            border: 2px solid #2980b9;
+            font-size: 14px;
+        }
+
+        .queue-item {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            border: 2px solid #c0392b;
+        }
+
+        .deque-item {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            border: 2px solid #8e44ad;
+        }
+
+        .priority-item {
+            background: linear-gradient(45deg, #f39c12, #d68910);
+            border: 2px solid #d68910;
+            position: relative;
+        }
+
+        .priority-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circular-queue {
+            width: 250px;
+            height: 250px;
+            border: 3px solid #3498db;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circular-item {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #16a085, #1abc9c);
+            border: 2px solid #16a085;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .front-pointer,
+        .rear-pointer {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+        }
+
+        .front-pointer {
+            border-bottom: 15px solid #e74c3c;
+            top: -20px;
+        }
+
+        .rear-pointer {
+            border-top: 15px solid #f39c12;
+            bottom: -20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .complexity {
+            background: #d5dbdb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .complexity h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .complexity-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .operation-log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover {
+            background: #e3f2fd;
+        }
+
+        .arrow {
+            font-size: 20px;
+            color: #e74c3c;
+            margin: 0 5px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+
+            .nav-tab {
+                flex: 1;
+                min-width: 100px;
+                padding: 12px 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls input,
+            .controls button,
+            .controls select {
+                width: 100%;
+            }
+
+            .visualization {
+                min-height: 150px;
+                padding: 10px;
+            }
+
+            .circular-queue {
+                width: 200px;
+                height: 200px;
+            }
+
+            .comparison-table {
+                font-size: 12px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Queue Variants</h1>
+            <p>Interactive visualization of linear data structures and their variants</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('stack')">📚 Stack</button>
+            <button class="nav-tab" onclick="showTab('simple-queue')">🚶‍♂️ Simple Queue</button>
+            <button class="nav-tab" onclick="showTab('circular-queue')">🔄 Circular Queue</button>
+            <button class="nav-tab" onclick="showTab('deque')">↔️ Deque</button>
+            <button class="nav-tab" onclick="showTab('priority-queue')">⭐ Priority Queue</button>
+            <button class="nav-tab" onclick="showTab('comparison')">📊 Comparison</button>
+        </div>
+
+        <!-- Stack Tab -->
+        <div class="tab-content active" id="stack">
+            <div class="content">
+                <div class="section">
+                    <h2>📚 Stack (LIFO)</h2>
+                    <div class="explanation">
+                        A stack follows Last In, First Out (LIFO) principle. Like a stack of plates, you can only add or
+                        remove elements from the top.
+                    </div>
+                    <div class="controls">
+                        <input type="text" id="stackInput" placeholder="Enter value" maxlength="10">
+                        <button class="add-btn" onclick="pushStack()">Push</button>
+                        <button class="remove-btn" onclick="popStack()">Pop</button>
+                        <button class="view-btn" onclick="peekStack()">Peek</button>
+                        <button class="clear-btn" onclick="clearStack()">Clear</button>
+                    </div>
+                    <div class="visualization" id="stackViz">
+                        <div style="color: #7f8c8d; font-style: italic;">Stack is empty</div>
+                    </div>
+                    <div class="info">
+                        <div class="info-item"><span>Size:</span><span id="stackSize">0</span></div>
+                        <div class="info-item"><span>Top:</span><span id="stackTop">None</span></div>
+                        <div class="info-item"><span>Empty:</span><span id="stackEmpty">true</span></div>
+                    </div>
+                    <div class="complexity">
+                        <h4>Time Complexity:</h4>
+                        <div class="complexity-item"><span>Push:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Pop:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Peek:</span><span>O(1)</span></div>
+                    </div>
+                    <div class="operation-log" id="stackLog">Stack operations will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple Queue Tab -->
+        <div class="tab-content" id="simple-queue">
+            <div class="content">
+                <div class="section">
+                    <h2>🚶‍♂️ Simple Queue (FIFO)</h2>
+                    <div class="explanation">
+                        A simple queue follows First In, First Out (FIFO) principle. Elements are added at the rear and
+                        removed from the front, like a line of people.
+                    </div>
+                    <div class="controls">
+                        <input type="text" id="queueInput" placeholder="Enter value" maxlength="10">
+                        <button class="add-btn" onclick="enqueue()">Enqueue</button>
+                        <button class="remove-btn" onclick="dequeue()">Dequeue</button>
+                        <button class="view-btn" onclick="frontQueue()">Front</button>
+                        <button class="view-btn" onclick="rearQueue()">Rear</button>
+                        <button class="clear-btn" onclick="clearQueue()">Clear</button>
+                    </div>
+                    <div class="visualization queue-visualization" id="queueViz">
+                        <div style="color: #7f8c8d; font-style: italic;">Queue is empty</div>
+                    </div>
+                    <div class="info">
+                        <div class="info-item"><span>Size:</span><span id="queueSize">0</span></div>
+                        <div class="info-item"><span>Front:</span><span id="queueFront">None</span></div>
+                        <div class="info-item"><span>Rear:</span><span id="queueRear">None</span></div>
+                        <div class="info-item"><span>Empty:</span><span id="queueEmpty">true</span></div>
+                    </div>
+                    <div class="complexity">
+                        <h4>Time Complexity:</h4>
+                        <div class="complexity-item"><span>Enqueue:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Dequeue:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Front/Rear:</span><span>O(1)</span></div>
+                    </div>
+                    <div class="operation-log" id="queueLog">Queue operations will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Circular Queue Tab -->
+        <div class="tab-content" id="circular-queue">
+            <div class="content">
+                <div class="section">
+                    <h2>🔄 Circular Queue</h2>
+                    <div class="explanation">
+                        A circular queue connects the rear and front positions, forming a circle. This efficiently uses
+                        memory by reusing empty spaces created after dequeue operations.
+                    </div>
+                    <div class="controls">
+                        <input type="text" id="circularInput" placeholder="Enter value" maxlength="10">
+                        <button class="add-btn" onclick="circularEnqueue()">Enqueue</button>
+                        <button class="remove-btn" onclick="circularDequeue()">Dequeue</button>
+                        <button class="view-btn" onclick="circularFront()">Front</button>
+                        <button class="view-btn" onclick="circularRear()">Rear</button>
+                        <button class="clear-btn" onclick="clearCircular()">Clear</button>
+                    </div>
+                    <div class="visualization circular-visualization" id="circularViz">
+                        <div class="circular-queue">
+                            <div style="color: #7f8c8d; font-style: italic; text-align: center;">Circular Queue<br>(Max
+                                8 items)</div>
+                        </div>
+                    </div>
+                    <div class="info">
+                        <div class="info-item"><span>Size:</span><span id="circularSize">0</span></div>
+                        <div class="info-item"><span>Front Index:</span><span id="circularFrontIdx">-1</span></div>
+                        <div class="info-item"><span>Rear Index:</span><span id="circularRearIdx">-1</span></div>
+                        <div class="info-item"><span>Is Full:</span><span id="circularFull">false</span></div>
+                    </div>
+                    <div class="complexity">
+                        <h4>Time Complexity:</h4>
+                        <div class="complexity-item"><span>Enqueue:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Dequeue:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Space Efficient:</span><span>Yes</span></div>
+                    </div>
+                    <div class="operation-log" id="circularLog">Circular queue operations will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deque Tab -->
+        <div class="tab-content" id="deque">
+            <div class="content">
+                <div class="section">
+                    <h2>↔️ Double Ended Queue (Deque)</h2>
+                    <div class="explanation">
+                        A deque allows insertion and deletion at both ends. It combines the functionality of both stack
+                        and queue, providing maximum flexibility.
+                    </div>
+                    <div class="controls">
+                        <input type="text" id="dequeInput" placeholder="Enter value" maxlength="10">
+                        <button class="add-btn" onclick="addFront()">Add Front</button>
+                        <button class="add-btn" onclick="addRear()">Add Rear</button>
+                        <button class="remove-btn" onclick="removeFront()">Remove Front</button>
+                        <button class="remove-btn" onclick="removeRear()">Remove Rear</button>
+                        <button class="clear-btn" onclick="clearDeque()">Clear</button>
+                    </div>
+                    <div class="visualization queue-visualization" id="dequeViz">
+                        <div style="color: #7f8c8d; font-style: italic;">Deque is empty</div>
+                    </div>
+                    <div class="info">
+                        <div class="info-item"><span>Size:</span><span id="dequeSize">0</span></div>
+                        <div class="info-item"><span>Front:</span><span id="dequeFront">None</span></div>
+                        <div class="info-item"><span>Rear:</span><span id="dequeRear">None</span></div>
+                        <div class="info-item"><span>Empty:</span><span id="dequeEmpty">true</span></div>
+                    </div>
+                    <div class="complexity">
+                        <h4>Time Complexity:</h4>
+                        <div class="complexity-item"><span>Add Front/Rear:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Remove Front/Rear:</span><span>O(1)</span></div>
+                        <div class="complexity-item"><span>Access:</span><span>O(1)</span></div>
+                    </div>
+                    <div class="operation-log" id="dequeLog">Deque operations will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Queue Tab -->
+        <div class="tab-content" id="priority-queue">
+            <div class="content">
+                <div class="section">
+                    <h2>⭐ Priority Queue</h2>
+                    <div class="explanation">
+                        A priority queue processes elements based on their priority, not their insertion order. Higher
+                        priority elements are dequeued first.
+                    </div>
+                    <div class="controls">
+                        <input type="text" id="priorityInput" placeholder="Enter value" maxlength="10">
+                        <select id="prioritySelect">
+                            <option value="1">Priority 1 (Highest)</option>
+                            <option value="2">Priority 2</option>
+                            <option value="3">Priority 3</option>
+                            <option value="4">Priority 4</option>
+                            <option value="5">Priority 5 (Lowest)</option>
+                        </select>
+                        <button class="add-btn" onclick="priorityEnqueue()">Enqueue</button>
+                        <button class="remove-btn" onclick="priorityDequeue()">Dequeue</button>
+                        <button class="view-btn" onclick="priorityPeek()">Peek</button>
+                        <button class="clear-btn" onclick="clearPriority()">Clear</button>
+                    </div>
+                    <div class="visualization queue-visualization" id="priorityViz">
+                        <div style="color: #7f8c8d; font-style: italic;">Priority queue is empty</div>
+                    </div>
+                    <div class="info">
+                        <div class="info-item"><span>Size:</span><span id="prioritySize">0</span></div>
+                        <div class="info-item"><span>Highest Priority:</span><span id="priorityTop">None</span></div>
+                        <div class="info-item"><span>Empty:</span><span id="priorityEmpty">true</span></div>
+                    </div>
+                    <div class="complexity">
+                        <h4>Time Complexity:</h4>
+                        <div class="complexity-item"><span>Enqueue:</span><span>O(log n)</span></div>
+                        <div class="complexity-item"><span>Dequeue:</span><span>O(log n)</span></div>
+                        <div class="complexity-item"><span>Peek:</span><span>O(1)</span></div>
+                    </div>
+                    <div class="operation-log" id="priorityLog">Priority queue operations will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Tab -->
+        <div class="tab-content" id="comparison">
+            <div class="content single-column">
+                <div class="section">
+                    <h2>📊 Queue Variants Comparison</h2>
+                    <div class="explanation">
+                        Here's a comprehensive comparison of all queue variants, highlighting their key differences, use
+                        cases, and characteristics.
+                    </div>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Simple Queue</th>
+                                <th>Circular Queue</th>
+                                <th>Deque</th>
+                                <th>Priority Queue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Insertion</strong></td>
+                                <td>Rear only</td>
+                                <td>Rear only</td>
+                                <td>Both ends</td>
+                                <td>Based on priority</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Deletion</strong></td>
+                                <td>Front only</td>
+                                <td>Front only</td>
+                                <td>Both ends</td>
+                                <td>Highest priority first</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Memory Usage</strong></td>
+                                <td>Linear, may waste space</td>
+                                <td>Circular, space efficient</td>
+                                <td>Linear, flexible</td>
+                                <td>Heap-based, dynamic</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Order</strong></td>
+                                <td>FIFO (First In, First Out)</td>
+                                <td>FIFO (First In, First Out)</td>
+                                <td>Flexible (FIFO/LIFO)</td>
+                                <td>Priority-based</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Enqueue Time</strong></td>
+                                <td>O(1)</td>
+                                <td>O(1)</td>
+                                <td>O(1)</td>
+                                <td>O(log n)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dequeue Time</strong></td>
+                                <td>O(1)</td>
+                                <td>O(1)</td>
+                                <td>O(1)</td>
+                                <td>O(log n)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Space Complexity</strong></td>
+                                <td>O(n)</td>
+                                <td>O(n)</td>
+                                <td>O(n)</td>
+                                <td>O(n)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Use Cases</strong></td>
+                                <td>Task scheduling, BFS</td>
+                                <td>Buffer management, OS scheduling</td>
+                                <td>Undo/Redo operations, sliding window</td>
+                                <td>Dijkstra's algorithm, task scheduling</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Advantages</strong></td>
+                                <td>Simple implementation</td>
+                                <td>No memory waste, efficient</td>
+                                <td>Maximum flexibility</td>
+                                <td>Automatic ordering by priority</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Disadvantages</strong></td>
+                                <td>Memory waste after dequeue</td>
+                                <td>Fixed size limitation</td>
+                                <td>More complex than simple queue</td>
+                                <td>Higher time complexity, more memory</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Implementation</strong></td>
+                                <td>Array or Linked List</td>
+                                <td>Array with modular arithmetic</td>
+                                <td>Doubly Linked List or Dynamic Array</td>
+                                <td>Heap (Binary Tree)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Simple FIFO operations</td>
+                                <td>Fixed-size buffer applications</td>
+                                <td>Flexible insertion/deletion needs</td>
+                                <td>Priority-based processing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Structure Implementations
+        class Stack {
+            constructor() { this.items = []; }
+            push(element) { this.items.push(element); }
+            pop() { return this.isEmpty() ? null : this.items.pop(); }
+            peek() { return this.isEmpty() ? null : this.items[this.items.length - 1]; }
+            isEmpty() { return this.items.length === 0; }
+            size() { return this.items.length; }
+            clear() { this.items = []; }
+        }
+
+        class SimpleQueue {
+            constructor() { this.items = []; }
+            enqueue(element) { this.items.push(element); }
+            dequeue() { return this.isEmpty() ? null : this.items.shift(); }
+            front() { return this.isEmpty() ? null : this.items[0]; }
+            rear() { return this.isEmpty() ? null : this.items[this.items.length - 1]; }
+            isEmpty() { return this.items.length === 0; }
+            size() { return this.items.length; }
+            clear() { this.items = []; }
+        }
+
+        class CircularQueue {
+            constructor(maxSize = 8) {
+                this.items = new Array(maxSize);
+                this.maxSize = maxSize;
+                this.front = -1;
+                this.rear = -1;
+                this.count = 0;
+            }
+
+            enqueue(element) {
+                if (this.isFull()) return false;
+                if (this.isEmpty()) {
+                    this.front = 0;
+                    this.rear = 0;
+                } else {
+                    this.rear = (this.rear + 1) % this.maxSize;
+                }
+                this.items[this.rear] = element;
+                this.count++;
+                return true;
+            }
+
+            dequeue() {
+                if (this.isEmpty()) return null;
+                const item = this.items[this.front];
+                this.items[this.front] = undefined;
+                if (this.count === 1) {
+                    this.front = -1;
+                    this.rear = -1;
+                } else {
+                    this.front = (this.front + 1) % this.maxSize;
+                }
+                this.count--;
+                return item;
+            }
+
+            frontElement() { return this.isEmpty() ? null : this.items[this.front]; }
+            rearElement() { return this.isEmpty() ? null : this.items[this.rear]; }
+            isEmpty() { return this.count === 0; }
+            isFull() { return this.count === this.maxSize; }
+            size() { return this.count; }
+            clear() {
+                this.items = new Array(this.maxSize);
+                this.front = -1;
+                this.rear = -1;
+                this.count = 0;
+            }
+        }
+
+        class Deque {
+            constructor() { this.items = []; }
+            addFront(element) { this.items.unshift(element); }
+            addRear(element) { this.items.push(element); }
+            removeFront() { return this.isEmpty() ? null : this.items.shift(); }
+            removeRear() { return this.isEmpty() ? null : this.items.pop(); }
+            front() { return this.isEmpty() ? null : this.items[0]; }
+            rear() { return this.isEmpty() ? null : this.items[this.items.length - 1]; }
+            isEmpty() { return this.items.length === 0; }
+            size() { return this.items.length; }
+            clear() { this.items = []; }
+        }
+
+        class PriorityQueue {
+            constructor() { this.items = []; }
+
+            enqueue(element, priority) {
+                const item = { element, priority };
+                let added = false;
+
+                for (let i = 0; i < this.items.length; i++) {
+                    if (item.priority < this.items[i].priority) {
+                        this.items.splice(i, 0, item);
+                        added = true;
+                        break;
+                    }
+                }
+
+                if (!added) {
+                    this.items.push(item);
+                }
+            }
+
+            dequeue() { return this.isEmpty() ? null : this.items.shift(); }
+            peek() { return this.isEmpty() ? null : this.items[0]; }
+            isEmpty() { return this.items.length === 0; }
+            size() { return this.items.length; }
+            clear() { this.items = []; }
+        }
+
+        // Initialize data structures
+        const stack = new Stack();
+        const queue = new SimpleQueue();
+        const circularQueue = new CircularQueue(8);
+        const deque = new Deque();
+        const priorityQueue = new PriorityQueue();
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Stack Functions
+        function pushStack() {
+            const input = document.getElementById('stackInput');
+            const value = input.value.trim();
+            if (!value) { alert('Please enter a value'); return; }
+
+            stack.push(value);
+            input.value = '';
+            updateStackDisplay();
+            logOperation('stackLog', `PUSH: ${value}`);
+        }
+
+        function popStack() {
+            const popped = stack.pop();
+            if (popped === null) {
+                alert('Stack is empty!');
+                logOperation('stackLog', 'POP: Stack is empty');
+                return;
+            }
+            updateStackDisplay();
+            logOperation('stackLog', `POP: ${popped}`);
+        }
+
+        function peekStack() {
+            const top = stack.peek();
+            if (top === null) {
+                alert('Stack is empty!');
+                logOperation('stackLog', 'PEEK: Stack is empty');
+            } else {
+                alert(`Top element: ${top}`);
+                logOperation('stackLog', `PEEK: ${top}`);
+            }
+        }
+
+        function clearStack() {
+            stack.clear();
+            updateStackDisplay();
+            logOperation('stackLog', 'CLEAR: Stack cleared');
+        }
+
+        function updateStackDisplay() {
+            const viz = document.getElementById('stackViz');
+            const items = stack.items;
+
+            if (items.length === 0) {
+                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Stack is empty</div>';
+            } else {
+                viz.innerHTML = items.map(item =>
+                    `<div class="stack-item">${item}</div>`
+                ).join('');
+            }
+
+            document.getElementById('stackSize').textContent = stack.size();
+            document.getElementById('stackTop').textContent = stack.peek() || 'None';
+            document.getElementById('stackEmpty').textContent = stack.isEmpty();
+        }
+
+        // Simple Queue Functions
+        function enqueue() {
+            const input = document.getElementById('queueInput');
+            const value = input.value.trim();
+            if (!value) { alert('Please enter a value'); return; }
+
+            queue.enqueue(value);
+            input.value = '';
+            updateQueueDisplay();
+            logOperation('queueLog', `ENQUEUE: ${value}`);
+        }
+
+        function dequeue() {
+            const dequeued = queue.dequeue();
+            if (dequeued === null) {
+                alert('Queue is empty!');
+                logOperation('queueLog', 'DEQUEUE: Queue is empty');
+                return;
+            }
+            updateQueueDisplay();
+            logOperation('queueLog', `DEQUEUE: ${dequeued}`);
+        }
+
+        function frontQueue() {
+            const front = queue.front();
+            if (front === null) {
+                alert('Queue is empty!');
+                logOperation('queueLog', 'FRONT: Queue is empty');
+            } else {
+                alert(`Front element: ${front}`);
+                logOperation('queueLog', `FRONT: ${front}`);
+            }
+        }
+
+        function rearQueue() {
+            const rear = queue.rear();
+            if (rear === null) {
+                alert('Queue is empty!');
+                logOperation('queueLog', 'REAR: Queue is empty');
+            } else {
+                alert(`Rear element: ${rear}`);
+                logOperation('queueLog', `REAR: ${rear}`);
+            }
+        }
+
+        function clearQueue() {
+            queue.clear();
+            updateQueueDisplay();
+            logOperation('queueLog', 'CLEAR: Queue cleared');
+        }
+
+        function updateQueueDisplay() {
+            const viz = document.getElementById('queueViz');
+            const items = queue.items;
+
+            if (items.length === 0) {
+                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Queue is empty</div>';
+            } else {
+                let html = '<span style="font-size: 12px; color: #e74c3c; margin-right: 10px;">FRONT →</span>';
+                html += items.map(item =>
+                    `<div class="queue-item">${item}</div>`
+                ).join('<span class="arrow">→</span>');
+                html += '<span style="font-size: 12px; color: #e74c3c; margin-left: 10px;">← REAR</span>';
+                viz.innerHTML = html;
+            }
+
+            document.getElementById('queueSize').textContent = queue.size();
+            document.getElementById('queueFront').textContent = queue.front() || 'None';
+            document.getElementById('queueRear').textContent = queue.rear() || 'None';
+            document.getElementById('queueEmpty').textContent = queue.isEmpty();
+        }
+
+        // Circular Queue Functions
+        function circularEnqueue() {
+            const input = document.getElementById('circularInput');
+            const value = input.value.trim();
+            if (!value) { alert('Please enter a value'); return; }
+
+            if (circularQueue.isFull()) {
+                alert('Circular queue is full!');
+                logOperation('circularLog', 'ENQUEUE: Queue is full');
+                return;
+            }
+
+            circularQueue.enqueue(value);
+            input.value = '';
+            updateCircularDisplay();
+            logOperation('circularLog', `ENQUEUE: ${value}`);
+        }
+
+        function circularDequeue() {
+            const dequeued = circularQueue.dequeue();
+            if (dequeued === null) {
+                alert('Circular queue is empty!');
+                logOperation('circularLog', 'DEQUEUE: Queue is empty');
+                return;
+            }
+            updateCircularDisplay();
+            logOperation('circularLog', `DEQUEUE: ${dequeued}`);
+        }
+
+        function circularFront() {
+            const front = circularQueue.frontElement();
+            if (front === null) {
+                alert('Circular queue is empty!');
+                logOperation('circularLog', 'FRONT: Queue is empty');
+            } else {
+                alert(`Front element: ${front}`);
+                logOperation('circularLog', `FRONT: ${front}`);
+            }
+        }
+
+        function circularRear() {
+            const rear = circularQueue.rearElement();
+            if (rear === null) {
+                alert('Circular queue is empty!');
+                logOperation('circularLog', 'REAR: Queue is empty');
+            } else {
+                alert(`Rear element: ${rear}`);
+                logOperation('circularLog', `REAR: ${rear}`);
+            }
+        }
+
+        function clearCircular() {
+            circularQueue.clear();
+            updateCircularDisplay();
+            logOperation('circularLog', 'CLEAR: Circular queue cleared');
+        }
+
+        function updateCircularDisplay() {
+            const viz = document.getElementById('circularViz');
+            const queue = circularQueue;
+
+            if (queue.isEmpty()) {
+                viz.innerHTML = `
+                    <div class="circular-queue">
+                        <div style="color: #7f8c8d; font-style: italic; text-align: center;">Circular Queue<br>(Max 8 items)</div>
+                    </div>
+                `;
+            } else {
+                let html = '<div class="circular-queue">';
+
+                // Create 8 positions in circle
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i * 45) - 90; // Start from top
+                    const x = Math.cos(angle * Math.PI / 180) * 90;
+                    const y = Math.sin(angle * Math.PI / 180) * 90;
+
+                    if (queue.items[i] !== undefined) {
+                        html += `<div class="circular-item" style="transform: translate(${x}px, ${y}px);">${queue.items[i]}`;
+                        if (i === queue.front) html += '<div class="front-pointer" title="Front"></div>';
+                        if (i === queue.rear) html += '<div class="rear-pointer" title="Rear"></div>';
+                        html += '</div>';
+                    }
+                }
+
+                html += '</div>';
+                viz.innerHTML = html;
+            }
+
+            document.getElementById('circularSize').textContent = queue.size();
+            document.getElementById('circularFrontIdx').textContent = queue.front;
+            document.getElementById('circularRearIdx').textContent = queue.rear;
+            document.getElementById('circularFull').textContent = queue.isFull();
+        }
+
+        // Deque Functions
+        function addFront() {
+            const input = document.getElementById('dequeInput');
+            const value = input.value.trim();
+            if (!value) { alert('Please enter a value'); return; }
+
+            deque.addFront(value);
+            input.value = '';
+            updateDequeDisplay();
+            logOperation('dequeLog', `ADD_FRONT: ${value}`);
+        }
+
+        function addRear() {
+            const input = document.getElementById('dequeInput');
+            const value = input.value.trim();
+            if (!value) { alert('Please enter a value'); return; }
+
+            deque.addRear(value);
+            input.value = '';
+            updateDequeDisplay();
+            logOperation('dequeLog', `ADD_REAR: ${value}`);
+        }
+
+        function removeFront() {
+            const removed = deque.removeFront();
+            if (removed === null) {
+                alert('Deque is empty!');
+                logOperation('dequeLog', 'REMOVE_FRONT: Deque is empty');
+                return;
+            }
+            updateDequeDisplay();
+            logOperation('dequeLog', `REMOVE_FRONT: ${removed}`);
+        }
+
+        function removeRear() {
+            const removed = deque.removeRear();
+            if (removed === null) {
+                alert('Deque is empty!');
+                logOperation('dequeLog', 'REMOVE_REAR: Deque is empty');
+                return;
+            }
+            updateDequeDisplay();
+            logOperation('dequeLog', `REMOVE_REAR: ${removed}`);
+        }
+
+        function clearDeque() {
+            deque.clear();
+            updateDequeDisplay();
+            logOperation('dequeLog', 'CLEAR: Deque cleared');
+        }
+
+        function updateDequeDisplay() {
+            const viz = document.getElementById('dequeViz');
+            const items = deque.items;
+
+            if (items.length === 0) {
+                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Deque is empty</div>';
+            } else {
+                let html = '<span style="font-size: 12px; color: #9b59b6; margin-right: 10px;">FRONT ↔</span>';
+                html += items.map(item =>
+                    `<div class="deque-item">${item}</div>`
+                ).join('<span class="arrow">↔</span>');
+                html += '<span style="font-size: 12px; color: #9b59b6; margin-left: 10px;">↔ REAR</span>';
+                viz.innerHTML = html;
+            }
+
+            document.getElementById('dequeSize').textContent = deque.size();
+            document.getElementById('dequeFront').textContent = deque.front() || 'None';
+            document.getElementById('dequeRear').textContent = deque.rear() || 'None';
+            document.getElementById('dequeEmpty').textContent = deque.isEmpty();
+        }
+
+        // Priority Queue Functions
+        function priorityEnqueue() {
+            const input = document.getElementById('priorityInput');
+            const prioritySelect = document.getElementById('prioritySelect');
+            const value = input.value.trim();
+            const priority = parseInt(prioritySelect.value);
+
+            if (!value) { alert('Please enter a value'); return; }
+
+            priorityQueue.enqueue(value, priority);
+            input.value = '';
+            updatePriorityDisplay();
+            logOperation('priorityLog', `ENQUEUE: ${value} (Priority ${priority})`);
+        }
+
+        function priorityDequeue() {
+            const dequeued = priorityQueue.dequeue();
+            if (dequeued === null) {
+                alert('Priority queue is empty!');
+                logOperation('priorityLog', 'DEQUEUE: Queue is empty');
+                return;
+            }
+            updatePriorityDisplay();
+            logOperation('priorityLog', `DEQUEUE: ${dequeued.element} (Priority ${dequeued.priority})`);
+        }
+
+        function priorityPeek() {
+            const top = priorityQueue.peek();
+            if (top === null) {
+                alert('Priority queue is empty!');
+                logOperation('priorityLog', 'PEEK: Queue is empty');
+            } else {
+                alert(`Highest priority element: ${top.element} (Priority ${top.priority})`);
+                logOperation('priorityLog', `PEEK: ${top.element} (Priority ${top.priority})`);
+            }
+        }
+
+        function clearPriority() {
+            priorityQueue.clear();
+            updatePriorityDisplay();
+            logOperation('priorityLog', 'CLEAR: Priority queue cleared');
+        }
+
+        function updatePriorityDisplay() {
+            const viz = document.getElementById('priorityViz');
+            const items = priorityQueue.items;
+
+            if (items.length === 0) {
+                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Priority queue is empty</div>';
+            } else {
+                let html = '<span style="font-size: 12px; color: #f39c12; margin-right: 10px;">HIGH →</span>';
+                html += items.map(item =>
+                    `<div class="priority-item">${item.element}<div class="priority-badge">${item.priority}</div></div>`
+                ).join('<span class="arrow">→</span>');
+                html += '<span style="font-size: 12px; color: #f39c12; margin-left: 10px;">← LOW</span>';
+                viz.innerHTML = html;
+            }
+
+            document.getElementById('prioritySize').textContent = priorityQueue.size();
+            const topItem = priorityQueue.peek();
+            document.getElementById('priorityTop').textContent = topItem ? `${topItem.element} (P${topItem.priority})` : 'None';
+            document.getElementById('priorityEmpty').textContent = priorityQueue.isEmpty();
+        }
+
+        function logOperation(logId, operation) {
+            const log = document.getElementById(logId);
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${operation}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Enter key support
+        document.getElementById('stackInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') pushStack();
+        });
+        document.getElementById('queueInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') enqueue();
+        });
+        document.getElementById('circularInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') circularEnqueue();
+        });
+        document.getElementById('dequeInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addRear();
+        });
+        document.getElementById('priorityInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') priorityEnqueue();
+        });
+
+        // Initialize displays
+        updateStackDisplay();
+        updateQueueDisplay();
+        updateCircularDisplay();
+        updateDequeDisplay();
+        updatePriorityDisplay();
+    </script>
+</body>
+
+</html>
