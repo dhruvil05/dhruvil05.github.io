@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>npm & Package.json Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f5576c;
+        }
+
+        .topic {
+            background: #fff5f5;
+            border-left: 4px solid #f5576c;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .topic:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.2);
+        }
+
+        .topic-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #c53030;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+
+        .topic-content {
+            color: #4a5568;
+            line-height: 1.8;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .topic-content.active {
+            max-height: 2000px;
+            margin-top: 15px;
+        }
+
+        .topic-content p {
+            margin-bottom: 10px;
+        }
+
+        .method-list {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .method {
+            font-family: 'Courier New', monospace;
+            background: #fed7d7;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 0.95rem;
+            color: #742a2a;
+            font-weight: 600;
+        }
+
+        .command-description {
+            margin: 5px 0 15px 0;
+            color: #2d3748;
+            font-style: italic;
+        }
+
+        .npm-icon {
+            display: inline-block;
+            background: #cc3534;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .example-box {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .example-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .topic-header {
+                font-size: 1.1rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Working with npm & Package.json</h1>
+            <p>Complete guide to Node Package Manager and package configuration</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">Common Commands</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span><span class="npm-icon">npm</span>Initialize Project</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong>Command:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm init -y</div>
+                            <p class="command-description">Initialize a new package.json file with default values</p>
+                        </div>
+                        <p>This command creates a package.json file in your project directory. The <span
+                                class="method">-y</span> flag accepts all default options automatically.</p>
+                        <div class="example-box">
+                            <div class="example-title">What it does:</div>
+                            <p>✓ Creates package.json with project metadata</p>
+                            <p>✓ Sets up basic project structure</p>
+                            <p>✓ Prepares project for dependency management</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span><span class="npm-icon">npm</span>Install Packages</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong>Install a specific package:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm install express</div>
+                            <p class="command-description">Installs the express package and adds it to dependencies</p>
+                        </div>
+
+                        <p><strong>Install all dependencies:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm install</div>
+                            <p class="command-description">Installs all packages listed in package.json</p>
+                        </div>
+
+                        <p><strong>Install as dev dependency:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm install --save-dev jest</div>
+                            <div class="method">npm install -D nodemon</div>
+                            <p class="command-description">Installs packages only needed during development</p>
+                        </div>
+
+                        <p><strong>Install globally:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm install -g nodemon</div>
+                            <p class="command-description">Installs package globally on your system</p>
+                        </div>
+
+                        <div class="example-box">
+                            <div class="example-title">Common packages to install:</div>
+                            <p><span class="method">express</span> - Web framework</p>
+                            <p><span class="method">mongoose</span> - MongoDB ODM</p>
+                            <p><span class="method">axios</span> - HTTP client</p>
+                            <p><span class="method">dotenv</span> - Environment variables</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span><span class="npm-icon">npm</span>Uninstall Packages</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <div class="method-list">
+                            <div class="method">npm uninstall express</div>
+                            <p class="command-description">Removes the express package from your project</p>
+                        </div>
+                        <p>This command removes the package from node_modules folder and removes the entry from
+                            package.json dependencies.</p>
+
+                        <p><strong>Alternative commands:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm remove express</div>
+                            <div class="method">npm rm express</div>
+                            <div class="method">npm un express</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span><span class="npm-icon">npm</span>Update Dependencies</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <div class="method-list">
+                            <div class="method">npm update</div>
+                            <p class="command-description">Updates all dependencies to their latest compatible versions
+                            </p>
+                        </div>
+
+                        <p><strong>Update specific package:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm update express</div>
+                            <p class="command-description">Updates only the express package</p>
+                        </div>
+
+                        <p><strong>Check for outdated packages:</strong></p>
+                        <div class="method-list">
+                            <div class="method">npm outdated</div>
+                            <p class="command-description">Lists packages that have newer versions available</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span><span class="npm-icon">npm</span>Other Useful Commands</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <div class="method-list">
+                            <div class="method">npm list</div>
+                            <p class="command-description">Lists all installed packages in a tree structure</p>
+
+                            <div class="method">npm list --depth=0</div>
+                            <p class="command-description">Lists only top-level packages</p>
+
+                            <div class="method">npm search express</div>
+                            <p class="command-description">Searches for packages in npm registry</p>
+
+                            <div class="method">npm view express</div>
+                            <p class="command-description">Shows package information</p>
+
+                            <div class="method">npm audit</div>
+                            <p class="command-description">Checks for security vulnerabilities</p>
+
+                            <div class="method">npm audit fix</div>
+                            <p class="command-description">Automatically fixes security issues</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Understanding package.json</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>dependencies vs devDependencies</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong><span class="method">dependencies</span></strong></p>
+                        <p>Packages required for the application to run in production. These are essential for your app
+                            to function.</p>
+
+                        <div class="example-box">
+                            <div class="example-title">Examples of dependencies:</div>
+                            <p><span class="method">express</span> - Web server framework</p>
+                            <p><span class="method">mongoose</span> - Database ORM</p>
+                            <p><span class="method">axios</span> - HTTP requests</p>
+                            <p><span class="method">dotenv</span> - Environment variables</p>
+                            <p><span class="method">bcrypt</span> - Password hashing</p>
+                        </div>
+
+                        <p style="margin-top: 20px;"><strong><span class="method">devDependencies</span></strong></p>
+                        <p>Packages only needed during development and testing. Not required in production.</p>
+
+                        <div class="example-box">
+                            <div class="example-title">Examples of devDependencies:</div>
+                            <p><span class="method">nodemon</span> - Auto-restart server</p>
+                            <p><span class="method">jest</span> - Testing framework</p>
+                            <p><span class="method">eslint</span> - Code linting</p>
+                            <p><span class="method">prettier</span> - Code formatting</p>
+                            <p><span class="method">webpack</span> - Module bundler</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Scripts for running commands</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Scripts allow you to define custom commands in package.json to streamline your workflow.</p>
+
+                        <div class="example-box">
+                            <div class="example-title">Common script examples:</div>
+
+                            <div class="method">start</div>
+                            <p class="command-description">Run with: npm start</p>
+                            <p>Example: <span class="method">"start": "node app.js"</span></p>
+                            <p style="margin-bottom: 15px;">Starts your application in production mode</p>
+
+                            <div class="method">test</div>
+                            <p class="command-description">Run with: npm test</p>
+                            <p>Example: <span class="method">"test": "jest"</span></p>
+                            <p style="margin-bottom: 15px;">Executes your test suite</p>
+
+                            <div class="method">lint</div>
+                            <p class="command-description">Run with: npm run lint</p>
+                            <p>Example: <span class="method">"lint": "eslint ."</span></p>
+                            <p style="margin-bottom: 15px;">Checks code quality and style</p>
+
+                            <div class="method">dev</div>
+                            <p class="command-description">Run with: npm run dev</p>
+                            <p>Example: <span class="method">"dev": "nodemon app.js"</span></p>
+                            <p style="margin-bottom: 15px;">Starts with auto-reload for development</p>
+                        </div>
+
+                        <p style="margin-top: 20px;"><strong>Note:</strong> <span class="method">start</span> and <span
+                                class="method">test</span> are special scripts that don't need "run" keyword. All other
+                            scripts require <span class="method">npm run script-name</span></p>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Important package.json Fields</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <div class="method-list">
+                            <div class="method">"name"</div>
+                            <p class="command-description">The package name (required, lowercase, no spaces)</p>
+
+                            <div class="method">"version"</div>
+                            <p class="command-description">Package version following semantic versioning (e.g., 1.0.0)
+                            </p>
+
+                            <div class="method">"description"</div>
+                            <p class="command-description">Brief description of your project</p>
+
+                            <div class="method">"main"</div>
+                            <p class="command-description">Entry point file (e.g., "index.js" or "app.js")</p>
+
+                            <div class="method">"scripts"</div>
+                            <p class="command-description">Custom commands for your project</p>
+
+                            <div class="method">"keywords"</div>
+                            <p class="command-description">Array of keywords for npm search</p>
+
+                            <div class="method">"author"</div>
+                            <p class="command-description">Package author's name</p>
+
+                            <div class="method">"license"</div>
+                            <p class="command-description">License type (e.g., "MIT", "ISC")</p>
+
+                            <div class="method">"repository"</div>
+                            <p class="command-description">GitHub repository URL</p>
+
+                            <div class="method">"engines"</div>
+                            <p class="command-description">Specifies Node.js and npm versions required</p>
+                        </div>
+
+                        <div class="example-box" style="margin-top: 20px;">
+                            <div class="example-title">Example package.json structure:</div>
+                            <pre
+                                style="background: #2d3748; color: #68d391; padding: 15px; border-radius: 5px; overflow-x: auto;">
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "My awesome Node.js app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Version Numbers Explained</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>npm uses semantic versioning (semver) in the format: <span
+                                class="method">MAJOR.MINOR.PATCH</span></p>
+
+                        <div class="example-box">
+                            <div class="example-title">Version symbols:</div>
+
+                            <p><span class="method">^4.18.2</span> (Caret)</p>
+                            <p class="command-description">Allows updates that don't change the leftmost non-zero digit
+                                (e.g., 4.18.2 → 4.19.0 ✓, but not 5.0.0 ✗)</p>
+
+                            <p><span class="method">~4.18.2</span> (Tilde)</p>
+                            <p class="command-description">Allows only patch updates (e.g., 4.18.2 → 4.18.5 ✓, but not
+                                4.19.0 ✗)</p>
+
+                            <p><span class="method">4.18.2</span> (Exact)</p>
+                            <p class="command-description">Installs exactly this version only</p>
+
+                            <p><span class="method">*</span> or <span class="method">latest</span></p>
+                            <p class="command-description">Installs the latest version available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTopic(element) {
+            const content = element.querySelector('.topic-content');
+            const icon = element.querySelector('.toggle-icon');
+
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>
