@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Basics Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .topic {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .topic:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .topic-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4c51bf;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+
+        .topic-content {
+            color: #4a5568;
+            line-height: 1.8;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .topic-content.active {
+            max-height: 1000px;
+            margin-top: 15px;
+        }
+
+        .topic-content p {
+            margin-bottom: 10px;
+        }
+
+        .method-list {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .method {
+            font-family: 'Courier New', monospace;
+            background: #edf2f7;
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 0.9rem;
+            color: #2d3748;
+        }
+
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .topic-header {
+                font-size: 1.1rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Understanding Node.js Basics</h1>
+            <p>Complete guide to JavaScript fundamentals and core Node.js concepts</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">JavaScript Fundamentals (ES6+ Features)</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>let/const, arrow functions, template literals</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Modern variable declarations where <span class="method">let</span> allows reassignment and
+                            <span class="method">const</span> creates immutable bindings.</p>
+                        <p>Arrow functions <span class="method">() => {}</span> provide concise syntax and lexical this
+                            binding.</p>
+                        <p>Template literals use backticks for string interpolation: <span class="method">`Hello
+                                ${name}`</span></p>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Destructuring, Rest/Spread Operators</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Destructuring extracts values from objects and arrays efficiently.</p>
+                        <div class="method-list">
+                            <div class="method">const {name, age} = user</div>
+                            <div class="method">const [first, second] = array</div>
+                        </div>
+                        <p>Spread operator expands arrays/objects: <span class="method">[...arr1, ...arr2]</span></p>
+                        <p>Rest operator collects remaining elements: <span class="method">function sum(...numbers)
+                                {}</span></p>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Promises and Async/Await</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Promises handle asynchronous operations with chainable methods.</p>
+                        <div class="method-list">
+                            <div class="method">.then()</div>
+                            <div class="method">.catch()</div>
+                            <div class="method">.finally()</div>
+                            <div class="method">Promise.all()</div>
+                            <div class="method">Promise.race()</div>
+                            <div class="method">Promise.resolve()</div>
+                            <div class="method">Promise.reject()</div>
+                        </div>
+                        <p>Async/await provides synchronous-looking async code: <span class="method">await
+                                fetch(url)</span></p>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Modules: CommonJS (require) vs ES Modules (import)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong>CommonJS:</strong></p>
+                        <div class="method-list">
+                            <div class="method">const module = require('module')</div>
+                            <div class="method">module.exports = {}</div>
+                        </div>
+                        <p><strong>ES Modules:</strong></p>
+                        <div class="method-list">
+                            <div class="method">import { func } from 'module'</div>
+                            <div class="method">export default</div>
+                            <div class="method">export const</div>
+                        </div>
+                        <p>ES modules are static and support tree-shaking for optimization.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Core Node.js Concepts</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Event Loop & Async Programming</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Node.js runs on a single-threaded event loop that handles async operations efficiently.</p>
+                        <p><strong>Phases:</strong> timers, pending callbacks, poll, check, close callbacks</p>
+                        <div class="method-list">
+                            <div class="method">process.nextTick()</div>
+                            <div class="method">setImmediate()</div>
+                            <div class="method">setTimeout()</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Callbacks, Promises, and Async/Await</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong>Callbacks:</strong> Traditional pattern for async operations</p>
+                        <div class="method-list">
+                            <div class="method">fs.readFile(path, (err, data) => {})</div>
+                        </div>
+                        <p><strong>Promises:</strong> Modern async handling with chainable <span
+                                class="method">.then()</span></p>
+                        <p><strong>Async/await:</strong> Syntactic sugar over promises for cleaner, more readable code
+                        </p>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Streams and Buffers</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Streams process data in chunks (Readable, Writable, Duplex, Transform).</p>
+                        <div class="method-list">
+                            <div class="method">.pipe()</div>
+                            <div class="method">.on('data')</div>
+                            <div class="method">.on('end')</div>
+                            <div class="method">.read()</div>
+                            <div class="method">.write()</div>
+                        </div>
+                        <p>Buffers handle binary data efficiently:</p>
+                        <div class="method-list">
+                            <div class="method">Buffer.from()</div>
+                            <div class="method">Buffer.alloc()</div>
+                            <div class="method">.toString()</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>File System (fs module)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong>Read files:</strong></p>
+                        <div class="method-list">
+                            <div class="method">fs.readFile()</div>
+                            <div class="method">fs.readFileSync()</div>
+                            <div class="method">fs.createReadStream()</div>
+                        </div>
+                        <p><strong>Write files:</strong></p>
+                        <div class="method-list">
+                            <div class="method">fs.writeFile()</div>
+                            <div class="method">fs.writeFileSync()</div>
+                            <div class="method">fs.createWriteStream()</div>
+                        </div>
+                        <p><strong>Directory operations:</strong></p>
+                        <div class="method-list">
+                            <div class="method">fs.readdir()</div>
+                            <div class="method">fs.mkdir()</div>
+                            <div class="method">fs.rmdir()</div>
+                        </div>
+                        <p><strong>File info:</strong></p>
+                        <div class="method-list">
+                            <div class="method">fs.stat()</div>
+                            <div class="method">fs.exists()</div>
+                            <div class="method">fs.unlink()</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Process Management</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p><strong>Access process info:</strong></p>
+                        <div class="method-list">
+                            <div class="method">process.argv</div>
+                            <div class="method">process.env</div>
+                            <div class="method">process.cwd()</div>
+                        </div>
+                        <p><strong>Control execution:</strong></p>
+                        <div class="method-list">
+                            <div class="method">process.exit()</div>
+                            <div class="method">process.kill()</div>
+                        </div>
+                        <p><strong>Event handling:</strong></p>
+                        <div class="method-list">
+                            <div class="method">process.on('uncaughtException')</div>
+                            <div class="method">process.on('exit')</div>
+                        </div>
+                        <p><strong>Child processes:</strong></p>
+                        <div class="method-list">
+                            <div class="method">child_process.exec()</div>
+                            <div class="method">.spawn()</div>
+                            <div class="method">.fork()</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>Environment Variables</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Access via <span class="method">process.env.VARIABLE_NAME</span></p>
+                        <p>Set using .env files with packages like <span class="method">dotenv</span></p>
+                        <p>Used for configuration such as database URLs, API keys, and port numbers.</p>
+                        <p>Check environment: <span class="method">process.env.NODE_ENV</span> to determine
+                            development/production mode.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTopic(element) {
+            const content = element.querySelector('.topic-content');
+            const icon = element.querySelector('.toggle-icon');
+
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>
