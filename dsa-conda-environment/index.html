@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Conda Environment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 2px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        nav button {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        nav button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        nav button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .highlight-box {
+            background: #f0f4ff;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        .code-block code {
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+        }
+
+        ol, ul {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .tip-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #ff9a76;
+        }
+
+        footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            header p {
+                font-size: 0.95em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+
+            nav {
+                padding: 10px 15px;
+            }
+
+            nav button {
+                font-size: 0.85em;
+                padding: 8px 15px;
+            }
+
+            .comparison-table {
+                font-size: 0.9em;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 25px 15px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .code-block {
+                font-size: 0.8em;
+                padding: 15px;
+            }
+
+            nav button {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐍 Understanding the Conda Environment</h1>
+            <p>A Complete Guide to Anaconda, Miniconda & Conda Workflow</p>
+        </header>
+
+        <nav id="nav">
+            <button onclick="showSection('intro')" class="active">Introduction</button>
+            <button onclick="showSection('install')">Installation</button>
+            <button onclick="showSection('comparison')">Anaconda vs Miniconda</button>
+            <button onclick="showSection('path')">Adding to Path</button>
+            <button onclick="showSection('workflow')">Conda Workflow</button>
+            <button onclick="showSection('navigator')">Anaconda Navigator</button>
+            <button onclick="showSection('jupyter')">Jupyter</button>
+        </nav>
+
+        <div class="content">
+            <!-- Introduction Section -->
+            <div id="intro" class="section active">
+                <h2>📚 What is Anaconda?</h2>
+                <p>Anaconda is a popular Python distribution specifically designed for data science and machine learning applications. It simplifies the entire setup process by coming pre-installed with essential libraries and tools that data scientists use daily.</p>
+
+                <div class="highlight-box">
+                    <h3>✨ Key Features</h3>
+                    <ul>
+                        <li><strong>Pre-installed Libraries:</strong> NumPy, pandas, scikit-learn come ready to use</li>
+                        <li><strong>Integrated Tools:</strong> Jupyter Notebook included out of the box</li>
+                        <li><strong>Consistent Environment:</strong> No dependency conflicts or compatibility issues</li>
+                        <li><strong>Beginner-Friendly:</strong> Easy setup without technical complexity</li>
+                        <li><strong>Time-Saving:</strong> Simplified package management and project setup</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>💡 Why Choose Anaconda?</strong></p>
+                    <p>Anaconda eliminates the hassle of manually installing and configuring dozens of packages. Instead of spending hours setting up your environment, you can start coding immediately with all the tools you need already configured and tested for compatibility.</p>
+                </div>
+            </div>
+
+            <!-- Installation Section -->
+            <div id="install" class="section">
+                <h2>🔧 How to Install Anaconda</h2>
+                
+                <h3><span class="step-number">1</span>Download Anaconda</h3>
+                <p>Visit the official Anaconda website to download the installer:</p>
+                <div class="code-block">
+                    <code>https://www.anaconda.com/products/distribution</code>
+                </div>
+                <div class="warning-box">
+                    <strong>⚠️ Note:</strong> The website might ask for your email, but there's a "Skip Registration" button that allows you to download Anaconda directly without providing an email address.
+                </div>
+
+                <h3><span class="step-number">2</span>Choose Your Operating System</h3>
+                <p>Select the appropriate version for your operating system:</p>
+                <ul>
+                    <li>Windows</li>
+                    <li>macOS</li>
+                    <li>Linux</li>
+                </ul>
+
+                <h3><span class="step-number">3</span>Download the Installer</h3>
+                <p>Click the appropriate download button. The 64-bit version is recommended for modern systems.</p>
+
+                <h3><span class="step-number">4</span>Run the Installer</h3>
+                
+                <h4>For Windows/macOS:</h4>
+                <p>Simply open the downloaded file and follow the setup instructions provided by the installer wizard.</p>
+
+                <h4>For Linux:</h4>
+                <p>Download the bash file and run it in your terminal:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>bash Anaconda3-*.sh</code>
+                </div>
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> Don't forget to replace <code>Anaconda3-*</code> with the correct filename you downloaded.
+                </div>
+
+                <h3><span class="step-number">5</span>Verify Installation</h3>
+                <p>Open your terminal or Anaconda Prompt and type:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda --version</code>
+                </div>
+                <p>If the installation was successful, this command will display the version of conda you just installed.</p>
+
+                <div class="highlight-box">
+                    <strong>🎉 Congratulations!</strong> You've successfully installed Anaconda and are ready to start your data science journey!
+                </div>
+            </div>
+
+            <!-- Comparison Section -->
+            <div id="comparison" class="section">
+                <h2>⚖️ Anaconda vs Miniconda</h2>
+                
+                <p>Understanding the difference between Anaconda and Miniconda helps you choose the right tool for your needs.</p>
+
+                <div class="highlight-box">
+                    <h3>🔹 Miniconda</h3>
+                    <ul>
+                        <li><strong>Lightweight distribution</strong> with minimal installation size</li>
+                        <li>Comes with only <code>conda</code>, <code>pip</code>, and a few essential packages</li>
+                        <li>When you run <code>conda list</code> after installing Miniconda, packages like NumPy will NOT be present</li>
+                        <li>You need to manually install packages as needed</li>
+                    </ul>
+                    <p><strong>To install NumPy in Miniconda:</strong></p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <code>conda install numpy</code>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🔹 Anaconda</h3>
+                    <ul>
+                        <li><strong>Full distribution</strong> with hundreds of packages pre-installed</li>
+                        <li>Includes NumPy and many other popular libraries (pandas, matplotlib, scikit-learn, etc.)</li>
+                        <li>After installing Anaconda, running <code>conda list</code> will show NumPy and many other packages by default</li>
+                        <li>Ready for immediate data science and machine learning work</li>
+                    </ul>
+                </div>
+
+                <h3>📊 Quick Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Miniconda</th>
+                            <th>Anaconda</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Size</strong></td>
+                            <td>~50 MB</td>
+                            <td>~500 MB</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Packages</strong></td>
+                            <td>Minimal (conda, pip only)</td>
+                            <td>Hundreds pre-installed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NumPy Included</strong></td>
+                            <td>❌ No</td>
+                            <td>✅ Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Setup Time</strong></td>
+                            <td>Faster install, manual setup</td>
+                            <td>Slower install, ready to use</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best For</strong></td>
+                            <td>Custom setups, flexibility</td>
+                            <td>Quick start, convenience</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <strong>💡 Which Should You Choose?</strong>
+                    <p><strong>Choose Miniconda</strong> if you want complete control over which packages to install and prefer a minimal footprint.</p>
+                    <p><strong>Choose Anaconda</strong> if you want to get started quickly with data science without worrying about installing individual packages.</p>
+                </div>
+            </div>
+
+            <!-- Path Section -->
+            <div id="path" class="section">
+                <h2>🛣️ Adding Conda to Path (Windows)</h2>
+                
+                <p>When you install Anaconda or Miniconda, the <code>conda</code> command-line tool becomes available in the terminal where you ran the installation. However, it may not work in other terminals unless you add it to your system's environment variables.</p>
+
+                <h3>🔄 Automatic Method (Recommended)</h3>
+                <p>Run this command in Anaconda Prompt to initialize conda for Command Prompt (cmd) or PowerShell:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda init</code>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>What does this do?</strong>
+                    <ul>
+                        <li>Modifies your shell's configuration to recognize conda</li>
+                        <li>Makes conda available in any directory</li>
+                        <li>Ensures the process is automatic for all future sessions</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> You must restart your terminal after running the <code>conda init</code> command for the changes to take effect.
+                </div>
+
+                <h3>🔧 Manual Method (If Needed)</h3>
+                <p>If the automatic method doesn't work, you can manually add conda to your System Environment Variables:</p>
+
+                <h4><span class="step-number">1</span>Open System Properties</h4>
+                <ul>
+                    <li>Press <code>Win + R</code> on your keyboard</li>
+                    <li>Type <code>sysdm.cpl</code> and press Enter</li>
+                    <li>Click on "Environment Variables" button</li>
+                </ul>
+
+                <h4><span class="step-number">2</span>Edit Path Variable</h4>
+                <ul>
+                    <li>Find the "Path" variable in "System Variables"</li>
+                    <li>Click "Edit"</li>
+                    <li>Add these two entries (replace &lt;YourUsername&gt; with your actual Windows username):</li>
+                </ul>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>C:\Users\&lt;YourUsername&gt;\Anaconda3\Scripts
+C:\Users\&lt;YourUsername&gt;\Anaconda3\bin</code>
+                </div>
+
+                <h4><span class="step-number">3</span>Verify the Configuration</h4>
+                <p>Open a new terminal and verify conda is working:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda --version</code>
+                </div>
+                <p>If configured correctly, this will display the conda version.</p>
+            </div>
+
+            <!-- Workflow Section -->
+            <div id="workflow" class="section">
+                <h2>⚙️ Understanding Conda Workflow</h2>
+
+                <h3>🤔 What is Conda?</h3>
+                <p>Conda is both a <strong>package manager</strong> and an <strong>environment manager</strong> for Python (and other languages). Think of it as a sophisticated tool that manages your project dependencies and keeps different projects isolated from each other.</p>
+
+                <div class="analogy-box">
+                    <h3>🥔 The Recipe Analogy</h3>
+                    <p>Imagine you're making mashed potatoes. The type of potato you use significantly changes the taste of the final dish. In the same way, package versions change how your code works and behaves.</p>
+                    <p><strong>For example:</strong></p>
+                    <ul>
+                        <li>Python 3.11 is like using a Shimla Aloo (one variety of potato)</li>
+                        <li>Python 3.8 is like using a Kufri Sindhuri Aloo (a different variety)</li>
+                    </ul>
+                    <p>Conda lets you control the "ingredients" (package versions) for each project, ensuring you always get the exact "taste" (behavior) you need!</p>
+                </div>
+
+                <h3>🎯 Managing Environments with Conda</h3>
+                <p>By default, when you open a terminal with conda installed, you're in the <strong>base environment</strong>. This is your default workspace.</p>
+
+                <h4><span class="step-number">1</span>Check Available Environments</h4>
+                <p>To see all the environments you have created:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda env list</code>
+                </div>
+
+                <h4><span class="step-number">2</span>Create a New Environment</h4>
+                <p>Create a new isolated environment for your project:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda create -n myenv</code>
+                </div>
+                
+                <div class="tip-badge">💡 Pro Tip</div>
+                <p>You can create an environment with a specific Python version:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda create -n myenv python=3.11</code>
+                </div>
+
+                <h4><span class="step-number">3</span>Activate an Environment</h4>
+                <p>Switch to your newly created environment:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda activate myenv</code>
+                </div>
+                <p>Once activated, any packages you install will be specific to this environment.</p>
+
+                <h4><span class="step-number">4</span>Install Packages</h4>
+                <p>Install packages from different channels. Here's an example using conda-forge:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda install -c conda-forge numpy</code>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>📦 Understanding Channels</h3>
+                    <ul>
+                        <li>The <code>-c</code> flag specifies the channel (a source for packages)</li>
+                        <li><strong>conda-forge</strong> is a popular community-maintained channel</li>
+                        <li>It often has cutting-edge packages and more frequent updates</li>
+                        <li>Default channel: Maintained by Anaconda Inc.</li>
+                    </ul>
+                </div>
+
+                <h4><span class="step-number">5</span>Deactivate the Environment</h4>
+                <p>When you're done working in an environment, return to the base environment:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda deactivate</code>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Important Tip:</strong> Always activate an environment before installing packages to ensure they're installed in the correct location!
+                </div>
+
+                <h3>📝 Summary</h3>
+                <div class="info-box">
+                    <ul>
+                        <li>Conda is a package and environment manager for Python</li>
+                        <li>It lets you manage different environments for different projects</li>
+                        <li>You can create, activate, and deactivate environments using conda commands</li>
+                        <li>Use <code>conda install</code> to add packages to an environment</li>
+                        <li>Conda-forge is a community-maintained channel with extensive package availability</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Navigator Section -->
+            <div id="navigator" class="section">
+                <h2>🧭 Anaconda Navigator - Quick Tour</h2>
+
+                <h3>What is Anaconda Navigator?</h3>
+                <p>Anaconda Navigator is a graphical user interface (GUI) that comes bundled with the Anaconda distribution. It provides a visual, user-friendly way to manage your data science workflow without needing to use command-line interfaces.</p>
+
+                <div class="highlight-box">
+                    <h3>✨ Key Features</h3>
+                    <ul>
+                        <li><strong>Launch Tools:</strong> Start Jupyter Notebook, JupyterLab, Spyder, and other applications with a single click</li>
+                        <li><strong>Manage Environments:</strong> Create, delete, and switch between conda environments visually</li>
+                        <li><strong>Package Management:</strong> Install, update, and remove packages without typing commands</li>
+                        <li><strong>Beginner-Friendly:</strong> Perfect for those who prefer visual interfaces over command-line tools</li>
+                    </ul>
+                </div>
+
+                <h3>🚀 How to Open Navigator</h3>
+                
+                <h4>Windows:</h4>
+                <p>Search for "Anaconda Navigator" in the Start menu and click to open.</p>
+
+                <h4>macOS/Linux:</h4>
+                <p>Open your terminal and run:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>anaconda-navigator</code>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Why Use Navigator?</strong>
+                    <p>Navigator is particularly useful for beginners and those who prefer visual workflow management. It makes complex tasks like environment management and package installation accessible through an intuitive interface, eliminating the need to remember specific command-line syntax.</p>
+                </div>
+            </div>
+
+            <!-- Jupyter Section -->
+            <div id="jupyter" class="section">
+                <h2>📓 Jupyter Notebook vs JupyterLab</h2>
+
+                <p>Jupyter is an open-source tool for creating and sharing interactive documents that contain live code, visualizations, equations, and explanatory text.</p>
+
+                <h3>📔 What is Jupyter Notebook?</h3>
+                <p>Jupyter Notebook is a simple, interactive environment designed for writing and running code in a web browser.</p>
+
+                <div class="highlight-box">
+                    <h3>Key Features</h3>
+                    <ul>
+                        <li>Simple, streamlined interface focused on single documents</li>
+                        <li>Each document is called a "notebook" and saved as a <code>.ipynb</code> file</li>
+                        <li>Perfect for quick prototyping, data exploration, and teaching</li>
+                        <li>A <strong>cell</strong> is a container where you can write and execute code, markdown text, or raw content</li>
+                    </ul>
+                </div>
+
+                <h4>🔧 Installing and Starting Jupyter Notebook</h4>
+                <p>First, install Jupyter Notebook:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda install jupyter</code>
+                </div>
+
+                <p>Then launch it:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>jupyter notebook</code>
+                </div>
+
+                <h3>🔬 What is JupyterLab?</h3>
+                <p>JupyterLab is the next-generation interface for Jupyter, offering a more advanced and flexible workspace for data science workflows.</p>
+
+                <div class="highlight-box">
+                    <h3>Why We Use JupyterLab</h3>
+                    <ul>
+                        <li><strong>Multi-Panel Interface:</strong> Open notebooks, terminals, text editors, and output panels side by side</li>
+                        <li><strong>Better Navigation:</strong> Enhanced file browsing and workspace management</li>
+                        <li><strong>Extensions:</strong> Customize with themes, plugins, and advanced features</li>
+                        <li><strong>Integrated Tools:</strong> Combine notebooks with terminals, markdown files, and data viewers in one unified window</li>
+                    </ul>
+                </div>
+
+                <h4>🔧 Installing and Starting JupyterLab</h4>
+                <p>Install JupyterLab:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>conda install jupyterlab</code>
+                </div>
+
+                <p>Launch JupyterLab:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <code>jupyter lab</code>
+                </div>
+
+                <h3>📊 Key Differences</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Jupyter Notebook</th>
+                            <th>JupyterLab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Interface</strong></td>
+                            <td>Single document view</td>
+                            <td>Multi-tab, multi-panel workspace</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Customization</strong></td>
+                            <td>Limited</td>
+                            <td>Extensive via extensions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td>Lightweight and fast</td>
+                            <td>Slightly heavier but feature-rich</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Use Case</strong></td>
+                            <td>Quick tasks, tutorials, teaching</td>
+                            <td>Large projects, complex workflows</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🎯 When to Use What?</h3>
+                <div class="highlight-box">
+                    <p><strong>Use Jupyter Notebook for:</strong></p>
+                    <ul>
+                        <li>Simple analysis and quick checks</li>
+                        <li>Tutorials and learning exercises</li>
+                        <li>Presenting single-document workflows</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>Use JupyterLab for:</strong></p>
+                    <ul>
+                        <li>Complex projects with multiple files</li>
+                        <li>Interactive dashboards</li>
+                        <li>Better organization and productivity</li>
+                        <li>Professional data science and machine learning projects</li>
+                    </ul>
+                </div>
+
+                <h3>🏆 Why We Choose JupyterLab</h3>
+                <div class="info-box">
+                    <p><strong>Three Main Reasons:</strong></p>
+                    <ol>
+                        <li><strong>Better Workflow:</strong> Manage multiple notebooks and files in one unified view, improving productivity</li>
+                        <li><strong>Scalability:</strong> Ideal for growing data science and machine learning projects that require multiple resources</li>
+                        <li><strong>Future-Proofing:</strong> JupyterLab is actively developed and represents the future direction of the Jupyter project</li>
+                    </ol>
+                </div>
+
+                <div class="analogy-box">
+                    <h3>📝 An Interesting Perspective</h3>
+                    <p>At a conference in Orlando, one of the organizers shared an insightful way to think about Jupyter Notebook:</p>
+                    <p><em>"Jupyter Notebook is a blog where you can execute code. It is an information-rich coding interface."</em></p>
+                    <p>This perspective beautifully captures the essence of Jupyter - it's not just a code editor, but a storytelling platform where code, visualizations, and explanations come together to create a complete narrative.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>🎓 Hope you're enjoying this course so far!</strong> These tools will be fundamental to your data science journey.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>🐍 Understanding the Conda Environment | Complete Guide</p>
+            <p>Happy Learning! 🚀</p>
+        </footer>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('nav button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top of content
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#28a745';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#667eea';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                button.textContent = 'Failed';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scrolling for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there's a hash in URL
+            if (window.location.hash) {
+                const sectionId = window.location.hash.substring(1);
+                const section = document.getElementById(sectionId);
+                if (section && section.classList.contains('section')) {
+                    showSection(sectionId);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
