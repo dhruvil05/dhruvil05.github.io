@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeBook Data Science Internship</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .offer-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: translateY(-3px);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .task-box {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .task-box h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .function {
+            color: #dcdcaa;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .output-box {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .output-box h4 {
+            color: #0369a1;
+            margin-bottom: 10px;
+        }
+
+        .list-box {
+            background: #fff7ed;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #f59e0b;
+        }
+
+        .list-box ul, .list-box ol {
+            margin-left: 25px;
+            margin-top: 10px;
+        }
+
+        .list-box li {
+            margin: 8px 0;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .example-box {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .example-box h4 {
+            color: #16a34a;
+            margin-bottom: 10px;
+        }
+
+        .data-structure {
+            background: #fffbeb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #fbbf24;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .progress-step {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 15px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.completed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .note-box {
+            background: #fef2f2;
+            border-left: 5px solid #ef4444;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #10b981;
+            text-align: center;
+        }
+
+        .success-box h3 {
+            color: #065f46;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tab {
+                min-width: 100px;
+                padding: 12px 15px;
+                font-size: 0.9em;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+
+            .code-block {
+                font-size: 0.85em;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-tabs {
+                padding: 10px;
+            }
+
+            .nav-tab {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Coders of Delhi</h1>
+            <p>Data Science Internship at CodeBook</p>
+            <div class="offer-badge">₹10 LPA Job Offer Awaits! 💰</div>
+        </div>
+
+        <div class="nav-tabs" id="navTabs">
+            <button class="nav-tab active">Introduction</button>
+            <button class="nav-tab">Task 1: Load Data</button>
+            <button class="nav-tab">Task 2: Clean Data</button>
+            <button class="nav-tab">Task 3: People Suggest</button>
+            <button class="nav-tab">Task 4: Pages Suggest</button>
+        </div>
+
+        <div id="contentContainer">
+            <!-- Section 0: Introduction -->
+            <div class="content-section active">
+                <h2>Welcome to Your Internship! 🎉</h2>
+                
+                <div class="task-box">
+                    <h4>Your Mission</h4>
+                    <p>Congratulations! You've been hired as a Data Scientist Intern at <strong>CodeBook</strong> – The Social Media for Coders. This Delhi-based company is offering you a <span class="highlight">₹10 LPA job</span> if you successfully complete this 1-month internship.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>The Challenge</h4>
+                    <p>Your manager <strong>Puneet Kumar</strong> has assigned you to analyze CodeBook's user data using <strong>only pure Python</strong> – no pandas, NumPy, or fancy libraries allowed!</p>
+                </div>
+
+                <h3>What You'll Build</h3>
+                <div class="progress-indicator">
+                    <div class="progress-step">Load & Display Data</div>
+                    <div class="progress-step">Clean & Structure</div>
+                    <div class="progress-step">People You May Know</div>
+                    <div class="progress-step">Pages You Might Like</div>
+                </div>
+
+                <h3>Understanding the Data Structure</h3>
+                <div class="data-structure">
+                    <p><strong>The dataset contains three main components:</strong></p>
+                    <ol>
+                        <li><strong>Users:</strong> Each user has an ID, name, a list of friends (by their IDs), and a list of liked pages (by their IDs)</li>
+                        <li><strong>Pages:</strong> Each page has an ID and a name</li>
+                        <li><strong>Connections:</strong> Users can have multiple friends and can like multiple pages</li>
+                    </ol>
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Sample Data Structure (JSON format)</span>
+{
+  <span class="string">"users"</span>: [
+    {<span class="string">"id"</span>: <span class="keyword">1</span>, <span class="string">"name"</span>: <span class="string">"Amit"</span>, <span class="string">"friends"</span>: [<span class="keyword">2</span>, <span class="keyword">3</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">101</span>]},
+    {<span class="string">"id"</span>: <span class="keyword">2</span>, <span class="string">"name"</span>: <span class="string">"Priya"</span>, <span class="string">"friends"</span>: [<span class="keyword">1</span>, <span class="keyword">4</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">102</span>]},
+    {<span class="string">"id"</span>: <span class="keyword">3</span>, <span class="string">"name"</span>: <span class="string">"Rahul"</span>, <span class="string">"friends"</span>: [<span class="keyword">1</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">101</span>, <span class="keyword">103</span>]},
+    {<span class="string">"id"</span>: <span class="keyword">4</span>, <span class="string">"name"</span>: <span class="string">"Sara"</span>, <span class="string">"friends"</span>: [<span class="keyword">2</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">104</span>]}
+  ],
+  <span class="string">"pages"</span>: [
+    {<span class="string">"id"</span>: <span class="keyword">101</span>, <span class="string">"name"</span>: <span class="string">"Python Developers"</span>},
+    {<span class="string">"id"</span>: <span class="keyword">102</span>, <span class="string">"name"</span>: <span class="string">"Data Science Enthusiasts"</span>},
+    {<span class="string">"id"</span>: <span class="keyword">103</span>, <span class="string">"name"</span>: <span class="string">"AI & ML Community"</span>},
+    {<span class="string">"id"</span>: <span class="keyword">104</span>, <span class="string">"name"</span>: <span class="string">"Web Dev Hub"</span>}
+  ]
+}
+                </div>
+
+                <div class="success-box">
+                    <h3>Ready to Begin? 🎯</h3>
+                    <p>Navigate through the tabs above to complete each task and earn your ₹10 LPA offer letter!</p>
+                </div>
+            </div>
+
+            <!-- Section 1: Load Data -->
+            <div class="content-section">
+                <h2>Task 1: Load the User Data 📂</h2>
+
+                <div class="task-box">
+                    <h4>Your Assignment</h4>
+                    <p>Your manager has given you a dataset containing information about CodeBook users, their connections (friends), and the pages they have liked. Your job is to load and explore this data to understand its structure.</p>
+                </div>
+
+                <h3>Steps to Complete</h3>
+                <div class="list-box">
+                    <ol>
+                        <li>Save the JSON data in a file called <code>codebook_data.json</code></li>
+                        <li>Read the JSON file using Python's built-in modules</li>
+                        <li>Print user details and their connections</li>
+                        <li>Print available pages</li>
+                    </ol>
+                </div>
+
+                <h3>Code Implementation</h3>
+                <div class="code-block">
+<span class="keyword">import</span> json
+
+<span class="comment"># Load the JSON file</span>
+<span class="keyword">def</span> <span class="function">load_data</span>(filename):
+    <span class="keyword">with</span> <span class="function">open</span>(filename, <span class="string">"r"</span>) <span class="keyword">as</span> file:
+        data = json.<span class="function">load</span>(file)
+        <span class="keyword">return</span> data
+
+<span class="comment"># Display users and their connections</span>
+<span class="keyword">def</span> <span class="function">display_users</span>(data):
+    <span class="function">print</span>(<span class="string">"Users and Their Connections:\n"</span>)
+    <span class="keyword">for</span> user <span class="keyword">in</span> data[<span class="string">"users"</span>]:
+        <span class="function">print</span>(<span class="string">f"{user['name']} (ID: {user['id']}) - Friends: {user['friends']} - Liked Pages: {user['liked_pages']}"</span>)
+    
+    <span class="function">print</span>(<span class="string">"\nPages:\n"</span>)
+    <span class="keyword">for</span> page <span class="keyword">in</span> data[<span class="string">"pages"</span>]:
+        <span class="function">print</span>(<span class="string">f"{page['id']}: {page['name']}"</span>)
+
+<span class="comment"># Load and display the data</span>
+data = <span class="function">load_data</span>(<span class="string">"codebook_data.json"</span>)
+<span class="function">display_users</span>(data)
+                </div>
+
+                <h3>Expected Output</h3>
+                <div class="output-box">
+                    <h4>Console Output:</h4>
+                    <pre>Users and Their Connections:
+
+Amit (ID: 1) - Friends: [2, 3] - Liked Pages: [101]
+Priya (ID: 2) - Friends: [1, 4] - Liked Pages: [102]
+Rahul (ID: 3) - Friends: [1] - Liked Pages: [101, 103]
+Sara (ID: 4) - Friends: [2] - Liked Pages: [104]
+
+Pages:
+
+101: Python Developers
+102: Data Science Enthusiasts
+103: AI & ML Community
+104: Web Dev Hub</pre>
+                </div>
+
+                <div class="note-box">
+                    <strong>Manager's Feedback:</strong> "The data looks messy. Can you clean and structure it better?"
+                </div>
+
+                <div class="success-box">
+                    <h3>Task Completed! ✅</h3>
+                    <p>Move to the next tab to learn how to clean the data.</p>
+                </div>
+            </div>
+
+            <!-- Section 2: Clean Data -->
+            <div class="content-section">
+                <h2>Task 2: Cleaning and Structuring the Data 🧹</h2>
+
+                <div class="task-box">
+                    <h4>The Problem</h4>
+                    <p>Your manager is impressed with your progress but points out that the data is messy. Before analyzing it effectively, we need to clean and structure the data properly.</p>
+                </div>
+
+                <h3>Issues to Address</h3>
+                <div class="list-box">
+                    <ul>
+                        <li><strong>Missing Values:</strong> Some users have empty names</li>
+                        <li><strong>Duplicate Data:</strong> Duplicate friend entries in lists</li>
+                        <li><strong>Inactive Users:</strong> Users with no connections or liked pages</li>
+                        <li><strong>Inconsistent Data:</strong> Duplicate page IDs with different names</li>
+                    </ul>
+                </div>
+
+                <h3>Example of Messy Data</h3>
+                <div class="code-block">
+{
+  <span class="string">"users"</span>: [
+    {<span class="string">"id"</span>: <span class="keyword">1</span>, <span class="string">"name"</span>: <span class="string">"Amit"</span>, <span class="string">"friends"</span>: [<span class="keyword">2</span>, <span class="keyword">3</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">101</span>]},
+    {<span class="string">"id"</span>: <span class="keyword">2</span>, <span class="string">"name"</span>: <span class="string">"Priya"</span>, <span class="string">"friends"</span>: [<span class="keyword">1</span>, <span class="keyword">4</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">102</span>]},
+    {<span class="string">"id"</span>: <span class="keyword">3</span>, <span class="string">"name"</span>: <span class="string">""</span>, <span class="string">"friends"</span>: [<span class="keyword">1</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">101</span>, <span class="keyword">103</span>]}, <span class="comment">// Empty name!</span>
+    {<span class="string">"id"</span>: <span class="keyword">4</span>, <span class="string">"name"</span>: <span class="string">"Sara"</span>, <span class="string">"friends"</span>: [<span class="keyword">2</span>, <span class="keyword">2</span>], <span class="string">"liked_pages"</span>: [<span class="keyword">104</span>]}, <span class="comment">// Duplicate friend!</span>
+    {<span class="string">"id"</span>: <span class="keyword">5</span>, <span class="string">"name"</span>: <span class="string">"Amit"</span>, <span class="string">"friends"</span>: [], <span class="string">"liked_pages"</span>: []} <span class="comment">// Inactive user!</span>
+  ],
+  <span class="string">"pages"</span>: [
+    {<span class="string">"id"</span>: <span class="keyword">104</span>, <span class="string">"name"</span>: <span class="string">"Web Dev Hub"</span>},
+    {<span class="string">"id"</span>: <span class="keyword">104</span>, <span class="string">"name"</span>: <span class="string">"Web Development"</span>} <span class="comment">// Duplicate page ID!</span>
+  ]
+}
+                </div>
+
+                <h3>Cleaning Strategy</h3>
+                <div class="list-box">
+                    <ol>
+                        <li>Remove users with missing names</li>
+                        <li>Remove duplicate friend entries</li>
+                        <li>Remove inactive users (no friends and no liked pages)</li>
+                        <li>Deduplicate pages based on IDs</li>
+                    </ol>
+                </div>
+
+                <h3>Code Implementation</h3>
+                <div class="code-block">
+<span class="keyword">import</span> json
+
+<span class="keyword">def</span> <span class="function">clean_data</span>(data):
+    <span class="comment"># 1. Remove users with missing names</span>
+    data[<span class="string">"users"</span>] = [user <span class="keyword">for</span> user <span class="keyword">in</span> data[<span class="string">"users"</span>] <span class="keyword">if</span> user[<span class="string">"name"</span>].<span class="function">strip</span>()]
+    
+    <span class="comment"># 2. Remove duplicate friends</span>
+    <span class="keyword">for</span> user <span class="keyword">in</span> data[<span class="string">"users"</span>]:
+        user[<span class="string">"friends"</span>] = <span class="function">list</span>(<span class="function">set</span>(user[<span class="string">"friends"</span>]))
+    
+    <span class="comment"># 3. Remove inactive users</span>
+    data[<span class="string">"users"</span>] = [user <span class="keyword">for</span> user <span class="keyword">in</span> data[<span class="string">"users"</span>] 
+                      <span class="keyword">if</span> user[<span class="string">"friends"</span>] <span class="keyword">or</span> user[<span class="string">"liked_pages"</span>]]
+    
+    <span class="comment"># 4. Remove duplicate pages</span>
+    unique_pages = {}
+    <span class="keyword">for</span> page <span class="keyword">in</span> data[<span class="string">"pages"</span>]:
+        unique_pages[page[<span class="string">"id"</span>]] = page
+    data[<span class="string">"pages"</span>] = <span class="function">list</span>(unique_pages.<span class="function">values</span>())
+    
+    <span class="keyword">return</span> data
+
+<span class="comment"># Load, clean, and save the cleaned data</span>
+data = json.<span class="function">load</span>(<span class="function">open</span>(<span class="string">"codebook_data.json"</span>))
+data = <span class="function">clean_data</span>(data)
+json.<span class="function">dump</span>(data, <span class="function">open</span>(<span class="string">"cleaned_codebook_data.json"</span>, <span class="string">"w"</span>), indent=<span class="keyword">4</span>)
+<span class="function">print</span>(<span class="string">"Data cleaned successfully!"</span>)
+                </div>
+
+                <h3>Cleaned Data Output</h3>
+                <div class="output-box">
+                    <h4>After Cleaning:</h4>
+                    <pre>{
+  "users": [
+    {"id": 1, "name": "Amit", "friends": [2, 3], "liked_pages": [101]},
+    {"id": 2, "name": "Priya", "friends": [1, 4], "liked_pages": [102]},
+    {"id": 4, "name": "Sara", "friends": [2], "liked_pages": [104]}
+  ],
+  "pages": [
+    {"id": 101, "name": "Python Developers"},
+    {"id": 102, "name": "Data Science Enthusiasts"},
+    {"id": 103, "name": "AI & ML Community"},
+    {"id": 104, "name": "Web Development"}
+  ]
+}</pre>
+                </div>
+
+                <div class="example-box">
+                    <h4>What Changed?</h4>
+                    <ul>
+                        <li>✅ User with empty name (ID: 3) removed</li>
+                        <li>✅ Duplicate friend in Sara's list removed (2, 2 → 2)</li>
+                        <li>✅ Inactive user (ID: 5) removed</li>
+                        <li>✅ Duplicate page (ID: 104) deduplicated</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h3>Data Cleaned Successfully! ✅</h3>
+                    <p>Your manager says: "Great! Now let's build a 'People You May Know' feature!"</p>
+                </div>
+            </div>
+
+            <!-- Section 3: People You May Know -->
+            <div class="content-section">
+                <h2>Task 3: Finding "People You May Know" 👥</h2>
+
+                <div class="task-box">
+                    <h4>The Feature</h4>
+                    <p>Build a recommendation system that suggests potential friends based on mutual connections. This is a core feature of social networks that helps users expand their network!</p>
+                </div>
+
+                <h3>Understanding the Logic</h3>
+                <div class="example-box">
+                    <h4>How It Works:</h4>
+                    <ul>
+                        <li>If <strong>User A</strong> and <strong>User B</strong> are not friends but have mutual friends, suggest User B to User A</li>
+                        <li>More mutual friends = higher priority recommendation</li>
+                    </ul>
+                </div>
+
+                <h3>Real Example</h3>
+                <div class="data-structure">
+                    <p><strong>Scenario:</strong></p>
+                    <ul>
+                        <li><strong>Amit (ID: 1)</strong> is friends with Priya (ID: 2) and Rahul (ID: 3)</li>
+                        <li><strong>Priya (ID: 2)</strong> is friends with Sara (ID: 4)</li>
+                        <li>Amit is not directly friends with Sara, but they share <strong>Priya</strong> as a mutual friend</li>
+                        <li><strong>Recommendation:</strong> Suggest Sara to Amit as "People You May Know"</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Steps</h3>
+                <div class="list-box">
+                    <ol>
+                        <li>Find all direct friends of the target user</li>
+                        <li>For each friend, find their friends (friends of friends)</li>
+                        <li>Count how many mutual connections exist with each potential friend</li>
+                        <li>Rank suggestions by number of mutual friends (highest first)</li>
+                    </ol>
+                </div>
+
+                <h3>Code Implementation</h3>
+                <div class="code-block">
+<span class="keyword">import</span> json
+
+<span class="keyword">def</span> <span class="function">load_data</span>(filename):
+    <span class="keyword">with</span> <span class="function">open</span>(filename, <span class="string">"r"</span>) <span class="keyword">as</span> file:
+        <span class="keyword">return</span> json.<span class="function">load</span>(file)
+
+<span class="keyword">def</span> <span class="function">find_people_you_may_know</span>(user_id, data):
+    <span class="comment"># Create a mapping of user_id to their friends (as a set)</span>
+    user_friends = {}
+    <span class="keyword">for</span> user <span class="keyword">in</span> data[<span class="string">"users"</span>]:
+        user_friends[user[<span class="string">"id"</span>]] = <span class="function">set</span>(user[<span class="string">"friends"</span>])
+    
+    <span class="comment"># If user doesn't exist, return empty list</span>
+    <span class="keyword">if</span> user_id <span class="keyword">not in</span> user_friends:
+        <span class="keyword">return</span> []
+    
+    <span class="comment"># Get direct friends of the user</span>
+    direct_friends = user_friends[user_id]
+    suggestions = {}
+    
+    <span class="comment"># For each direct friend</span>
+    <span class="keyword">for</span> friend <span class="keyword">in</span> direct_friends:
+        <span class="comment"># Look at all friends of this friend</span>
+        <span class="keyword">for</span> mutual <span class="keyword">in</span> user_friends[friend]:
+            <span class="comment"># If mutual is not the user themselves and not already a friend</span>
+            <span class="keyword">if</span> mutual != user_id <span class="keyword">and</span> mutual <span class="keyword">not in</span> direct_friends:
+                <span class="comment"># Count mutual friends (each shared connection adds 1)</span>
+                suggestions[mutual] = suggestions.<span class="function">get</span>(mutual, <span class="keyword">0</span>) + <span class="keyword">1</span>
+    
+    <span class="comment"># Sort by number of mutual friends (descending)</span>
+    sorted_suggestions = <span class="function">sorted</span>(suggestions.<span class="function">items</span>(), 
+                                    key=<span class="keyword">lambda</span> x: x[<span class="keyword">1</span>], 
+                                    reverse=<span class="keyword">True</span>)
+    
+    <span class="comment"># Return just the user IDs</span>
+    <span class="keyword">return</span> [user_id <span class="keyword">for</span> user_id, _ <span class="keyword">in</span> sorted_suggestions]
+
+<span class="comment"># Load data and find recommendations</span>
+data = <span class="function">load_data</span>(<span class="string">"cleaned_codebook_data.json"</span>)
+user_id = <span class="keyword">1</span>  <span class="comment"># Example: Finding suggestions for Amit</span>
+recommendations = <span class="function">find_people_you_may_know</span>(user_id, data)
+<span class="function">print</span>(<span class="string">f"People You May Know for User {user_id}: {recommendations}"</span>)
+                </div>
+
+                <h3>Expected Output</h3>
+                <div class="output-box">
+                    <h4>Console Output:</h4>
+                    <pre>People You May Know for User 1: [4]</pre>
+                    <p><strong>Explanation:</strong> Amit (User 1) should connect with Sara (User 4) because they share Priya as a mutual friend!</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>How the Algorithm Works:</h4>
+                    <p><strong>For Amit (ID: 1):</strong></p>
+                    <ul>
+                        <li>Direct friends: [2, 3] (Priya and Rahul)</li>
+                        <li>Priya's friends: [1, 4] → Sara (4) is a potential connection</li>
+                        <li>Rahul's friends: [1] → No new suggestions</li>
+                        <li><strong>Result:</strong> Recommend Sara (User 4) to Amit</li>
+                    </ul>
+                </div>
+
+                <div class="note-box">
+                    <strong>Real-World Application:</strong> The frontend developer of CodeBook can use this data via API and display it on Amit's profile when he logs in!
+                </div>
+
+                <h3>Ranking by Mutual Friends</h3>
+                <div class="data-structure">
+                    <p><strong>When there are multiple suggestions:</strong></p>
+                    <p>If User A and User B share <strong>5 mutual friends</strong>, while User A and User C share only <strong>2 mutual friends</strong>, then User B gets ranked higher in the recommendation list.</p>
+                    <p><em>More mutual connections = Stronger recommendation!</em></p>
+                </div>
+
+                <div class="success-box">
+                    <h3>Feature Completed! 🎉</h3>
+                    <p>Your manager is excited and says: "Great job! Next, find 'Pages You Might Like' based on connections and preferences."</p>
+                </div>
+            </div>
+
+            <!-- Section 4: Pages You Might Like -->
+            <div class="content-section">
+                <h2>Task 4: Finding "Pages You Might Like" 📄</h2>
+
+                <div class="task-box">
+                    <h4>Final Milestone!</h4>
+                    <p>You've reached the final milestone of your first data science project at CodeBook! After cleaning data and building "People You May Know", it's time to launch: <strong>Pages You Might Like</strong></p>
+                </div>
+
+                <h3>Why This Matters</h3>
+                <div class="example-box">
+                    <h4>Content Discovery</h4>
+                    <p>In real-world social networks, content discovery keeps users engaged. This feature simulates that experience using pure Python, showing how even simple logic can power impactful insights!</p>
+                </div>
+
+                <h3>Understanding the Logic</h3>
+                <div class="list-box">
+                    <h4>How "Pages You Might Like" Works:</h4>
+                    <ul>
+                        <li>Users engage with pages (like, comment, share, etc.)</li>
+                        <li>If two users have interacted with similar pages, they likely have common interests</li>
+                        <li>For this implementation, we consider "liking a page" as an interaction</li>
+                        <li>Pages followed by similar users should be recommended</li>
+                    </ul>
+                </div>
+
+                <h3>Real Example</h3>
+                <div class="data-structure">
+                    <p><strong>Scenario:</strong></p>
+                    <ul>
+                        <li><strong>Amit (ID: 1)</strong> likes: Python Hub (101) and AI World (102)</li>
+                        <li><strong>Priya (ID: 2)</strong> likes: AI World (102) and Data Science Daily (103)</li>
+                        <li>Since Amit and Priya both like <strong>AI World (102)</strong>, we suggest:</li>
+                        <ul>
+                            <li>Data Science Daily (103) to Amit</li>
+                            <li>Python Hub (101) to Priya</li>
+                        </ul>
+                    </ul>
+                </div>
+
+                <h3>Collaborative Filtering Concept</h3>
+                <div class="example-box">
+                    <h4>The Core Principle:</h4>
+                    <p><em>"If two people like the same thing, maybe they'll like other things each one likes too."</em></p>
+                    <p>This is a basic form of a <strong>real-world recommendation engine</strong> used by platforms like Facebook, LinkedIn, and Netflix!</p>
+                </div>
+
+                <h3>Algorithm Steps</h3>
+                <div class="list-box">
+                    <ol>
+                        <li>Map users to pages they have interacted with</li>
+                        <li>Identify pages liked by users with similar interests</li>
+                        <li>Calculate similarity score (number of shared pages)</li>
+                        <li>Rank recommendations based on common interactions</li>
+                    </ol>
+                </div>
+
+                <h3>Code Implementation</h3>
+                <div class="code-block">
+<span class="keyword">import</span> json
+
+<span class="comment"># Function to load JSON data from a file</span>
+<span class="keyword">def</span> <span class="function">load_data</span>(filename):
+    <span class="keyword">with</span> <span class="function">open</span>(filename, <span class="string">"r"</span>) <span class="keyword">as</span> file:
+        <span class="keyword">return</span> json.<span class="function">load</span>(file)
+
+<span class="comment"># Function to find pages a user might like based on common interests</span>
+<span class="keyword">def</span> <span class="function">find_pages_you_might_like</span>(user_id, data):
+    <span class="comment"># Dictionary to store user interactions with pages</span>
+    user_pages = {}
+    <span class="keyword">for</span> user <span class="keyword">in</span> data[<span class="string">"users"</span>]:
+        user_pages[user[<span class="string">"id"</span>]] = <span class="function">set</span>(user[<span class="string">"liked_pages"</span>])
+    
+    <span class="comment"># If the user is not found, return an empty list</span>
+    <span class="keyword">if</span> user_id <span class="keyword">not in</span> user_pages:
+        <span class="keyword">return</span> []
+    
+    <span class="comment"># Get pages liked by the target user</span>
+    user_liked_pages = user_pages[user_id]
+    page_suggestions = {}
+    
+    <span class="comment"># Iterate through all other users</span>
+    <span class="keyword">for</span> other_user, pages <span class="keyword">in</span> user_pages.<span class="function">items</span>():
+        <span class="keyword">if</span> other_user != user_id:
+            <span class="comment"># Find shared pages between users</span>
+            shared_pages = user_liked_pages.<span class="function">intersection</span>(pages)
+            
+            <span class="comment"># For each page the other user likes</span>
+            <span class="keyword">for</span> page <span class="keyword">in</span> pages:
+                <span class="comment"># If target user hasn't liked this page yet</span>
+                <span class="keyword">if</span> page <span class="keyword">not in</span> user_liked_pages:
+                    <span class="comment"># Add score based on number of shared pages</span>
+                    page_suggestions[page] = page_suggestions.<span class="function">get</span>(page, <span class="keyword">0</span>) + <span class="function">len</span>(shared_pages)
+    
+    <span class="comment"># Sort recommended pages based on the number of shared interactions</span>
+    sorted_pages = <span class="function">sorted</span>(page_suggestions.<span class="function">items</span>(), 
+                          key=<span class="keyword">lambda</span> x: x[<span class="keyword">1</span>], 
+                          reverse=<span class="keyword">True</span>)
+    
+    <span class="comment"># Return just the page IDs</span>
+    <span class="keyword">return</span> [page_id <span class="keyword">for</span> page_id, _ <span class="keyword">in</span> sorted_pages]
+
+<span class="comment"># Load data and find recommendations</span>
+data = <span class="function">load_data</span>(<span class="string">"cleaned_codebook_data.json"</span>)
+user_id = <span class="keyword">1</span>  <span class="comment"># Example: Finding recommendations for Amit</span>
+page_recommendations = <span class="function">find_pages_you_might_like</span>(user_id, data)
+<span class="function">print</span>(<span class="string">f"Pages You Might Like for User {user_id}: {page_recommendations}"</span>)
+                </div>
+
+                <h3>Expected Output</h3>
+                <div class="output-box">
+                    <h4>Console Output:</h4>
+                    <pre>Pages You Might Like for User 1: [103]</pre>
+                    <p><strong>Explanation:</strong> Amit should be interested in 'AI & ML Community' (Page 103) because users with similar interests like it!</p>
+                </div>
+
+                <h3>Understanding the Similarity Score</h3>
+                <div class="data-structure">
+                    <p><strong>How Scoring Works:</strong></p>
+                    <ul>
+                        <li>If Amit and Priya both like <strong>AI World</strong>, they share 1 common page</li>
+                        <li>Any page Priya likes gets a score of <strong>+1</strong> for Amit's recommendations</li>
+                        <li>If Amit and Rahul share <strong>5 common pages</strong>, any page Rahul likes gets <strong>+5</strong> score</li>
+                        <li><strong>Higher score = Higher priority recommendation</strong></li>
+                    </ul>
+                </div>
+
+                <h3>Real-World Application</h3>
+                <div class="example-box">
+                    <h4>Complex Scenario:</h4>
+                    <p>If two users each like 10 pages:</p>
+                    <ul>
+                        <li>All pages liked by User 1 will be recommended to User 2 and vice versa</li>
+                        <li>The score = number of common pages they like</li>
+                        <li>This helps prioritize recommendations in large networks</li>
+                        <li>Similar to how Facebook, LinkedIn, and other platforms work!</li>
+                    </ul>
+                </div>
+
+                <h3>Key Concept: Collaborative Filtering</h3>
+                <div class="note-box">
+                    <strong>In Simple Terms:</strong><br>
+                    If two users like some of the same pages, they likely share similar interests. So, pages liked by one can be recommended to the other.<br><br>
+                    <strong>Similarity Score:</strong> The number of pages they both like. Higher score = stronger connection = better recommendations!
+                </div>
+
+                <div class="success-box">
+                    <h3>🎉 CONGRATULATIONS! 🎉</h3>
+                    <h2>You've Completed Your Internship!</h2>
+                    <p><strong>What You've Accomplished:</strong></p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 15px;">
+                        <li>✅ Loaded and displayed JSON data using pure Python</li>
+                        <li>✅ Cleaned messy data and handled edge cases</li>
+                        <li>✅ Built "People You May Know" recommendation feature</li>
+                        <li>✅ Built "Pages You Might Like" recommendation feature</li>
+                        <li>✅ Implemented collaborative filtering algorithms</li>
+                    </ul>
+                    <h2 style="margin-top: 20px; color: #059669;">Your ₹10 LPA Offer Letter is Ready! 💼</h2>
+                    <p style="font-size: 1.2em; margin-top: 10px;">Your manager Puneet Kumar is impressed with your work!</p>
+                </div>
+
+                <div class="task-box" style="margin-top: 30px;">
+                    <h4>What You've Learned</h4>
+                    <p>From loading and cleaning data to recommending people and pages, you've successfully completed your first <strong>end-to-end data project</strong> using raw Python.</p>
+                    <p style="margin-top: 15px;"><strong>Skills Gained:</strong></p>
+                    <ul style="margin-top: 10px;">
+                        <li>Data manipulation and cleaning techniques</li>
+                        <li>Algorithm design for recommendation systems</li>
+                        <li>Collaborative filtering implementation</li>
+                        <li>Social network analysis fundamentals</li>
+                        <li>Pure Python programming without external libraries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var currentSection = 0;
+            var tabs = document.querySelectorAll('.nav-tab');
+            var sections = document.querySelectorAll('.content-section');
+            
+            function switchSection(index) {
+                if (index < 0 || index >= sections.length) return;
+                
+                for (var i = 0; i < sections.length; i++) {
+                    sections[i].classList.remove('active');
+                    tabs[i].classList.remove('active');
+                }
+                
+                sections[index].classList.add('active');
+                tabs[index].classList.add('active');
+                currentSection = index;
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            for (var i = 0; i < tabs.length; i++) {
+                (function(idx) {
+                    tabs[idx].addEventListener('click', function() {
+                        switchSection(idx);
+                    });
+                })(i);
+            }
+        })();
+    </script>
+</body>
+</html>
