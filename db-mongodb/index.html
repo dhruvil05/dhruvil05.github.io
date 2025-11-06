@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Handbook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #00684a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #00684a;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #00684a;
+        }
+
+        .nav-btn:hover {
+            background: #00684a;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 104, 74, 0.3);
+        }
+
+        .nav-btn.active {
+            background: #00684a;
+            color: white;
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #00684a;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #00684a;
+        }
+
+        h3 {
+            color: #00684a;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .number {
+            color: #b5cea8;
+        }
+
+        .comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #00684a;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .component-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .component-card h4 {
+            color: #00684a;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .stage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stage-table th {
+            background: #00684a;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .stage-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .stage-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .stage-table tr:hover {
+            background: #e9ecef;
+        }
+
+        ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .nav-buttons {
+                gap: 10px;
+            }
+
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.85em;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+
+            .code-block {
+                padding: 15px;
+                font-size: 0.8em;
+            }
+
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stage-table {
+                font-size: 0.85em;
+            }
+
+            .stage-table th,
+            .stage-table td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 30px 15px;
+            }
+
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🍃 MongoDB Handbook</h1>
+            <p class="subtitle">Complete guide to mastering MongoDB - from basics to advanced operations</p>
+        </header>
+
+        <div class="nav-buttons" id="navButtons"></div>
+
+        <!-- Section 1: Introduction -->
+        <div class="content-section active" id="section-1">
+            <h2>1. Introduction to MongoDB</h2>
+            <p>MongoDB is a powerful NoSQL document-oriented database that stores data in JSON-like documents (actually
+                BSON - Binary JSON). This handbook uses an e-commerce website as the primary example with three main
+                collections:</p>
+
+            <div class="component-grid">
+                <div class="component-card">
+                    <h4>Step 1: Sign Up</h4>
+                    <p>Go to <strong>https://cloud.mongodb.com</strong> and create a free account</p>
+                </div>
+                <div class="component-card">
+                    <h4>Step 2: Create Cluster</h4>
+                    <p>Create a free cluster (Serverless recommended for beginners)</p>
+                </div>
+                <div class="component-card">
+                    <h4>Step 3: Security Setup</h4>
+                    <p>Whitelist your IP address and create a database user with credentials</p>
+                </div>
+                <div class="component-card">
+                    <h4>Step 4: Connect</h4>
+                    <p>Follow the connection string instructions to connect via mongosh or your application</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>🌐 Why Use Atlas?</h4>
+                <ul>
+                    <li>No infrastructure management required</li>
+                    <li>Automatic backups and monitoring</li>
+                    <li>Built-in security features</li>
+                    <li>Global distribution capabilities</li>
+                    <li>Free tier available for learning and small projects</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 13: Best Practices -->
+        <div class="content-section" id="section-13">
+            <h2>13. Best Practices & Tips</h2>
+
+            <div class="component-grid">
+                <div class="component-card">
+                    <h4>🎯 Schema Design</h4>
+                    <p>Design schemas based on how you'll query data, not just how it's structured. Embed related data
+                        that's accessed together.</p>
+                </div>
+                <div class="component-card">
+                    <h4>📊 Indexing Strategy</h4>
+                    <p>Create indexes on frequently queried fields. Monitor query performance with explain() before
+                        adding indexes.</p>
+                </div>
+                <div class="component-card">
+                    <h4>🔍 Query Optimization</h4>
+                    <p>Use projection to return only needed fields. Limit results when possible. Use covered queries
+                        with indexes.</p>
+                </div>
+                <div class="component-card">
+                    <h4>💾 Data Management</h4>
+                    <p>Regularly backup your data. Use updateOne/updateMany instead of save(). Always test delete
+                        operations with find() first.</p>
+                </div>
+                <div class="component-card">
+                    <h4>🔐 Security</h4>
+                    <p>Enable authentication. Use role-based access control. Keep MongoDB updated with latest security
+                        patches.</p>
+                </div>
+                <div class="component-card">
+                    <h4>📈 Monitoring</h4>
+                    <p>Use MongoDB Compass or Atlas for performance monitoring. Watch for slow queries and optimize them
+                        with indexes.</p>
+                </div>
+            </div>
+
+            <h3>Common Pitfalls to Avoid</h3>
+            <div class="info-box">
+                <ul>
+                    <li>❌ Not using indexes on frequently queried fields</li>
+                    <li>❌ Creating too many indexes (slows down writes)</li>
+                    <li>❌ Using find() without limits on large collections</li>
+                    <li>❌ Storing large arrays that keep growing</li>
+                    <li>❌ Not validating data before insertion</li>
+                    <li>❌ Ignoring the explain() output for slow queries</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 14: Quick Reference -->
+        <div class="content-section" id="section-14">
+            <h2>14. Quick Reference Cheat Sheet</h2>
+
+            <h3>CRUD Operations</h3>
+            <table class="stage-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Command</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Create</strong></td>
+                        <td>insertOne(), insertMany()</td>
+                        <td>db.products.insertOne({name: "Item"})</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read</strong></td>
+                        <td>find(), findOne()</td>
+                        <td>db.products.find({price: {$gt: 100}})</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Update</strong></td>
+                        <td>updateOne(), updateMany()</td>
+                        <td>db.products.updateOne({}, {$set: {}})</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Delete</strong></td>
+                        <td>deleteOne(), deleteMany()</td>
+                        <td>db.products.deleteMany({status: "old"})</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Query Operators</h3>
+            <table class="stage-table">
+                <thead>
+                    <tr>
+                        <th>Operator</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$eq</td>
+                        <td>Equal to</td>
+                        <td>{price: {$eq: 100}}</td>
+                    </tr>
+                    <tr>
+                        <td>$gt / $gte</td>
+                        <td>Greater than / Greater than or equal</td>
+                        <td>{price: {$gte: 100}}</td>
+                    </tr>
+                    <tr>
+                        <td>$lt / $lte</td>
+                        <td>Less than / Less than or equal</td>
+                        <td>{stock: {$lt: 50}}</td>
+                    </tr>
+                    <tr>
+                        <td>$in</td>
+                        <td>Match any value in array</td>
+                        <td>{category: {$in: ["A", "B"]}}</td>
+                    </tr>
+                    <tr>
+                        <td>$or</td>
+                        <td>Logical OR</td>
+                        <td>{$or: [{a: 1}, {b: 2}]}</td>
+                    </tr>
+                    <tr>
+                        <td>$and</td>
+                        <td>Logical AND</td>
+                        <td>{$and: [{a: 1}, {b: 2}]}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Update Operators</h3>
+            <table class="stage-table">
+                <thead>
+                    <tr>
+                        <th>Operator</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$set</td>
+                        <td>Set field value</td>
+                        <td>{$set: {price: 100}}</td>
+                    </tr>
+                    <tr>
+                        <td>$inc</td>
+                        <td>Increment value</td>
+                        <td>{$inc: {stock: 5}}</td>
+                    </tr>
+                    <tr>
+                        <td>$push</td>
+                        <td>Add to array</td>
+                        <td>{$push: {tags: "new"}}</td>
+                    </tr>
+                    <tr>
+                        <td>$pull</td>
+                        <td>Remove from array</td>
+                        <td>{$pull: {tags: "old"}}</td>
+                    </tr>
+                    <tr>
+                        <td>$unset</td>
+                        <td>Remove field</td>
+                        <td>{$unset: {field: ""}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        const sections = [
+            { id: 1, title: "Introduction" },
+            { id: 2, title: "Components" },
+            { id: 3, title: "Basic Commands" },
+            { id: 4, title: "Insert Data" },
+            { id: 5, title: "Read Data" },
+            { id: 6, title: "Update Data" },
+            { id: 7, title: "Delete Data" },
+            { id: 8, title: "Indexing" },
+            { id: 9, title: "Aggregation" },
+            { id: 10, title: "Pipeline Stages" },
+            { id: 11, title: "Admin Commands" },
+            { id: 12, title: "Atlas Cloud" },
+            { id: 13, title: "Best Practices" },
+            { id: 14, title: "Quick Reference" }
+        ];
+
+        const navButtons = document.getElementById('navButtons');
+
+        sections.forEach(section => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            if (section.id === 1) btn.classList.add('active');
+            btn.textContent = section.title;
+            btn.onclick = () => showSection(section.id);
+            navButtons.appendChild(btn);
+        });
+
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(`section-${id}`).classList.add('active');
+            document.querySelectorAll('.nav-btn')[id - 1].classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
+
+<!-- Section 2: Components -->
+<div class="content-section" id="section-2">
+    <h2>2. Key Components</h2>
+
+    <div class="component-grid">
+        <div class="component-card">
+            <h4>mongod</h4>
+            <p><strong>The MongoDB Server Daemon</strong></p>
+            <p>Handles database connections, storage, and queries. Must be running before using MongoDB locally.</p>
+        </div>
+        <div class="component-card">
+            <h4>mongosh</h4>
+            <p><strong>MongoDB Shell</strong></p>
+            <p>Command-line interface for interacting with MongoDB. Run commands, queries, and scripts directly.</p>
+        </div>
+        <div class="component-card">
+            <h4>MongoDB Compass</h4>
+            <p><strong>GUI Tool</strong></p>
+            <p>Visual interface for data exploration, query building, and performance analysis. Perfect for beginners.
+            </p>
+        </div>
+    </div>
+
+    <h3>Installation</h3>
+    <p>Visit the official MongoDB website to download the community edition - it's free and suitable for most use cases.
+    </p>
+</div>
+
+<!-- Section 3: Basic Commands -->
+<div class="content-section" id="section-3">
+    <h2>3. Basic Shell Commands</h2>
+
+    <h3>Database Operations</h3>
+    <div class="code-block">
+        <pre><span class="keyword">show</span> dbs                <span class="comment">// List all databases</span>
+<span class="keyword">use</span> ecommerce          <span class="comment">// Create or switch to a database</span>
+<span class="keyword">show</span> collections       <span class="comment">// List all collections in current DB</span>
+db.dropDatabase()        <span class="comment">// Drop current database</span></pre>
+    </div>
+
+    <div class="info-box">
+        <h4>💡 Pro Tip</h4>
+        <p>The <span class="highlight">use</span> command automatically creates a database if it doesn't exist. However,
+            it won't appear in <span class="highlight">show dbs</span> until you insert data into it.</p>
+    </div>
+</div>
+
+<!-- Section 4: Inserting Data -->
+<div class="content-section" id="section-4">
+    <h2>4. Creating Collections & Inserting Data</h2>
+
+    <h3>Insert Products</h3>
+    <div class="code-block">
+        <pre><span class="keyword">use</span> ecommerce
+
+db.products.insertMany([
+  {
+    <span class="string">name</span>: <span class="string">"Wireless Mouse"</span>,
+    <span class="string">price</span>: <span class="number">799</span>,
+    <span class="string">category</span>: <span class="string">"Electronics"</span>,
+    <span class="string">stock</span>: <span class="number">120</span>,
+    <span class="string">ratings</span>: <span class="number">4.5</span>,
+    <span class="string">tags</span>: [<span class="string">"computer"</span>, <span class="string">"accessory"</span>, <span class="string">"wireless"</span>],
+    <span class="string">createdAt</span>: <span class="keyword">new</span> Date()
+  },
+  {
+    <span class="string">name</span>: <span class="string">"Mechanical Keyboard"</span>,
+    <span class="string">price</span>: <span class="number">2499</span>,
+    <span class="string">category</span>: <span class="string">"Electronics"</span>,
+    <span class="string">stock</span>: <span class="number">80</span>,
+    <span class="string">ratings</span>: <span class="number">4.8</span>,
+    <span class="string">tags</span>: [<span class="string">"keyboard"</span>, <span class="string">"mechanical"</span>],
+    <span class="string">createdAt</span>: <span class="keyword">new</span> Date()
+  }
+])</pre>
+    </div>
+
+    <h3>Insert Orders</h3>
+    <div class="code-block">
+        <pre>db.orders.insertMany([
+  {
+    <span class="string">orderId</span>: <span class="string">"ORD001"</span>,
+    <span class="string">user</span>: <span class="string">"John Doe"</span>,
+    <span class="string">products</span>: [
+      { <span class="string">name</span>: <span class="string">"Wireless Mouse"</span>, <span class="string">quantity</span>: <span class="number">1</span>, <span class="string">price</span>: <span class="number">799</span> }
+    ],
+    <span class="string">total</span>: <span class="number">3298</span>,
+    <span class="string">status</span>: <span class="string">"Delivered"</span>,
+    <span class="string">createdAt</span>: <span class="keyword">new</span> Date()
+  }
+])</pre>
+    </div>
+
+    <h3>Insert Contact Messages</h3>
+    <div class="code-block">
+        <pre>db.contacts.insertMany([
+  { 
+    <span class="string">name</span>: <span class="string">"Alice"</span>, 
+    <span class="string">message</span>: <span class="string">"Loved your website!"</span>, 
+    <span class="string">phone</span>: <span class="string">"9876543210"</span>,
+    <span class="string">createdAt</span>: <span class="keyword">new</span> Date() 
+  }
+])</pre>
+    </div>
+</div>
+
+<!-- Section 5: Reading Data -->
+<div class="content-section" id="section-5">
+    <h2>5. Reading Data (Find Queries)</h2>
+
+    <h3>Basic Find Operations</h3>
+    <div class="code-block">
+        <pre>db.products.find()                    <span class="comment">// Find all documents</span>
+db.products.find().pretty()           <span class="comment">// Pretty print results</span></pre>
+    </div>
+
+    <h3>Filter by Field</h3>
+    <div class="code-block">
+        <pre>db.products.find({ <span class="string">category</span>: <span class="string">"Electronics"</span> })</pre>
+    </div>
+
+    <h3>Comparison Operators</h3>
+    <div class="code-block">
+        <pre>db.products.find({ <span class="string">price</span>: { <span class="keyword">$gt</span>: <span class="number">1000</span> } })      <span class="comment">// Greater than 1000</span>
+db.products.find({ <span class="string">price</span>: { <span class="keyword">$gte</span>: <span class="number">1000</span>, <span class="keyword">$lte</span>: <span class="number">50000</span> } }) <span class="comment">// Between 1000 and 50000</span></pre>
+    </div>
+
+    <h3>Logical Operators</h3>
+    <div class="code-block">
+        <pre>db.products.find({ 
+  <span class="keyword">$or</span>: [
+    { <span class="string">category</span>: <span class="string">"Electronics"</span> }, 
+    { <span class="string">stock</span>: { <span class="keyword">$lt</span>: <span class="number">50</span> } }
+  ] 
+})</pre>
+    </div>
+
+    <h3>Projection (Select Specific Fields)</h3>
+    <div class="code-block">
+        <pre>db.products.find({}, { <span class="string">name</span>: <span class="number">1</span>, <span class="string">price</span>: <span class="number">1</span>, <span class="string">_id</span>: <span class="number">0</span> })</pre>
+    </div>
+
+    <h3>Sorting and Limiting</h3>
+    <div class="code-block">
+        <pre>db.products.find().sort({ <span class="string">price</span>: <span class="number">-1</span> }).limit(<span class="number">2</span>)  <span class="comment">// Top 2 most expensive</span></pre>
+    </div>
+</div>
+
+<!-- Section 6: Updating -->
+<div class="content-section" id="section-6">
+    <h2>6. Updating Documents</h2>
+
+    <h3>Update One Document</h3>
+    <div class="code-block">
+        <pre>db.products.updateOne(
+  { <span class="string">name</span>: <span class="string">"Wireless Mouse"</span> },
+  { <span class="keyword">$set</span>: { <span class="string">price</span>: <span class="number">899</span> } }
+)</pre>
+    </div>
+
+    <h3>Update Many Documents</h3>
+    <div class="code-block">
+        <pre>db.products.updateMany(
+  { <span class="string">category</span>: <span class="string">"Electronics"</span> },
+  { <span class="keyword">$inc</span>: { <span class="string">stock</span>: <span class="number">10</span> } }  <span class="comment">// Increment stock by 10</span>
+)</pre>
+    </div>
+
+    <h3>Add to Arrays with $push</h3>
+    <div class="code-block">
+        <pre>db.products.updateOne(
+  { <span class="string">name</span>: <span class="string">"Wireless Mouse"</span> },
+  { <span class="keyword">$push</span>: { <span class="string">tags</span>: <span class="string">"new"</span> } }
+)</pre>
+    </div>
+
+    <div class="info-box">
+        <h4>Common Update Operators</h4>
+        <ul>
+            <li><strong>$set</strong> - Set field value</li>
+            <li><strong>$inc</strong> - Increment/decrement number</li>
+            <li><strong>$push</strong> - Add to array</li>
+            <li><strong>$pull</strong> - Remove from array</li>
+            <li><strong>$unset</strong> - Remove field</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Section 7: Deleting -->
+<div class="content-section" id="section-7">
+    <h2>7. Deleting Documents</h2>
+
+    <h3>Delete One Document</h3>
+    <div class="code-block">
+        <pre>db.contacts.deleteOne({ <span class="string">name</span>: <span class="string">"Alice"</span> })</pre>
+    </div>
+
+    <h3>Delete Many Documents</h3>
+    <div class="code-block">
+        <pre>db.orders.deleteMany({ <span class="string">status</span>: <span class="string">"Delivered"</span> })</pre>
+    </div>
+
+    <div class="info-box">
+        <h4>⚠️ Warning</h4>
+        <p>Be careful with delete operations! They are permanent. Always test your query with <span
+                class="highlight">find()</span> before using <span class="highlight">deleteMany()</span>.</p>
+    </div>
+</div>
+
+<!-- Section 8: Indexing -->
+<div class="content-section" id="section-8">
+    <h2>8. Indexing and Performance</h2>
+
+    <p>Indexes improve the speed of read operations by allowing MongoDB to quickly locate data without scanning every
+        document.</p>
+
+    <h3>Create an Index</h3>
+    <div class="code-block">
+        <pre>db.products.createIndex({ <span class="string">name</span>: <span class="number">1</span> })  <span class="comment">// Ascending index on 'name' field</span></pre>
+    </div>
+
+    <h3>View All Indexes</h3>
+    <div class="code-block">
+        <pre>db.products.getIndexes()</pre>
+    </div>
+
+    <h3>Explain Query Performance</h3>
+    <div class="code-block">
+        <pre>db.products.find({ <span class="string">price</span>: { <span class="keyword">$gt</span>: <span class="number">5000</span> } }).explain(<span class="string">"executionStats"</span>)</pre>
+    </div>
+
+    <div class="info-box">
+        <h4>Should You Always Create Indexes?</h4>
+        <p>While indexes improve <strong>read performance</strong>, they can slow down <strong>write operations</strong>
+            (inserts, updates, deletes) because the index must also be updated. Create indexes thoughtfully based on
+            your query patterns!</p>
+    </div>
+</div>
+
+<!-- Section 9: Aggregation -->
+<div class="content-section" id="section-9">
+    <h2>9. Aggregation Framework</h2>
+
+    <p>Aggregation pipelines analyze and transform data through stages. Each stage performs an operation, passing
+        results to the next stage.</p>
+
+    <h3>Basic Example - Total Revenue</h3>
+    <div class="code-block">
+        <pre>db.orders.aggregate([
+  { <span class="keyword">$group</span>: { 
+    <span class="string">_id</span>: <span class="keyword">null</span>, 
+    <span class="string">totalRevenue</span>: { <span class="keyword">$sum</span>: <span class="string">"$total"</span> } 
+  }}
+])</pre>
+    </div>
+
+    <h3>Group by Status</h3>
+    <div class="code-block">
+        <pre>db.orders.aggregate([
+  { <span class="keyword">$group</span>: { 
+    <span class="string">_id</span>: <span class="string">"$status"</span>, 
+    <span class="string">totalOrders</span>: { <span class="keyword">$sum</span>: <span class="number">1</span> } 
+  }}
+])</pre>
+    </div>
+
+    <h3>Lookup (Join Collections)</h3>
+    <div class="code-block">
+        <pre>db.orders.aggregate([
+  {
+    <span class="keyword">$lookup</span>: {
+      <span class="string">from</span>: <span class="string">"products"</span>,
+      <span class="string">localField</span>: <span class="string">"products.name"</span>,
+      <span class="string">foreignField</span>: <span class="string">"name"</span>,
+      <span class="string">as</span>: <span class="string">"productDetails"</span>
+    }
+  }
+])</pre>
+    </div>
+</div>
+
+<!-- Section 10: Pipeline Stages -->
+<div class="content-section" id="section-10">
+    <h2>10. Aggregation Pipeline Stages</h2>
+
+    <h3>Stage 1: $match - Filter Documents</h3>
+    <div class="code-block">
+        <pre>db.sales.aggregate([
+  { <span class="keyword">$match</span>: { <span class="string">category</span>: <span class="string">"Fruit"</span> } }
+])</pre>
+    </div>
+
+    <h3>Stage 2: $project - Select Fields</h3>
+    <div class="code-block">
+        <pre>db.sales.aggregate([
+  { <span class="keyword">$project</span>: { <span class="string">_id</span>: <span class="number">0</span>, <span class="string">item</span>: <span class="number">1</span>, <span class="string">price</span>: <span class="number">1</span> } }
+])</pre>
+    </div>
+
+    <h3>Stage 3: $group - Calculate Totals</h3>
+    <div class="code-block">
+        <pre>db.sales.aggregate([
+  {
+    <span class="keyword">$group</span>: {
+      <span class="string">_id</span>: <span class="string">"$category"</span>,
+      <span class="string">totalSales</span>: { <span class="keyword">$sum</span>: { <span class="keyword">$multiply</span>: [<span class="string">"$price"</span>, <span class="string">"$quantity"</span>] } }
+    }
+  }
+])</pre>
+    </div>
+
+    <h3>Stage 4: $sort - Sort Results</h3>
+    <div class="code-block">
+        <pre>db.sales.aggregate([
+  { <span class="keyword">$group</span>: { <span class="string">_id</span>: <span class="string">"$category"</span>, <span class="string">total</span>: { <span class="keyword">$sum</span>: <span class="number">1</span> } }},
+  { <span class="keyword">$sort</span>: { <span class="string">total</span>: <span class="number">-1</span> } }  <span class="comment">// -1 for descending</span>
+])</pre>
+    </div>
+
+    <h3>Aggregation Stages Summary</h3>
+    <table class="stage-table">
+        <thead>
+            <tr>
+                <th>Stage</th>
+                <th>Description</th>
+                <th>Example Use</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>$match</strong></td>
+                <td>Filter documents</td>
+                <td>{ category: "Fruit" }</td>
+            </tr>
+            <tr>
+                <td><strong>$project</strong></td>
+                <td>Show/hide fields or create new ones</td>
+                <td>item, price</td>
+            </tr>
+            <tr>
+                <td><strong>$group</strong></td>
+                <td>Group data and calculate sums, averages</td>
+                <td>Total sales per category</td>
+            </tr>
+            <tr>
+                <td><strong>$sort</strong></td>
+                <td>Sort results</td>
+                <td>Sort by total sales</td>
+            </tr>
+            <tr>
+                <td><strong>$limit</strong></td>
+                <td>Limit number of results</td>
+                <td>Top 3 items</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="info-box">
+        <h4>💡 Did You Know?</h4>
+        <p>MongoDB supports over 25 aggregation stages! The ones covered here are the most common and beginner-friendly
+            core stages.</p>
+    </div>
+</div>
+
+<!-- Section 11: Admin Commands -->
+<div class="content-section" id="section-11">
+    <h2>11. Useful Admin Commands</h2>
+
+    <div class="code-block">
+        <pre>db.stats()                           <span class="comment">// Show database statistics</span>
+db.serverStatus()                    <span class="comment">// Server information</span>
+db.products.countDocuments()         <span class="comment">// Count documents in collection</span>
+db.products.renameCollection(<span class="string">"items"</span>) <span class="comment">// Rename collection</span>
+db.products.drop()                   <span class="comment">// Drop collection</span></pre>
+    </div>
+
+    <h3>Collection Management</h3>
+    <ul>
+        <li><strong>stats()</strong> - Get detailed statistics about database size and storage</li>
+        <li><strong>serverStatus()</strong> - View server metrics and health information</li>
+        <li><strong>countDocuments()</strong> - Get accurate count of documents</li>
+        <li><strong>drop()</strong> - Permanently delete a collection</li>
+    </ul>
+</div>
+
+<!-- Section 12: Atlas -->
+<div class="content-section" id="section-12">
+    <h2>12. MongoDB Atlas (Cloud)</h2>
+
+    <p>MongoDB Atlas is the cloud-hosted version of MongoDB. It's fully managed, scalable, and offers a free tier!</p>
+
+    <h3>Steps to Use Atlas</h3>
+    <div class="component-grid">
+        <div class="component-card">
+            <h4>🛍️ Products</h4>
+            <p>Store products information including name, price, stock, and ratings</p>
+        </div>
+        <div class="component-card">
+            <h4>📦 Orders</h4>
+            <p>Store order details including customer info, items, and order status</p>
+        </div>
+        <div class="component-card">
+            <h4>💬 Contacts</h4>
+            <p>Messages from the contact form with customer inquiries</p>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h4>Why MongoDB?</h4>
+        <p>MongoDB provides flexibility with schema-less design, horizontal scalability, and powerful query
+            capabilities. Perfect for modern applications requiring rapid development and evolution.</p>
+    </div>
+</div>
