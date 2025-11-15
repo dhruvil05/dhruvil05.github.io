@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraping & Data Collection Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-block code {
+            white-space: pre;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .example-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px solid #2196f3;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .success-box {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        ul,
+        ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .interactive-demo {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+        }
+
+        .demo-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin: 10px 5px 10px 0;
+        }
+
+        .demo-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .demo-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            min-height: 100px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            header,
+            .section,
+            nav {
+                padding: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th,
+            td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .code-block {
+                font-size: 0.75em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Data Collection & Web Scraping Guide</h1>
+            <p class="subtitle">Master the Art of Automated Data Extraction with Python</p>
+        </header>
+
+        <nav>
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+                <button class="nav-btn" onclick="showSection('ethics')">Ethics</button>
+                <button class="nav-btn" onclick="showSection('tools')">Tools</button>
+                <button class="nav-btn" onclick="showSection('webscraping')">Web Scraping</button>
+                <button class="nav-btn" onclick="showSection('html')">HTML Basics</button>
+                <button class="nav-btn" onclick="showSection('css')">CSS Selectors</button>
+                <button class="nav-btn" onclick="showSection('requests')">Requests</button>
+                <button class="nav-btn" onclick="showSection('beautifulsoup')">BeautifulSoup</button>
+                <button class="nav-btn" onclick="showSection('demo')">Interactive Demo</button>
+            </div>
+        </nav>
+
+        <!-- Introduction Section -->
+        <div id="intro" class="section active">
+            <h2>🎯 Data Collection Techniques</h2>
+
+            <div class="highlight">
+                <h3>💡 Golden Rule: "Garbage In, Garbage Out"</h3>
+                <p>The quality of insights directly depends on the quality of data collected. Whether you're building
+                    machine learning models, performing statistical analysis, or developing AI systems, your success
+                    begins with gathering accurate, reliable data.</p>
+            </div>
+
+            <h3>Understanding Data Sources</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>🌐 APIs</h4>
+                    <p>Provide structured access to real-time information, such as weather or stock data.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>🗄️ Databases</h4>
+                    <p>Both SQL and NoSQL databases house large volumes of structured data.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>📄 Webpages</h4>
+                    <p>Offer valuable unstructured data from blogs, e-commerce platforms, and more.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>📁 Files</h4>
+                    <p>CSV, JSON, and Excel sheets serve as local or cloud-based data repositories.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>📡 Sensors & Logs</h4>
+                    <p>Provide real-time inputs from IoT devices and application events.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Final Takeaway</h3>
+                <p>Data collection is more than just gathering information—it's about doing so responsibly, efficiently,
+                    and with the right tools. Python stands out as a versatile language, offering powerful libraries for
+                    virtually every type of data source. Mastering these techniques lays a strong foundation for any
+                    data science project.</p>
+            </div>
+        </div>
+
+        <!-- Ethics Section -->
+        <div id="ethics" class="section">
+            <h2>⚖️ Ethical Considerations</h2>
+
+            <div class="warning-box">
+                <h3>⚠️ Critical Requirements</h3>
+                <p>Ethical data collection is crucial. Always review a website's Terms of Service and respect robots.txt
+                    when scraping.</p>
+            </div>
+
+            <h3>Key Ethical Principles</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>📋 Terms of Service</h4>
+                    <p>Always review and comply with website terms before scraping.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>🤖 robots.txt</h4>
+                    <p>Respect the robots.txt file that indicates what can be crawled.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>✅ Informed Consent</h4>
+                    <p>Data must be collected with proper user consent.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>📜 Regulations</h4>
+                    <p>Comply with GDPR, CCPA, and other data protection regulations.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>©️ Attribution</h4>
+                    <p>Properly attribute sources and respect licensing.</p>
+                </div>
+                <div class="grid-item">
+                    <h4>🔒 Data Usage Rights</h4>
+                    <p>Never overlook proper usage rights and permissions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Section -->
+        <div id="tools" class="section">
+            <h2>🛠️ Tools and Techniques</h2>
+
+            <h3>Data Collection Methods</h3>
+
+            <div class="card">
+                <h4>🔌 APIs (REST or GraphQL)</h4>
+                <p>For structured, remote data access. Best choice when available.</p>
+            </div>
+
+            <div class="card">
+                <h4>🕷️ Web Scraping</h4>
+                <p>Using tools like BeautifulSoup, Scrapy, or Selenium for HTML parsing.</p>
+            </div>
+
+            <div class="card">
+                <h4>🔔 Webhooks</h4>
+                <p>For event-based data (e.g., payment notifications).</p>
+            </div>
+
+            <div class="card">
+                <h4>📝 Manual Methods</h4>
+                <p>Forms or surveys for crowd-sourced insights.</p>
+            </div>
+
+            <div class="card">
+                <h4>📂 File Handling</h4>
+                <p>Python libraries such as pandas, csv, and json.</p>
+            </div>
+
+            <h3>Python Libraries for Databases</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Library</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>sqlite3</td>
+                        <td>SQLite database operations</td>
+                    </tr>
+                    <tr>
+                        <td>SQLAlchemy</td>
+                        <td>SQL toolkit and ORM</td>
+                    </tr>
+                    <tr>
+                        <td>pymongo</td>
+                        <td>MongoDB (NoSQL) operations</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Web Scraping Section -->
+        <div id="webscraping" class="section">
+            <h2>🕸️ What is Web Scraping?</h2>
+
+            <div class="highlight">
+                <p><strong>Web Scraping</strong> is the automated process of extracting information from websites.
+                    Instead of manually copying data, a scraper reads and parses the webpage's code to collect the
+                    needed data.</p>
+            </div>
+
+            <h3>Common Use Cases</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>💰 Product Prices</h4>
+                    <p>Monitor price changes across e-commerce sites</p>
+                </div>
+                <div class="grid-item">
+                    <h4>📰 News Articles</h4>
+                    <p>Collect news and media content</p>
+                </div>
+                <div class="grid-item">
+                    <h4>💼 Job Listings</h4>
+                    <p>Aggregate job postings from multiple sources</p>
+                </div>
+                <div class="grid-item">
+                    <h4>🔬 Research Datasets</h4>
+                    <p>Build datasets for analysis and research</p>
+                </div>
+            </div>
+
+            <h3>✅ Why Use Web Scraping?</h3>
+            <ul>
+                <li>Automate repetitive data collection tasks</li>
+                <li>Access data that is not available via APIs</li>
+                <li>Build datasets for Machine Learning models and Analytics</li>
+                <li>Monitor websites for price changes, content updates, or news alerts</li>
+            </ul>
+
+            <h3>❌ When NOT to Use Web Scraping</h3>
+            <div class="warning-box">
+                <ul>
+                    <li><strong>If the site offers an official API</strong> - prefer that (it's cleaner and more stable)
+                    </li>
+                    <li><strong>If scraping violates the site's Terms of Service</strong></li>
+                    <li><strong>If the scraping harms the website</strong> - excessive requests can cause server
+                        overload</li>
+                </ul>
+            </div>
+
+            <h3>🔧 Tools We'll Use</h3>
+            <div class="card">
+                <p><strong>requests</strong> → To download the HTML content of a webpage</p>
+                <p><strong>BeautifulSoup</strong> → To parse and extract data from the HTML</p>
+                <p><strong>Selenium (Optional)</strong> → For websites that load data dynamically with JavaScript</p>
+            </div>
+
+            <div class="success-box">
+                <h4>✨ Summary</h4>
+                <ul>
+                    <li>Web scraping automates data extraction from websites</li>
+                    <li>Understanding basic HTML structure and CSS selectors is crucial</li>
+                    <li>Python provides powerful libraries to make web scraping easy</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- HTML Section -->
+        <div id="html" class="section">
+            <h2>📝 HTML Basics for Web Scraping</h2>
+
+            <div class="highlight">
+                <h3>What is HTML?</h3>
+                <p>HTML (HyperText Markup Language) structures content on the web. It's made up of elements (tags) like
+                    &lt;div&gt;, &lt;p&gt;, &lt;h1&gt;, &lt;a&gt;, etc.</p>
+            </div>
+
+            <h3>Basic HTML Structure</h3>
+            <div class="code-block"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Sample Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Welcome!&lt;/h1&gt;
+    &lt;p&gt;This is a sample page.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></div>
+
+            <h3>Key HTML Elements</h3>
+            <div class="card">
+                <p><strong>&lt;!DOCTYPE html&gt;</strong>: Declares the document type</p>
+                <p><strong>&lt;html&gt;</strong>: Root element of the page</p>
+                <p><strong>&lt;head&gt;</strong>: Contains metadata, styles, and scripts</p>
+                <p><strong>&lt;body&gt;</strong>: Contains visible content</p>
+            </div>
+
+            <h3>Important HTML Tags for Scraping</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Meaning</th>
+                        <th>Common Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>&lt;div&gt;</td>
+                        <td>Division/Container</td>
+                        <td>Group content</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;p&gt;</td>
+                        <td>Paragraph</td>
+                        <td>Text blocks</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;h1&gt;-&lt;h6&gt;</td>
+                        <td>Headings</td>
+                        <td>Titles and sections</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;a&gt;</td>
+                        <td>Anchor (links)</td>
+                        <td>URLs, navigation</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;img&gt;</td>
+                        <td>Image</td>
+                        <td>Pictures and icons</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;table&gt;</td>
+                        <td>Table</td>
+                        <td>Structured tabular data</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</td>
+                        <td>Lists</td>
+                        <td>List items</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;span&gt;</td>
+                        <td>Inline container</td>
+                        <td>Inline styling</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 Attributes Matter!</h3>
+            <div class="example-box">
+                <p>HTML tags often have attributes like <strong>id</strong>, <strong>class</strong>,
+                    <strong>href</strong>, <strong>src</strong>.</p>
+                <p>We use these attributes to target the correct elements.</p>
+                <div class="code-block"><code>&lt;p class="price"&gt;$29.99&lt;/p&gt;</code></div>
+                <p>Here, the <strong>class="price"</strong> attribute helps identify the price on the page.</p>
+            </div>
+
+            <h3>Common HTML Attributes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>href</td>
+                        <td>Hyperlink reference</td>
+                    </tr>
+                    <tr>
+                        <td>src</td>
+                        <td>Image or media source</td>
+                    </tr>
+                    <tr>
+                        <td>class</td>
+                        <td>CSS class (commonly used for scraping)</td>
+                    </tr>
+                    <tr>
+                        <td>id</td>
+                        <td>Unique identifier for an element</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>Often used in form elements</td>
+                    </tr>
+                    <tr>
+                        <td>type</td>
+                        <td>Used in &lt;input&gt; tags</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Understanding Nested Elements</h3>
+            <div class="card">
+                <p>HTML is hierarchical. Tags can contain other tags.</p>
+                <div class="code-block"><code>&lt;div class="article"&gt;
+    &lt;h2&gt;Title&lt;/h2&gt;
+    &lt;p&gt;This is a summary.&lt;/p&gt;
+&lt;/div&gt;</code></div>
+                <p>To extract both the title and summary, first locate the parent &lt;div class="article"&gt;, then its
+                    children.</p>
+            </div>
+
+            <div class="success-box">
+                <h4>💡 Practical Tips</h4>
+                <ul>
+                    <li>Use browser DevTools (Right-click → Inspect) to examine HTML structure</li>
+                    <li>Target elements with unique <strong>id</strong> or descriptive <strong>class</strong> attributes
+                    </li>
+                    <li>Use tag nesting logic to extract specific parts of a page</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CSS Section -->
+        <div id="css" class="section">
+            <h2>🎨 CSS Selectors for Scraping</h2>
+
+            <div class="highlight">
+                <h3>What is CSS?</h3>
+                <p>CSS (Cascading Style Sheets) controls the style and layout of HTML elements. For scraping, we mainly
+                    care about CSS selectors to find and extract data.</p>
+            </div>
+
+            <h3>Common CSS Selectors</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Selector</th>
+                        <th>Meaning</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>.class</td>
+                        <td>Selects elements by class</td>
+                        <td>.price, .title</td>
+                    </tr>
+                    <tr>
+                        <td>#id</td>
+                        <td>Selects an element by id</td>
+                        <td>#main, #product-title</td>
+                    </tr>
+                    <tr>
+                        <td>tag</td>
+                        <td>Selects all elements of a tag</td>
+                        <td>h1, div, p</td>
+                    </tr>
+                    <tr>
+                        <td>tag.class</td>
+                        <td>Selects a tag with class</td>
+                        <td>p.price, div.container</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example: Selecting Elements</h3>
+            <div class="example-box">
+                <p><strong>HTML:</strong></p>
+                <div class="code-block"><code>&lt;p class="price"&gt;$29.99&lt;/p&gt;</code></div>
+
+                <p><strong>CSS selector to target this:</strong></p>
+                <div class="code-block"><code>p.price</code></div>
+
+                <p><strong>In Python using BeautifulSoup:</strong></p>
+                <div class="code-block"><code>soup.select_one("p.price")</code></div>
+            </div>
+
+            <h3>Navigating HTML in Scraping</h3>
+            <div class="card">
+                <p>Scraping tools like BeautifulSoup use tag names and attributes to locate elements.</p>
+                <h4>Example Targets:</h4>
+                <ul>
+                    <li><strong>By tag:</strong> soup.find('div')</li>
+                    <li><strong>By class:</strong> soup.find('div', class_='product')</li>
+                    <li><strong>By ID:</strong> soup.find(id='header')</li>
+                    <li><strong>By attribute:</strong> soup.find('a', {'href': True})</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Requests Section -->
+        <div id="requests" class="section">
+            <h2>🌐 Using Requests for Web Scraping</h2>
+
+            <div class="highlight">
+                <h3>What is requests?</h3>
+                <p><strong>requests</strong> is a Python library used to send HTTP requests easily. It allows you to
+                    fetch the content of a webpage programmatically. It is commonly used as the first step before
+                    parsing HTML with BeautifulSoup.</p>
+            </div>
+
+            <h3>📦 Installing requests</h3>
+            <div class="code-block"><code>pip install requests</code></div>
+
+            <h3>🚀 Sending a Basic GET Request</h3>
+            <div class="code-block"><code>import requests
+
+url = "https://example.com"
+response = requests.get(url)
+
+# Print the HTML content
+print(response.text)</code></div>
+
+            <div class="card">
+                <p><strong>url:</strong> The website you want to fetch</p>
+                <p><strong>response.text:</strong> The HTML content of the page as a string</p>
+            </div>
+
+            <h3>✅ Checking the Response Status</h3>
+            <div class="code-block"><code>print(response.status_code)
+
+if response.status_code == 200:
+    print("Page fetched successfully!")
+else:
+    print("Failed to fetch the page.")</code></div>
+
+            <h3>Common Status Codes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Meaning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>200</td>
+                        <td>OK (Success)</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>Forbidden</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Important Response Properties</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>response.text</td>
+                        <td>HTML content as Unicode text</td>
+                    </tr>
+                    <tr>
+                        <td>response.content</td>
+                        <td>Raw bytes of the response</td>
+                    </tr>
+                    <tr>
+                        <td>response.status_code</td>
+                        <td>HTTP status code</td>
+                    </tr>
+                    <tr>
+                        <td>response.headers</td>
+                        <td>Metadata like content-type, server info</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎭 Adding Headers to Mimic a Browser</h3>
+            <div class="warning-box">
+                <p>Sometimes websites block automated requests. Adding a User-Agent header helps the request look like
+                    it is coming from a real browser.</p>
+            </div>
+            <div class="code-block"><code>headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+}
+response = requests.get(url, headers=headers)</code></div>
+
+            <h3>⚠️ Handling Connection Errors</h3>
+            <div class="code-block"><code>try:
+    response = requests.get(url, timeout=5)
+    response.raise_for_status()  # Raises HTTPError for bad responses
+    print(response.text)
+except requests.exceptions.RequestException as e:
+    print(f"An error occurred: {e}")</code></div>
+
+            <h3>✨ Best Practices for Fetching Pages</h3>
+            <div class="success-box">
+                <ul>
+                    <li>Always check the HTTP status code</li>
+                    <li>Use proper headers to mimic a browser</li>
+                    <li>Set a timeout to avoid hanging indefinitely</li>
+                    <li>Respect the website by not making too many rapid requests</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>📚 Summary</h4>
+                <ul>
+                    <li><strong>requests</strong> makes it simple to fetch web pages using Python</li>
+                    <li>It is the starting point for most web scraping workflows</li>
+                    <li>Combining <strong>requests</strong> with <strong>BeautifulSoup</strong> allows for powerful data
+                        extraction</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4>🧪 Practice Sites</h4>
+                <p>You can safely practice on:</p>
+                <ul>
+                    <li><a href="https://quotes.toscrape.com/" target="_blank">quotes.toscrape.com</a></li>
+                    <li><a href="https://books.toscrape.com/" target="_blank">books.toscrape.com</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BeautifulSoup Section -->
+        <div id="beautifulsoup" class="section">
+            <h2>🍜 Using BeautifulSoup for Web Scraping</h2>
+
+            <div class="highlight">
+                <h3>What is BeautifulSoup?</h3>
+                <p><strong>BeautifulSoup</strong> is a Python library used to parse HTML and XML documents. It creates a
+                    parse tree from page content, making it easy to extract data. It is often used with requests to
+                    scrape websites.</p>
+            </div>
+
+            <h3>📦 Installing BeautifulSoup</h3>
+            <div class="code-block"><code>pip install beautifulsoup4 lxml</code></div>
+
+            <h3>🎨 Creating a BeautifulSoup Object</h3>
+            <div class="code-block"><code>from bs4 import BeautifulSoup
+import requests
+
+url = "https://example.com"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "lxml")</code></div>
+
+            <div class="card">
+                <p><strong>response.text:</strong> HTML content</p>
+                <p><strong>"lxml":</strong> A fast and powerful parser (you can also use "html.parser")</p>
+            </div>
+
+            <h3>🌳 Understanding the HTML Structure</h3>
+            <div class="example-box">
+                <p>BeautifulSoup treats the page like a tree. You can search and navigate through tags, classes, ids,
+                    and attributes.</p>
+                <div class="code-block"><code>&lt;html&gt;
+&lt;body&gt;
+    &lt;h1&gt;Title&lt;/h1&gt;
+    &lt;p class="description"&gt;This is a paragraph.&lt;/p&gt;
+    &lt;a href="/page"&gt;Read more&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></div>
+            </div>
+
+            <h3>🔍 Common Methods in BeautifulSoup</h3>
+
+            <h4>1. Accessing Elements</h4>
+            <div class="code-block"><code># Access the first occurrence of a tag
+soup.h1
+
+# Get the text inside a tag
+soup.h1.text</code></div>
+
+            <h4>2. find() Method</h4>
+            <div class="card">
+                <p>Finds the <strong>first</strong> matching element:</p>
+                <div class="code-block"><code>soup.find("p")
+
+# Find a tag with specific attributes
+soup.find("p", class_="description")</code></div>
+            </div>
+
+            <h4>3. find_all() Method</h4>
+            <div class="card">
+                <p>Finds <strong>all</strong> matching elements:</p>
+                <div class="code-block"><code>soup.find_all("a")</code></div>
+            </div>
+
+            <h4>4. Using select() and select_one()</h4>
+            <div class="card">
+                <p>Select elements using CSS selectors:</p>
+                <div class="code-block"><code>soup.select_one("p.description")
+soup.select("a")</code></div>
+            </div>
+
+            <h3>🔗 Extracting Attributes</h3>
+            <div class="example-box">
+                <p>Get the value of an attribute, such as <strong>href</strong> from an &lt;a&gt; tag:</p>
+                <div class="code-block"><code>link = soup.find("a")
+print(link["href"])
+
+# Or using .get()
+print(link.get("href"))</code></div>
+            </div>
+
+            <h3>🌲 Traversing the Tree</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>.parent</td>
+                        <td>Access parent element</td>
+                        <td>soup.p.parent</td>
+                    </tr>
+                    <tr>
+                        <td>.children</td>
+                        <td>Access child elements</td>
+                        <td>list(soup.body.children)</td>
+                    </tr>
+                    <tr>
+                        <td>.find_next_sibling()</td>
+                        <td>Find next sibling</td>
+                        <td>soup.h1.find_next_sibling()</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>✅ Handling Missing Elements Safely</h3>
+            <div class="warning-box">
+                <p>Always check if an element exists before accessing it:</p>
+                <div class="code-block"><code>title_tag = soup.find("h1")
+if title_tag:
+    print(title_tag.text)
+else:
+    print("Title not found")</code></div>
+            </div>
+
+            <h3>🎯 Summary</h3>
+            <div class="success-box">
+                <ul>
+                    <li>BeautifulSoup helps parse and navigate HTML easily</li>
+                    <li>Use <strong>.find()</strong>, <strong>.find_all()</strong>, <strong>.select()</strong>, and
+                        <strong>.select_one()</strong> to locate data</li>
+                    <li>Always inspect the website's structure before writing scraping logic</li>
+                    <li>Combine BeautifulSoup with requests for full scraping workflows</li>
+                </ul>
+            </div>
+
+            <h3>📚 Useful Python Libraries</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>requests</h4>
+                    <p>Sending HTTP requests</p>
+                </div>
+                <div class="grid-item">
+                    <h4>BeautifulSoup</h4>
+                    <p>Parsing and traversing HTML</p>
+                </div>
+                <div class="grid-item">
+                    <h4>lxml</h4>
+                    <p>Fast parser for large documents</p>
+                </div>
+                <div class="grid-item">
+                    <h4>Selenium</h4>
+                    <p>Interacting with JavaScript-rendered pages</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Demo Section -->
+        <div id="demo" class="section">
+            <h2>🎮 Interactive Demo</h2>
+
+            <div class="highlight">
+                <h3>Try It Yourself!</h3>
+                <p>Test your understanding of HTML parsing with this interactive demo.</p>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>HTML Parser Simulator</h3>
+                <p>Enter HTML code and select what you want to extract:</p>
+
+                <textarea class="demo-input" id="htmlInput" rows="10" placeholder="Enter HTML code here...">
+&lt;div class="product"&gt;
+    &lt;h1&gt;Laptop&lt;/h1&gt;
+    &lt;p class="price"&gt;$999&lt;/p&gt;
+    &lt;a href="/buy"&gt;Buy Now&lt;/a&gt;
+&lt;/div&gt;</textarea>
+
+                <div style="margin: 15px 0;">
+                    <button class="demo-btn" onclick="extractTag()">Extract All Tags</button>
+                    <button class="demo-btn" onclick="extractText()">Extract All Text</button>
+                    <button class="demo-btn" onclick="extractClass()">Find by Class</button>
+                    <button class="demo-btn" onclick="clearOutput()">Clear Output</button>
+                </div>
+
+                <input type="text" class="demo-input" id="classInput" placeholder="Enter class name (e.g., price)"
+                    style="margin-top: 10px;">
+
+                <div class="demo-output" id="output">Output will appear here...</div>
+            </div>
+
+            <div class="card" style="margin-top: 30px;">
+                <h3>💡 Quick Reference Guide</h3>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>requests.get()</h4>
+                        <p>Fetch webpage HTML</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>soup.find()</h4>
+                        <p>Find first matching element</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>soup.find_all()</h4>
+                        <p>Find all matching elements</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>soup.select()</h4>
+                        <p>CSS selector search</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>.text</h4>
+                        <p>Extract text content</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>["attribute"]</h4>
+                        <p>Get attribute value</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <h3>🎓 Master Web Scraping with Python</h3>
+            <p>Remember: Always scrape responsibly and ethically!</p>
+            <p style="margin-top: 15px; color: #999;">© 2025 Web Scraping Guide | Built with HTML, CSS & JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function extractTag() {
+            const html = document.getElementById('htmlInput').value;
+            const output = document.getElementById('output');
+
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const tags = doc.body.getElementsByTagName('*');
+
+                let result = 'Found Tags:\n\n';
+                for (let tag of tags) {
+                    result += `<${tag.tagName.toLowerCase()}>${tag.innerHTML ? ' ... ' : ''}</${tag.tagName.toLowerCase()}>\n`;
+                }
+
+                output.textContent = result || 'No tags found';
+            } catch (e) {
+                output.textContent = 'Error parsing HTML: ' + e.message;
+            }
+        }
+
+        function extractText() {
+            const html = document.getElementById('htmlInput').value;
+            const output = document.getElementById('output');
+
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const text = doc.body.textContent.trim();
+
+                output.textContent = 'Extracted Text:\n\n' + (text || 'No text content found');
+            } catch (e) {
+                output.textContent = 'Error parsing HTML: ' + e.message;
+            }
+        }
+
+        function extractClass() {
+            const html = document.getElementById('htmlInput').value;
+            const className = document.getElementById('classInput').value.trim();
+            const output = document.getElementById('output');
+
+            if (!className) {
+                output.textContent = 'Please enter a class name in the input field above.';
+                return;
+            }
+
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const elements = doc.getElementsByClassName(className);
+
+                if (elements.length === 0) {
+                    output.textContent = `No elements found with class "${className}"`;
+                    return;
+                }
+
+                let result = `Found ${elements.length} element(s) with class "${className}":\n\n`;
+                for (let el of elements) {
+                    result += `<${el.tagName.toLowerCase()} class="${className}">\n`;
+                    result += `  Text: ${el.textContent.trim()}\n`;
+                    result += `</${el.tagName.toLowerCase()}>\n\n`;
+                }
+
+                output.textContent = result;
+            } catch (e) {
+                output.textContent = 'Error parsing HTML: ' + e.message;
+            }
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Output will appear here...';
+        }
+
+        // Set first section as active on load
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('intro').classList.add('active');
+        });
+    </script>
+</body>
+
+</html>
