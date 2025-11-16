@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Handbook - Interactive Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .nav-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .topic-btn {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .topic-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .topic-btn.active {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-height: 500px;
+        }
+
+        .topic-content {
+            display: none;
+        }
+
+        .topic-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-block .keyword {
+            color: #f472b6;
+            font-weight: bold;
+        }
+
+        .code-block .string {
+            color: #86efac;
+        }
+
+        .code-block .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .example-box {
+            background: #f0f9ff;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 5px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        ul,
+        ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .topic-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .code-block {
+                font-size: 12px;
+                padding: 15px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-btn {
+                font-size: 13px;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+        }
+
+        .back-to-top.visible {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 SQL Handbook</h1>
+            <p class="subtitle">Interactive Guide to Master Databases & MySQL</p>
+        </header>
+
+        <div class="nav-container">
+            <input type="text" class="search-box" placeholder="🔍 Search topics..." id="searchBox">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="topic-grid" id="topicGrid"></div>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <div class="topic-content active" id="intro">
+                <h2>Introduction to Databases</h2>
+
+                <h3>What is a Database?</h3>
+                <p>A <span class="highlight">Database</span> is an organized collection of structured information or
+                    data, typically stored electronically in a computer system. It's a way to store data in a format
+                    that is easily accessible.</p>
+
+                <div class="example-box">
+                    <strong>Example:</strong> Think of a library where books are organized by topic, author, and title –
+                    that's essentially what a database does with data.
+                </div>
+
+                <h3>Why Do We Need Databases?</h3>
+                <ul>
+                    <li>To store, manage, and retrieve large amounts of data efficiently</li>
+                    <li>To prevent data duplication and maintain data integrity</li>
+                    <li>To allow multiple users to access and manipulate data simultaneously</li>
+                </ul>
+
+                <h3>What is SQL?</h3>
+                <p><span class="highlight">SQL (Structured Query Language)</span> is the standard programming language
+                    used to communicate with and manipulate databases.</p>
+
+                <h4>Common Operations (CRUD):</h4>
+                <table>
+                    <tr>
+                        <th>Operation</th>
+                        <th>SQL Command</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>Create</td>
+                        <td>INSERT</td>
+                        <td>Add new records</td>
+                    </tr>
+                    <tr>
+                        <td>Read</td>
+                        <td>SELECT</td>
+                        <td>Retrieve data</td>
+                    </tr>
+                    <tr>
+                        <td>Update</td>
+                        <td>UPDATE</td>
+                        <td>Modify existing data</td>
+                    </tr>
+                    <tr>
+                        <td>Delete</td>
+                        <td>DELETE</td>
+                        <td>Remove records</td>
+                    </tr>
+                </table>
+
+                <h3>Comparison with Excel</h3>
+                <ul>
+                    <li>In Excel, a sheet is like a table in a database</li>
+                    <li>Each row in the sheet is similar to a record (or entry) in a database table</li>
+                    <li>Each column in Excel corresponds to a field (or attribute) in a table</li>
+                    <li>Excel stores all data in one file, whereas a database can contain multiple related tables</li>
+                    <li>In databases, you can define strict data types and rules, which Excel doesn't enforce</li>
+                    <li>Unlike Excel, databases allow complex querying, relationships between tables, and secure
+                        multi-user access</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Think of it this way:</strong> A database is a more powerful, structured, and scalable
+                    version of Excel for data management.
+                </div>
+
+                <h3>Relational vs Non-relational Databases</h3>
+                <p>Relational databases store data in structured tables with predefined schemas and relationships
+                    between tables (e.g., MySQL, PostgreSQL). Non-relational databases (NoSQL) use flexible formats like
+                    documents, key-value pairs, or graphs, and don't require a fixed schema (e.g., MongoDB, Firebase).
+                </p>
+
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Relational (SQL)</th>
+                        <th>Non-relational (NoSQL)</th>
+                    </tr>
+                    <tr>
+                        <td>Structure</td>
+                        <td>Tables (rows & columns)</td>
+                        <td>Documents, Key-Value</td>
+                    </tr>
+                    <tr>
+                        <td>Language</td>
+                        <td>SQL</td>
+                        <td>Varies (Mongo Query, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>Schema</td>
+                        <td>Fixed schema</td>
+                        <td>Flexible schema</td>
+                    </tr>
+                    <tr>
+                        <td>Examples</td>
+                        <td>MySQL, PostgreSQL</td>
+                        <td>MongoDB, Firebase</td>
+                    </tr>
+                </table>
+
+                <h3>What is DBMS?</h3>
+                <p>A <span class="highlight">Database Management System (DBMS)</span> is software that interacts with
+                    users, applications, and the database itself to capture and analyze data.</p>
+                <ul>
+                    <li><strong>Examples:</strong> MySQL, PostgreSQL, Oracle Database, SQLite</li>
+                    <li><strong>Functions:</strong> Data storage, retrieval, security, backup, and recovery</li>
+                </ul>
+
+                <h3>What is MySQL?</h3>
+                <p>MySQL is an open-source relational database management system (RDBMS) that uses SQL.</p>
+                <ul>
+                    <li>Widely used in web development</li>
+                    <li>High performance and reliability</li>
+                    <li>Powers platforms like WordPress, Facebook (early days), and YouTube</li>
+                </ul>
+
+                <h4>Real-World Use Cases:</h4>
+                <ul>
+                    <li>E-commerce websites to store customer orders and product listings</li>
+                    <li>Banking systems to handle transactions securely</li>
+                    <li>Social networks to manage user data, messages, and posts</li>
+                </ul>
+            </div>
+
+            <div class="topic-content" id="creating-db">
+                <h2>Creating a Database in MySQL</h2>
+
+                <h3>Creating a Database</h3>
+                <div class="code-block">
+                    <span class="keyword">CREATE DATABASE</span> database_name;
+
+                    <span class="comment">-- Example:</span>
+                    <span class="keyword">CREATE DATABASE</span> student_db;
+                </div>
+
+                <div class="info-box">
+                    <strong>Tips:</strong>
+                    <ul>
+                        <li>Database names should be unique</li>
+                        <li>Avoid using spaces or special characters</li>
+                        <li>Use lowercase and underscores (_) for better readability (e.g., employee_records)</li>
+                    </ul>
+                </div>
+
+                <h3>Viewing All Databases</h3>
+                <div class="code-block">
+                    <span class="keyword">SHOW DATABASES</span>;
+                </div>
+
+                <h3>Switching to a Database</h3>
+                <p>Before working with tables, you must select the database:</p>
+                <div class="code-block">
+                    <span class="keyword">USE</span> student_db;
+                </div>
+
+                <h3>Dropping a Database</h3>
+                <div class="warning-box">
+                    <strong>⚠️ Warning:</strong> This action is irreversible! This will permanently delete all data and
+                    tables in the database.
+                </div>
+                <div class="code-block">
+                    <span class="keyword">DROP DATABASE</span> database_name;
+
+                    <span class="comment">-- Example:</span>
+                    <span class="keyword">DROP DATABASE</span> student_db;
+                </div>
+            </div>
+
+            <div class="topic-content" id="creating-tables">
+                <h2>Creating Tables in MySQL</h2>
+
+                <h3>Basic Syntax</h3>
+                <div class="code-block">
+                    <span class="keyword">CREATE TABLE</span> table_name (
+                    column1 datatype constraints,
+                    column2 datatype constraints,
+                    ...
+                    );
+                </div>
+
+                <h3>Example: Creating a Students Table</h3>
+                <div class="code-block">
+                    <span class="keyword">CREATE TABLE</span> students (
+                    id <span class="keyword">INT AUTO_INCREMENT PRIMARY KEY</span>,
+                    name <span class="keyword">VARCHAR</span>(100) <span class="keyword">NOT NULL DEFAULT</span> <span
+                        class="string">'No Name'</span>,
+                    age <span class="keyword">INT</span>,
+                    email <span class="keyword">VARCHAR</span>(100) <span class="keyword">UNIQUE</span>,
+                    admission_date <span class="keyword">DATE</span>
+                    );
+                </div>
+
+                <h4>Explanation:</h4>
+                <ul>
+                    <li><code>id INT AUTO_INCREMENT PRIMARY KEY</code> – A unique identifier for each student that
+                        auto-increments</li>
+                    <li><code>name VARCHAR(100) NOT NULL</code> – Name must be provided</li>
+                    <li><code>age INT</code> – Stores numeric values for age</li>
+                    <li><code>email VARCHAR(100) UNIQUE</code> – Each email must be different</li>
+                    <li><code>admission_date DATE</code> – Stores the date of admission</li>
+                </ul>
+
+                <h3>Commonly Used Data Types</h3>
+                <table>
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                        <th>Example Usage</th>
+                    </tr>
+                    <tr>
+                        <td>INT</td>
+                        <td>Whole numbers</td>
+                        <td>age, quantity</td>
+                    </tr>
+                    <tr>
+                        <td>VARCHAR(n)</td>
+                        <td>Variable-length string</td>
+                        <td>names, emails</td>
+                    </tr>
+                    <tr>
+                        <td>TEXT</td>
+                        <td>Long text strings</td>
+                        <td>descriptions</td>
+                    </tr>
+                    <tr>
+                        <td>DATE</td>
+                        <td>Date values (YYYY-MM-DD)</td>
+                        <td>birth dates</td>
+                    </tr>
+                    <tr>
+                        <td>DATETIME</td>
+                        <td>Date and time values</td>
+                        <td>timestamps</td>
+                    </tr>
+                    <tr>
+                        <td>BOOLEAN</td>
+                        <td>TRUE or FALSE</td>
+                        <td>flags</td>
+                    </tr>
+                </table>
+
+                <h3>Common Constraints</h3>
+                <table>
+                    <tr>
+                        <th>Constraint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>PRIMARY KEY</td>
+                        <td>Uniquely identifies each record</td>
+                    </tr>
+                    <tr>
+                        <td>NOT NULL</td>
+                        <td>Ensures the column cannot be left empty</td>
+                    </tr>
+                    <tr>
+                        <td>UNIQUE</td>
+                        <td>Ensures all values in a column are different</td>
+                    </tr>
+                    <tr>
+                        <td>AUTO_INCREMENT</td>
+                        <td>Automatically increases numeric values</td>
+                    </tr>
+                    <tr>
+                        <td>DEFAULT</td>
+                        <td>Sets a default value for the column</td>
+                    </tr>
+                    <tr>
+                        <td>FOREIGN KEY</td>
+                        <td>Enforces relationships between tables</td>
+                    </tr>
+                </table>
+
+                <h3>Viewing Table Information</h3>
+                <div class="code-block">
+                    <span class="comment">-- View all tables</span>
+                    <span class="keyword">SHOW TABLES</span>;
+
+                    <span class="comment">-- View table structure</span>
+                    <span class="keyword">DESCRIBE</span> students;
+
+                    <span class="comment">-- View table data</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students;
+                </div>
+            </div>
+
+            <div class="topic-content" id="modifying-tables">
+                <h2>Modifying Tables in MySQL</h2>
+
+                <h3>Renaming a Table</h3>
+                <div class="code-block">
+                    <span class="keyword">RENAME TABLE</span> old_table_name <span class="keyword">TO</span>
+                    new_table_name;
+                </div>
+
+                <h3>Dropping a Table</h3>
+                <div class="warning-box">
+                    <strong>⚠️ Warning:</strong> This permanently deletes the table and all its data!
+                </div>
+                <div class="code-block">
+                    <span class="keyword">DROP TABLE</span> table_name;
+                </div>
+
+                <h3>Renaming a Column</h3>
+                <div class="code-block">
+                    <span class="keyword">ALTER TABLE</span> table_name
+                    <span class="keyword">RENAME COLUMN</span> old_column_name <span class="keyword">TO</span>
+                    new_column_name;
+                </div>
+
+                <h3>Adding a Column</h3>
+                <div class="code-block">
+                    <span class="keyword">ALTER TABLE</span> table_name
+                    <span class="keyword">ADD COLUMN</span> column_name datatype constraints;
+
+                    <span class="comment">-- Example:</span>
+                    <span class="keyword">ALTER TABLE</span> students
+                    <span class="keyword">ADD COLUMN</span> gender <span class="keyword">VARCHAR</span>(10);
+                </div>
+
+                <h3>Dropping a Column</h3>
+                <div class="code-block">
+                    <span class="keyword">ALTER TABLE</span> table_name
+                    <span class="keyword">DROP COLUMN</span> column_name;
+                </div>
+
+                <h3>Modifying a Column</h3>
+                <div class="code-block">
+                    <span class="keyword">ALTER TABLE</span> table_name
+                    <span class="keyword">MODIFY COLUMN</span> column_name new_datatype new_constraints;
+
+                    <span class="comment">-- Example:</span>
+                    <span class="keyword">ALTER TABLE</span> students
+                    <span class="keyword">MODIFY COLUMN</span> name <span class="keyword">VARCHAR</span>(150) <span
+                        class="keyword">NOT NULL</span>;
+                </div>
+
+                <h3>Changing Column Order</h3>
+                <div class="code-block">
+                    <span class="keyword">ALTER TABLE</span> table_name
+                    <span class="keyword">MODIFY COLUMN</span> column_name datatype <span class="keyword">AFTER</span>
+                    another_column_name;
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Always review changes on production databases carefully. Use
+                    <code>DESCRIBE table_name</code> to verify structure before and after modifications.
+                </div>
+            </div>
+
+            <div class="topic-content" id="inserting-data">
+                <h2>Inserting Data into Tables</h2>
+
+                <h3>Insert One Row</h3>
+                <div class="code-block">
+                    <span class="keyword">INSERT INTO</span> student (id, name, age, grade, date_of_birth)
+                    <span class="keyword">VALUES</span> (1, <span class="string">'Ayesha Khan'</span>, 16, <span
+                        class="string">'10th'</span>, <span class="string">'2007-05-15'</span>);
+                </div>
+
+                <h3>Insert Multiple Rows at Once</h3>
+                <div class="code-block">
+                    <span class="keyword">INSERT INTO</span> student (id, name, age, grade) <span
+                        class="keyword">VALUES</span>
+                    (15, <span class="string">'Ayesha Khan'</span>, 16, <span class="string">'10th'</span>),
+                    (25, <span class="string">'Ravi Sharma'</span>, 17, <span class="string">'11th'</span>),
+                    (35, <span class="string">'Meena Joshi'</span>, 15, <span class="string">'9th'</span>),
+                    (45, <span class="string">'Arjun Verma'</span>, 18, <span class="string">'12th'</span>),
+                    (55, <span class="string">'Sara Ali'</span>, 16, <span class="string">'10th'</span>);
+                </div>
+
+                <h3>Verify Inserted Records</h3>
+                <div class="code-block">
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student;
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Inserting multiple rows at once is more efficient than inserting them one
+                    by one.
+                </div>
+            </div>
+
+            <div class="topic-content" id="selecting-data">
+                <h2>Selecting Data from Tables</h2>
+
+                <h3>Basic SELECT Statement</h3>
+                <div class="code-block">
+                    <span class="comment">-- Retrieve all data</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student;
+
+                    <span class="comment">-- Retrieve specific columns</span>
+                    <span class="keyword">SELECT</span> name, grade <span class="keyword">FROM</span> student;
+                </div>
+
+                <h3>Using WHERE Clause</h3>
+                <div class="code-block">
+                    <span class="comment">-- Students in 10th grade</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> grade = <span class="string">'10th'</span>;
+
+                    <span class="comment">-- Students older than 16</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> age > 16;
+                </div>
+
+                <h3>Comparison Operators</h3>
+                <table>
+                    <tr>
+                        <th>Operator</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>=</td>
+                        <td>Equals</td>
+                        <td>WHERE age = 16</td>
+                    </tr>
+                    <tr>
+                        <td>!= or <>
+                        </td>
+                        <td>Not equal to</td>
+                        <td>WHERE grade != '12th'</td>
+                    </tr>
+                    <tr>
+                        <td>></td>
+                        <td>Greater than</td>
+                        <td>WHERE age > 16</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            << /td>
+                        <td>Less than</td>
+                        <td>WHERE age < 17</td>
+                    </tr>
+                    <tr>
+                        <td>>=</td>
+                        <td>Greater than or equal</td>
+                        <td>WHERE age >= 16</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <=< /td>
+                        <td>Less than or equal</td>
+                        <td>WHERE age <= 18</td>
+                    </tr>
+                    <tr>
+                        <td>BETWEEN</td>
+                        <td>Within a range (inclusive)</td>
+                        <td>WHERE age BETWEEN 15 AND 17</td>
+                    </tr>
+                    <tr>
+                        <td>IN</td>
+                        <td>Matches any in a list</td>
+                        <td>WHERE grade IN ('10th', '12th')</td>
+                    </tr>
+                    <tr>
+                        <td>NOT IN</td>
+                        <td>Excludes list items</td>
+                        <td>WHERE grade NOT IN ('9th', '11th')</td>
+                    </tr>
+                    <tr>
+                        <td>LIKE</td>
+                        <td>Pattern matching</td>
+                        <td>WHERE name LIKE 'A%'</td>
+                    </tr>
+                </table>
+
+                <h3>Handling NULL Values</h3>
+                <div class="warning-box">
+                    <strong>Common Mistake:</strong> <code>WHERE grade = NULL</code> will NOT work!
+                </div>
+                <div class="code-block">
+                    <span class="comment">-- Correct way to check for NULL</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> grade <span class="keyword">IS NULL</span>;
+
+                    <span class="comment">-- Check for NOT NULL</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> grade <span class="keyword">IS NOT NULL</span>;
+                </div>
+
+                <h3>Combining Conditions</h3>
+                <div class="code-block">
+                    <span class="comment">-- Using AND</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> grade = <span class="string">'10th'</span> <span
+                        class="keyword">AND</span> age > 16;
+
+                    <span class="comment">-- Using OR</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> grade = <span class="string">'9th'</span> <span
+                        class="keyword">OR</span> grade = <span class="string">'12th'</span>;
+
+                    <span class="comment">-- Complex conditions</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">WHERE</span> (grade = <span class="string">'10th'</span> <span
+                        class="keyword">OR</span> grade = <span class="string">'11th'</span>) <span
+                        class="keyword">AND</span> age >= 16;
+                </div>
+
+                <h3>Sorting Results with ORDER BY</h3>
+                <div class="code-block">
+                    <span class="comment">-- Sort by age (ascending)</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">ORDER BY</span> age <span class="keyword">ASC</span>;
+
+                    <span class="comment">-- Sort by name (descending)</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">ORDER BY</span> name <span class="keyword">DESC</span>;
+                </div>
+
+                <h3>Limiting Results with LIMIT</h3>
+                <div class="code-block">
+                    <span class="comment">-- Get only 5 rows</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">LIMIT</span> 5;
+
+                    <span class="comment">-- Get 5 rows starting from the 3rd (offset 2)</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student
+                    <span class="keyword">LIMIT</span> 2, 5;
+                </div>
+
+                <h3>Using Wildcards with LIKE</h3>
+                <div class="info-box">
+                    <strong>Wildcards:</strong>
+                    <ul>
+                        <li><code>%</code> – Matches zero or more characters</li>
+                        <li><code>_</code> – Matches exactly one character</li>
+                    </ul>
+                </div>
+                <div class="code-block">
+                    <span class="comment">-- Names starting with 'A'</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> students
+                    <span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span
+                        class="string">'A%'</span>;
+
+                    <span class="comment">-- Dates with day = 05 (any year, any month)</span>
+                    <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> attendance
+                    <span class="keyword">WHERE</span> date <span class="keyword">LIKE</span> <span
+                        class="string">'____-__-05'</span>;
+
+                    <span class="comment">-- Any day in May 2025</span>
+                    <span class="keyword">WHERE</span> date <span class="keyword">LIKE</span> <span
+                        class="string">'2025-05-%'</span>;
+
+                    <span class="comment">-- 1st January of any year</span>
+                    <span class="keyword">WHERE</span> date <span class="keyword">LIKE</span> <span
+                        class="string">'____-01-01'</span>;
+                </div>
+            </div>
+
+            <div class="topic-content" id="updating-data">
+                <h2>Updating Data in Tables</h2>
+
+                <h3>Basic Syntax</h3>
+                <div class="code-block">
+                    <span class="keyword">UPDATE</span> table_name
+                    <span class="keyword">SET</span> column1 = value1, column2 = value2
+                    <span class="keyword">WHERE</span> condition;
+                </div>
+
+                <h3>Update a Single Row</h3>
+                <div class="code-block">
+                    <span class="keyword">UPDATE</span> student
+                    <span class="keyword">SET</span> grade = <span class="string">'12th'</span>
+                    <span class="keyword">WHERE</span> id = 2;
+                </div>
+
+                <h3>Update Multiple Columns</h3>
+                <div class="code-block">
+                    <span class="keyword">UPDATE</span> student
+                    <span class="keyword">SET</span> age = 17, grade = <span class="string">'10th'</span>
+                    <span class="keyword">WHERE</span> id = 3;
+                </div>
+
+                <h3>Update All Rows</h3>
+                <div class="warning-box">
+                    <strong>⚠️ Warning:</strong> This will modify every row in the table!
+                </div>
+                <div class="code-block">
+                    <span class="keyword">UPDATE</span> student
+                    <span class="keyword">SET</span> age = 18;
+                </div>
+
+                <h3>Conditional Updates</h3>
+                <div class="code-block">
+                    <span class="comment">-- Promote all students in 9th grade</span>
+                    <span class="keyword">UPDATE</span> student
+                    <span class="keyword">SET</span> grade = <span class="string">'10th'</span>
+                    <span class="keyword">WHERE</span> grade = <span class="string">'9th'</span>;
+
+                    <span class="comment">-- Increase age by 1 for students younger than 18</span>
+                    <span class="keyword">UPDATE</span> student
+                    <span class="keyword">SET</span> age = age + 1
+                    <span class="keyword">WHERE</span> age < 18; </div>
+
+                        <h3>Update Using IS NULL</h3>
+                        <div class="code-block">
+                            <span class="keyword">UPDATE</span> student
+                            <span class="keyword">SET</span> grade = <span class="string">'Unknown'</span>
+                            <span class="keyword">WHERE</span> grade <span class="keyword">IS NULL</span>;
+                        </div>
+
+                        <h3>Verify the Update</h3>
+                        <div class="code-block">
+                            <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> student;
+                        </div>
+                </div>
+
+                <div class="topic-content" id="deleting-data">
+                    <h2>Deleting Data from Tables</h2>
+
+                    <h3>Basic Syntax</h3>
+                    <div class="code-block">
+                        <span class="keyword">DELETE FROM</span> table_name
+                        <span class="keyword">WHERE</span> condition;
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Important:</strong> If you omit the WHERE clause, all rows in the table will be
+                        deleted!
+                    </div>
+
+                    <h3>Delete a Specific Row</h3>
+                    <div class="code-block">
+                        <span class="keyword">DELETE FROM</span> student
+                        <span class="keyword">WHERE</span> id = 2;
+                    </div>
+
+                    <h3>Delete Based on Conditions</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Delete all students in 9th grade</span>
+                        <span class="keyword">DELETE FROM</span> student
+                        <span class="keyword">WHERE</span> grade = <span class="string">'9th'</span>;
+
+                        <span class="comment">-- Delete students younger than 16</span>
+                        <span class="keyword">DELETE FROM</span> student
+                        <span class="keyword">WHERE</span> age < 16; <span class="comment">-- Delete students with no
+                            grade assigned</span>
+                            <span class="keyword">DELETE FROM</span> student
+                            <span class="keyword">WHERE</span> grade <span class="keyword">IS NULL</span>;
+                    </div>
+
+                    <h3>Delete All Rows</h3>
+                    <div class="code-block">
+                        <span class="keyword">DELETE FROM</span> student;
+                    </div>
+
+                    <h3>Completely Remove the Table</h3>
+                    <div class="code-block">
+                        <span class="keyword">DROP TABLE</span> student;
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Difference:</strong>
+                        <ul>
+                            <li><code>DELETE FROM</code> removes all rows but keeps the table structure</li>
+                            <li><code>DROP TABLE</code> removes both the data and the table structure</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-content" id="transactions">
+                    <h2>Transactions: AUTOCOMMIT, COMMIT, and ROLLBACK</h2>
+
+                    <h3>What is a Transaction?</h3>
+                    <p>A transaction is a sequence of one or more SQL statements executed as a single unit. Transactions
+                        have four key properties (ACID):</p>
+                    <ul>
+                        <li><strong>Atomicity:</strong> All or nothing</li>
+                        <li><strong>Consistency:</strong> Valid state before and after</li>
+                        <li><strong>Isolation:</strong> Transactions do not interfere</li>
+                        <li><strong>Durability:</strong> Changes persist after commit</li>
+                    </ul>
+
+                    <h3>AUTOCOMMIT</h3>
+                    <p>By default, MySQL runs in autocommit mode. Every SQL statement is treated as a separate
+                        transaction and committed automatically.</p>
+                    <div class="code-block">
+                        <span class="comment">-- Check autocommit status</span>
+                        <span class="keyword">SELECT</span> @@autocommit;
+
+                        <span class="comment">-- Disable autocommit</span>
+                        <span class="keyword">SET</span> autocommit = 0;
+
+                        <span class="comment">-- Enable autocommit</span>
+                        <span class="keyword">SET</span> autocommit = 1;
+                    </div>
+
+                    <h3>COMMIT</h3>
+                    <p>The COMMIT statement permanently saves all changes made in the current transaction.</p>
+                    <div class="code-block">
+                        <span class="keyword">START TRANSACTION</span>;
+                        <span class="keyword">UPDATE</span> accounts <span class="keyword">SET</span> balance = balance
+                        - 100 <span class="keyword">WHERE</span> id = 1;
+                        <span class="keyword">UPDATE</span> accounts <span class="keyword">SET</span> balance = balance
+                        + 100 <span class="keyword">WHERE</span> id = 2;
+                        <span class="keyword">COMMIT</span>;
+                    </div>
+
+                    <h3>ROLLBACK</h3>
+                    <p>The ROLLBACK statement undoes changes made in the current transaction.</p>
+                    <div class="code-block">
+                        <span class="keyword">START TRANSACTION</span>;
+                        <span class="keyword">UPDATE</span> accounts <span class="keyword">SET</span> balance = balance
+                        - 100 <span class="keyword">WHERE</span> id = 1;
+                        <span class="comment">-- An error or condition check fails here</span>
+                        <span class="keyword">ROLLBACK</span>;
+                    </div>
+
+                    <h3>Best Practices</h3>
+                    <ul>
+                        <li>Always use transactions when performing multiple related operations</li>
+                        <li>Disable autocommit when working with critical data updates</li>
+                        <li>Rollback if any step in your transaction fails</li>
+                        <li>Test your transactions thoroughly before running them on production data</li>
+                    </ul>
+                </div>
+
+                <div class="topic-content" id="datetime-functions">
+                    <h2>Date and Time Functions</h2>
+
+                    <h3>Getting Current Date and Time</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Current date (YYYY-MM-DD)</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">CURRENT_DATE</span>;
+                        <span class="comment">-- Output: 2025-05-02</span>
+
+                        <span class="comment">-- Current time (HH:MM:SS)</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">CURRENT_TIME</span>;
+                        <span class="comment">-- Output: 14:23:45</span>
+
+                        <span class="comment">-- Current date and time</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">CURRENT_TIMESTAMP</span>;
+                        <span class="keyword">SELECT</span> <span class="keyword">NOW</span>();
+                        <span class="comment">-- Output: 2025-05-02 14:23:45</span>
+
+                        <span class="comment">-- Local time (synonyms for NOW)</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">LOCALTIME</span>;
+                        <span class="keyword">SELECT</span> <span class="keyword">LOCALTIMESTAMP</span>;
+                    </div>
+
+                    <h3>Using in Table Inserts</h3>
+                    <div class="code-block">
+                        <span class="keyword">INSERT INTO</span> logs (event, created_at)
+                        <span class="keyword">VALUES</span> (<span class="string">'data_import'</span>, <span
+                            class="keyword">NOW</span>());
+                    </div>
+
+                    <h3>Date and Time Functions Recap</h3>
+                    <table>
+                        <tr>
+                            <th>Function</th>
+                            <th>Returns</th>
+                            <th>Example Output</th>
+                        </tr>
+                        <tr>
+                            <td>CURRENT_DATE</td>
+                            <td>Date only</td>
+                            <td>2025-05-02</td>
+                        </tr>
+                        <tr>
+                            <td>CURRENT_TIME</td>
+                            <td>Time only</td>
+                            <td>14:23:45</td>
+                        </tr>
+                        <tr>
+                            <td>NOW()</td>
+                            <td>Date and time</td>
+                            <td>2025-05-02 14:23:45</td>
+                        </tr>
+                        <tr>
+                            <td>CURDATE()</td>
+                            <td>Current date</td>
+                            <td>2025-05-02</td>
+                        </tr>
+                        <tr>
+                            <td>CURTIME()</td>
+                            <td>Current time</td>
+                            <td>14:23:45</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="topic-content" id="constraints">
+                    <h2>SQL Constraints</h2>
+
+                    <p>Constraints are rules applied to table columns to enforce data integrity, consistency, and
+                        validity.</p>
+
+                    <h3>Why Use Constraints?</h3>
+                    <ul>
+                        <li>Ensure data quality and reliability</li>
+                        <li>Prevent invalid, duplicate, or null data</li>
+                        <li>Maintain business rules directly in the database layer</li>
+                    </ul>
+
+                    <h3>NOT NULL Constraint</h3>
+                    <p>Ensures that a column cannot contain NULL values.</p>
+                    <div class="code-block">
+                        <span class="keyword">CREATE TABLE</span> employees (
+                        id <span class="keyword">INT NOT NULL</span>,
+                        name <span class="keyword">VARCHAR</span>(100) <span class="keyword">NOT NULL</span>
+                        );
+                    </div>
+
+                    <h3>UNIQUE Constraint</h3>
+                    <p>Ensures that all values in a column are distinct (no duplicates).</p>
+                    <div class="code-block">
+                        <span class="keyword">CREATE TABLE</span> users (
+                        username <span class="keyword">VARCHAR</span>(50) <span class="keyword">UNIQUE</span>,
+                        email <span class="keyword">VARCHAR</span>(100) <span class="keyword">UNIQUE</span>
+                        );
+                    </div>
+
+                    <h3>DEFAULT Constraint</h3>
+                    <p>Sets a default value for a column if none is provided during insert.</p>
+                    <div class="code-block">
+                        <span class="keyword">CREATE TABLE</span> products (
+                        name <span class="keyword">VARCHAR</span>(100),
+                        status <span class="keyword">VARCHAR</span>(20) <span class="keyword">DEFAULT</span> <span
+                            class="string">'in_stock'</span>
+                        );
+                    </div>
+
+                    <h3>CHECK Constraint</h3>
+                    <p>Validates that values in a column meet a specific condition.</p>
+                    <div class="code-block">
+                        <span class="keyword">CREATE TABLE</span> accounts (
+                        id <span class="keyword">INT</span>,
+                        balance <span class="keyword">DECIMAL</span>(10,2) <span class="keyword">CHECK</span> (balance
+                        >= 0)
+                        );
+                    </div>
+
+                    <h3>Naming Constraints</h3>
+                    <div class="code-block">
+                        <span class="keyword">CREATE TABLE</span> students (
+                        roll_no <span class="keyword">INT PRIMARY KEY</span>,
+                        age <span class="keyword">INT CONSTRAINT</span> chk_age <span class="keyword">CHECK</span> (age
+                        >= 5),
+                        email <span class="keyword">VARCHAR</span>(100) <span class="keyword">UNIQUE</span>
+                        );
+                    </div>
+
+                    <h3>Constraint Summary</h3>
+                    <table>
+                        <tr>
+                            <th>Constraint</th>
+                            <th>Purpose</th>
+                        </tr>
+                        <tr>
+                            <td>NOT NULL</td>
+                            <td>Disallow null values</td>
+                        </tr>
+                        <tr>
+                            <td>UNIQUE</td>
+                            <td>Disallow duplicate values</td>
+                        </tr>
+                        <tr>
+                            <td>DEFAULT</td>
+                            <td>Set default value if none given</td>
+                        </tr>
+                        <tr>
+                            <td>CHECK</td>
+                            <td>Enforce value conditions</td>
+                        </tr>
+                        <tr>
+                            <td>PRIMARY KEY</td>
+                            <td>Uniquely identify each record</td>
+                        </tr>
+                        <tr>
+                            <td>FOREIGN KEY</td>
+                            <td>Establish relationships between tables</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="topic-content" id="foreign-keys">
+                    <h2>Foreign Keys</h2>
+
+                    <h3>What is a Foreign Key?</h3>
+                    <p>A foreign key is a column (or set of columns) that establishes a link between data in two tables.
+                    </p>
+
+                    <h3>Creating Tables with Foreign Keys</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Create parent table</span>
+                        <span class="keyword">CREATE TABLE</span> classes (
+                        class_id <span class="keyword">INT AUTO_INCREMENT PRIMARY KEY</span>,
+                        class_name <span class="keyword">VARCHAR</span>(50) <span class="keyword">NOT NULL</span>
+                        );
+
+                        <span class="comment">-- Create child table with foreign key</span>
+                        <span class="keyword">CREATE TABLE</span> students (
+                        student_id <span class="keyword">INT AUTO_INCREMENT PRIMARY KEY</span>,
+                        student_name <span class="keyword">VARCHAR</span>(100) <span class="keyword">NOT NULL</span>,
+                        class_id <span class="keyword">INT</span>,
+                        <span class="keyword">FOREIGN KEY</span> (class_id) <span class="keyword">REFERENCES</span>
+                        classes(class_id)
+                        <span class="keyword">ON UPDATE CASCADE</span>
+                        <span class="keyword">ON DELETE SET NULL</span>
+                        );
+                    </div>
+
+                    <h3>Understanding Referential Actions</h3>
+
+                    <h4>ON UPDATE CASCADE</h4>
+                    <p>If the value in the parent table is updated, the corresponding foreign key value in the child
+                        table is automatically updated.</p>
+                    <div class="code-block">
+                        <span class="keyword">UPDATE</span> classes <span class="keyword">SET</span> class_id = 10 <span
+                            class="keyword">WHERE</span> class_id = 1;
+                        <span class="comment">-- All students with class_id = 1 will automatically become 10</span>
+                    </div>
+
+                    <h4>ON DELETE SET NULL</h4>
+                    <p>If a row in the parent table is deleted, the foreign key in the child table will be set to NULL.
+                    </p>
+                    <div class="code-block">
+                        <span class="keyword">DELETE FROM</span> classes <span class="keyword">WHERE</span> class_id =
+                        2;
+                        <span class="comment">-- All students in class 2 will have class_id set to NULL</span>
+                    </div>
+
+                    <h3>Other Referential Actions</h3>
+                    <table>
+                        <tr>
+                            <th>Action</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>ON DELETE CASCADE</td>
+                            <td>Deletes the child rows when parent row is deleted</td>
+                        </tr>
+                        <tr>
+                            <td>ON DELETE RESTRICT</td>
+                            <td>Prevents deletion if any child rows exist</td>
+                        </tr>
+                        <tr>
+                            <td>ON DELETE NO ACTION</td>
+                            <td>Same as RESTRICT in MySQL</td>
+                        </tr>
+                        <tr>
+                            <td>ON DELETE SET NULL</td>
+                            <td>Sets foreign key to NULL when parent is deleted</td>
+                        </tr>
+                    </table>
+
+                    <h3>Viewing Foreign Keys</h3>
+                    <div class="code-block">
+                        <span class="comment">-- View foreign key constraints</span>
+                        <span class="keyword">SHOW CREATE TABLE</span> students;
+
+                        <span class="comment">-- List all foreign keys in database</span>
+                        <span class="keyword">SELECT</span>
+                        table_name,
+                        column_name,
+                        constraint_name,
+                        referenced_table_name,
+                        referenced_column_name
+                        <span class="keyword">FROM</span> information_schema.key_column_usage
+                        <span class="keyword">WHERE</span> referenced_table_name <span class="keyword">IS NOT
+                            NULL</span>
+                        <span class="keyword">AND</span> table_schema = <span class="string">'school'</span>;
+                    </div>
+                </div>
+
+                <div class="topic-content" id="joins">
+                    <h2>MySQL Joins</h2>
+
+                    <p>Joins are used to combine data from multiple tables based on a related column.</p>
+
+                    <h3>INNER JOIN</h3>
+                    <p>Returns only rows that have matching values in both tables.</p>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> students.name, marks.subject, marks.score
+                        <span class="keyword">FROM</span> students
+                        <span class="keyword">INNER JOIN</span> marks <span class="keyword">ON</span> students.id =
+                        marks.student_id;
+                    </div>
+
+                    <h3>LEFT JOIN</h3>
+                    <p>Returns all rows from the left table, and matching rows from the right table. If no match, NULL
+                        is returned.</p>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> students.name, marks.subject, marks.score
+                        <span class="keyword">FROM</span> students
+                        <span class="keyword">LEFT JOIN</span> marks <span class="keyword">ON</span> students.id =
+                        marks.student_id;
+                    </div>
+
+                    <h3>RIGHT JOIN</h3>
+                    <p>Returns all rows from the right table, and matching rows from the left table.</p>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> students.name, marks.subject, marks.score
+                        <span class="keyword">FROM</span> students
+                        <span class="keyword">RIGHT JOIN</span> marks <span class="keyword">ON</span> students.id =
+                        marks.student_id;
+                    </div>
+
+                    <h3>CROSS JOIN</h3>
+                    <p>Combines every row in the first table with every row in the second table.</p>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> students.name, marks.subject
+                        <span class="keyword">FROM</span> students
+                        <span class="keyword">CROSS JOIN</span> marks;
+                    </div>
+
+                    <h3>Join Types Summary</h3>
+                    <table>
+                        <tr>
+                            <th>Join Type</th>
+                            <th>What it does</th>
+                        </tr>
+                        <tr>
+                            <td>INNER JOIN</td>
+                            <td>Only rows with a match in both tables</td>
+                        </tr>
+                        <tr>
+                            <td>LEFT JOIN</td>
+                            <td>All rows from left table, with matched data if any</td>
+                        </tr>
+                        <tr>
+                            <td>RIGHT JOIN</td>
+                            <td>All rows from right table, with matched data if any</td>
+                        </tr>
+                        <tr>
+                            <td>CROSS JOIN</td>
+                            <td>All combinations of rows from both tables</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="topic-content" id="union">
+                    <h2>Using UNION</h2>
+
+                    <p>The UNION operator combines result sets of two or more SELECT statements into a single result.
+                    </p>
+
+                    <h3>Basic UNION</h3>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> name, city <span class="keyword">FROM</span> customers
+                        <span class="keyword">UNION</span>
+                        <span class="keyword">SELECT</span> name, city <span class="keyword">FROM</span> vendors;
+                    </div>
+
+                    <h3>Requirements for UNION</h3>
+                    <ul>
+                        <li>Same number of columns in all SELECT statements</li>
+                        <li>Compatible data types in corresponding columns</li>
+                        <li>Columns are matched by position, not by name</li>
+                    </ul>
+
+                    <h3>UNION vs UNION ALL</h3>
+                    <div class="info-box">
+                        <strong>Key Difference:</strong>
+                        <ul>
+                            <li><code>UNION</code> removes duplicate rows</li>
+                            <li><code>UNION ALL</code> keeps all rows including duplicates (faster)</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-block">
+                        <span class="comment">-- UNION ALL keeps duplicates</span>
+                        <span class="keyword">SELECT</span> name <span class="keyword">FROM</span> students
+                        <span class="keyword">UNION ALL</span>
+                        <span class="keyword">SELECT</span> name <span class="keyword">FROM</span> alumni;
+                    </div>
+
+                    <h3>Sorting Combined Results</h3>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> name <span class="keyword">FROM</span> students_2023
+                        <span class="keyword">UNION</span>
+                        <span class="keyword">SELECT</span> name <span class="keyword">FROM</span> students_2024
+                        <span class="keyword">ORDER BY</span> name;
+                    </div>
+
+                    <h3>When to Use</h3>
+                    <ul>
+                        <li>Use <strong>UNION</strong> if you want a clean list without duplicates</li>
+                        <li>Use <strong>UNION ALL</strong> if you want better performance and don't care about
+                            duplicates</li>
+                    </ul>
+                </div>
+
+                <div class="topic-content" id="functions">
+                    <h2>MySQL Functions</h2>
+
+                    <h3>String Functions</h3>
+                    <div class="code-block">
+                        <span class="comment">-- CONCAT: Join strings</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">CONCAT</span>(<span
+                            class="string">'Hello'</span>, <span class="string">' '</span>, <span
+                            class="string">'World'</span>) <span class="keyword">AS</span> greeting;
+                        <span class="keyword">SELECT</span> <span class="keyword">CONCAT</span>(first_name, <span
+                            class="string">' '</span>, last_name) <span class="keyword">AS</span> full_name <span
+                            class="keyword">FROM</span> users;
+
+                        <span class="comment">-- LENGTH: String length in bytes</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">LENGTH</span>(<span
+                            class="string">'Harry'</span>); <span class="comment">-- Output: 5</span>
+
+                        <span class="comment">-- UPPER/LOWER: Change case</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">UPPER</span>(<span
+                            class="string">'hello'</span>); <span class="comment">-- Output: HELLO</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">LOWER</span>(<span
+                            class="string">'MySQL'</span>); <span class="comment">-- Output: mysql</span>
+
+                        <span class="comment">-- REPLACE: Replace substring</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">REPLACE</span>(<span
+                            class="string">'abc'</span>, <span class="string">'b'</span>, <span
+                            class="string">'x'</span>); <span class="comment">-- Output: axc</span>
+
+                        <span class="comment">-- TRIM: Remove spaces</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">TRIM</span>(<span class="string">'
+                            hello '</span>); <span class="comment">-- Output: hello</span>
+                    </div>
+
+                    <h3>Numeric Functions</h3>
+                    <div class="code-block">
+                        <span class="comment">-- ROUND: Round to decimal places</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">ROUND</span>(12.6789, 2); <span
+                            class="comment">-- Output: 12.68</span>
+
+                        <span class="comment">-- FLOOR/CEIL: Round down/up</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">FLOOR</span>(5.9); <span
+                            class="comment">-- Output: 5</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">CEIL</span>(5.1); <span
+                            class="comment">-- Output: 6</span>
+
+                        <span class="comment">-- ABS: Absolute value</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">ABS</span>(-10); <span
+                            class="comment">-- Output: 10</span>
+
+                        <span class="comment">-- MOD: Remainder</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">MOD</span>(10, 3); <span
+                            class="comment">-- Output: 1</span>
+                    </div>
+
+                    <h3>Date Functions</h3>
+                    <div class="code-block">
+                        <span class="comment">-- DATEDIFF: Days between dates</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">DATEDIFF</span>(<span
+                            class="string">'2025-06-01'</span>, <span class="string">'2025-05-01'</span>); <span
+                            class="comment">-- Output: 31</span>
+
+                        <span class="comment">-- YEAR, MONTH, DAY: Extract date parts</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">YEAR</span>(<span
+                            class="keyword">NOW</span>());
+                        <span class="keyword">SELECT</span> <span class="keyword">MONTHNAME</span>(<span
+                            class="string">'2025-05-03'</span>); <span class="comment">-- Output: May</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">DAY</span>(<span
+                            class="string">'2025-05-03'</span>); <span class="comment">-- Output: 3</span>
+
+                        <span class="comment">-- DATE: Extract date from datetime</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">DATE</span>(<span
+                            class="keyword">NOW</span>());
+                    </div>
+
+                    <h3>Aggregate Functions</h3>
+                    <div class="code-block">
+                        <span class="comment">-- COUNT: Count rows</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*) <span
+                            class="keyword">FROM</span> students;
+
+                        <span class="comment">-- AVG: Average value</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">AVG</span>(score) <span
+                            class="keyword">FROM</span> marks;
+
+                        <span class="comment">-- SUM: Total sum</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">SUM</span>(score) <span
+                            class="keyword">FROM</span> marks;
+
+                        <span class="comment">-- MIN/MAX: Smallest/Largest value</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">MIN</span>(score) <span
+                            class="keyword">FROM</span> marks;
+                        <span class="keyword">SELECT</span> <span class="keyword">MAX</span>(score) <span
+                            class="keyword">FROM</span> marks;
+                    </div>
+
+                    <h3>Other Useful Functions</h3>
+                    <div class="code-block">
+                        <span class="comment">-- IFNULL: Replace NULL with default</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">IFNULL</span>(<span
+                            class="keyword">NULL</span>, <span class="string">'N/A'</span>); <span class="comment">--
+                            Output: N/A</span>
+
+                        <span class="comment">-- COALESCE: First non-NULL value</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">COALESCE</span>(<span
+                            class="keyword">NULL</span>, <span class="string">''</span>, <span
+                            class="string">'Hello'</span>); <span class="comment">-- Output: ''</span>
+
+                        <span class="comment">-- RAND: Random decimal between 0 and 1</span>
+                        <span class="keyword">SELECT</span> <span class="keyword">RAND</span>();
+                    </div>
+                </div>
+
+                <div class="topic-content" id="views">
+                    <h2>MySQL Views</h2>
+
+                    <h3>What is a View?</h3>
+                    <p>A <span class="highlight">View</span> is like a virtual table. It doesn't store data by itself
+                        but shows data from one or more tables through a saved SQL query.</p>
+
+                    <h3>Why Use Views?</h3>
+                    <ul>
+                        <li>To simplify complex queries by giving them a name</li>
+                        <li>To hide sensitive columns from users</li>
+                        <li>To show only specific rows/columns from a table</li>
+                        <li>To reuse common query logic across your app or reports</li>
+                    </ul>
+
+                    <h3>Creating a View</h3>
+                    <div class="code-block">
+                        <span class="keyword">CREATE VIEW</span> public_employees <span class="keyword">AS</span>
+                        <span class="keyword">SELECT</span> name, department, salary
+                        <span class="keyword">FROM</span> employees;
+                    </div>
+
+                    <h3>Using a View</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Query like a normal table</span>
+                        <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> public_employees;
+
+                        <span class="comment">-- Apply filters</span>
+                        <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> public_employees
+                        <span class="keyword">WHERE</span> department = <span class="string">'IT'</span>;
+                    </div>
+
+                    <h3>Updating a View</h3>
+                    <div class="code-block">
+                        <span class="keyword">CREATE OR REPLACE VIEW</span> public_employees <span
+                            class="keyword">AS</span>
+                        <span class="keyword">SELECT</span> name, department
+                        <span class="keyword">FROM</span> employees;
+                    </div>
+
+                    <h3>Dropping a View</h3>
+                    <div class="code-block">
+                        <span class="keyword">DROP VIEW</span> public_employees;
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Important Notes:</strong>
+                        <ul>
+                            <li>Views don't store data. If the underlying table changes, the view reflects that
+                                automatically</li>
+                            <li>Not all views are updatable. Simple views usually are, but complex ones may not allow
+                                INSERT, UPDATE, or DELETE</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="topic-content" id="indexes">
+                    <h2>MySQL Indexes</h2>
+
+                    <h3>What is an Index?</h3>
+                    <p>An <span class="highlight">index</span> is a data structure that makes data retrieval
+                        faster—especially when using WHERE, JOIN, ORDER BY, or searching large tables.</p>
+
+                    <div class="example-box">
+                        <strong>Think of it like:</strong> The index in a book—instead of reading every page, MySQL uses
+                        the index to jump straight to the relevant row(s).
+                    </div>
+
+                    <h3>Why Use Indexes?</h3>
+                    <ul>
+                        <li>Speed up queries that search, filter, or sort data</li>
+                        <li>Improve performance for frequent lookups or joins</li>
+                        <li>Enhance scalability of your database over time</li>
+                    </ul>
+
+                    <h3>Creating an Index</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Single column index</span>
+                        <span class="keyword">CREATE INDEX</span> idx_email <span class="keyword">ON</span>
+                        users(email);
+
+                        <span class="comment">-- Multi-column (composite) index</span>
+                        <span class="keyword">CREATE INDEX</span> idx_name_city <span class="keyword">ON</span>
+                        users(name, city);
+                    </div>
+
+                    <h3>Dropping an Index</h3>
+                    <div class="code-block">
+                        <span class="keyword">DROP INDEX</span> idx_email <span class="keyword">ON</span> users;
+                    </div>
+
+                    <h3>Viewing Indexes</h3>
+                    <div class="code-block">
+                        <span class="keyword">SHOW INDEX FROM</span> users;
+                    </div>
+
+                    <h3>When to Use Indexes</h3>
+                    <ul>
+                        <li>A column is often used in WHERE, JOIN, or ORDER BY clauses</li>
+                        <li>You're searching by unique fields like email, username, or ID</li>
+                        <li>You're filtering large tables for specific values regularly</li>
+                        <li>You want to improve performance of lookups and joins</li>
+                    </ul>
+
+                    <h3>When NOT to Use Indexes</h3>
+                    <ul>
+                        <li>The table is small (MySQL can scan it quickly anyway)</li>
+                        <li>The column is rarely used in searches or filtering</li>
+                        <li>You're indexing a column with very few unique values</li>
+                        <li>You're inserting or updating very frequently (indexes slow down writes)</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Warning:</strong> Overusing indexes or indexing the wrong columns can hurt
+                        performance. Use them wisely based on how your data is queried.
+                    </div>
+                </div>
+
+                <div class="topic-content" id="subqueries">
+                    <h2>Subqueries in MySQL</h2>
+
+                    <h3>What is a Subquery?</h3>
+                    <p>A <span class="highlight">subquery</span> is a query nested inside another SQL query. It helps
+                        you perform complex filtering, calculations, or temporary data shaping.</p>
+
+                    <h3>Subquery in WHERE Clause</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Employees who earn more than average</span>
+                        <span class="keyword">SELECT</span> name, salary
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">WHERE</span> salary > (
+                        <span class="keyword">SELECT</span> <span class="keyword">AVG</span>(salary)
+                        <span class="keyword">FROM</span> employees
+                        );
+                    </div>
+
+                    <h3>Subquery in FROM Clause</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Department-wise average salary above 50,000</span>
+                        <span class="keyword">SELECT</span> department, avg_salary
+                        <span class="keyword">FROM</span> (
+                        <span class="keyword">SELECT</span> department, <span class="keyword">AVG</span>(salary) <span
+                            class="keyword">AS</span> avg_salary
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">GROUP BY</span> department
+                        ) <span class="keyword">AS</span> dept_avg
+                        <span class="keyword">WHERE</span> avg_salary > 50000;
+                    </div>
+
+                    <h3>Subquery in SELECT Clause</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Count of projects per employee</span>
+                        <span class="keyword">SELECT</span> name,
+                        (<span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*)
+                        <span class="keyword">FROM</span> projects
+                        <span class="keyword">WHERE</span> projects.employee_id = employees.id) <span
+                            class="keyword">AS</span> project_count
+                        <span class="keyword">FROM</span> employees;
+                    </div>
+
+                    <h3>Correlated Subqueries</h3>
+                    <p>A correlated subquery depends on the outer query. It runs once for each row in the outer query.
+                    </p>
+                    <div class="code-block">
+                        <span class="comment">-- Employee earning more than department's average</span>
+                        <span class="keyword">SELECT</span> name, department, salary
+                        <span class="keyword">FROM</span> employees e
+                        <span class="keyword">WHERE</span> salary > (
+                        <span class="keyword">SELECT</span> <span class="keyword">AVG</span>(salary)
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">WHERE</span> department = e.department
+                        );
+                    </div>
+
+                    <h3>Types of Subqueries</h3>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>Scalar Subquery</td>
+                            <td>Returns a single value</td>
+                        </tr>
+                        <tr>
+                            <td>Row Subquery</td>
+                            <td>Returns one row with multiple columns</td>
+                        </tr>
+                        <tr>
+                            <td>Table Subquery</td>
+                            <td>Returns multiple rows and columns</td>
+                        </tr>
+                        <tr>
+                            <td>Correlated Subquery</td>
+                            <td>Refers to the outer query inside the subquery</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="topic-content" id="groupby">
+                    <h2>GROUP BY in MySQL</h2>
+
+                    <h3>What is GROUP BY?</h3>
+                    <p>The <span class="highlight">GROUP BY</span> clause groups rows that have the same values in
+                        specified columns. It's usually combined with aggregate functions like COUNT(), SUM(), AVG(),
+                        MAX(), or MIN().</p>
+
+                    <h3>Basic GROUP BY</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Count of employees in each department</span>
+                        <span class="keyword">SELECT</span> department, <span class="keyword">COUNT</span>(*) <span
+                            class="keyword">AS</span> total_employees
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">GROUP BY</span> department;
+
+                        <span class="comment">-- Average salary per department</span>
+                        <span class="keyword">SELECT</span> department, <span class="keyword">AVG</span>(salary) <span
+                            class="keyword">AS</span> avg_salary
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">GROUP BY</span> department;
+                    </div>
+
+                    <h3>GROUP BY with Multiple Columns</h3>
+                    <div class="code-block">
+                        <span class="comment">-- Count by department and job title</span>
+                        <span class="keyword">SELECT</span> department, job_title, <span class="keyword">COUNT</span>(*)
+                        <span class="keyword">AS</span> count
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">GROUP BY</span> department, job_title;
+                    </div>
+
+                    <h3>The HAVING Clause</h3>
+                    <p>HAVING is like WHERE, but it works after the grouping is done. It filters groups based on
+                        aggregate results.</p>
+                    <div class="code-block">
+                        <span class="comment">-- Departments with more than 5 employees</span>
+                        <span class="keyword">SELECT</span> department, <span class="keyword">COUNT</span>(*) <span
+                            class="keyword">AS</span> total
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">GROUP BY</span> department
+                        <span class="keyword">HAVING</span> <span class="keyword">COUNT</span>(*) > 5;
+                    </div>
+
+                    <h3>WHERE vs HAVING</h3>
+                    <table>
+                        <tr>
+                            <th>Clause</th>
+                            <th>Used For</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td>WHERE</td>
+                            <td>Filters rows before grouping</td>
+                            <td>WHERE salary > 50000</td>
+                        </tr>
+                        <tr>
+                            <td>HAVING</td>
+                            <td>Filters groups after grouping</td>
+                            <td>HAVING AVG(salary) > 60000</td>
+                        </tr>
+                    </table>
+
+                    <h3>Using Both WHERE and HAVING</h3>
+                    <div class="code-block">
+                        <span class="keyword">SELECT</span> department, <span class="keyword">AVG</span>(salary) <span
+                            class="keyword">AS</span> avg_salary
+                        <span class="keyword">FROM</span> employees
+                        <span class="keyword">WHERE</span> status = <span class="string">'active'</span>
+                        <span class="keyword">GROUP BY</span> department
+                        <span class="keyword">HAVING</span> <span class="keyword">AVG</span>(salary) > 60000;
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Execution Order:</strong>
+                        <ol>
+                            <li>WHERE filters rows</li>
+                            <li>GROUP BY groups them</li>
+                            <li>HAVING filters the groups</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="topic-content" id="procedures">
+                    <h2>Stored Procedures</h2>
+
+                    <h3>What is a Stored Procedure?</h3>
+                    <p>A <span class="highlight">Stored Procedure</span> is a saved block of SQL code that you can
+                        execute later by calling its name—just like a function in programming.</p>
+
+                    <h3>Why Use Stored Procedures?</h3>
+                    <ul>
+                        <li>To avoid repeating the same SQL logic in multiple places</li>
+                        <li>To improve performance by reducing network traffic</li>
+                        <li>To encapsulate complex business logic inside the database</li>
+                    </ul>
+
+                    <h3>Creating a Simple Procedure</h3>
+                    <div class="info-box">
+                        <strong>Why change the DELIMITER?</strong><br>
+                        MySQL ends a command at the first semicolon (;). Since stored procedures contain multiple SQL
+                        statements (each ending in ;), we need to tell MySQL not to end the procedure too early. So we
+                        temporarily change the delimiter to something else—then switch it back.
+                    </div>
+
+                    <div class="code-block">
+                        <span class="keyword">DELIMITER</span> //
+
+                        <span class="keyword">CREATE PROCEDURE</span> list_employees()
+                        <span class="keyword">BEGIN</span>
+                        <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> employees;
+                        <span class="keyword">END</span> //
+
+                        <span class="keyword">DELIMITER</span> ;
+                    </div>
+
+                    <h3>Calling a Stored Procedure</h3>
+                    <div class="code-block">
+                        <span class="keyword">CALL</span> list_employees();
+                    </div>
+
+                    <h3>Procedure with Parameters</h3>
+                    <div class="code-block">
+                        <span class="keyword">DELIMITER</span> //
+
+                        <span class="keyword">CREATE PROCEDURE</span> get_employee_by_id(<span class="keyword">IN</span>
+                        emp_id <span class="keyword">INT</span>)
+                        <span class="keyword">BEGIN</span>
+                        <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> employees
+                        <span class="keyword">WHERE</span> id = emp_id;
+                        <span class="keyword">END</span> //
+
+                        <span class="keyword">DELIMITER</span> ;
+
+                        <span class="comment">-- Call with parameter</span>
+                        <span class="keyword">CALL</span> get_employee_by_id(3);
+                    </div>
+
+                    <h3>Dropping a Stored Procedure</h3>
+                    <div class="code-block">
+                        <span class="keyword">DROP PROCEDURE IF EXISTS</span> get_employee_by_id;
+                    </div>
+
+                    <h3>Best Practices</h3>
+                    <ul>
+                        <li>Always give clear names to procedures</li>
+                        <li>Use IN, OUT, or INOUT for flexible parameter handling</li>
+                        <li>Keep business logic in the database only if it improves clarity or performance</li>
+                        <li>Document complex procedures for easier maintenance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="back-to-top" id="backToTop">↑</button>
+        </div>
+
+        <script>
+            const topics = [
+                { id: 'intro', name: 'Introduction to Databases' },
+                { id: 'creating-db', name: 'Creating Database' },
+                { id: 'creating-tables', name: 'Creating Tables' },
+                { id: 'modifying-tables', name: 'Modifying Tables' },
+                { id: 'inserting-data', name: 'Inserting Data' },
+                { id: 'selecting-data', name: 'Selecting Data' },
+                { id: 'updating-data', name: 'Updating Data' },
+                { id: 'deleting-data', name: 'Deleting Data' },
+                { id: 'transactions', name: 'Transactions' },
+                { id: 'datetime-functions', name: 'Date & Time Functions' },
+                { id: 'constraints', name: 'Constraints' },
+                { id: 'foreign-keys', name: 'Foreign Keys' },
+                { id: 'joins', name: 'Joins' },
+                { id: 'union', name: 'UNION' },
+                { id: 'functions', name: 'MySQL Functions' },
+                { id: 'views', name: 'Views' },
+                { id: 'indexes', name: 'Indexes' },
+                { id: 'subqueries', name: 'Subqueries' },
+                { id: 'groupby', name: 'GROUP BY & HAVING' },
+                { id: 'procedures', name: 'Stored Procedures' }
+            ];
+
+            const topicGrid = document.getElementById('topicGrid');
+            const contentArea = document.getElementById('contentArea');
+            const searchBox = document.getElementById('searchBox');
+            const backToTop = document.getElementById('backToTop');
+            const progressBar = document.getElementById('progressBar');
+
+            let visitedTopics = new Set(['intro']);
+
+            // Create topic buttons
+            topics.forEach(topic => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.textContent = topic.name;
+                btn.onclick = () => showTopic(topic.id);
+                btn.dataset.id = topic.id;
+                if (topic.id === 'intro') btn.classList.add('active');
+                topicGrid.appendChild(btn);
+            });
+
+            function showTopic(topicId) {
+                // Hide all topics
+                document.querySelectorAll('.topic-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Show selected topic
+                document.getElementById(topicId).classList.add('active');
+
+                // Update button states
+                document.querySelectorAll('.topic-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.id === topicId) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // Track visited topics
+                visitedTopics.add(topicId);
+                updateProgress();
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function updateProgress() {
+                const percentage = (visitedTopics.size / topics.length) * 100;
+                progressBar.style.width = percentage + '%';
+            }
+
+            // Search functionality
+            searchBox.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.topic-btn').forEach(btn => {
+                    const topicName = btn.textContent.toLowerCase();
+                    if (topicName.includes(searchTerm)) {
+                        btn.style.display = 'block';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            });
+
+            // Back to top button
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Initialize progress
+            updateProgress();
+        </script>
+</body>
+
+</html>
