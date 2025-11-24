@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History of Machine Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .highlight-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 30px;
+            border-left: 3px solid #e9ecef;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .timeline-year {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+
+        ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .key-concept {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .example-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .example-box strong {
+            color: #17a2b8;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #6c757d;
+            padding: 15px 20px;
+            border-left: 3px solid #6c757d;
+            margin: 20px 0;
+            background: #f8f9fa;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 40px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 25px 20px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            h3 {
+                font-size: 1.3em;
+            }
+
+            .nav-tab {
+                font-size: 0.85em;
+                padding: 15px 10px;
+            }
+
+            .timeline-item {
+                padding-left: 30px;
+            }
+
+            .comparison-table {
+                font-size: 0.9em;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header p {
+                font-size: 0.95em;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📚 History of Machine Learning</h1>
+            <p>From Alan Turing's dream to today's intelligent systems</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection(0)">Origins</button>
+            <button class="nav-tab" onclick="showSection(1)">Supervised</button>
+            <button class="nav-tab" onclick="showSection(2)">Unsupervised</button>
+            <button class="nav-tab" onclick="showSection(3)">Reinforcement</button>
+            <button class="nav-tab" onclick="showSection(4)">Comparison</button>
+        </div>
+
+        <div class="content">
+            <!-- Section 1: The Beginning -->
+            <div class="section active">
+                <h2>The Birth of Machine Learning</h2>
+
+                <div class="highlight-box">
+                    <p><strong>Imagine it's 1936...</strong> A young genius named Alan Turing sits in his room,
+                        pondering a revolutionary question: "What if I could design a machine that thinks?"</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">1936: The Turing Machine</div>
+                    <p>Alan Turing didn't build a physical robot. Instead, he created a brilliant concept: a
+                        hypothetical machine that could simulate any algorithm given enough time and resources.</p>
+                    <p>Think of it as inventing the brain's logic without needing actual neurons. If you can explain the
+                        rules clearly enough, this "machine" can follow them and produce results.</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">1950: "Can Machines Think?"</div>
+                    <p>Turing wrote a groundbreaking paper asking the boldest question of his time: Can machines think?
+                    </p>
+                    <p>He proposed the famous <strong>Turing Test</strong>: If a machine can convince a human that it's
+                        also human during a conversation, we must acknowledge it possesses some form of intelligence.
+                    </p>
+                    <div class="key-concept">
+                        <strong>Key Insight:</strong> This moment is considered the starting point of Artificial
+                        Intelligence as a field of study.
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">1957: The First Learning Machine</div>
+                    <p>Psychologist Frank Rosenblatt created the <strong>Perceptron</strong> - the first algorithm that
+                        could actually learn from data.</p>
+                    <p>It was simple and limited, but revolutionary. For the first time, a machine could improve itself
+                        based on experience.</p>
+                    <div class="quote">
+                        "Headlines declared: Perceptron could walk, talk, and learn like a baby!"
+                    </div>
+                    <p>While oversold at the time, this planted the seed for modern machine learning.</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">1980s: The Quiet Comeback</div>
+                    <p>After years of disappointment, AI became almost a joke in computer science. Funding disappeared.
+                    </p>
+                    <p>But in 1986, researchers revived <strong>neural networks</strong> - systems inspired by how our
+                        brains work. This time, they could do useful things like recognizing handwriting and predicting
+                        trends.</p>
+                    <p>The machines were learning again, and this time for real.</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-year">1997: Game Over, Humans</div>
+                    <p>IBM's Deep Blue defeated world chess champion Garry Kasparov.</p>
+                    <p>A computer didn't just beat the best human through brute force - it learned and optimized
+                        strategies.</p>
+                    <div class="highlight-box">
+                        <strong>The turning point:</strong> "Can machines think?" transformed from a philosophical
+                        question into a practical reality. We had officially entered the Machine Learning era.
+                    </div>
+                </div>
+
+                <h3>How Do Machines Learn?</h3>
+                <p>Not all machines learn the same way. There are three main approaches:</p>
+                <ul>
+                    <li><strong>Supervised Learning:</strong> Learning from labeled examples, like a student with
+                        flashcards and a teacher</li>
+                    <li><strong>Unsupervised Learning:</strong> Exploring and discovering patterns without guidance,
+                        like a detective finding clues</li>
+                    <li><strong>Reinforcement Learning:</strong> Learning through trial and error, rewards and
+                        punishments, like playing a video game</li>
+                </ul>
+            </div>
+
+            <!-- Section 2: Supervised Learning -->
+            <div class="section">
+                <h2>Supervised Learning</h2>
+
+                <h3>The Classroom Analogy</h3>
+                <p>Imagine you're in first grade. Your teacher holds up flashcards with animal pictures:</p>
+                <p>"This is a cat." <br>"This is a dog."</p>
+                <p>Card after card, you see the picture and get the answer. Over time, your brain figures out the
+                    patterns: cats have pointy ears, dogs have longer snouts.</p>
+                <p><strong>That's supervised learning.</strong></p>
+
+                <div class="highlight-box">
+                    <h3>Why "Supervised"?</h3>
+                    <p>Because there's a teacher - a supervisor - telling the machine: "This is the input, and this is
+                        the correct output."</p>
+                    <p>The machine, like a student, looks at examples and learns the relationship between input and
+                        output. It's not magic, just pattern matching.</p>
+                </div>
+
+                <div class="example-box">
+                    <strong>Real-World Example: Spam Email Filter</strong>
+                    <p>You have 100 emails. Some are spam, some aren't. You mark which ones are spam - that's the label.
+                    </p>
+                    <p>You feed these labeled emails to a machine learning model. It starts noticing patterns:</p>
+                    <ul>
+                        <li>Spam emails often say "Congratulations!"</li>
+                        <li>They have lots of exclamation marks!!!</li>
+                        <li>They ask for money</li>
+                    </ul>
+                    <p>Next time a new email arrives, the model predicts if it's spam based on what it learned.</p>
+                </div>
+
+                <h3>Common Supervised Learning Algorithms</h3>
+                <p>You don't need to memorize these, but here are popular ones:</p>
+                <ul>
+                    <li><strong>Linear Regression:</strong> Predicts numbers (like house prices)</li>
+                    <li><strong>Logistic Regression:</strong> Predicts categories (yes/no, spam/not spam)</li>
+                    <li><strong>Decision Trees:</strong> Asks questions like the game "20 Questions"</li>
+                    <li><strong>Support Vector Machines:</strong> Draws mathematical lines to separate different things
+                    </li>
+                </ul>
+
+                <p>They all do the same basic job: Learn from labeled data → Predict labels for new data</p>
+
+                <h3>Why Is It So Popular?</h3>
+                <p>Because labeled data is everywhere:</p>
+                <ul>
+                    <li>Doctors label X-rays: "This shows cancer"</li>
+                    <li>Users label product reviews: "This is positive"</li>
+                    <li>Banks label loan applications: "This one defaulted"</li>
+                </ul>
+                <p>Machines thrive on this kind of help. The more labeled examples they see, the better they get.</p>
+
+                <div class="key-concept">
+                    <strong>The Limitation:</strong> What if you don't have labels? What if nobody told you what's a cat
+                    or a dog? Then the machine is on its own. That's where unsupervised learning comes in.
+                </div>
+
+                <h3>Remember This</h3>
+                <p>Supervised learning is like a student with flashcards and a teacher by their side.</p>
+                <p><strong>Watch. Learn. Practice. Repeat.</strong></p>
+                <p>That's how machines - and humans - get smarter.</p>
+            </div>
+
+            <!-- Section 3: Unsupervised Learning -->
+            <div class="section">
+                <h2>Unsupervised Learning</h2>
+
+                <h3>Lost in a New City</h3>
+                <div class="highlight-box">
+                    <p><strong>Imagine this:</strong> You're dropped in a brand new city. No guide. No map. No
+                        translator.</p>
+                    <p>You walk the streets, observe people, try the food, hear the language - and start figuring things
+                        out on your own.</p>
+                </div>
+
+                <p>You notice patterns:</p>
+                <ul>
+                    <li>Some people wear suits, rushing into glass buildings</li>
+                    <li>Others wear aprons, hanging around food stalls</li>
+                    <li>Some wear uniforms, directing traffic</li>
+                </ul>
+
+                <p>Nobody told you their job titles. But your brain starts grouping them: office workers, chefs, police
+                    officers.</p>
+                <p><strong>That's unsupervised learning.</strong></p>
+
+                <h3>Learning Without Answers</h3>
+                <p>Unsupervised learning means there's no teacher. No labels. No one telling the machine what's right or
+                    wrong.</p>
+                <p>You give the machine a pile of data and say: "Go figure it out."</p>
+                <p>Find patterns. Find structure. Group similar things. Make sense of the chaos.</p>
+
+                <div class="key-concept">
+                    <strong>Why "Unsupervised"?</strong> Because there's no supervision. No labels. No answers. Just the
+                    data. The machine is flying blind, using math and pattern recognition to group things that look
+                    similar.
+                </div>
+
+                <div class="example-box">
+                    <strong>Real-World Example: Customer Segmentation</strong>
+                    <p>You run an online store with thousands of customers. You don't know much about them, but you have
+                        their behavior data:</p>
+                    <ul>
+                        <li>What they buy</li>
+                        <li>How often they visit</li>
+                        <li>How much they spend</li>
+                    </ul>
+                    <p>Using unsupervised learning, your system might discover groups like:</p>
+                    <ul>
+                        <li>Bargain hunters</li>
+                        <li>Big spenders</li>
+                        <li>Night-time browsers</li>
+                    </ul>
+                    <p>Nobody gave the machine these labels. It discovered them on its own. Now you can offer targeted
+                        deals to each group!</p>
+                </div>
+
+                <h3>Common Algorithms</h3>
+                <ul>
+                    <li><strong>K-means Clustering:</strong> Groups similar items into "clusters"</li>
+                    <li><strong>Hierarchical Clustering:</strong> Builds a family tree of data relationships</li>
+                    <li><strong>PCA (Principal Component Analysis):</strong> Compresses complex data into simpler forms
+                    </li>
+                </ul>
+                <p>The core idea is the same: "I don't know what this is, but let me find what's similar."</p>
+
+                <h3>Sherlock Holmes Was Unsupervised</h3>
+                <div class="highlight-box">
+                    <p>Think about it. Sherlock shows up at a crime scene. Nobody tells him what happened.</p>
+                    <p>He examines clues, gathers data, and discovers patterns others miss.</p>
+                    <p>That's classic unsupervised thinking. Machines do the same thing - but with numbers instead of
+                        footprints.</p>
+                </div>
+
+                <h3>When Do We Use It?</h3>
+                <ul>
+                    <li>When we don't have labeled data</li>
+                    <li>When we want to discover hidden patterns</li>
+                    <li>When we want to explore data before making decisions</li>
+                </ul>
+                <p>It's not always perfectly accurate, but it's incredibly useful for discovery and exploration.</p>
+            </div>
+
+            <!-- Section 4: Reinforcement Learning -->
+            <div class="section">
+                <h2>Reinforcement Learning</h2>
+
+                <h3>The Robot in the Maze</h3>
+                <div class="highlight-box">
+                    <p><strong>Picture this:</strong> A small robot stands before a maze. The goal? Reach the exit.</p>
+                    <p>The robot has no map. Nobody tells it where to go.</p>
+                    <p>It takes a step forward... hits a wall. Ouch.</p>
+                    <p>Takes a step right... nothing happens.</p>
+                    <p>Takes another step... and the floor lights up. A reward!</p>
+                    <p>The robot is learning.</p>
+                </div>
+
+                <p><strong>That's reinforcement learning.</strong></p>
+
+                <h3>Learning by Doing</h3>
+                <p>Reinforcement learning is about:</p>
+                <ul>
+                    <li>Learning by doing</li>
+                    <li>Learning by trying</li>
+                    <li>Learning by failing</li>
+                    <li>Getting rewards or punishments and figuring out what works</li>
+                </ul>
+
+                <p>It's how we all learn naturally:</p>
+                <ul>
+                    <li>A child touches a hot pan - learns not to do it again</li>
+                    <li>A dog gets a treat for sitting - starts sitting more often</li>
+                </ul>
+                <p>Machines can learn the same way.</p>
+
+                <div class="key-concept">
+                    <strong>Why "Reinforcement"?</strong> Because every action gets feedback - positive or negative.
+                    That feedback is called a reward. The machine's job is to figure out: "What sequence of actions gets
+                    me the most reward over time?"
+                </div>
+
+                <div class="example-box">
+                    <strong>Real-World Analogy: Playing Super Mario</strong>
+                    <p>The first time you play, you fall into holes and bump into enemies.</p>
+                    <p>But slowly, you learn when to jump, where to run, how to win.</p>
+                    <p>You're not memorizing - you're adjusting based on results.</p>
+                    <p>That's reinforcement learning. Now imagine a bot doing this thousands of times faster and never
+                        getting bored. That's how machines beat humans at games we thought were unbeatable.</p>
+                </div>
+
+                <h3>Key Concepts (Simplified)</h3>
+                <ul>
+                    <li><strong>Agent:</strong> The learner (robot, bot, or AI)</li>
+                    <li><strong>Environment:</strong> The world it operates in (maze, game, road)</li>
+                    <li><strong>Action:</strong> What the agent does</li>
+                    <li><strong>Reward:</strong> The score it gets after taking an action (good or bad)</li>
+                    <li><strong>Policy:</strong> The strategy it develops over time</li>
+                </ul>
+                <p><strong>The Goal:</strong> Maximize total reward over time.</p>
+
+                <h3>The AlphaGo Story (2016)</h3>
+                <div class="highlight-box">
+                    <p>In 2015, Google DeepMind built AlphaGo - a reinforcement learning system that learned to play the
+                        ancient game of Go.</p>
+                    <p>Nobody thought a computer could beat a Go champion. The game was considered too complex, too
+                        intuitive.</p>
+                    <p>But AlphaGo didn't just study human moves - it played millions of games against itself, learning
+                        from every win and loss.</p>
+                    <p>In 2016, it defeated the world champion Lee Sedol.</p>
+                    <p>That's reinforcement learning at its absolute best.</p>
+                </div>
+
+                <h3>Where Is It Used Today?</h3>
+                <ul>
+                    <li><strong>Self-driving cars:</strong> Learn safe driving through millions of simulated scenarios
+                    </li>
+                    <li><strong>Robotics:</strong> Teach robots to walk, pick up objects, or open doors</li>
+                    <li><strong>Finance:</strong> Learn optimal times to buy or sell stocks</li>
+                    <li><strong>Game AIs:</strong> From chess to Dota 2, RL bots dominate competitive gaming</li>
+                </ul>
+
+                <p>Reinforcement learning excels in situations where actions have consequences and learning comes from
+                    experience rather than examples.</p>
+            </div>
+
+            <!-- Section 5: Comparison -->
+            <div class="section">
+                <h2>Which One to Use When?</h2>
+
+                <p>We've met all three machine learning styles. Now let's understand when to use each one.</p>
+
+                <div class="highlight-box">
+                    <h3>The Reality Show Analogy</h3>
+                    <p>Imagine this is a reality show. You're the host. A problem appears.</p>
+                    <p>Three contestants - Supervised, Unsupervised, and Reinforcement - raise their hands.</p>
+                    <p>But only one gets to solve it.</p>
+                </div>
+
+                <h3>Round 1: Recognizing Animals</h3>
+                <p><strong>Problem:</strong> You have 10,000 images of animals. Each is labeled as "cat" or "dog".</p>
+                <p><strong>Winner:</strong> Supervised Learning</p>
+                <div class="quote">"Give me the answers, and I'll learn the pattern."</div>
+                <p>Perfect for labeled data with clear goals.</p>
+
+                <h3>Round 2: Understanding Customers</h3>
+                <p><strong>Problem:</strong> You have customer data but no labels. Just behavior logs.</p>
+                <p><strong>Winner:</strong> Unsupervised Learning</p>
+                <div class="quote">"I got this. I'll find patterns without needing labels."</div>
+                <p>It groups people based on behavior - the curious explorer of the group.</p>
+
+                <h3>Round 3: The Game Player</h3>
+                <p><strong>Problem:</strong> Train a robot to walk, teach a car to drive, or win at chess.</p>
+                <p><strong>Winner:</strong> Reinforcement Learning</p>
+                <div class="quote">"Let me try. I'll figure it out after a few thousand mistakes."</div>
+                <p>Thrives where actions have consequences and learning comes from experience.</p>
+
+                <h3>Complete Comparison Table</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Learning Type</th>
+                            <th>Learns From</th>
+                            <th>Example Task</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Supervised</strong></td>
+                            <td>Labeled data with clear answers</td>
+                            <td>Email spam filter, image recognition, price prediction</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unsupervised</strong></td>
+                            <td>Unlabeled data, finds patterns</td>
+                            <td>Customer segmentation, anomaly detection</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reinforcement</strong></td>
+                            <td>Trial and error with rewards</td>
+                            <td>Self-driving cars, game AI, robotics</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Quick Quiz - Who Would You Call?</h3>
+                <div class="example-box">
+                    <strong>Test Your Understanding:</strong>
+                    <ol>
+                        <li><strong>Predict tomorrow's weather based on past labeled data?</strong><br>→ Supervised
+                            Learning</li>
+                        <li><strong>Discover hidden groups in social media users?</strong><br>→ Unsupervised Learning
+                        </li>
+                        <li><strong>Train a drone to land smoothly on a platform?</strong><br>→ Reinforcement Learning
+                        </li>
+                        <li><strong>Classify X-rays as healthy or not?</strong><br>→ Supervised Learning</li>
+                    </ol>
+                </div>
+
+                <h3>The Character Analogy</h3>
+                <div class="highlight-box">
+                    <p>Think of them as characters in a team:</p>
+                    <ul>
+                        <li><strong>Supervised</strong> is the diligent student with detailed notes</li>
+                        <li><strong>Unsupervised</strong> is the detective with no clues</li>
+                        <li><strong>Reinforcement</strong> is the gamer who never gives up</li>
+                    </ul>
+                </div>
+
+                <h3>Final Thoughts</h3>
+                <p>All three learning styles are valuable. None is inherently better than the others.</p>
+                <p><strong>It depends entirely on your problem:</strong></p>
+                <ul>
+                    <li>Do you have labeled data? → Supervised</li>
+                    <li>Do you need to discover patterns? → Unsupervised</li>
+                    <li>Do actions have consequences that need optimization? → Reinforcement</li>
+                </ul>
+
+                <p>Together, these three approaches form the complete foundation of machine learning.</p>
+
+                <div class="key-concept">
+                    <strong>Remember:</strong> From Alan Turing's question in 1936 - "Can machines think?" - we've
+                    arrived at a world where machines can learn, adapt, and even surpass human capabilities in specific
+                    domains. The journey continues, and the question still evolves.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(index) {
+            const sections = document.querySelectorAll('.section');
+            const tabs = document.querySelectorAll('.nav-tab');
+
+            sections.forEach(section => section.classList.remove('active'));
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            sections[index].classList.add('active');
+            tabs[index].classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
+
+            document.getElementById('progressBar').style.width = scrollPercent + '%';
+        });
+
+        // Smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
