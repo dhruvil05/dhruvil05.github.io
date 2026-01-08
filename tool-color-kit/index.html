@@ -19,11 +19,14 @@
             --dark: #0f172a;
             --light: #f8fafc;
             --gray: #64748b;
+            --bg-light: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border: #e2e8f0;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-light);
             color: var(--dark);
             line-height: 1.6;
             min-height: 100vh;
@@ -38,20 +41,130 @@
         header {
             text-align: center;
             padding: 40px 20px 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
         }
 
         h1 {
             font-size: clamp(2em, 5vw, 3.5em);
             font-weight: 700;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .tagline {
             font-size: clamp(0.9em, 2vw, 1.2em);
-            opacity: 0.9;
+            opacity: 0.95;
+            margin-bottom: 0;
+        }
+
+        .search-filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.2em;
+            pointer-events: none;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-tag {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .filter-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .filter-tag.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .results-count {
+            color: var(--gray);
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-results-text {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .no-results-hint {
+            font-size: 0.95em;
+        }
+
+        .tool-card.hidden {
+            display: none;
         }
 
         .tools-grid {
@@ -64,17 +177,19 @@
             background: white;
             border-radius: 20px;
             padding: clamp(20px, 3vw, 30px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             break-inside: avoid;
             margin-bottom: 20px;
             display: inline-block;
             width: 100%;
+            border: 1px solid var(--border);
         }
 
         .tool-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
         }
 
         .tool-header {
@@ -127,7 +242,7 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         input[type="text"],
@@ -196,7 +311,7 @@
             font-size: clamp(0.7em, 1.5vw, 0.85em);
             cursor: pointer;
             transition: transform 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: relative;
             text-align: center;
             padding: 5px;
@@ -207,27 +322,28 @@
         }
 
         .result-box {
-            background: #f8fafc;
+            background: var(--bg-secondary);
             padding: 15px;
             border-radius: 10px;
             margin-top: 15px;
             font-family: 'Courier New', monospace;
             font-size: clamp(0.75em, 1.5vw, 0.9em);
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border);
             word-break: break-all;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: background 0.2s ease, border-color 0.2s ease;
         }
 
         .result-box:hover {
             background: #e2e8f0;
+            border-color: var(--primary);
         }
 
         .gradient-preview {
             height: 150px;
             border-radius: 10px;
             margin-top: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .contrast-result {
@@ -235,11 +351,12 @@
             align-items: center;
             justify-content: space-between;
             padding: 15px;
-            background: #f8fafc;
+            background: var(--bg-secondary);
             border-radius: 10px;
             margin-top: 15px;
             flex-wrap: wrap;
             gap: 15px;
+            border: 1px solid var(--border);
         }
 
         .contrast-score {
@@ -274,8 +391,11 @@
         footer {
             text-align: center;
             padding: 40px 20px;
-            color: white;
+            color: var(--gray);
             font-size: clamp(0.8em, 1.5vw, 0.9em);
+            border-top: 2px solid var(--border);
+            margin-top: 40px;
+            background: var(--bg-secondary);
         }
 
         .palette-row {
@@ -299,7 +419,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             word-break: break-all;
         }
 
@@ -315,7 +435,7 @@
             color: white;
             padding: 15px 25px;
             border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transform: translateY(-20px);
             transition: all 0.3s ease;
@@ -335,15 +455,16 @@
             object-fit: cover;
             border-radius: 10px;
             margin-top: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .color-name-display {
-            background: #f8fafc;
+            background: var(--bg-secondary);
             padding: 20px;
             border-radius: 10px;
             margin-top: 15px;
             text-align: center;
+            border: 1px solid var(--border);
         }
 
         .color-name-title {
@@ -376,7 +497,7 @@
             margin-bottom: 8px;
             cursor: pointer;
             transition: transform 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .harmony-color:hover {
@@ -400,21 +521,24 @@
             align-items: center;
             gap: 10px;
             padding: 10px;
-            background: #f8fafc;
+            background: var(--bg-secondary);
             border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, background 0.2s ease;
+            border: 1px solid var(--border);
         }
 
         .tailwind-item:hover {
             transform: translateX(5px);
+            background: #e2e8f0;
+            border-color: var(--primary);
         }
 
         .tailwind-swatch {
             width: 50px;
             height: 50px;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
 
@@ -457,6 +581,7 @@
             background: var(--primary);
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         @media (max-width: 1024px) {
@@ -514,9 +639,47 @@
     </header>
 
     <div class="container">
+        <div class="search-filter-section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput"
+                    placeholder="Search tools... (e.g., gradient, palette, contrast)" oninput="filterTools()">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filter-tags">
+                <div class="filter-tag active" data-category="all" onclick="filterByCategory('all')">
+                    All Tools
+                </div>
+                <div class="filter-tag" data-category="generator" onclick="filterByCategory('generator')">
+                    🎨 Generators
+                </div>
+                <div class="filter-tag" data-category="analyzer" onclick="filterByCategory('analyzer')">
+                    🔍 Analyzers
+                </div>
+                <div class="filter-tag" data-category="converter" onclick="filterByCategory('converter')">
+                    🔄 Converters
+                </div>
+                <div class="filter-tag" data-category="accessibility" onclick="filterByCategory('accessibility')">
+                    ♿ Accessibility
+                </div>
+                <div class="filter-tag" data-category="design" onclick="filterByCategory('design')">
+                    ✨ Design
+                </div>
+            </div>
+
+            <div class="results-count" id="resultsCount">Showing all 20 tools</div>
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <div class="no-results-icon">🔍</div>
+            <div class="no-results-text">No tools found</div>
+            <div class="no-results-hint">Try a different search term or filter</div>
+        </div>
+
         <div class="tools-grid">
             <!-- Color Palette Generator -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="generator"
+                data-keywords="palette color scheme harmony generate create">
                 <div class="tool-header">
                     <div class="tool-icon">🎨</div>
                     <h2 class="tool-title">Palette Generator</h2>
@@ -534,7 +697,8 @@
             </div>
 
             <!-- Color Harmonies -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="generator"
+                data-keywords="harmony complementary triadic analogous tetradic split color wheel">
                 <div class="tool-header">
                     <div class="tool-icon">⚡</div>
                     <h2 class="tool-title">Color Harmonies</h2>
@@ -563,7 +727,8 @@
             </div>
 
             <!-- Gradient Generator -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="generator design"
+                data-keywords="gradient css linear background maker create">
                 <div class="tool-header">
                     <div class="tool-icon">🌈</div>
                     <h2 class="tool-title">Gradient Maker</h2>
@@ -591,25 +756,9 @@
                 <div class="result-box" id="gradientCode"></div>
             </div>
 
-            <!-- Image Color Extractor -->
-            <div class="tool-card">
-                <div class="tool-header">
-                    <div class="tool-icon">🖼️</div>
-                    <h2 class="tool-title">Extract from Image</h2>
-                </div>
-                <p class="tool-description">Extract color palette from any image</p>
-
-                <div class="input-group">
-                    <label>Upload Image</label>
-                    <input type="file" id="imageInput" accept="image/*" onchange="extractColorsFromImage()">
-                </div>
-
-                <img id="imagePreview" class="image-preview" style="display: none;">
-                <div id="imageColorsOutput"></div>
-            </div>
-
             <!-- Contrast Checker -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="accessibility analyzer"
+                data-keywords="contrast wcag accessibility text background check ratio">
                 <div class="tool-header">
                     <div class="tool-icon">👁️</div>
                     <h2 class="tool-title">Contrast Checker</h2>
@@ -631,50 +780,9 @@
                 <div id="contrastResult"></div>
             </div>
 
-            <!-- Color Name Finder -->
-            <div class="tool-card">
-                <div class="tool-header">
-                    <div class="tool-icon">🏷️</div>
-                    <h2 class="tool-title">Color Name Finder</h2>
-                </div>
-                <p class="tool-description">Find the closest named color and its meaning</p>
-
-                <div class="input-group">
-                    <label>Pick a Color</label>
-                    <input type="color" id="nameColor" value="#6366f1">
-                </div>
-
-                <button onclick="findColorName()">Find Color Name</button>
-
-                <div id="colorNameOutput"></div>
-            </div>
-
-            <!-- Tailwind Color Generator -->
-            <div class="tool-card">
-                <div class="tool-header">
-                    <div class="tool-icon">🎯</div>
-                    <h2 class="tool-title">Tailwind Scale</h2>
-                </div>
-                <p class="tool-description">Generate Tailwind-style color scales (50-900)</p>
-
-                <div class="input-group">
-                    <label>Base Color (500)</label>
-                    <input type="color" id="tailwindColor" value="#6366f1">
-                </div>
-
-                <button onclick="generateTailwindScale()">Generate Scale</button>
-
-                <div id="tailwindOutput"></div>
-
-                <div class="export-buttons" id="tailwindExport" style="display: none;">
-                    <button class="export-btn" onclick="exportTailwindCSS()">CSS</button>
-                    <button class="export-btn" onclick="exportTailwindJSON()">JSON</button>
-                    <button class="export-btn" onclick="exportTailwindSCSS()">SCSS</button>
-                </div>
-            </div>
-
             <!-- Color Shades Generator -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="generator"
+                data-keywords="shades tints lighter darker variations tone">
                 <div class="tool-header">
                     <div class="tool-icon">🎭</div>
                     <h2 class="tool-title">Shades & Tints</h2>
@@ -692,7 +800,7 @@
             </div>
 
             <!-- Color Mixer -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="generator" data-keywords="mix blend combine colors ratio">
                 <div class="tool-header">
                     <div class="tool-icon">🧪</div>
                     <h2 class="tool-title">Color Mixer</h2>
@@ -720,7 +828,7 @@
             </div>
 
             <!-- Color Converter -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="converter" data-keywords="convert hex rgb hsl format translate">
                 <div class="tool-header">
                     <div class="tool-icon">🔄</div>
                     <h2 class="tool-title">Color Converter</h2>
@@ -738,7 +846,7 @@
             </div>
 
             <!-- Random Color Generator -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="generator" data-keywords="random generate inspiration ideas">
                 <div class="tool-header">
                     <div class="tool-icon">🎲</div>
                     <h2 class="tool-title">Random Colors</h2>
@@ -750,8 +858,69 @@
                 <div class="color-output" id="randomOutput"></div>
             </div>
 
+            <!-- Image Color Extractor -->
+            <div class="tool-card" data-category="analyzer" data-keywords="image photo extract picker upload palette">
+                <div class="tool-header">
+                    <div class="tool-icon">🖼️</div>
+                    <h2 class="tool-title">Extract from Image</h2>
+                </div>
+                <p class="tool-description">Extract color palette from any image</p>
+
+                <div class="input-group">
+                    <label>Upload Image</label>
+                    <input type="file" id="imageInput" accept="image/*" onchange="extractColorsFromImage()">
+                </div>
+
+                <img id="imagePreview" class="image-preview" style="display: none;">
+                <div id="imageColorsOutput"></div>
+            </div>
+
+            <!-- Color Name Finder -->
+            <div class="tool-card" data-category="analyzer" data-keywords="name identify find meaning">
+                <div class="tool-header">
+                    <div class="tool-icon">🏷️</div>
+                    <h2 class="tool-title">Color Name Finder</h2>
+                </div>
+                <p class="tool-description">Find the closest named color and its meaning</p>
+
+                <div class="input-group">
+                    <label>Pick a Color</label>
+                    <input type="color" id="nameColor" value="#6366f1">
+                </div>
+
+                <button onclick="findColorName()">Find Color Name</button>
+
+                <div id="colorNameOutput"></div>
+            </div>
+
+            <!-- Tailwind Color Generator -->
+            <div class="tool-card" data-category="generator converter design"
+                data-keywords="tailwind scale css framework export">
+                <div class="tool-header">
+                    <div class="tool-icon">🎯</div>
+                    <h2 class="tool-title">Tailwind Scale</h2>
+                </div>
+                <p class="tool-description">Generate Tailwind-style color scales (50-900)</p>
+
+                <div class="input-group">
+                    <label>Base Color (500)</label>
+                    <input type="color" id="tailwindColor" value="#6366f1">
+                </div>
+
+                <button onclick="generateTailwindScale()">Generate Scale</button>
+
+                <div id="tailwindOutput"></div>
+
+                <div class="export-buttons" id="tailwindExport" style="display: none;">
+                    <button class="export-btn" onclick="exportTailwindCSS()">CSS</button>
+                    <button class="export-btn" onclick="exportTailwindJSON()">JSON</button>
+                    <button class="export-btn" onclick="exportTailwindSCSS()">SCSS</button>
+                </div>
+            </div>
+
             <!-- CSS Variables Generator -->
-            <div class="tool-card">
+            <div class="tool-card" data-category="converter design"
+                data-keywords="css variables custom properties export code">
                 <div class="tool-header">
                     <div class="tool-icon">💻</div>
                     <h2 class="tool-title">CSS Variables</h2>
@@ -776,6 +945,149 @@
                 <button onclick="generateCSSVariables()">Generate Variables</button>
 
                 <div class="result-box" id="cssVarOutput"></div>
+            </div>
+
+            <!-- Color Blindness Simulator -->
+            <div class="tool-card" data-category="accessibility analyzer"
+                data-keywords="colorblind blind accessibility simulation protanopia deuteranopia">
+                <div class="tool-header">
+                    <div class="tool-icon">👓</div>
+                    <h2 class="tool-title">Color Blindness Simulator</h2>
+                </div>
+                <p class="tool-description">See how colors appear to people with color blindness</p>
+
+                <div class="input-group">
+                    <label>Select Color</label>
+                    <input type="color" id="blindnessColor" value="#6366f1">
+                </div>
+
+                <div class="input-group">
+                    <label>Type of Color Blindness</label>
+                    <select id="blindnessType">
+                        <option value="protanopia">Protanopia (Red-Blind)</option>
+                        <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                        <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                        <option value="achromatopsia">Achromatopsia (Total)</option>
+                    </select>
+                </div>
+
+                <button onclick="simulateColorBlindness()">Simulate</button>
+
+                <div id="blindnessOutput"></div>
+            </div>
+
+            <!-- Monochromatic Scheme -->
+            <div class="tool-card" data-category="generator"
+                data-keywords="monochromatic single hue variations saturation brightness">
+                <div class="tool-header">
+                    <div class="tool-icon">🎼</div>
+                    <h2 class="tool-title">Monochromatic Scheme</h2>
+                </div>
+                <p class="tool-description">Generate variations of a single hue with different saturations and
+                    brightness</p>
+
+                <div class="input-group">
+                    <label>Base Color</label>
+                    <input type="color" id="monoColor" value="#6366f1">
+                </div>
+
+                <button onclick="generateMonochromatic()">Generate Scheme</button>
+
+                <div class="color-output" id="monoOutput"></div>
+            </div>
+
+            <!-- Color Temperature Analyzer -->
+            <div class="tool-card" data-category="analyzer" data-keywords="temperature warm cool analyze mood tone">
+                <div class="tool-header">
+                    <div class="tool-icon">🌡️</div>
+                    <h2 class="tool-title">Color Temperature</h2>
+                </div>
+                <p class="tool-description">Analyze color temperature and get warm/cool variations</p>
+
+                <div class="input-group">
+                    <label>Analyze Color</label>
+                    <input type="color" id="tempColor" value="#6366f1">
+                </div>
+
+                <button onclick="analyzeTemperature()">Analyze Temperature</button>
+
+                <div id="tempOutput"></div>
+            </div>
+
+            <!-- Brand Color Palette -->
+            <div class="tool-card" data-category="generator design"
+                data-keywords="brand branding identity system palette ui">
+                <div class="tool-header">
+                    <div class="tool-icon">🏢</div>
+                    <h2 class="tool-title">Brand Palette Builder</h2>
+                </div>
+                <p class="tool-description">Create a complete brand color system with primary, secondary, and UI colors
+                </p>
+
+                <div class="input-group">
+                    <label>Primary Brand Color</label>
+                    <input type="color" id="brandColor" value="#6366f1">
+                </div>
+
+                <button onclick="generateBrandPalette()">Generate Brand System</button>
+
+                <div id="brandOutput"></div>
+            </div>
+
+            <!-- Color Psychology -->
+            <div class="tool-card" data-category="analyzer design"
+                data-keywords="psychology meaning emotions feelings brand">
+                <div class="tool-header">
+                    <div class="tool-icon">🧠</div>
+                    <h2 class="tool-title">Color Psychology</h2>
+                </div>
+                <p class="tool-description">Discover the psychological meaning and emotions associated with colors</p>
+
+                <div class="input-group">
+                    <label>Select Color</label>
+                    <input type="color" id="psychColor" value="#6366f1">
+                </div>
+
+                <button onclick="analyzeColorPsychology()">Analyze Psychology</button>
+
+                <div id="psychOutput"></div>
+            </div>
+
+            <!-- Opacity Variations -->
+            <div class="tool-card" data-category="generator" data-keywords="opacity alpha transparency rgba variations">
+                <div class="tool-header">
+                    <div class="tool-icon">💎</div>
+                    <h2 class="tool-title">Opacity Variations</h2>
+                </div>
+                <p class="tool-description">Generate RGBA variations with different opacity levels</p>
+
+                <div class="input-group">
+                    <label>Base Color</label>
+                    <input type="color" id="opacityColor" value="#6366f1">
+                </div>
+
+                <button onclick="generateOpacityVariations()">Generate Variations</button>
+
+                <div id="opacityOutput"></div>
+            </div>
+
+            <!-- Text Color Generator -->
+            <div class="tool-card" data-category="accessibility analyzer"
+                data-keywords="text readable contrast best black white background">
+                <div class="tool-header">
+                    <div class="tool-icon">📝</div>
+                    <h2 class="tool-title">Text Color Finder</h2>
+                </div>
+                <p class="tool-description">Find the best text color (black or white) for any background</p>
+
+                <div class="input-group">
+                    <label>Background Color</label>
+                    <input type="color" id="textBgColor" value="#6366f1">
+                </div>
+
+                <button onclick="findBestTextColor()">Find Best Text Color</button>
+
+                <div id="textColorOutput"></div>
             </div>
         </div>
     </div>
@@ -882,7 +1194,7 @@
             return rgbToHex(rgb.r, rgb.g, rgb.b);
         }
 
-        // Color Names Database (shortened for space)
+        // Color Names Database
         const colorNames = {
             '#FF0000': 'Red', '#00FF00': 'Lime', '#0000FF': 'Blue',
             '#FFFF00': 'Yellow', '#FF00FF': 'Magenta', '#00FFFF': 'Cyan',
@@ -893,9 +1205,7 @@
             '#EE82EE': 'Violet', '#F0E68C': 'Khaki', '#E6E6FA': 'Lavender',
             '#FF69B4': 'Hot Pink', '#CD5C5C': 'Indian Red', '#F08080': 'Light Coral',
             '#FA8072': 'Salmon', '#E9967A': 'Dark Salmon', '#FFA07A': 'Light Salmon',
-            '#DC143C': 'Crimson', '#FF1493': 'Deep Pink', '#C71585': 'Medium Violet Red',
-            '#DB7093': 'Pale Violet Red', '#FF7F50': 'Coral', '#FF4500': 'Orange Red',
-            '#FFB6C1': 'Light Pink', '#FFDAB9': 'Peach Puff', '#F5DEB3': 'Wheat'
+            '#DC143C': 'Crimson', '#FF1493': 'Deep Pink', '#C71585': 'Medium Violet Red'
         };
 
         function findClosestColorName(hex) {
@@ -1017,7 +1327,115 @@
             preview.style.background = gradient;
             code.innerHTML = `background: ${gradient};`;
             code.onclick = () => copyToClipboard(`background: ${gradient};`);
-            code.style.cursor = 'pointer';
+        }
+
+        // Contrast Checker
+        function checkContrast() {
+            const textColor = document.getElementById('textColor').value;
+            const bgColor = document.getElementById('bgColor').value;
+
+            const textRgb = hexToRgb(textColor);
+            const bgRgb = hexToRgb(bgColor);
+
+            const ratio = getContrastRatio(textRgb, bgRgb);
+            const passAA = ratio >= 4.5;
+            const passAAA = ratio >= 7;
+            const passAALarge = ratio >= 3;
+
+            const result = document.getElementById('contrastResult');
+            result.innerHTML = `
+                <div class="contrast-result">
+                    <div>
+                        <div class="contrast-score">${ratio.toFixed(2)}:1</div>
+                        <div class="contrast-rating">Contrast Ratio</div>
+                    </div>
+                    <div>
+                        <div class="${passAA ? 'pass-badge' : 'fail-badge'}">${passAA ? '✓' : '✗'} WCAG AA</div>
+                        <div class="${passAAA ? 'pass-badge' : 'fail-badge'}" style="margin-top: 5px">${passAAA ? '✓' : '✗'} WCAG AAA</div>
+                        <div class="${passAALarge ? 'pass-badge' : 'fail-badge'}" style="margin-top: 5px">${passAALarge ? '✓' : '✗'} Large Text</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 20px; background: ${bgColor}; color: ${textColor}; border-radius: 10px; text-align: center; font-weight: 600;">
+                    Sample Text Preview
+                </div>
+            `;
+        }
+
+        // Shades Generator
+        function generateShades() {
+            const baseColor = document.getElementById('shadeColor').value;
+            const shades = [-80, -50, -20, 0, 20, 50, 80, 110].map(amount => adjustColor(baseColor, amount));
+
+            const output = document.getElementById('shadesOutput');
+            output.innerHTML = shades.map(color =>
+                `<div class="color-box" style="background: ${color}" onclick="copyToClipboard('${color}')">${color}</div>`
+            ).join('');
+        }
+
+        // Color Mixer
+        function mixColors() {
+            const color1 = document.getElementById('mixColor1').value;
+            const color2 = document.getElementById('mixColor2').value;
+            const ratio = parseFloat(document.getElementById('mixRatio').value) / 100;
+
+            const rgb1 = hexToRgb(color1);
+            const rgb2 = hexToRgb(color2);
+
+            const mixed = {
+                r: Math.round(rgb1.r * (1 - ratio) + rgb2.r * ratio),
+                g: Math.round(rgb1.g * (1 - ratio) + rgb2.g * ratio),
+                b: Math.round(rgb1.b * (1 - ratio) + rgb2.b * ratio)
+            };
+
+            const mixedHex = rgbToHex(mixed.r, mixed.g, mixed.b);
+
+            const output = document.getElementById('mixOutput');
+            output.innerHTML = `
+                <div class="palette-row">
+                    <div class="palette-color" style="background: ${color1}" onclick="copyToClipboard('${color1}')">${color1}</div>
+                    <div class="palette-color" style="background: ${mixedHex}; flex: 2;" onclick="copyToClipboard('${mixedHex}')">${mixedHex}</div>
+                    <div class="palette-color" style="background: ${color2}" onclick="copyToClipboard('${color2}')">${color2}</div>
+                </div>
+            `;
+        }
+
+        // Color Converter
+        function convertColor() {
+            let input = document.getElementById('convertInput').value.trim();
+
+            if (!input.startsWith('#')) {
+                input = '#' + input;
+            }
+
+            const rgb = hexToRgb(input);
+            if (!rgb) {
+                document.getElementById('convertResult').innerHTML = 'Invalid color format';
+                return;
+            }
+
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            const result = document.getElementById('convertResult');
+            result.innerHTML = `
+                <div style="margin-bottom: 10px"><strong>HEX:</strong> ${input}</div>
+                <div style="margin-bottom: 10px"><strong>RGB:</strong> rgb(${rgb.r}, ${rgb.g}, ${rgb.b})</div>
+                <div><strong>HSL:</strong> hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)</div>
+            `;
+            result.onclick = () => copyToClipboard(input);
+        }
+
+        // Random Color Generator
+        function generateRandomColors() {
+            const colors = [];
+            for (let i = 0; i < 8; i++) {
+                const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                colors.push(randomColor);
+            }
+
+            const output = document.getElementById('randomOutput');
+            output.innerHTML = colors.map(color =>
+                `<div class="color-box" style="background: ${color}" onclick="copyToClipboard('${color}')">${color}</div>`
+            ).join('');
         }
 
         // Image Color Extractor
@@ -1069,38 +1487,6 @@
 
                 reader.readAsDataURL(input.files[0]);
             }
-        }
-
-        // Contrast Checker
-        function checkContrast() {
-            const textColor = document.getElementById('textColor').value;
-            const bgColor = document.getElementById('bgColor').value;
-
-            const textRgb = hexToRgb(textColor);
-            const bgRgb = hexToRgb(bgColor);
-
-            const ratio = getContrastRatio(textRgb, bgRgb);
-            const passAA = ratio >= 4.5;
-            const passAAA = ratio >= 7;
-            const passAALarge = ratio >= 3;
-
-            const result = document.getElementById('contrastResult');
-            result.innerHTML = `
-                <div class="contrast-result">
-                    <div>
-                        <div class="contrast-score">${ratio.toFixed(2)}:1</div>
-                        <div class="contrast-rating">Contrast Ratio</div>
-                    </div>
-                    <div>
-                        <div class="${passAA ? 'pass-badge' : 'fail-badge'}">${passAA ? '✓' : '✗'} WCAG AA</div>
-                        <div class="${passAAA ? 'pass-badge' : 'fail-badge'}" style="margin-top: 5px">${passAAA ? '✓' : '✗'} WCAG AAA</div>
-                        <div class="${passAALarge ? 'pass-badge' : 'fail-badge'}" style="margin-top: 5px">${passAALarge ? '✓' : '✗'} Large Text</div>
-                    </div>
-                </div>
-                <div style="margin-top: 15px; padding: 20px; background: ${bgColor}; color: ${textColor}; border-radius: 10px; text-align: center; font-weight: 600;">
-                    Sample Text Preview
-                </div>
-            `;
         }
 
         // Color Name Finder
@@ -1187,84 +1573,6 @@
             copyToClipboard(scss);
         }
 
-        // Shades Generator
-        function generateShades() {
-            const baseColor = document.getElementById('shadeColor').value;
-            const shades = [-80, -50, -20, 0, 20, 50, 80, 110].map(amount => adjustColor(baseColor, amount));
-
-            const output = document.getElementById('shadesOutput');
-            output.innerHTML = shades.map(color =>
-                `<div class="color-box" style="background: ${color}" onclick="copyToClipboard('${color}')">${color}</div>`
-            ).join('');
-        }
-
-        // Color Mixer
-        function mixColors() {
-            const color1 = document.getElementById('mixColor1').value;
-            const color2 = document.getElementById('mixColor2').value;
-            const ratio = parseFloat(document.getElementById('mixRatio').value) / 100;
-
-            const rgb1 = hexToRgb(color1);
-            const rgb2 = hexToRgb(color2);
-
-            const mixed = {
-                r: Math.round(rgb1.r * (1 - ratio) + rgb2.r * ratio),
-                g: Math.round(rgb1.g * (1 - ratio) + rgb2.g * ratio),
-                b: Math.round(rgb1.b * (1 - ratio) + rgb2.b * ratio)
-            };
-
-            const mixedHex = rgbToHex(mixed.r, mixed.g, mixed.b);
-
-            const output = document.getElementById('mixOutput');
-            output.innerHTML = `
-                <div class="palette-row">
-                    <div class="palette-color" style="background: ${color1}" onclick="copyToClipboard('${color1}')">${color1}</div>
-                    <div class="palette-color" style="background: ${mixedHex}; flex: 2;" onclick="copyToClipboard('${mixedHex}')">${mixedHex}</div>
-                    <div class="palette-color" style="background: ${color2}" onclick="copyToClipboard('${color2}')">${color2}</div>
-                </div>
-            `;
-        }
-
-        // Color Converter
-        function convertColor() {
-            let input = document.getElementById('convertInput').value.trim();
-
-            if (!input.startsWith('#')) {
-                input = '#' + input;
-            }
-
-            const rgb = hexToRgb(input);
-            if (!rgb) {
-                document.getElementById('convertResult').innerHTML = 'Invalid color format';
-                return;
-            }
-
-            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-
-            const result = document.getElementById('convertResult');
-            result.innerHTML = `
-                <div style="margin-bottom: 10px"><strong>HEX:</strong> ${input}</div>
-                <div style="margin-bottom: 10px"><strong>RGB:</strong> rgb(${rgb.r}, ${rgb.g}, ${rgb.b})</div>
-                <div><strong>HSL:</strong> hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)</div>
-            `;
-            result.style.cursor = 'pointer';
-            result.onclick = () => copyToClipboard(input);
-        }
-
-        // Random Color Generator
-        function generateRandomColors() {
-            const colors = [];
-            for (let i = 0; i < 8; i++) {
-                const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-                colors.push(randomColor);
-            }
-
-            const output = document.getElementById('randomOutput');
-            output.innerHTML = colors.map(color =>
-                `<div class="color-box" style="background: ${color}" onclick="copyToClipboard('${color}')">${color}</div>`
-            ).join('');
-        }
-
         // CSS Variables Generator
         function generateCSSVariables() {
             const primary = document.getElementById('cssVar1').value;
@@ -1282,8 +1590,368 @@
 
             const output = document.getElementById('cssVarOutput');
             output.innerHTML = css;
-            output.style.cursor = 'pointer';
             output.onclick = () => copyToClipboard(css);
+        }
+
+        // Color Blindness Simulator
+        function simulateColorBlindness() {
+            const color = document.getElementById('blindnessColor').value;
+            const type = document.getElementById('blindnessType').value;
+            const rgb = hexToRgb(color);
+
+            let simulated;
+
+            switch (type) {
+                case 'protanopia':
+                    simulated = {
+                        r: Math.round(0.567 * rgb.r + 0.433 * rgb.g),
+                        g: Math.round(0.558 * rgb.r + 0.442 * rgb.g),
+                        b: Math.round(0.242 * rgb.g + 0.758 * rgb.b)
+                    };
+                    break;
+                case 'deuteranopia':
+                    simulated = {
+                        r: Math.round(0.625 * rgb.r + 0.375 * rgb.g),
+                        g: Math.round(0.7 * rgb.r + 0.3 * rgb.g),
+                        b: Math.round(0.3 * rgb.g + 0.7 * rgb.b)
+                    };
+                    break;
+                case 'tritanopia':
+                    simulated = {
+                        r: Math.round(0.95 * rgb.r + 0.05 * rgb.g),
+                        g: Math.round(0.433 * rgb.g + 0.567 * rgb.b),
+                        b: Math.round(0.475 * rgb.g + 0.525 * rgb.b)
+                    };
+                    break;
+                case 'achromatopsia':
+                    const gray = Math.round(0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b);
+                    simulated = { r: gray, g: gray, b: gray };
+                    break;
+            }
+
+            const simulatedHex = rgbToHex(simulated.r, simulated.g, simulated.b);
+
+            const output = document.getElementById('blindnessOutput');
+            output.innerHTML = `
+                <div class="palette-row">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.9em; color: var(--gray); margin-bottom: 10px; font-weight: 600;">Original</div>
+                        <div class="palette-color" style="background: ${color}" onclick="copyToClipboard('${color}')">${color}</div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.9em; color: var(--gray); margin-bottom: 10px; font-weight: 600;">Simulated</div>
+                        <div class="palette-color" style="background: ${simulatedHex}" onclick="copyToClipboard('${simulatedHex}')">${simulatedHex}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Monochromatic Scheme
+        function generateMonochromatic() {
+            const baseColor = document.getElementById('monoColor').value;
+            const rgb = hexToRgb(baseColor);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            const colors = [
+                hslToHex(hsl.h, Math.max(10, hsl.s - 30), Math.min(95, hsl.l + 30)),
+                hslToHex(hsl.h, Math.max(10, hsl.s - 15), Math.min(90, hsl.l + 15)),
+                baseColor,
+                hslToHex(hsl.h, Math.min(100, hsl.s + 15), Math.max(15, hsl.l - 15)),
+                hslToHex(hsl.h, Math.min(100, hsl.s + 30), Math.max(10, hsl.l - 30)),
+                hslToHex(hsl.h, Math.min(100, hsl.s + 20), Math.max(5, hsl.l - 40))
+            ];
+
+            const output = document.getElementById('monoOutput');
+            output.innerHTML = colors.map(color =>
+                `<div class="color-box" style="background: ${color}" onclick="copyToClipboard('${color}')">${color}</div>`
+            ).join('');
+        }
+
+        // Color Temperature Analyzer
+        function analyzeTemperature() {
+            const color = document.getElementById('tempColor').value;
+            const rgb = hexToRgb(color);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            let temperature, description;
+
+            if ((hsl.h >= 0 && hsl.h < 60) || hsl.h >= 300) {
+                temperature = 'Warm';
+                description = 'This color evokes warmth, energy, and excitement. Perfect for creating passionate, energetic designs.';
+            } else if (hsl.h >= 180 && hsl.h < 300) {
+                temperature = 'Cool';
+                description = 'This color evokes calmness, professionalism, and trust. Ideal for corporate and tranquil designs.';
+            } else {
+                temperature = 'Neutral';
+                description = 'This color is balanced between warm and cool, offering versatility in design applications.';
+            }
+
+            const warmer = hslToHex((hsl.h + 30) % 360, Math.min(100, hsl.s + 10), hsl.l);
+            const cooler = hslToHex((hsl.h - 30 + 360) % 360, Math.min(100, hsl.s + 10), hsl.l);
+
+            const output = document.getElementById('tempOutput');
+            output.innerHTML = `
+                <div class="color-name-display">
+                    <div style="width: 100%; height: 100px; background: ${color}; border-radius: 10px; margin-bottom: 15px;"></div>
+                    <div class="color-name-title">Temperature: ${temperature}</div>
+                    <div class="color-name-info">${description}</div>
+                </div>
+                <div class="palette-row" style="margin-top: 15px;">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.8em; color: var(--gray); margin-bottom: 8px;">Warmer</div>
+                        <div class="palette-color" style="background: ${warmer}" onclick="copyToClipboard('${warmer}')">${warmer}</div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.8em; color: var(--gray); margin-bottom: 8px;">Cooler</div>
+                        <div class="palette-color" style="background: ${cooler}" onclick="copyToClipboard('${cooler}')">${cooler}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Brand Color Palette Generator
+        function generateBrandPalette() {
+            const primary = document.getElementById('brandColor').value;
+            const rgb = hexToRgb(primary);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            const palette = {
+                primary: primary,
+                secondary: hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l),
+                accent: hslToHex((hsl.h + 60) % 360, Math.min(100, hsl.s + 20), hsl.l),
+                success: '#10b981',
+                warning: '#f59e0b',
+                error: '#ef4444',
+                info: '#3b82f6',
+                light: '#f8fafc',
+                dark: '#0f172a'
+            };
+
+            const output = document.getElementById('brandOutput');
+            output.innerHTML = `
+                <div style="display: grid; gap: 10px; margin-top: 15px;">
+                    ${Object.entries(palette).map(([name, color]) => `
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; cursor: pointer;" onclick="copyToClipboard('${color}')">
+                            <div style="width: 50px; height: 50px; background: ${color}; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"></div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; color: var(--dark); text-transform: capitalize;">${name}</div>
+                                <div style="font-family: monospace; color: var(--gray); font-size: 0.85em;">${color}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Color Psychology Analyzer
+        function analyzeColorPsychology() {
+            const color = document.getElementById('psychColor').value;
+            const rgb = hexToRgb(color);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            let psychology = {
+                name: '',
+                emotions: '',
+                uses: '',
+                brands: ''
+            };
+
+            if (hsl.h >= 0 && hsl.h < 30) {
+                psychology = {
+                    name: 'Red',
+                    emotions: 'Passion, Energy, Excitement, Danger, Love, Power',
+                    uses: 'Call-to-action buttons, sales, food industry, emergency alerts',
+                    brands: 'Coca-Cola, Netflix, YouTube, Target'
+                };
+            } else if (hsl.h >= 30 && hsl.h < 60) {
+                psychology = {
+                    name: 'Orange/Yellow',
+                    emotions: 'Happiness, Optimism, Warmth, Creativity, Friendliness',
+                    uses: 'Children products, food brands, warnings, creativity',
+                    brands: 'McDonald\'s, IKEA, Snapchat, National Geographic'
+                };
+            } else if (hsl.h >= 60 && hsl.h < 150) {
+                psychology = {
+                    name: 'Green',
+                    emotions: 'Growth, Health, Nature, Freshness, Tranquility, Money',
+                    uses: 'Environmental, health, finance, organic products',
+                    brands: 'Starbucks, Spotify, WhatsApp, Whole Foods'
+                };
+            } else if (hsl.h >= 150 && hsl.h < 210) {
+                psychology = {
+                    name: 'Cyan/Teal',
+                    emotions: 'Clarity, Refreshment, Balance, Healing, Communication',
+                    uses: 'Technology, healthcare, water products, communication',
+                    brands: 'Twitter (formerly), Vimeo, Tiffany & Co.'
+                };
+            } else if (hsl.h >= 210 && hsl.h < 270) {
+                psychology = {
+                    name: 'Blue',
+                    emotions: 'Trust, Stability, Calmness, Intelligence, Professionalism',
+                    uses: 'Corporate, technology, healthcare, finance, social media',
+                    brands: 'Facebook, IBM, LinkedIn, PayPal, Samsung'
+                };
+            } else if (hsl.h >= 270 && hsl.h < 330) {
+                psychology = {
+                    name: 'Purple',
+                    emotions: 'Luxury, Creativity, Mystery, Spirituality, Royalty',
+                    uses: 'Beauty, luxury brands, creative industries, spirituality',
+                    brands: 'Yahoo, Hallmark, Twitch, Cadbury'
+                };
+            } else {
+                psychology = {
+                    name: 'Pink/Magenta',
+                    emotions: 'Romance, Compassion, Playfulness, Femininity, Youth',
+                    uses: 'Beauty, fashion, children, romantic products',
+                    brands: 'Barbie, Victoria\'s Secret, T-Mobile, Cosmopolitan'
+                };
+            }
+
+            const output = document.getElementById('psychOutput');
+            output.innerHTML = `
+                <div class="color-name-display">
+                    <div style="width: 100%; height: 100px; background: ${color}; border-radius: 10px; margin-bottom: 15px;"></div>
+                    <div class="color-name-title">${psychology.name} Psychology</div>
+                    <div style="text-align: left; margin-top: 15px;">
+                        <div style="margin-bottom: 12px;">
+                            <strong style="color: var(--dark);">Emotions:</strong>
+                            <div style="color: var(--gray); margin-top: 5px;">${psychology.emotions}</div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong style="color: var(--dark);">Best Uses:</strong>
+                            <div style="color: var(--gray); margin-top: 5px;">${psychology.uses}</div>
+                        </div>
+                        <div>
+                            <strong style="color: var(--dark);">Famous Brands:</strong>
+                            <div style="color: var(--gray); margin-top: 5px;">${psychology.brands}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Opacity Variations Generator
+        function generateOpacityVariations() {
+            const color = document.getElementById('opacityColor').value;
+            const rgb = hexToRgb(color);
+
+            const opacities = [1, 0.9, 0.7, 0.5, 0.3, 0.1];
+
+            const output = document.getElementById('opacityOutput');
+            output.innerHTML = `
+                <div style="display: grid; gap: 12px; margin-top: 15px;">
+                    ${opacities.map(opacity => {
+                const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+                return `
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f8fafc; border-radius: 8px; cursor: pointer;" onclick="copyToClipboard('${rgba}')">
+                                <div style="width: 60px; height: 60px; background: ${rgba}; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;"></div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 700; color: var(--dark);">${Math.round(opacity * 100)}% Opacity</div>
+                                    <div style="font-family: monospace; color: var(--gray); font-size: 0.85em;">${rgba}</div>
+                                </div>
+                            </div>
+                        `;
+            }).join('')}
+                </div>
+            `;
+        }
+
+        // Text Color Finder
+        function findBestTextColor() {
+            const bgColor = document.getElementById('textBgColor').value;
+            const bgRgb = hexToRgb(bgColor);
+
+            const whiteRgb = { r: 255, g: 255, b: 255 };
+            const blackRgb = { r: 0, g: 0, b: 0 };
+
+            const whiteContrast = getContrastRatio(whiteRgb, bgRgb);
+            const blackContrast = getContrastRatio(blackRgb, bgRgb);
+
+            const bestColor = whiteContrast > blackContrast ? '#ffffff' : '#000000';
+            const bestContrast = Math.max(whiteContrast, blackContrast);
+
+            const output = document.getElementById('textColorOutput');
+            output.innerHTML = `
+                <div class="color-name-display">
+                    <div style="width: 100%; padding: 40px 20px; background: ${bgColor}; color: ${bestColor}; border-radius: 10px; margin-bottom: 15px; font-size: 1.3em; font-weight: 700; text-align: center;">
+                        Sample Text Preview
+                    </div>
+                    <div class="color-name-title">Best Text Color: ${bestColor}</div>
+                    <div class="color-name-info">Contrast Ratio: ${bestContrast.toFixed(2)}:1</div>
+                    <div class="color-name-info" style="margin-top: 10px;">
+                        ${bestContrast >= 4.5 ? '✓ WCAG AA Compliant' : '✗ Does not meet WCAG AA'}
+                    </div>
+                </div>
+                <div class="palette-row" style="margin-top: 15px;">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.8em; color: var(--gray); margin-bottom: 8px;">White Text</div>
+                        <div class="palette-color" style="background: ${bgColor}; color: #ffffff" onclick="copyToClipboard('#ffffff')">
+                            ${whiteContrast.toFixed(2)}:1
+                        </div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.8em; color: var(--gray); margin-bottom: 8px;">Black Text</div>
+                        <div class="palette-color" style="background: ${bgColor}; color: #000000" onclick="copyToClipboard('#000000')">
+                            ${blackContrast.toFixed(2)}:1
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Search and Filter Functions
+        let currentCategory = 'all';
+
+        function filterTools() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.tool-card');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const keywords = card.getAttribute('data-keywords') || '';
+                const title = card.querySelector('.tool-title').textContent.toLowerCase();
+                const description = card.querySelector('.tool-description').textContent.toLowerCase();
+                const category = card.getAttribute('data-category');
+
+                const matchesSearch = keywords.includes(searchTerm) ||
+                    title.includes(searchTerm) ||
+                    description.includes(searchTerm);
+
+                const matchesCategory = currentCategory === 'all' ||
+                    category.includes(currentCategory);
+
+                if (matchesSearch && matchesCategory) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Update results count
+            const resultsCount = document.getElementById('resultsCount');
+            resultsCount.textContent = `Showing ${visibleCount} of 20 tools`;
+
+            // Show/hide no results message
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+
+            // Update active filter tag
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Apply filter
+            filterTools();
         }
 
         // Initialize on load
@@ -1299,6 +1967,13 @@
             generateTailwindScale();
             mixColors();
             generateCSSVariables();
+            simulateColorBlindness();
+            generateMonochromatic();
+            analyzeTemperature();
+            generateBrandPalette();
+            analyzeColorPsychology();
+            generateOpacityVariations();
+            findBestTextColor();
         };
     </script>
 </body>
