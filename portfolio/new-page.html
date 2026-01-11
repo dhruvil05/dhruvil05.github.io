@@ -26,6 +26,49 @@
             color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-follower {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.4s ease;
+            opacity: 0.3;
+        }
+
+        /* Rainbow Trail */
+        .cursor-trail {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9997;
+            animation: fadeOut 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
         }
 
         /* Navigation */
@@ -481,6 +524,10 @@
 </head>
 
 <body>
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+
     <!-- Navigation -->
     <nav>
         <div class="container">
@@ -655,6 +702,80 @@
     </footer>
 
     <script>
+        // Custom Cursor with Rainbow Trail
+        const cursor = document.getElementById('cursor');
+        const cursorFollower = document.getElementById('cursorFollower');
+        let mouseX = 0, mouseY = 0;
+        let followerX = 0, followerY = 0;
+        let trailIndex = 0;
+
+        // Rainbow colors array (light, pastel tones)
+        const rainbowColors = [
+            'rgba(255, 179, 186, 0.6)', // Light pink
+            'rgba(255, 223, 186, 0.6)', // Light peach
+            'rgba(255, 255, 186, 0.6)', // Light yellow
+            'rgba(186, 255, 201, 0.6)', // Light green
+            'rgba(186, 225, 255, 0.6)', // Light blue
+            'rgba(220, 198, 224, 0.6)', // Light purple
+        ];
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+
+            // Create rainbow trail
+            if (Math.random() > 0.7) {
+                createTrail(mouseX, mouseY);
+            }
+        });
+
+        // Smooth follower animation
+        function animateFollower() {
+            followerX += (mouseX - followerX) * 0.1;
+            followerY += (mouseY - followerY) * 0.1;
+
+            cursorFollower.style.left = followerX - 20 + 'px';
+            cursorFollower.style.top = followerY - 20 + 'px';
+
+            // Cycle through rainbow colors
+            const colorIndex = Math.floor(Date.now() / 200) % rainbowColors.length;
+            cursorFollower.style.background = `radial-gradient(circle, ${rainbowColors[colorIndex]}, transparent)`;
+
+            requestAnimationFrame(animateFollower);
+        }
+        animateFollower();
+
+        // Create rainbow trail particles
+        function createTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = x + 'px';
+            trail.style.top = y + 'px';
+            trail.style.background = rainbowColors[trailIndex % rainbowColors.length];
+            document.body.appendChild(trail);
+
+            trailIndex++;
+
+            setTimeout(() => {
+                trail.remove();
+            }, 800);
+        }
+
+        // Hover effects
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(1.5)';
+                cursorFollower.style.transform = 'scale(1.5)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+                cursorFollower.style.transform = 'scale(1)';
+            });
+        });
+
         // Mobile menu toggle
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
