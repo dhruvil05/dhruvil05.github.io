@@ -27,6 +27,119 @@
             line-height: 1.6;
             overflow-x: hidden;
             cursor: none;
+            position: relative;
+        }
+
+        /* Starry Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite, moveAround 20s ease-in-out infinite;
+        }
+
+        .star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 2px rgba(255, 255, 255, 0.3),
+                    0 0 4px rgba(255, 255, 255, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 6px rgba(255, 255, 255, 0.6),
+                    0 0 12px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        @keyframes moveAround {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(20px, -20px);
+            }
+
+            50% {
+                transform: translate(-15px, 15px);
+            }
+
+            75% {
+                transform: translate(15px, 20px);
+            }
+        }
+
+        /* Lightning effect */
+        .lightning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .lightning.flash {
+            animation: flashEffect 0.4s ease-out;
+        }
+
+        @keyframes flashEffect {
+            0% {
+                opacity: 0;
+                background: radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+            }
+
+            10% {
+                opacity: 1;
+                background: radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0.25) 0%, transparent 60%);
+            }
+
+            100% {
+                opacity: 0;
+                background: radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0) 0%, transparent 70%);
+            }
         }
 
         /* Custom Cursor */
@@ -209,6 +322,8 @@
             padding: 100px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
 
         .section-header {
@@ -643,6 +758,10 @@
 </head>
 
 <body>
+    <!-- Starry Background -->
+    <div class="stars" id="stars"></div>
+    <div class="lightning" id="lightning"></div>
+
     <!-- Custom Cursor -->
     <div class="cursor" id="cursor"></div>
     <div class="cursor-follower" id="cursorFollower"></div>
@@ -900,9 +1019,9 @@
                 Available for freelance projects. Let's discuss how I can help bring your ideas to life.
             </p>
             <div class="contact-links">
-                <a href="mailto:dhruvil.work10@gmail.com" class="contact-link">
+                <a href="mailto:developer.build02@gmail.com" class="contact-link">
                     <span>✉️</span>
-                    <span>dhruvil.work10@gmail.com</span>
+                    <span>developer.build02@gmail.com</span>
                 </a>
                 <a href="#" class="contact-link">
                     <span>📍</span>
@@ -922,6 +1041,46 @@
     </footer>
 
     <script>
+        // Create stars background
+        const starsContainer = document.getElementById('stars');
+        const numberOfStars = 15; // Minimal number of stars
+
+        for (let i = 0; i < numberOfStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+
+            // Random durations for both twinkle and movement
+            const twinkleDuration = (Math.random() * 2 + 2) + 's';
+            const moveDuration = (Math.random() * 10 + 15) + 's'; // 15-25 seconds
+            star.style.animation = `twinkle ${twinkleDuration} ease-in-out infinite, moveAround ${moveDuration} ease-in-out infinite`;
+
+            starsContainer.appendChild(star);
+        }
+
+        // Lightning effect
+        const lightning = document.getElementById('lightning');
+        function triggerLightning() {
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            lightning.style.setProperty('--x', x + '%');
+            lightning.style.setProperty('--y', y + '%');
+            lightning.classList.add('flash');
+
+            setTimeout(() => {
+                lightning.classList.remove('flash');
+            }, 400);
+        }
+
+        // Trigger lightning randomly (every 8-15 seconds)
+        setInterval(() => {
+            if (Math.random() > 0.3) { // 70% chance to trigger
+                triggerLightning();
+            }
+        }, Math.random() * 7000 + 8000);
+
         // Custom Cursor with Rainbow Trail
         const cursor = document.getElementById('cursor');
         const cursorFollower = document.getElementById('cursorFollower');
