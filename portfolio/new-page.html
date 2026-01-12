@@ -467,10 +467,17 @@
         .industry-tag {
             padding: 6px 12px;
             background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.2);
             border-radius: 6px;
             font-size: 12px;
             color: var(--accent);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .industry-tag:hover {
+            transform: scale(1.05);
+            animation: rainbowBorder 2s linear infinite;
         }
 
         /* Services Section */
@@ -631,6 +638,45 @@
             border-radius: 6px;
             font-size: 13px;
             color: var(--text-dim);
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            color: var(--text);
+            transform: scale(1.05);
+            animation: rainbowBorder 2s linear infinite;
+        }
+
+        @keyframes rainbowBorder {
+            0% {
+                border-color: rgba(255, 179, 186, 1);
+            }
+
+            16.6% {
+                border-color: rgba(255, 223, 186, 1);
+            }
+
+            33.2% {
+                border-color: rgba(255, 255, 186, 1);
+            }
+
+            49.8% {
+                border-color: rgba(186, 255, 201, 1);
+            }
+
+            66.4% {
+                border-color: rgba(186, 225, 255, 1);
+            }
+
+            83% {
+                border-color: rgba(220, 198, 224, 1);
+            }
+
+            100% {
+                border-color: rgba(255, 179, 186, 1);
+            }
         }
 
         /* Education & Achievements */
