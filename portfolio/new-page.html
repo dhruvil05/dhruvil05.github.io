@@ -271,10 +271,43 @@
             text-decoration: none;
             font-size: 14px;
             transition: color 0.3s;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg,
+                    rgba(255, 179, 186, 1),
+                    rgba(255, 223, 186, 1),
+                    rgba(255, 255, 186, 1),
+                    rgba(186, 255, 201, 1),
+                    rgba(186, 225, 255, 1),
+                    rgba(220, 198, 224, 1));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
         }
 
         .nav-links a:hover {
             color: var(--text);
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .nav-links a.active {
+            color: var(--text);
+        }
+
+        .nav-links a.active::after {
+            transform: scaleX(1);
         }
 
         /* Hero Section */
@@ -409,12 +442,17 @@
 
         .industry-card {
             padding: 40px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transform-style: preserve-3d;
+            perspective: 1000px;
         }
 
         .industry-card::before {
@@ -429,14 +467,32 @@
             transition: transform 0.3s;
         }
 
+        .industry-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.15), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
         .industry-card:hover::before {
             transform: scaleX(1);
         }
 
+        .industry-card:hover::after {
+            opacity: 1;
+        }
+
         .industry-card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px 0 rgba(59, 130, 246, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
         }
 
         .industry-icon {
@@ -489,15 +545,41 @@
 
         .service-card {
             padding: 32px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
             transition: all 0.3s;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.15), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border-radius: 16px;
+        }
+
+        .service-card:hover::after {
+            opacity: 1;
         }
 
         .service-card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px 0 rgba(59, 130, 246, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
         }
 
         .service-icon {
@@ -588,65 +670,58 @@
             color: var(--accent);
         }
 
-        /* Skills */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-        }
-
-        .skill-card {
-            padding: 32px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .skill-card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .skill-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        .skill-name {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .skill-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .skill-tag {
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            font-size: 13px;
-            color: var(--text-dim);
+        /* Skills - Horizontal Scrolling */
+        .tech-scroll-container {
+            width: 100%;
+            overflow: hidden;
+            padding: 40px 0;
             position: relative;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
 
-        .skill-tag:hover {
+        .tech-scroll {
+            display: flex;
+            gap: 20px;
+            animation: scrollTech 40s linear infinite;
+            width: fit-content;
+        }
+
+        .tech-scroll:hover {
+            animation-play-state: paused;
+        }
+
+        .tech-item {
+            padding: 10px 32px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
             color: var(--text);
-            transform: scale(1.05);
+            font-size: 16px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .tech-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.3);
             animation: rainbowBorder 2s linear infinite;
+        }
+
+        @keyframes scrollTech {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
 
         @keyframes rainbowBorder {
@@ -738,19 +813,23 @@
             align-items: center;
             gap: 12px;
             padding: 16px 24px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
             color: var(--text);
             text-decoration: none;
             transition: all 0.3s;
             font-size: 14px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .contact-link:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.2);
         }
 
         /* Footer */
@@ -849,6 +928,85 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Clock Timer */
+        @keyframes rainbowText {
+            0% {
+                color: rgba(255, 179, 186, 1);
+            }
+
+            16.6% {
+                color: rgba(255, 223, 186, 1);
+            }
+
+            33.2% {
+                color: rgba(255, 255, 186, 1);
+            }
+
+            49.8% {
+                color: rgba(186, 255, 201, 1);
+            }
+
+            66.4% {
+                color: rgba(186, 225, 255, 1);
+            }
+
+            83% {
+                color: rgba(220, 198, 224, 1);
+            }
+
+            100% {
+                color: rgba(255, 179, 186, 1);
+            }
+        }
+
+        .clock {
+            position: fixed;
+            top: 85%;
+            right: 93%;
+            width: 70px;
+            height: 70px;
+            z-index: 11;
+        }
+
+        .time {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 500;
+            color: white;
+            z-index: 2;
+            /* animation: rainbowText 2s linear infinite; */
+        }
+
+        .circle {
+            position: absolute;
+            inset: 0;
+        }
+
+        .tick {
+            position: absolute;
+            width: 0.5px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.15);
+            top: 0;
+            left: 50%;
+            transform-origin: center 35px;
+        }
+
+        .tick.active {
+            background: gray;
+            height: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .clock {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -864,17 +1022,24 @@
     <!-- Navigation -->
     <nav>
         <div class="container">
-            <div class="logo">DS</div>
+            <div class="logo">Portfolio.</div>
             <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#industries">Industries</a></li>
                 <li><a href="#services">Services</a></li>
-                <li><a href="#experience">Experience</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
     </nav>
+
+    <div class="clock">
+        <div class="time" id="time">00:00</div>
+
+        <div class="circle" id="circle">
+            <!-- Lines injected by JS -->
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -884,7 +1049,7 @@
                 <span class="gradient-text">Freelance Developer</span>
             </h1>
             <p class="hero-description">
-                Specializing in SaaS, Logistics, and Healthcare solutions. I build production-level web applications
+                Specializing in SaaS, Logistics, and Healthcare solutions. We build production-level web applications
                 with 2+ years of experience in PHP/Laravel, React, and modern web technologies.
             </p>
             <div class="hero-cta">
@@ -898,7 +1063,7 @@
     <section id="industries">
         <div class="section-header fade-in-up">
             <span class="section-tag">SPECIALIZATION</span>
-            <h2 class="section-title">Industries I Work With</h2>
+            <h2 class="section-title">Industries We Work With</h2>
             <p class="section-subtitle">
                 Focused expertise in building scalable solutions for specific industry needs
             </p>
@@ -953,7 +1118,7 @@
     <section id="services">
         <div class="section-header fade-in-up">
             <span class="section-tag">SERVICES</span>
-            <h2 class="section-title">What I Offer</h2>
+            <h2 class="section-title">What We Offer</h2>
         </div>
         <div class="services-grid">
             <div class="service-card fade-in-up">
@@ -993,114 +1158,55 @@
         </div>
     </section>
 
-    <!-- Experience Section -->
-    <section id="experience">
-        <div class="section-header fade-in-up">
-            <span class="section-tag">EXPERIENCE</span>
-            <h2 class="section-title">Professional Background</h2>
-        </div>
-        <div class="experience-grid">
-            <div class="experience-item fade-in-up">
-                <div class="experience-header">
-                    <div>
-                        <div class="experience-title">PHP/Laravel Developer</div>
-                        <div class="experience-type">Freelance & Contract Work</div>
-                    </div>
-                    <div class="experience-date">2023 – Present</div>
-                </div>
-                <ul class="experience-description">
-                    <li>Developed production-level web applications for SaaS, logistics, and healthcare clients</li>
-                    <li>Built scalable solutions using PHP/Laravel framework with modern frontend technologies</li>
-                    <li>Implemented API integrations, database optimization, and cloud deployment strategies</li>
-                    <li>Collaborated with cross-functional teams to deliver high-quality solutions on time</li>
-                </ul>
-            </div>
-            <div class="experience-item fade-in-up">
-                <div class="experience-header">
-                    <div>
-                        <div class="experience-title">Web Development Projects</div>
-                        <div class="experience-type">Professional Training & Development</div>
-                    </div>
-                    <div class="experience-date">2022 – 2023</div>
-                </div>
-                <ul class="experience-description">
-                    <li>Gained hands-on experience with Laravel framework on production-level applications</li>
-                    <li>Developed foundational skills in PHP, React, Node.js, and database management</li>
-                    <li>Learned industry best practices, coding standards, and agile methodologies</li>
-                    <li>Built portfolio of projects demonstrating full-stack development capabilities</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
     <!-- Skills -->
     <section id="skills">
-        <div class="section-header fade-in-up">
+        <div class="section-header fade-in-up" style="text-align: center; max-width: 100%;">
             <span class="section-tag">SKILLS</span>
             <h2 class="section-title">Technical Expertise</h2>
         </div>
-        <div class="skills-grid">
-            <div class="skill-card fade-in-up">
-                <div class="skill-icon">💻</div>
-                <div class="skill-name">Frontend</div>
-                <div class="skill-items">
-                    <span class="skill-tag">HTML</span>
-                    <span class="skill-tag">CSS</span>
-                    <span class="skill-tag">JavaScript</span>
-                    <span class="skill-tag">React</span>
-                </div>
-            </div>
-            <div class="skill-card fade-in-up">
-                <div class="skill-icon">⚙️</div>
-                <div class="skill-name">Backend</div>
-                <div class="skill-items">
-                    <span class="skill-tag">PHP</span>
-                    <span class="skill-tag">Laravel</span>
-                    <span class="skill-tag">Node.js</span>
-                </div>
-            </div>
-            <div class="skill-card fade-in-up">
-                <div class="skill-icon">🛠️</div>
-                <div class="skill-name">Tools & Platform</div>
-                <div class="skill-items">
-                    <span class="skill-tag">GitHub</span>
-                    <span class="skill-tag">AWS</span>
-                    <span class="skill-tag">Docker</span>
-                    <span class="skill-tag">Dev Tools</span>
-                </div>
-            </div>
-            <div class="skill-card fade-in-up">
-                <div class="skill-icon">✨</div>
-                <div class="skill-name">Professional</div>
-                <div class="skill-items">
-                    <span class="skill-tag">Client Communication</span>
-                    <span class="skill-tag">Project Management</span>
-                    <span class="skill-tag">Problem Solving</span>
-                    <span class="skill-tag">Adaptability</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Education & Achievements -->
-    <section id="education">
-        <div class="section-header fade-in-up">
-            <span class="section-tag">BACKGROUND</span>
-            <h2 class="section-title">Education & Achievements</h2>
-        </div>
-        <div class="info-grid">
-            <div class="info-card fade-in-up">
-                <h3>Bachelor of Engineering</h3>
-                <div class="info-meta">Information Technology • L.E. College, Morbi</div>
-                <div class="info-meta">2022 • CGPA: 7.79/10.0</div>
-            </div>
-            <div class="info-card fade-in-up">
-                <h3>Professional Development</h3>
-                <ul class="achievement-list">
-                    <li>Completed AI Fundamentals Training</li>
-                    <li>Enhanced English proficiency through IELTS preparation</li>
-                    <li>Continuously learning new technologies and frameworks</li>
-                </ul>
+        <div class="tech-scroll-container fade-in-up">
+            <div class="tech-scroll">
+                <div class="tech-item">HTML</div>
+                <div class="tech-item">CSS</div>
+                <div class="tech-item">JavaScript</div>
+                <div class="tech-item">React</div>
+                <div class="tech-item">PHP</div>
+                <div class="tech-item">Laravel</div>
+                <div class="tech-item">Node.js</div>
+                <div class="tech-item">MySQL</div>
+                <div class="tech-item">PostgreSQL</div>
+                <div class="tech-item">MongoDB</div>
+                <div class="tech-item">GitHub</div>
+                <div class="tech-item">Git</div>
+                <div class="tech-item">AWS</div>
+                <div class="tech-item">Docker</div>
+                <div class="tech-item">REST API</div>
+                <div class="tech-item">GraphQL</div>
+                <div class="tech-item">Redis</div>
+                <div class="tech-item">Nginx</div>
+                <div class="tech-item">Apache</div>
+                <div class="tech-item">Linux</div>
+                <!-- Duplicate for seamless loop -->
+                <div class="tech-item">HTML</div>
+                <div class="tech-item">CSS</div>
+                <div class="tech-item">JavaScript</div>
+                <div class="tech-item">React</div>
+                <div class="tech-item">PHP</div>
+                <div class="tech-item">Laravel</div>
+                <div class="tech-item">Node.js</div>
+                <div class="tech-item">MySQL</div>
+                <div class="tech-item">PostgreSQL</div>
+                <div class="tech-item">MongoDB</div>
+                <div class="tech-item">GitHub</div>
+                <div class="tech-item">Git</div>
+                <div class="tech-item">AWS</div>
+                <div class="tech-item">Docker</div>
+                <div class="tech-item">REST API</div>
+                <div class="tech-item">GraphQL</div>
+                <div class="tech-item">Redis</div>
+                <div class="tech-item">Nginx</div>
+                <div class="tech-item">Apache</div>
+                <div class="tech-item">Linux</div>
             </div>
         </div>
     </section>
@@ -1111,10 +1217,10 @@
             <span class="section-tag">CONTACT</span>
             <h2 class="section-title">Let's Build Something Together</h2>
             <p class="section-subtitle" style="margin: 16px auto 0;">
-                Available for freelance projects. Let's discuss how I can help bring your ideas to life.
+                Available for freelance projects. Let's discuss how We can help bring your ideas to life.
             </p>
             <div class="contact-links">
-                <a href="mailto:developer.build02@gmail.com" class="contact-link">
+                <a href="mailto:developer.build02@gmail.com" class="contact-link" target="_blank">
                     <span>✉️</span>
                     <span>developer.build02@gmail.com</span>
                 </a>
@@ -1122,9 +1228,9 @@
                     <span>📍</span>
                     <span>Ahmedabad, Gujarat</span>
                 </a>
-                <a href="#" class="contact-link">
+                <a href="https://dhruvil05.github.io/" class="contact-link" target="_blank">
                     <span>🔗</span>
-                    <span>LinkedIn</span>
+                    <span>Github</span>
                 </a>
             </div>
         </div>
@@ -1132,7 +1238,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>© 2026 Dhruvil Sudani. Freelance Developer specializing in SaaS, Logistics & Healthcare.</p>
+        <p>© 2026 Portfolio. Freelance Developer specializing in SaaS, Logistics & Healthcare.</p>
     </footer>
 
     <script>
@@ -1299,6 +1405,39 @@
             observer.observe(el);
         });
 
+        // 3D Card Tilt Effect
+        function handleCardTilt(e) {
+            const card = e.currentTarget;
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+            // Update mouse position for light effect
+            const mouseX = (x / rect.width) * 100;
+            const mouseY = (y / rect.height) * 100;
+            card.style.setProperty('--mouse-x', mouseX + '%');
+            card.style.setProperty('--mouse-y', mouseY + '%');
+        }
+
+        function resetCardTilt(e) {
+            const card = e.currentTarget;
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+        }
+
+        // Apply 3D effect to all cards
+        document.querySelectorAll('.industry-card, .service-card').forEach(card => {
+            card.addEventListener('mousemove', handleCardTilt);
+            card.addEventListener('mouseleave', resetCardTilt);
+        });
+
         // Active nav link on scroll
         window.addEventListener('scroll', () => {
             let current = '';
@@ -1311,12 +1450,47 @@
             });
 
             document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
                 link.style.color = 'var(--text-dim)';
                 if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
                     link.style.color = 'var(--text)';
                 }
             });
         });
+
+        // Clock Timer
+        const circle = document.getElementById("circle");
+        const timeEl = document.getElementById("time");
+        const TICKS = 60;
+
+        // create ticks
+        for (let i = 0; i < TICKS; i++) {
+            const tick = document.createElement("div");
+            tick.className = "tick";
+            tick.style.transform = `rotate(${i * 6}deg)`;
+            circle.appendChild(tick);
+        }
+
+        const ticks = document.querySelectorAll(".tick");
+
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, "0");
+            const m = String(now.getMinutes()).padStart(2, "0");
+
+            // reverse seconds
+            const secondsLeft = 59 - now.getSeconds();
+
+            timeEl.textContent = `${h}:${m}`;
+
+            ticks.forEach((tick, index) => {
+                tick.classList.toggle("active", index <= secondsLeft);
+            });
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
     </script>
 </body>
 

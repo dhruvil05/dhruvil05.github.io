@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dhruvil Sudani - Portfolio</title>
+    <title>Dhruvil Sudani - Freelance Developer</title>
     <style>
         * {
             margin: 0;
@@ -27,6 +27,168 @@
             line-height: 1.6;
             overflow-x: hidden;
             cursor: none;
+            position: relative;
+        }
+
+        /* Starry Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite, moveAround 20s ease-in-out infinite;
+        }
+
+        .star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Rainbow colored stars */
+        .star.color-1 {
+            background: rgba(255, 179, 186, 0.8);
+        }
+
+        .star.color-1::before {
+            background: rgba(255, 179, 186, 0.8);
+        }
+
+        .star.color-2 {
+            background: rgba(255, 223, 186, 0.8);
+        }
+
+        .star.color-2::before {
+            background: rgba(255, 223, 186, 0.8);
+        }
+
+        .star.color-3 {
+            background: rgba(255, 255, 186, 0.8);
+        }
+
+        .star.color-3::before {
+            background: rgba(255, 255, 186, 0.8);
+        }
+
+        .star.color-4 {
+            background: rgba(186, 255, 201, 0.8);
+        }
+
+        .star.color-4::before {
+            background: rgba(186, 255, 201, 0.8);
+        }
+
+        .star.color-5 {
+            background: rgba(186, 225, 255, 0.8);
+        }
+
+        .star.color-5::before {
+            background: rgba(186, 225, 255, 0.8);
+        }
+
+        .star.color-6 {
+            background: rgba(220, 198, 224, 0.8);
+        }
+
+        .star.color-6::before {
+            background: rgba(220, 198, 224, 0.8);
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 2px currentColor,
+                    0 0 4px currentColor;
+            }
+
+            50% {
+                box-shadow: 0 0 6px currentColor,
+                    0 0 12px currentColor;
+            }
+        }
+
+        @keyframes moveAround {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(20px, -20px);
+            }
+
+            50% {
+                transform: translate(-15px, 15px);
+            }
+
+            75% {
+                transform: translate(15px, 20px);
+            }
+        }
+
+        /* Lightning effect */
+        .lightning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .lightning.flash {
+            animation: flashEffect 0.4s ease-out;
+        }
+
+        @keyframes flashEffect {
+            0% {
+                opacity: 0;
+                background: radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+            }
+
+            10% {
+                opacity: 1;
+                background: radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0.25) 0%, transparent 60%);
+            }
+
+            100% {
+                opacity: 0;
+                background: radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0) 0%, transparent 70%);
+            }
         }
 
         /* Custom Cursor */
@@ -126,7 +288,7 @@
         }
 
         .hero-content {
-            max-width: 800px;
+            max-width: 900px;
             text-align: center;
         }
 
@@ -161,7 +323,7 @@
         .hero-description {
             font-size: 18px;
             color: var(--text-dim);
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 40px;
             animation: fadeIn 0.6s ease 0.2s backwards;
         }
@@ -209,6 +371,8 @@
             padding: 100px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
 
         .section-header {
@@ -236,10 +400,134 @@
             max-width: 600px;
         }
 
-        /* Experience */
+        /* Industries Section */
+        .industries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .industry-card {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .industry-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .industry-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .industry-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .industry-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .industry-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .industry-description {
+            color: var(--text-dim);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .industry-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .industry-tag {
+            padding: 6px 12px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--accent);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .industry-tag:hover {
+            transform: scale(1.05);
+            animation: rainbowBorder 2s linear infinite;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .service-card {
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .service-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .service-description {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Experience Timeline */
         .experience-grid {
             display: grid;
-            gap: 40px;
+            gap: 32px;
         }
 
         .experience-item {
@@ -270,7 +558,7 @@
             margin-bottom: 4px;
         }
 
-        .experience-company {
+        .experience-type {
             color: var(--accent);
             font-size: 14px;
         }
@@ -350,6 +638,45 @@
             border-radius: 6px;
             font-size: 13px;
             color: var(--text-dim);
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            color: var(--text);
+            transform: scale(1.05);
+            animation: rainbowBorder 2s linear infinite;
+        }
+
+        @keyframes rainbowBorder {
+            0% {
+                border-color: rgba(255, 179, 186, 1);
+            }
+
+            16.6% {
+                border-color: rgba(255, 223, 186, 1);
+            }
+
+            33.2% {
+                border-color: rgba(255, 255, 186, 1);
+            }
+
+            49.8% {
+                border-color: rgba(186, 255, 201, 1);
+            }
+
+            66.4% {
+                border-color: rgba(186, 225, 255, 1);
+            }
+
+            83% {
+                border-color: rgba(220, 198, 224, 1);
+            }
+
+            100% {
+                border-color: rgba(255, 179, 186, 1);
+            }
         }
 
         /* Education & Achievements */
@@ -498,6 +825,8 @@
                 padding: 120px 20px 60px;
             }
 
+            .industries-grid,
+            .services-grid,
             .skills-grid,
             .info-grid {
                 grid-template-columns: 1fr;
@@ -524,6 +853,10 @@
 </head>
 
 <body>
+    <!-- Starry Background -->
+    <div class="stars" id="stars"></div>
+    <div class="lightning" id="lightning"></div>
+
     <!-- Custom Cursor -->
     <div class="cursor" id="cursor"></div>
     <div class="cursor-follower" id="cursorFollower"></div>
@@ -534,9 +867,10 @@
             <div class="logo">DS</div>
             <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
             <ul class="nav-links" id="navLinks">
+                <li><a href="#industries">Industries</a></li>
+                <li><a href="#services">Services</a></li>
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#skills">Skills</a></li>
-                <li><a href="#education">Education</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -545,17 +879,116 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <span class="hero-tag">Available for opportunities</span>
+            <span class="hero-tag">Available for Freelance Projects</span>
             <h1>
-                <span class="gradient-text">Dhruvil Sudani</span>
+                <span class="gradient-text">Freelance Developer</span>
             </h1>
             <p class="hero-description">
-                PHP/Laravel Developer with 2+ years of experience crafting production-level web applications.
-                Passionate about learning new technologies and building scalable solutions.
+                Specializing in SaaS, Logistics, and Healthcare solutions. I build production-level web applications
+                with 2+ years of experience in PHP/Laravel, React, and modern web technologies.
             </p>
             <div class="hero-cta">
-                <a href="#contact" class="btn btn-primary">Get in touch</a>
-                <a href="#experience" class="btn btn-secondary">View my work</a>
+                <a href="#contact" class="btn btn-primary">Start a Project</a>
+                <a href="#industries" class="btn btn-secondary">View Industries</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industries Section -->
+    <section id="industries">
+        <div class="section-header fade-in-up">
+            <span class="section-tag">SPECIALIZATION</span>
+            <h2 class="section-title">Industries I Work With</h2>
+            <p class="section-subtitle">
+                Focused expertise in building scalable solutions for specific industry needs
+            </p>
+        </div>
+        <div class="industries-grid">
+            <div class="industry-card fade-in-up">
+                <span class="industry-icon">💼</span>
+                <h3 class="industry-title">SaaS & B2B Software</h3>
+                <p class="industry-description">
+                    Building scalable multi-tenant platforms, subscription management systems, API integrations,
+                    and dashboard analytics for B2B software companies.
+                </p>
+                <div class="industry-tags">
+                    <span class="industry-tag">Multi-tenancy</span>
+                    <span class="industry-tag">API Development</span>
+                    <span class="industry-tag">Dashboards</span>
+                    <span class="industry-tag">Billing Systems</span>
+                </div>
+            </div>
+            <div class="industry-card fade-in-up">
+                <span class="industry-icon">🚚</span>
+                <h3 class="industry-title">Logistics / Supply Chain</h3>
+                <p class="industry-description">
+                    Developing tracking systems, inventory management, warehouse operations, delivery optimization,
+                    and real-time shipment monitoring solutions.
+                </p>
+                <div class="industry-tags">
+                    <span class="industry-tag">Tracking Systems</span>
+                    <span class="industry-tag">Inventory Mgmt</span>
+                    <span class="industry-tag">Route Optimization</span>
+                    <span class="industry-tag">Real-time Updates</span>
+                </div>
+            </div>
+            <div class="industry-card fade-in-up">
+                <span class="industry-icon">🏥</span>
+                <h3 class="industry-title">Healthcare Tech (Ops)</h3>
+                <p class="industry-description">
+                    Creating patient management systems, appointment scheduling, medical records handling,
+                    and healthcare operations platforms with HIPAA considerations.
+                </p>
+                <div class="industry-tags">
+                    <span class="industry-tag">Patient Systems</span>
+                    <span class="industry-tag">Scheduling</span>
+                    <span class="industry-tag">Records Mgmt</span>
+                    <span class="industry-tag">Compliance</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="section-header fade-in-up">
+            <span class="section-tag">SERVICES</span>
+            <h2 class="section-title">What I Offer</h2>
+        </div>
+        <div class="services-grid">
+            <div class="service-card fade-in-up">
+                <div class="service-icon">🎨</div>
+                <div class="service-name">Web Application Development</div>
+                <p class="service-description">Full-stack development using PHP/Laravel and React for scalable web
+                    applications</p>
+            </div>
+            <div class="service-card fade-in-up">
+                <div class="service-icon">🔌</div>
+                <div class="service-name">API Development & Integration</div>
+                <p class="service-description">RESTful API design, third-party integrations, and microservices
+                    architecture</p>
+            </div>
+            <div class="service-card fade-in-up">
+                <div class="service-icon">📊</div>
+                <div class="service-name">Database Design & Optimization</div>
+                <p class="service-description">Efficient database architecture, query optimization, and data management
+                </p>
+            </div>
+            <div class="service-card fade-in-up">
+                <div class="service-icon">☁️</div>
+                <div class="service-name">Cloud Deployment</div>
+                <p class="service-description">AWS setup, deployment automation, and cloud infrastructure management</p>
+            </div>
+            <div class="service-card fade-in-up">
+                <div class="service-icon">🔧</div>
+                <div class="service-name">Maintenance & Support</div>
+                <p class="service-description">Ongoing support, bug fixes, feature enhancements, and performance
+                    monitoring</p>
+            </div>
+            <div class="service-card fade-in-up">
+                <div class="service-icon">⚡</div>
+                <div class="service-name">Custom Solutions</div>
+                <p class="service-description">Tailored solutions for specific business requirements and workflows</p>
             </div>
         </div>
     </section>
@@ -564,48 +997,47 @@
     <section id="experience">
         <div class="section-header fade-in-up">
             <span class="section-tag">EXPERIENCE</span>
-            <h2 class="section-title">Where I've worked</h2>
+            <h2 class="section-title">Professional Background</h2>
         </div>
         <div class="experience-grid">
             <div class="experience-item fade-in-up">
                 <div class="experience-header">
                     <div>
                         <div class="experience-title">PHP/Laravel Developer</div>
-                        <div class="experience-company">Dvij Infotech</div>
+                        <div class="experience-type">Freelance & Contract Work</div>
                     </div>
                     <div class="experience-date">2023 – Present</div>
                 </div>
                 <ul class="experience-description">
-                    <li>Developing and maintaining web applications using PHP/Laravel framework for various client
-                        projects</li>
-                    <li>Enhanced technical knowledge by working on diverse projects and adapting to different technology
-                        requirements</li>
-                    <li>Expanded skill set by learning React, Node.js, and basic AWS to meet project demands</li>
-                    <li>Collaborated effectively in team environments to deliver high-quality solutions</li>
+                    <li>Developed production-level web applications for SaaS, logistics, and healthcare clients</li>
+                    <li>Built scalable solutions using PHP/Laravel framework with modern frontend technologies</li>
+                    <li>Implemented API integrations, database optimization, and cloud deployment strategies</li>
+                    <li>Collaborated with cross-functional teams to deliver high-quality solutions on time</li>
                 </ul>
             </div>
             <div class="experience-item fade-in-up">
                 <div class="experience-header">
                     <div>
-                        <div class="experience-title">PHP/Laravel Intern</div>
-                        <div class="experience-company">PHPdots Technologies (now Tuvoc Technologies)</div>
+                        <div class="experience-title">Web Development Projects</div>
+                        <div class="experience-type">Professional Training & Development</div>
                     </div>
                     <div class="experience-date">2022 – 2023</div>
                 </div>
                 <ul class="experience-description">
-                    <li>Gained hands-on experience with Laravel framework working on production-level projects</li>
-                    <li>Developed foundational skills in PHP web development and database management</li>
-                    <li>Learned industry best practices and coding standards in a professional environment</li>
+                    <li>Gained hands-on experience with Laravel framework on production-level applications</li>
+                    <li>Developed foundational skills in PHP, React, Node.js, and database management</li>
+                    <li>Learned industry best practices, coding standards, and agile methodologies</li>
+                    <li>Built portfolio of projects demonstrating full-stack development capabilities</li>
                 </ul>
             </div>
         </div>
     </section>
 
-    <!-- Skills Section -->
+    <!-- Skills -->
     <section id="skills">
         <div class="section-header fade-in-up">
             <span class="section-tag">SKILLS</span>
-            <h2 class="section-title">What I work with</h2>
+            <h2 class="section-title">Technical Expertise</h2>
         </div>
         <div class="skills-grid">
             <div class="skill-card fade-in-up">
@@ -629,19 +1061,21 @@
             </div>
             <div class="skill-card fade-in-up">
                 <div class="skill-icon">🛠️</div>
-                <div class="skill-name">Tools</div>
+                <div class="skill-name">Tools & Platform</div>
                 <div class="skill-items">
                     <span class="skill-tag">GitHub</span>
                     <span class="skill-tag">AWS</span>
+                    <span class="skill-tag">Docker</span>
                     <span class="skill-tag">Dev Tools</span>
                 </div>
             </div>
             <div class="skill-card fade-in-up">
                 <div class="skill-icon">✨</div>
-                <div class="skill-name">Other</div>
+                <div class="skill-name">Professional</div>
                 <div class="skill-items">
-                    <span class="skill-tag">Team Work</span>
-                    <span class="skill-tag">AI Basics</span>
+                    <span class="skill-tag">Client Communication</span>
+                    <span class="skill-tag">Project Management</span>
+                    <span class="skill-tag">Problem Solving</span>
                     <span class="skill-tag">Adaptability</span>
                 </div>
             </div>
@@ -661,11 +1095,11 @@
                 <div class="info-meta">2022 • CGPA: 7.79/10.0</div>
             </div>
             <div class="info-card fade-in-up">
-                <h3>Achievements</h3>
+                <h3>Professional Development</h3>
                 <ul class="achievement-list">
                     <li>Completed AI Fundamentals Training</li>
                     <li>Enhanced English proficiency through IELTS preparation</li>
-                    <li>Continuously learning new technologies</li>
+                    <li>Continuously learning new technologies and frameworks</li>
                 </ul>
             </div>
         </div>
@@ -675,14 +1109,14 @@
     <section id="contact" class="contact-section">
         <div class="fade-in-up">
             <span class="section-tag">CONTACT</span>
-            <h2 class="section-title">Let's work together</h2>
+            <h2 class="section-title">Let's Build Something Together</h2>
             <p class="section-subtitle" style="margin: 16px auto 0;">
-                I'm always open to discussing new projects and opportunities.
+                Available for freelance projects. Let's discuss how I can help bring your ideas to life.
             </p>
             <div class="contact-links">
-                <a href="mailto:dhruvil.sudani10@gmail.com" class="contact-link">
+                <a href="mailto:developer.build02@gmail.com" class="contact-link">
                     <span>✉️</span>
-                    <span>dhruvil.sudani10@gmail.com</span>
+                    <span>developer.build02@gmail.com</span>
                 </a>
                 <a href="#" class="contact-link">
                     <span>📍</span>
@@ -698,10 +1132,58 @@
 
     <!-- Footer -->
     <footer>
-        <p>© 2026 Dhruvil Sudani. Designed & Built with care.</p>
+        <p>© 2026 Dhruvil Sudani. Freelance Developer specializing in SaaS, Logistics & Healthcare.</p>
     </footer>
 
     <script>
+        // Rainbow colors for stars (light pastel tones)
+        const starColors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6'];
+
+        // Create stars background
+        const starsContainer = document.getElementById('stars');
+        const numberOfStars = 15; // Minimal number of stars
+
+        for (let i = 0; i < numberOfStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+
+            // Add random rainbow color to each star
+            const randomColor = starColors[Math.floor(Math.random() * starColors.length)];
+            star.classList.add(randomColor);
+
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+
+            // Random durations for both twinkle and movement
+            const twinkleDuration = (Math.random() * 2 + 2) + 's';
+            const moveDuration = (Math.random() * 10 + 15) + 's'; // 15-25 seconds
+            star.style.animation = `twinkle ${twinkleDuration} ease-in-out infinite, moveAround ${moveDuration} ease-in-out infinite`;
+
+            starsContainer.appendChild(star);
+        }
+
+        // Lightning effect
+        const lightning = document.getElementById('lightning');
+        function triggerLightning() {
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            lightning.style.setProperty('--x', x + '%');
+            lightning.style.setProperty('--y', y + '%');
+            lightning.classList.add('flash');
+
+            setTimeout(() => {
+                lightning.classList.remove('flash');
+            }, 400);
+        }
+
+        // Trigger lightning randomly (every 8-15 seconds)
+        setInterval(() => {
+            if (Math.random() > 0.3) { // 70% chance to trigger
+                triggerLightning();
+            }
+        }, Math.random() * 7000 + 8000);
+
         // Custom Cursor with Rainbow Trail
         const cursor = document.getElementById('cursor');
         const cursorFollower = document.getElementById('cursorFollower');
