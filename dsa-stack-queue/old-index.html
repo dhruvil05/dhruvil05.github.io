@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA: Stacks and Queues</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .explanation {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .controls button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .push-btn,
+        .enqueue-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .pop-btn,
+        .dequeue-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .peek-btn,
+        .front-btn,
+        .rear-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .clear-btn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .visualization {
+            min-height: 200px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+            background: linear-gradient(to top, #ecf0f1, #ffffff);
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .stack-item,
+        .queue-item {
+            min-width: 50px;
+            height: 40px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            border: 2px solid #2980b9;
+        }
+
+        .queue-visualization {
+            align-items: center;
+            flex-direction: row;
+        }
+
+        .queue-item {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            border: 2px solid #c0392b;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .complexity {
+            background: #d5dbdb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .complexity h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .complexity-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .operation-log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls input,
+            .controls button {
+                width: 100%;
+            }
+
+            .visualization {
+                min-height: 150px;
+                padding: 10px;
+            }
+
+            .stack-item,
+            .queue-item {
+                min-width: 40px;
+                height: 35px;
+                font-size: 12px;
+            }
+        }
+
+        .arrow {
+            font-size: 20px;
+            color: #e74c3c;
+            margin: 0 5px;
+        }
+
+        .front-marker,
+        .rear-marker {
+            position: absolute;
+            top: -25px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .queue-visualization {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Stacks & Queues</h1>
+            <p>Interactive visualization of fundamental linear data structures</p>
+        </div>
+
+        <div class="content">
+            <!-- Stack Section -->
+            <div class="section">
+                <h2>📚 Stack (LIFO - Last In, First Out)</h2>
+
+                <div class="explanation">
+                    A stack is a linear data structure that follows the LIFO principle. Think of it like a stack of
+                    plates - you can only add or remove plates from the top. The last element added is the first one to
+                    be removed.
+                </div>
+
+                <div class="controls">
+                    <input type="text" id="stackInput" placeholder="Enter value" maxlength="10">
+                    <button class="push-btn" onclick="pushStack()">Push</button>
+                    <button class="pop-btn" onclick="popStack()">Pop</button>
+                    <button class="peek-btn" onclick="peekStack()">Peek</button>
+                    <button class="clear-btn" onclick="clearStack()">Clear</button>
+                </div>
+
+                <div class="visualization" id="stackViz">
+                    <div style="color: #7f8c8d; font-style: italic;">Stack is empty</div>
+                </div>
+
+                <div class="info">
+                    <div class="info-item">
+                        <span>Size:</span>
+                        <span id="stackSize">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Top Element:</span>
+                        <span id="stackTop">None</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Is Empty:</span>
+                        <span id="stackEmpty">true</span>
+                    </div>
+                </div>
+
+                <div class="complexity">
+                    <h4>Time Complexity:</h4>
+                    <div class="complexity-item">
+                        <span>Push:</span>
+                        <span>O(1)</span>
+                    </div>
+                    <div class="complexity-item">
+                        <span>Pop:</span>
+                        <span>O(1)</span>
+                    </div>
+                    <div class="complexity-item">
+                        <span>Peek:</span>
+                        <span>O(1)</span>
+                    </div>
+                </div>
+
+                <div class="operation-log" id="stackLog">
+                    Stack operations will appear here...
+                </div>
+            </div>
+
+            <!-- Queue Section -->
+            <div class="section">
+                <h2>🚶‍♂️ Queue (FIFO - First In, First Out)</h2>
+
+                <div class="explanation">
+                    A queue is a linear data structure that follows the FIFO principle. Think of it like a line of
+                    people - the first person in line is the first to be served. Elements are added at the rear and
+                    removed from the front.
+                </div>
+
+                <div class="controls">
+                    <input type="text" id="queueInput" placeholder="Enter value" maxlength="10">
+                    <button class="enqueue-btn" onclick="enqueue()">Enqueue</button>
+                    <button class="dequeue-btn" onclick="dequeue()">Dequeue</button>
+                    <button class="front-btn" onclick="frontQueue()">Front</button>
+                    <button class="rear-btn" onclick="rearQueue()">Rear</button>
+                    <button class="clear-btn" onclick="clearQueue()">Clear</button>
+                </div>
+
+                <div class="visualization queue-visualization" id="queueViz">
+                    <div style="color: #7f8c8d; font-style: italic;">Queue is empty</div>
+                </div>
+
+                <div class="info">
+                    <div class="info-item">
+                        <span>Size:</span>
+                        <span id="queueSize">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Front Element:</span>
+                        <span id="queueFront">None</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Rear Element:</span>
+                        <span id="queueRear">None</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Is Empty:</span>
+                        <span id="queueEmpty">true</span>
+                    </div>
+                </div>
+
+                <div class="complexity">
+                    <h4>Time Complexity:</h4>
+                    <div class="complexity-item">
+                        <span>Enqueue:</span>
+                        <span>O(1)</span>
+                    </div>
+                    <div class="complexity-item">
+                        <span>Dequeue:</span>
+                        <span>O(1)</span>
+                    </div>
+                    <div class="complexity-item">
+                        <span>Front/Rear:</span>
+                        <span>O(1)</span>
+                    </div>
+                </div>
+
+                <div class="operation-log" id="queueLog">
+                    Queue operations will appear here...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stack Implementation
+        class Stack {
+            constructor() {
+                this.items = [];
+            }
+
+            push(element) {
+                this.items.push(element);
+            }
+
+            pop() {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.items.pop();
+            }
+
+            peek() {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.items[this.items.length - 1];
+            }
+
+            isEmpty() {
+                return this.items.length === 0;
+            }
+
+            size() {
+                return this.items.length;
+            }
+
+            clear() {
+                this.items = [];
+            }
+        }
+
+        // Queue Implementation
+        class Queue {
+            constructor() {
+                this.items = [];
+            }
+
+            enqueue(element) {
+                this.items.push(element);
+            }
+
+            dequeue() {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.items.shift();
+            }
+
+            front() {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.items[0];
+            }
+
+            rear() {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.items[this.items.length - 1];
+            }
+
+            isEmpty() {
+                return this.items.length === 0;
+            }
+
+            size() {
+                return this.items.length;
+            }
+
+            clear() {
+                this.items = [];
+            }
+        }
+
+        // Initialize data structures
+        const stack = new Stack();
+        const queue = new Queue();
+
+        // Stack Functions
+        function pushStack() {
+            const input = document.getElementById('stackInput');
+            const value = input.value.trim();
+
+            if (value === '') {
+                alert('Please enter a value');
+                return;
+            }
+
+            stack.push(value);
+            input.value = '';
+            updateStackDisplay();
+            logOperation('stackLog', `PUSH: ${value}`);
+        }
+
+        function popStack() {
+            const popped = stack.pop();
+            if (popped === null) {
+                alert('Stack is empty!');
+                logOperation('stackLog', 'POP: Stack is empty');
+                return;
+            }
+
+            updateStackDisplay();
+            logOperation('stackLog', `POP: ${popped}`);
+        }
+
+        function peekStack() {
+            const top = stack.peek();
+            if (top === null) {
+                alert('Stack is empty!');
+                logOperation('stackLog', 'PEEK: Stack is empty');
+            } else {
+                alert(`Top element: ${top}`);
+                logOperation('stackLog', `PEEK: ${top}`);
+            }
+        }
+
+        function clearStack() {
+            stack.clear();
+            updateStackDisplay();
+            logOperation('stackLog', 'CLEAR: Stack cleared');
+        }
+
+        function updateStackDisplay() {
+            const viz = document.getElementById('stackViz');
+            const items = stack.items;
+
+            if (items.length === 0) {
+                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Stack is empty</div>';
+            } else {
+                viz.innerHTML = items.map(item =>
+                    `<div class="stack-item">${item}</div>`
+                ).join('');
+            }
+
+            // Update info
+            document.getElementById('stackSize').textContent = stack.size();
+            document.getElementById('stackTop').textContent = stack.peek() || 'None';
+            document.getElementById('stackEmpty').textContent = stack.isEmpty();
+        }
+
+        // Queue Functions
+        function enqueue() {
+            const input = document.getElementById('queueInput');
+            const value = input.value.trim();
+
+            if (value === '') {
+                alert('Please enter a value');
+                return;
+            }
+
+            queue.enqueue(value);
+            input.value = '';
+            updateQueueDisplay();
+            logOperation('queueLog', `ENQUEUE: ${value}`);
+        }
+
+        function dequeue() {
+            const dequeued = queue.dequeue();
+            if (dequeued === null) {
+                alert('Queue is empty!');
+                logOperation('queueLog', 'DEQUEUE: Queue is empty');
+                return;
+            }
+
+            updateQueueDisplay();
+            logOperation('queueLog', `DEQUEUE: ${dequeued}`);
+        }
+
+        function frontQueue() {
+            const front = queue.front();
+            if (front === null) {
+                alert('Queue is empty!');
+                logOperation('queueLog', 'FRONT: Queue is empty');
+            } else {
+                alert(`Front element: ${front}`);
+                logOperation('queueLog', `FRONT: ${front}`);
+            }
+        }
+
+        function rearQueue() {
+            const rear = queue.rear();
+            if (rear === null) {
+                alert('Queue is empty!');
+                logOperation('queueLog', 'REAR: Queue is empty');
+            } else {
+                alert(`Rear element: ${rear}`);
+                logOperation('queueLog', `REAR: ${rear}`);
+            }
+        }
+
+        function clearQueue() {
+            queue.clear();
+            updateQueueDisplay();
+            logOperation('queueLog', 'CLEAR: Queue cleared');
+        }
+
+        function updateQueueDisplay() {
+            const viz = document.getElementById('queueViz');
+            const items = queue.items;
+
+            if (items.length === 0) {
+                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Queue is empty</div>';
+            } else {
+                let html = '';
+                if (items.length > 0) {
+                    html += '<span style="font-size: 12px; color: #e74c3c; margin-right: 5px;">FRONT →</span>';
+                }
+                html += items.map(item =>
+                    `<div class="queue-item">${item}</div>`
+                ).join('<span class="arrow">→</span>');
+                if (items.length > 0) {
+                    html += '<span style="font-size: 12px; color: #e74c3c; margin-left: 5px;">← REAR</span>';
+                }
+                viz.innerHTML = html;
+            }
+
+            // Update info
+            document.getElementById('queueSize').textContent = queue.size();
+            document.getElementById('queueFront').textContent = queue.front() || 'None';
+            document.getElementById('queueRear').textContent = queue.rear() || 'None';
+            document.getElementById('queueEmpty').textContent = queue.isEmpty();
+        }
+
+        function logOperation(logId, operation) {
+            const log = document.getElementById(logId);
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${operation}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Enter key support
+        document.getElementById('stackInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                pushStack();
+            }
+        });
+
+        document.getElementById('queueInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                enqueue();
+            }
+        });
+
+        // Initial display update
+        updateStackDisplay();
+        updateQueueDisplay();
+    </script>
+</body>
+
+</html>

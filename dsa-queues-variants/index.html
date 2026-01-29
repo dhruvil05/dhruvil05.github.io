@@ -4,1273 +4,1643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSA: Stacks and Queue Variants</title>
+    <title>Queue Variants | Circular, Priority & Deque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+        html {
+            scroll-behavior: smooth;
         }
 
-        .header {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        ::-webkit-scrollbar-track {
+            background: #f9fafb;
         }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        ::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 4px;
         }
 
-        .nav-tabs {
-            display: flex;
-            background: #2c3e50;
-            overflow-x: auto;
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .nav-tab {
-            padding: 15px 25px;
-            background: #34495e;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            min-width: 120px;
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .nav-tab.active {
-            background: #3498db;
+        .stagger-1 {
+            transition-delay: 0.1s;
         }
 
-        .nav-tab:hover {
-            background: #2980b9;
+        .stagger-2 {
+            transition-delay: 0.2s;
         }
 
-        .tab-content {
-            display: none;
-            padding: 30px;
+        .stagger-3 {
+            transition-delay: 0.3s;
         }
 
-        .tab-content.active {
-            display: block;
+        .concept-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        .concept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
         }
 
-        .single-column {
-            grid-template-columns: 1fr;
-        }
-
-        .section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .section h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        .explanation {
-            margin-bottom: 20px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .controls input,
-        .controls select {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .controls button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            min-width: 80px;
-        }
-
-        .add-btn {
-            background: #27ae60;
-            color: white;
-        }
-
-        .remove-btn {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .view-btn {
-            background: #f39c12;
-            color: white;
-        }
-
-        .clear-btn {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .controls button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .visualization {
-            min-height: 200px;
-            border: 2px dashed #bdc3c7;
-            border-radius: 10px;
-            padding: 20px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 5px;
-            background: linear-gradient(to top, #ecf0f1, #ffffff);
-            margin-bottom: 15px;
-            overflow-x: auto;
-            position: relative;
-        }
-
-        .queue-visualization {
-            align-items: center;
-            flex-direction: row;
-        }
-
-        .circular-visualization {
-            align-items: center;
-            justify-content: center;
-            min-height: 300px;
-        }
-
-        .stack-item,
-        .queue-item {
-            min-width: 50px;
-            height: 40px;
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            animation: slideIn 0.3s ease;
-            border: 2px solid #2980b9;
-            font-size: 14px;
-        }
-
-        .queue-item {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            border: 2px solid #c0392b;
-        }
-
-        .deque-item {
-            background: linear-gradient(45deg, #9b59b6, #8e44ad);
-            border: 2px solid #8e44ad;
-        }
-
-        .priority-item {
-            background: linear-gradient(45deg, #f39c12, #d68910);
-            border: 2px solid #d68910;
-            position: relative;
-        }
-
-        .priority-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .circular-queue {
-            width: 250px;
-            height: 250px;
-            border: 3px solid #3498db;
-            border-radius: 50%;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        /* Circular Queue Animation */
         .circular-item {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #16a085, #1abc9c);
-            border: 2px solid #16a085;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .front-pointer,
-        .rear-pointer {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
+        .circular-item.enqueuing {
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .front-pointer {
-            border-bottom: 15px solid #e74c3c;
-            top: -20px;
+        .circular-item.dequeuing {
+            animation: fadeOut 0.3s ease forwards;
         }
 
-        .rear-pointer {
-            border-top: 15px solid #f39c12;
-            bottom: -20px;
-        }
-
-        @keyframes slideIn {
-            from {
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
                 opacity: 0;
-                transform: scale(0.8);
             }
 
-            to {
-                opacity: 1;
+            100% {
                 transform: scale(1);
+                opacity: 1;
             }
         }
 
-        .info {
-            background: #ecf0f1;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+        @keyframes fadeOut {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
         }
 
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-weight: bold;
+        /* Priority Queue Animation */
+        .priority-item {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .complexity {
-            background: #d5dbdb;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+        .priority-item.sorting {
+            animation: sortShuffle 0.5s ease;
         }
 
-        .complexity h4 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+        @keyframes sortShuffle {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
-        .complexity-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 14px;
+        /* Deque Animation */
+        .deque-item {
+            transition: all 0.4s ease;
         }
 
-        .operation-log {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 120px;
-            overflow-y: auto;
-            margin-top: 15px;
+        .deque-item.add-front {
+            animation: slideFromLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 10px;
+        .deque-item.add-rear {
+            animation: slideFromRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .deque-item.remove {
+            animation: shrinkOut 0.3s ease forwards;
+        }
+
+        @keyframes slideFromLeft {
+            0% {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideFromRight {
+            0% {
+                transform: translateX(50px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shrinkOut {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Code block styling */
+        .code-block {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .comparison-table th {
-            background: #3498db;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
-        .comparison-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ecf0f1;
+        .concept-card:hover .code-block::before {
+            transform: scaleX(1);
         }
 
-        .comparison-table tr:nth-child(even) {
-            background: #f8f9fa;
+        /* Tab system */
+        .variant-tab {
+            position: relative;
+            transition: all 0.3s ease;
         }
 
-        .comparison-table tr:hover {
-            background: #e3f2fd;
+        .variant-tab.active {
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .arrow {
-            font-size: 20px;
-            color: #e74c3c;
-            margin: 0 5px;
+        .variant-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            transition: background 0.3s ease;
         }
 
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-                padding: 15px;
+        .variant-tab.active::after {
+            background: currentColor;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
             }
 
-            .header h1 {
-                font-size: 2rem;
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .float-anim {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Pulse ring for pointers */
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
             }
 
-            .nav-tabs {
-                flex-wrap: wrap;
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
             }
+        }
 
-            .nav-tab {
-                flex: 1;
-                min-width: 100px;
-                padding: 12px 15px;
-            }
+        .pointer-indicator::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
 
-            .controls {
-                flex-direction: column;
-            }
+        /* Circular progress */
+        .circular-progress {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
 
-            .controls input,
-            .controls button,
-            .controls select {
-                width: 100%;
-            }
-
-            .visualization {
-                min-height: 150px;
-                padding: 10px;
-            }
-
-            .circular-queue {
-                width: 200px;
-                height: 200px;
-            }
-
-            .comparison-table {
-                font-size: 12px;
-            }
-
-            .comparison-table th,
-            .comparison-table td {
-                padding: 8px 10px;
-            }
+        .circular-progress circle {
+            transition: stroke-dashoffset 0.5s ease;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Queue Variants</h1>
-            <p>Interactive visualization of linear data structures and their variants</p>
-        </div>
+<body class="bg-white text-gray-900 antialiased selection:bg-gray-200 selection:text-gray-900">
 
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('stack')">📚 Stack</button>
-            <button class="nav-tab" onclick="showTab('simple-queue')">🚶‍♂️ Simple Queue</button>
-            <button class="nav-tab" onclick="showTab('circular-queue')">🔄 Circular Queue</button>
-            <button class="nav-tab" onclick="showTab('deque')">↔️ Deque</button>
-            <button class="nav-tab" onclick="showTab('priority-queue')">⭐ Priority Queue</button>
-            <button class="nav-tab" onclick="showTab('comparison')">📊 Comparison</button>
-        </div>
-
-        <!-- Stack Tab -->
-        <div class="tab-content active" id="stack">
-            <div class="content">
-                <div class="section">
-                    <h2>📚 Stack (LIFO)</h2>
-                    <div class="explanation">
-                        A stack follows Last In, First Out (LIFO) principle. Like a stack of plates, you can only add or
-                        remove elements from the top.
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-gray-200/80 z-50 transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center shadow-sm">
+                        <span class="text-white font-bold text-xs mono">QV</span>
                     </div>
-                    <div class="controls">
-                        <input type="text" id="stackInput" placeholder="Enter value" maxlength="10">
-                        <button class="add-btn" onclick="pushStack()">Push</button>
-                        <button class="remove-btn" onclick="popStack()">Pop</button>
-                        <button class="view-btn" onclick="peekStack()">Peek</button>
-                        <button class="clear-btn" onclick="clearStack()">Clear</button>
-                    </div>
-                    <div class="visualization" id="stackViz">
-                        <div style="color: #7f8c8d; font-style: italic;">Stack is empty</div>
-                    </div>
-                    <div class="info">
-                        <div class="info-item"><span>Size:</span><span id="stackSize">0</span></div>
-                        <div class="info-item"><span>Top:</span><span id="stackTop">None</span></div>
-                        <div class="info-item"><span>Empty:</span><span id="stackEmpty">true</span></div>
-                    </div>
-                    <div class="complexity">
-                        <h4>Time Complexity:</h4>
-                        <div class="complexity-item"><span>Push:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Pop:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Peek:</span><span>O(1)</span></div>
-                    </div>
-                    <div class="operation-log" id="stackLog">Stack operations will appear here...</div>
+                    <span class="font-semibold text-lg tracking-tight">Queue Variants</span>
                 </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#circular"
+                        class="text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Circular</a>
+                    <a href="#priority"
+                        class="text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Priority</a>
+                    <a href="#deque"
+                        class="text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Deque</a>
+                    <a href="#comparison"
+                        class="text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Comparison</a>
+                </div>
+
+                <button class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    onclick="toggleMobileMenu()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </div>
 
-        <!-- Simple Queue Tab -->
-        <div class="tab-content" id="simple-queue">
-            <div class="content">
-                <div class="section">
-                    <h2>🚶‍♂️ Simple Queue (FIFO)</h2>
-                    <div class="explanation">
-                        A simple queue follows First In, First Out (FIFO) principle. Elements are added at the rear and
-                        removed from the front, like a line of people.
-                    </div>
-                    <div class="controls">
-                        <input type="text" id="queueInput" placeholder="Enter value" maxlength="10">
-                        <button class="add-btn" onclick="enqueue()">Enqueue</button>
-                        <button class="remove-btn" onclick="dequeue()">Dequeue</button>
-                        <button class="view-btn" onclick="frontQueue()">Front</button>
-                        <button class="view-btn" onclick="rearQueue()">Rear</button>
-                        <button class="clear-btn" onclick="clearQueue()">Clear</button>
-                    </div>
-                    <div class="visualization queue-visualization" id="queueViz">
-                        <div style="color: #7f8c8d; font-style: italic;">Queue is empty</div>
-                    </div>
-                    <div class="info">
-                        <div class="info-item"><span>Size:</span><span id="queueSize">0</span></div>
-                        <div class="info-item"><span>Front:</span><span id="queueFront">None</span></div>
-                        <div class="info-item"><span>Rear:</span><span id="queueRear">None</span></div>
-                        <div class="info-item"><span>Empty:</span><span id="queueEmpty">true</span></div>
-                    </div>
-                    <div class="complexity">
-                        <h4>Time Complexity:</h4>
-                        <div class="complexity-item"><span>Enqueue:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Dequeue:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Front/Rear:</span><span>O(1)</span></div>
-                    </div>
-                    <div class="operation-log" id="queueLog">Queue operations will appear here...</div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 absolute w-full">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#circular"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg" target="_self">Circular
+                    Queue</a>
+                <a href="#priority"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg" target="_self">Priority
+                    Queue</a>
+                <a href="#deque"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg" target="_self">Deque</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="max-w-3xl mx-auto text-center fade-in-up">
+            <div
+                class="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600 mb-6 border border-gray-200/60">
+                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+                Advanced Linear Structures
+            </div>
+
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
+                Queue<br>
+                <span class="gradient-text">Variants</span>
+            </h1>
+
+            <p class="text-lg text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+                Beyond the basic FIFO queue. Explore <strong>Circular</strong>, <strong>Priority</strong>, and
+                <strong>Double-ended</strong> queues—specialized structures for specific algorithmic challenges.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="#circular"
+                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                    Circular Queue
+                </a>
+                <a href="#priority"
+                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-purple-600 rounded-full hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">
+                    Priority Queue
+                </a>
+                <a href="#deque"
+                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-pink-600 rounded-full hover:bg-pink-700 transition-all shadow-lg shadow-pink-200">
+                    Deque
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Variants Overview -->
+    <section class="pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-6">
+            <div
+                class="concept-card bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-200/50 fade-in-up">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 float-anim">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Circular Queue</h3>
+                <p class="text-gray-600 text-sm mb-4">Last position connects back to first, forming a circle. Eliminates
+                    wasted space in array implementation.</p>
+                <div class="flex gap-2">
+                    <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-md mono">O(1)
+                        enqueue</span>
+                    <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-md mono">Fixed
+                        size</span>
+                </div>
+            </div>
+
+            <div
+                class="concept-card bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-200/50 fade-in-up stagger-1">
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 float-anim"
+                    style="animation-delay: 0.5s;">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Priority Queue</h3>
+                <p class="text-gray-600 text-sm mb-4">Elements served based on priority, not insertion order. Highest
+                    priority element is dequeued first.</p>
+                <div class="flex gap-2">
+                    <span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-md mono">O(log
+                        n)</span>
+                    <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-md mono">Heap
+                        based</span>
+                </div>
+            </div>
+
+            <div
+                class="concept-card bg-gradient-to-br from-pink-50 to-white p-6 rounded-2xl border border-pink-200/50 fade-in-up stagger-2">
+                <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-4 float-anim"
+                    style="animation-delay: 1s;">
+                    <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Deque</h3>
+                <p class="text-gray-600 text-sm mb-4">Double-ended queue allowing insertion and deletion at both front
+                    and rear ends.</p>
+                <div class="flex gap-2">
+                    <span class="px-2.5 py-1 bg-pink-100 text-pink-700 text-xs font-medium rounded-md mono">O(1) all
+                        ops</span>
+                    <span
+                        class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-md mono">Versatile</span>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Circular Queue Tab -->
-        <div class="tab-content" id="circular-queue">
-            <div class="content">
-                <div class="section">
-                    <h2>🔄 Circular Queue</h2>
-                    <div class="explanation">
-                        A circular queue connects the rear and front positions, forming a circle. This efficiently uses
-                        memory by reusing empty spaces created after dequeue operations.
-                    </div>
-                    <div class="controls">
-                        <input type="text" id="circularInput" placeholder="Enter value" maxlength="10">
-                        <button class="add-btn" onclick="circularEnqueue()">Enqueue</button>
-                        <button class="remove-btn" onclick="circularDequeue()">Dequeue</button>
-                        <button class="view-btn" onclick="circularFront()">Front</button>
-                        <button class="view-btn" onclick="circularRear()">Rear</button>
-                        <button class="clear-btn" onclick="clearCircular()">Clear</button>
-                    </div>
-                    <div class="visualization circular-visualization" id="circularViz">
-                        <div class="circular-queue">
-                            <div style="color: #7f8c8d; font-style: italic; text-align: center;">Circular Queue<br>(Max
-                                8 items)</div>
+    <!-- Circular Queue Section -->
+    <section id="circular" class="py-24 bg-gray-50/30 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                <!-- Left: Explanation -->
+                <div class="fade-in-up">
+                    <div
+                        class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-blue-600 uppercase bg-blue-50 rounded-full border border-blue-100">
+                        Space Optimized</div>
+                    <h2 class="text-4xl font-bold mb-6">Circular Queue</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        A circular queue connects the last position back to the first, forming a circle. This solves the
+                        "false overflow" problem of linear queues where space is available at the front but we can't
+                        insert at the rear.
+                    </p>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-4">
+                                <span class="text-blue-600 font-bold text-sm">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Circular Arrangement</h4>
+                                <p class="text-sm text-gray-600">After the last position, we wrap around to the first
+                                    position using modulo arithmetic.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-4">
+                                <span class="text-blue-600 font-bold text-sm">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">No Wasted Space</h4>
+                                <p class="text-sm text-gray-600">Unlike linear queues, empty spaces at the front can be
+                                    reused when rear reaches the end.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-4">
+                                <span class="text-blue-600 font-bold text-sm">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Modulo Arithmetic</h4>
+                                <p class="text-sm text-gray-600">Front and rear pointers use <span
+                                        class="mono text-blue-600">(position + 1) % size</span> to wrap around.</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="info">
-                        <div class="info-item"><span>Size:</span><span id="circularSize">0</span></div>
-                        <div class="info-item"><span>Front Index:</span><span id="circularFrontIdx">-1</span></div>
-                        <div class="info-item"><span>Rear Index:</span><span id="circularRearIdx">-1</span></div>
-                        <div class="info-item"><span>Is Full:</span><span id="circularFull">false</span></div>
+
+                    <div class="code-block rounded-xl p-4 mono text-sm">
+                        <div class="flex items-center justify-between mb-3 text-xs text-gray-400">
+                            <span class="font-medium">Circular Queue Operations</span>
+                            <button onclick="copyCode(this)" class="hover:text-gray-600 transition-colors">Copy</button>
+                        </div>
+                        <pre class="text-gray-800 overflow-x-auto leading-relaxed"><code>class CircularQueue {
+    constructor(size) {
+        this.items = new Array(size);
+        this.size = size;
+        this.front = -1;
+        this.rear = -1;
+    }
+    
+    enqueue(element) {
+        if (this.isFull()) return false;
+        
+        if (this.front === -1) this.front = 0;
+        
+        // Circular increment
+        this.rear = (this.rear + 1) % this.size;
+        this.items[this.rear] = element;
+        return true;
+    }
+    
+    dequeue() {
+        if (this.isEmpty()) return null;
+        
+        const item = this.items[this.front];
+        
+        if (this.front === this.rear) {
+            // Last element
+            this.front = -1;
+            this.rear = -1;
+        } else {
+            // Circular increment
+            this.front = (this.front + 1) % this.size;
+        }
+        return item;
+    }
+    
+    isFull() {
+        return (this.rear + 1) % this.size === this.front;
+    }
+}</code></pre>
                     </div>
-                    <div class="complexity">
-                        <h4>Time Complexity:</h4>
-                        <div class="complexity-item"><span>Enqueue:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Dequeue:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Space Efficient:</span><span>Yes</span></div>
+                </div>
+
+                <!-- Right: Interactive Visualization -->
+                <div class="fade-in-up stagger-2 lg:sticky lg:top-24">
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <h3 class="font-semibold text-gray-900">Circular Queue Visualizer</h3>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                Live Demo
+                            </div>
+                        </div>
+
+                        <div class="p-8">
+                            <!-- Circular Visualization -->
+                            <div class="relative h-80 flex items-center justify-center mb-6">
+                                <svg width="280" height="280" class="circular-progress">
+                                    <!-- Background circle -->
+                                    <circle cx="140" cy="140" r="120" fill="none" stroke="#e5e7eb" stroke-width="8" />
+                                    <!-- Progress circle (will be updated by JS) -->
+                                    <circle id="circular-fill" cx="140" cy="140" r="120" fill="none" stroke="#3b82f6"
+                                        stroke-width="8" stroke-dasharray="754" stroke-dashoffset="754"
+                                        stroke-linecap="round" />
+                                </svg>
+
+                                <!-- Queue slots positioned in circle -->
+                                <div id="circular-slots" class="absolute inset-0">
+                                    <!-- Generated by JS -->
+                                </div>
+
+                                <!-- Center info -->
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div
+                                        class="bg-white rounded-full w-24 h-24 flex flex-col items-center justify-center shadow-lg border border-gray-200">
+                                        <span class="text-xs text-gray-500 uppercase tracking-wider">Fill</span>
+                                        <span id="circular-fill-text" class="text-2xl font-bold text-blue-600">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pointers Display -->
+                            <div class="flex justify-center gap-8 mb-6 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full pointer-indicator relative"></div>
+                                    <span class="font-medium text-gray-700">Front: <span id="circular-front"
+                                            class="mono text-green-600">-</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 bg-purple-500 rounded-full pointer-indicator relative"></div>
+                                    <span class="font-medium text-gray-700">Rear: <span id="circular-rear"
+                                            class="mono text-purple-600">-</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="space-y-3">
+                                <div class="flex gap-2">
+                                    <input type="number" id="circular-input" placeholder="Value..."
+                                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all mono"
+                                        onkeypress="if(event.key==='Enter') circularEnqueue()">
+                                    <button onclick="circularEnqueue()"
+                                        class="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">
+                                        Enqueue
+                                    </button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="circularDequeue()"
+                                        class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200">
+                                        Dequeue
+                                    </button>
+                                    <button onclick="circularReset()"
+                                        class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200">
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div id="circular-status"
+                                class="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 text-center mono min-h-[44px] flex items-center justify-center">
+                                Empty circular queue. Size: 8
+                            </div>
+                        </div>
                     </div>
-                    <div class="operation-log" id="circularLog">Circular queue operations will appear here...</div>
+
+                    <!-- Key Points -->
+                    <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                        <h4 class="font-semibold text-blue-900 mb-2 text-sm">Key Insight</h4>
+                        <p class="text-sm text-blue-800">
+                            Circular queue uses modulo arithmetic to reuse empty slots at the beginning, achieving O(1)
+                            operations without shifting elements.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Priority Queue Section -->
+    <section id="priority" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-12 items-start">
+            <!-- Left: Interactive Visualization -->
+            <div class="order-2 lg:order-1 fade-in-up lg:sticky lg:top-24">
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Priority Queue Visualizer</h3>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+                            Max Heap
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <!-- Priority Queue Visualization -->
+                        <div class="h-64 flex items-end justify-center gap-2 mb-6 pb-4 border-b-2 border-gray-200"
+                            id="priority-container">
+                            <!-- Bars generated by JS -->
+                        </div>
+
+                        <!-- Heap Tree View (Mini) -->
+                        <div class="h-32 flex items-center justify-center mb-6 relative" id="heap-tree">
+                            <div class="text-gray-400 text-sm">Heap structure visualization</div>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <input type="number" id="priority-value" placeholder="Value"
+                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all mono">
+                                <select id="priority-level"
+                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white">
+                                    <option value="1">Low (1)</option>
+                                    <option value="2">Medium (2)</option>
+                                    <option value="3" selected>High (3)</option>
+                                    <option value="4">Critical (4)</option>
+                                </select>
+                                <button onclick="priorityEnqueue()"
+                                    class="px-6 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 shadow-lg shadow-purple-200 transition-all active:scale-95">
+                                    Add
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="priorityDequeue()"
+                                    class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200">
+                                    Extract Max
+                                </button>
+                                <button onclick="priorityReset()"
+                                    class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div id="priority-status"
+                            class="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 text-center mono min-h-[44px] flex items-center justify-center">
+                            Empty priority queue
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complexity Note -->
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <div class="p-4 bg-white rounded-xl border border-gray-200 text-center">
+                        <div class="text-2xl font-bold text-purple-600 mb-1 mono">O(log n)</div>
+                        <div class="text-sm font-medium text-gray-900">Insert / Extract</div>
+                        <div class="text-xs text-gray-500">Heap maintenance</div>
+                    </div>
+                    <div class="p-4 bg-white rounded-xl border border-gray-200 text-center">
+                        <div class="text-2xl font-bold text-green-600 mb-1 mono">O(1)</div>
+                        <div class="text-sm font-medium text-gray-900">Peek Max</div>
+                        <div class="text-xs text-gray-500">Root access</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Explanation -->
+            <div class="order-1 lg:order-2 fade-in-up stagger-2">
+                <div
+                    class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-purple-600 uppercase bg-purple-50 rounded-full border border-purple-100">
+                    Priority Based</div>
+                <h2 class="text-4xl font-bold mb-6">Priority Queue</h2>
+                <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                    A priority queue serves elements based on priority, not insertion order. The highest priority
+                    element is always served first. Typically implemented using a <strong>Heap</strong> for efficient
+                    operations.
+                </p>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <div
+                            class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-4">
+                            <span class="text-purple-600 font-bold text-sm">1</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Max Heap Structure</h4>
+                            <p class="text-sm text-gray-600">Parent node is always greater than or equal to children.
+                                Root is the maximum priority element.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <div
+                            class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-4">
+                            <span class="text-purple-600 font-bold text-sm">2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Heapify Operations</h4>
+                            <p class="text-sm text-gray-600">After insertion or extraction, heap property is restored
+                                through <strong>heapify-up</strong> or <strong>heapify-down</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <div
+                            class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-4">
+                            <span class="text-purple-600 font-bold text-sm">3</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Applications</h4>
+                            <p class="text-sm text-gray-600">Dijkstra's algorithm, A* pathfinding, Huffman coding, task
+                                scheduling, and load balancing.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block rounded-xl p-4 mono text-sm">
+                    <div class="flex items-center justify-between mb-3 text-xs text-gray-400">
+                        <span class="font-medium">Min Heap Implementation</span>
+                        <button onclick="copyCode(this)" class="hover:text-gray-600 transition-colors">Copy</button>
+                    </div>
+                    <pre class="text-gray-800 overflow-x-auto leading-relaxed"><code>class PriorityQueue {
+    constructor() {
+        this.heap = [];
+    }
+    
+    // Insert with priority
+    enqueue(value, priority) {
+        const node = { value, priority };
+        this.heap.push(node);
+        this.heapifyUp(this.heap.length - 1);
+    }
+    
+    heapifyUp(index) {
+        const parent = Math.floor((index - 1) / 2);
+        
+        if (parent >= 0 && this.heap[parent].priority > this.heap[index].priority) {
+            [this.heap[parent], this.heap[index]] = 
+            [this.heap[index], this.heap[parent]];
+            this.heapifyUp(parent);
+        }
+    }
+    
+    // Extract minimum (highest priority)
+    dequeue() {
+        if (this.heap.length === 0) return null;
+        
+        const min = this.heap[0];
+        const end = this.heap.pop();
+        
+        if (this.heap.length > 0) {
+            this.heap[0] = end;
+            this.heapifyDown(0);
+        }
+        return min;
+    }
+}</code></pre>
+                </div>
+
+                <!-- Use Cases -->
+                <div class="mt-8 p-6 bg-purple-50 rounded-2xl border border-purple-100">
+                    <h3 class="font-semibold text-purple-900 mb-4">Common Applications</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex items-center gap-2 text-sm text-purple-800">
+                            <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            Dijkstra's Algorithm
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-purple-800">
+                            <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            A* Pathfinding
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-purple-800">
+                            <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            Huffman Coding
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-purple-800">
+                            <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            CPU Scheduling
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deque Section -->
+    <section id="deque" class="py-24 bg-gray-50/30 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                <!-- Left: Explanation -->
+                <div class="fade-in-up">
+                    <div
+                        class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-pink-600 uppercase bg-pink-50 rounded-full border border-pink-100">
+                        Double Ended</div>
+                    <h2 class="text-4xl font-bold mb-6">Deque (Double-ended Queue)</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        A deque (pronounced "deck") allows insertion and deletion at both the front and rear ends. It
+                        combines the capabilities of both stacks and queues, offering maximum flexibility.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div class="text-2xl font-bold text-pink-600 mb-1 mono">O(1)</div>
+                            <div class="text-sm font-medium text-gray-900">Add/Remove Front</div>
+                            <div class="text-xs text-gray-500">pushFront / popFront</div>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div class="text-2xl font-bold text-pink-600 mb-1 mono">O(1)</div>
+                            <div class="text-sm font-medium text-gray-900">Add/Remove Rear</div>
+                            <div class="text-xs text-gray-500">pushRear / popRear</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center mr-4">
+                                <span class="text-pink-600 font-bold text-sm">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Input Restricted</h4>
+                                <p class="text-sm text-gray-600">Insertion at only one end, deletion at both ends.
+                                    Useful for specific scheduling algorithms.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center mr-4">
+                                <span class="text-pink-600 font-bold text-sm">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Output Restricted</h4>
+                                <p class="text-sm text-gray-600">Deletion at only one end, insertion at both ends. Used
+                                    in buffer management.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-block rounded-xl p-4 mono text-sm">
+                        <div class="flex items-center justify-between mb-3 text-xs text-gray-400">
+                            <span class="font-medium">Deque Implementation</span>
+                            <button onclick="copyCode(this)" class="hover:text-gray-600 transition-colors">Copy</button>
+                        </div>
+                        <pre class="text-gray-800 overflow-x-auto leading-relaxed"><code>class Deque {
+    constructor() {
+        this.items = [];
+    }
+    
+    // Add to front
+    pushFront(element) {
+        this.items.unshift(element);
+    }
+    
+    // Add to rear (same as queue enqueue)
+    pushRear(element) {
+        this.items.push(element);
+    }
+    
+    // Remove from front (same as queue dequeue)
+    popFront() {
+        if (this.isEmpty()) return null;
+        return this.items.shift();
+    }
+    
+    // Remove from rear (same as stack pop)
+    popRear() {
+        if (this.isEmpty()) return null;
+        return this.items.pop();
+    }
+    
+    peekFront() {
+        return this.items[0];
+    }
+    
+    peekRear() {
+        return this.items[this.items.length - 1];
+    }
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Visualization -->
+                <div class="fade-in-up stagger-2 lg:sticky lg:top-24">
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <h3 class="font-semibold text-gray-900">Deque Visualizer</h3>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <span class="w-2 h-2 bg-pink-500 rounded-full animate-pulse"></span>
+                                Double-ended
+                            </div>
+                        </div>
+
+                        <div class="p-8">
+                            <!-- Deque Visualization -->
+                            <div
+                                class="relative h-32 flex items-center justify-center mb-6 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 overflow-hidden">
+                                <div id="deque-container" class="flex items-center gap-2 px-4">
+                                    <!-- Items injected by JS -->
+                                </div>
+
+                                <!-- Front/Rear Labels -->
+                                <div class="absolute left-2 top-2 text-xs font-bold text-pink-600 mono">FRONT</div>
+                                <div class="absolute right-2 bottom-2 text-xs font-bold text-pink-600 mono">REAR</div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="space-y-3">
+                                <div class="flex gap-2">
+                                    <input type="text" id="deque-input" placeholder="Value..."
+                                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all mono"
+                                        onkeypress="if(event.key==='Enter') dequePushRear()">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="dequePushFront()"
+                                        class="px-4 py-2 bg-pink-100 text-pink-700 rounded-lg text-sm font-medium hover:bg-pink-200 transition-colors border border-pink-200">
+                                        Push Front
+                                    </button>
+                                    <button onclick="dequePushRear()"
+                                        class="px-4 py-2 bg-pink-600 text-white rounded-lg text-sm font-medium hover:bg-pink-700 shadow-lg shadow-pink-200 transition-all active:scale-95">
+                                        Push Rear
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="dequePopFront()"
+                                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200">
+                                        Pop Front
+                                    </button>
+                                    <button onclick="dequePopRear()"
+                                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200">
+                                        Pop Rear
+                                    </button>
+                                </div>
+                                <button onclick="dequeReset()"
+                                    class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200">
+                                    Clear Deque
+                                </button>
+                            </div>
+
+                            <!-- Status -->
+                            <div id="deque-status"
+                                class="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 text-center mono min-h-[44px] flex items-center justify-center">
+                                Empty deque. Add elements from either end.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Palindrome Checker Demo -->
+                    <div class="mt-6 p-6 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                        <h4 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="text-lg">🔄</span>
+                            Palindrome Checker
+                        </h4>
+                        <p class="text-sm text-gray-600 mb-4">Classic deque application: Check if a string is palindrome
+                            by comparing characters from both ends.</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="palindrome-input" placeholder="Enter text..."
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-pink-500">
+                            <button onclick="checkPalindrome()"
+                                class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                                Check
+                            </button>
+                        </div>
+                        <div id="palindrome-result" class="mt-3 text-center text-sm font-medium min-h-[24px]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section id="comparison" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+            <h2 class="text-3xl font-bold mb-4">Choose the Right Queue</h2>
+            <p class="text-gray-600">Each variant solves specific problems. Here's when to use which.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 fade-in-up">
+            <!-- Circular Queue Card -->
+            <div class="concept-card bg-white rounded-2xl border border-gray-200 p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Circular Queue</h3>
+                    <div class="space-y-3 text-sm text-gray-600 mb-6">
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Fixed memory constraints</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Memory efficiency critical</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Streaming data buffers</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Round-robin scheduling</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Best For</div>
+                        <div class="text-sm font-medium text-gray-900">Traffic management, CPU scheduling</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priority Queue Card -->
+            <div class="concept-card bg-white rounded-2xl border border-gray-200 p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Priority Queue</h3>
+                    <div class="space-y-3 text-sm text-gray-600 mb-6">
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Task scheduling by urgency</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Graph algorithms (Dijkstra)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Huffman coding</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Load balancing</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Best For</div>
+                        <div class="text-sm font-medium text-gray-900">Emergency rooms, network packets</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deque Card -->
+            <div class="concept-card bg-white rounded-2xl border border-gray-200 p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-pink-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Deque</h3>
+                    <div class="space-y-3 text-sm text-gray-600 mb-6">
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Undo-Redo functionality</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Sliding window problems</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Palindrome checking</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-500 mt-0.5">✓</span>
+                            <span>Steal work scheduling</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Best For</div>
+                        <div class="text-sm font-medium text-gray-900">Browser history, A* algorithm</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Deque Tab -->
-        <div class="tab-content" id="deque">
-            <div class="content">
-                <div class="section">
-                    <h2>↔️ Double Ended Queue (Deque)</h2>
-                    <div class="explanation">
-                        A deque allows insertion and deletion at both ends. It combines the functionality of both stack
-                        and queue, providing maximum flexibility.
-                    </div>
-                    <div class="controls">
-                        <input type="text" id="dequeInput" placeholder="Enter value" maxlength="10">
-                        <button class="add-btn" onclick="addFront()">Add Front</button>
-                        <button class="add-btn" onclick="addRear()">Add Rear</button>
-                        <button class="remove-btn" onclick="removeFront()">Remove Front</button>
-                        <button class="remove-btn" onclick="removeRear()">Remove Rear</button>
-                        <button class="clear-btn" onclick="clearDeque()">Clear</button>
-                    </div>
-                    <div class="visualization queue-visualization" id="dequeViz">
-                        <div style="color: #7f8c8d; font-style: italic;">Deque is empty</div>
-                    </div>
-                    <div class="info">
-                        <div class="info-item"><span>Size:</span><span id="dequeSize">0</span></div>
-                        <div class="info-item"><span>Front:</span><span id="dequeFront">None</span></div>
-                        <div class="info-item"><span>Rear:</span><span id="dequeRear">None</span></div>
-                        <div class="info-item"><span>Empty:</span><span id="dequeEmpty">true</span></div>
-                    </div>
-                    <div class="complexity">
-                        <h4>Time Complexity:</h4>
-                        <div class="complexity-item"><span>Add Front/Rear:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Remove Front/Rear:</span><span>O(1)</span></div>
-                        <div class="complexity-item"><span>Access:</span><span>O(1)</span></div>
-                    </div>
-                    <div class="operation-log" id="dequeLog">Deque operations will appear here...</div>
-                </div>
+        <!-- Complexity Summary Table -->
+        <div class="mt-12 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden fade-in-up">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h3 class="font-semibold text-gray-900">Time Complexity Comparison</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-600">
+                        <tr>
+                            <th class="px-6 py-3 text-left font-medium">Operation</th>
+                            <th class="px-6 py-3 text-center font-medium text-blue-600">Circular</th>
+                            <th class="px-6 py-3 text-center font-medium text-purple-600">Priority</th>
+                            <th class="px-6 py-3 text-center font-medium text-pink-600">Deque</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-900">Insert Front</td>
+                            <td class="px-6 py-4 text-center mono text-gray-600">O(1)</td>
+                            <td class="px-6 py-4 text-center mono text-gray-600">O(log n)</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-900">Insert Rear</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                            <td class="px-6 py-4 text-center mono text-gray-600">O(log n)</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-900">Delete Front</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                            <td class="px-6 py-4 text-center mono text-gray-600">O(log n)</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-900">Delete Rear</td>
+                            <td class="px-6 py-4 text-center mono text-gray-600">O(1)</td>
+                            <td class="px-6 py-4 text-center mono text-gray-500">-</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-900">Peek</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                            <td class="px-6 py-4 text-center mono text-green-600 font-semibold">O(1)</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
+    </section>
 
-        <!-- Priority Queue Tab -->
-        <div class="tab-content" id="priority-queue">
-            <div class="content">
-                <div class="section">
-                    <h2>⭐ Priority Queue</h2>
-                    <div class="explanation">
-                        A priority queue processes elements based on their priority, not their insertion order. Higher
-                        priority elements are dequeued first.
-                    </div>
-                    <div class="controls">
-                        <input type="text" id="priorityInput" placeholder="Enter value" maxlength="10">
-                        <select id="prioritySelect">
-                            <option value="1">Priority 1 (Highest)</option>
-                            <option value="2">Priority 2</option>
-                            <option value="3">Priority 3</option>
-                            <option value="4">Priority 4</option>
-                            <option value="5">Priority 5 (Lowest)</option>
-                        </select>
-                        <button class="add-btn" onclick="priorityEnqueue()">Enqueue</button>
-                        <button class="remove-btn" onclick="priorityDequeue()">Dequeue</button>
-                        <button class="view-btn" onclick="priorityPeek()">Peek</button>
-                        <button class="clear-btn" onclick="clearPriority()">Clear</button>
-                    </div>
-                    <div class="visualization queue-visualization" id="priorityViz">
-                        <div style="color: #7f8c8d; font-style: italic;">Priority queue is empty</div>
-                    </div>
-                    <div class="info">
-                        <div class="info-item"><span>Size:</span><span id="prioritySize">0</span></div>
-                        <div class="info-item"><span>Highest Priority:</span><span id="priorityTop">None</span></div>
-                        <div class="info-item"><span>Empty:</span><span id="priorityEmpty">true</span></div>
-                    </div>
-                    <div class="complexity">
-                        <h4>Time Complexity:</h4>
-                        <div class="complexity-item"><span>Enqueue:</span><span>O(log n)</span></div>
-                        <div class="complexity-item"><span>Dequeue:</span><span>O(log n)</span></div>
-                        <div class="complexity-item"><span>Peek:</span><span>O(1)</span></div>
-                    </div>
-                    <div class="operation-log" id="priorityLog">Priority queue operations will appear here...</div>
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-gray-400 py-12 border-t border-gray-900">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-gray-800 rounded flex items-center justify-center">
+                    <span class="text-white font-bold text-xs">QV</span>
                 </div>
+                <span class="text-sm font-medium text-gray-300">Queue Variants Guide</span>
+            </div>
+            <div class="text-sm">
+                Mastering Advanced Data Structures
             </div>
         </div>
-
-        <!-- Comparison Tab -->
-        <div class="tab-content" id="comparison">
-            <div class="content single-column">
-                <div class="section">
-                    <h2>📊 Queue Variants Comparison</h2>
-                    <div class="explanation">
-                        Here's a comprehensive comparison of all queue variants, highlighting their key differences, use
-                        cases, and characteristics.
-                    </div>
-                    <table class="comparison-table">
-                        <thead>
-                            <tr>
-                                <th>Feature</th>
-                                <th>Simple Queue</th>
-                                <th>Circular Queue</th>
-                                <th>Deque</th>
-                                <th>Priority Queue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Insertion</strong></td>
-                                <td>Rear only</td>
-                                <td>Rear only</td>
-                                <td>Both ends</td>
-                                <td>Based on priority</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Deletion</strong></td>
-                                <td>Front only</td>
-                                <td>Front only</td>
-                                <td>Both ends</td>
-                                <td>Highest priority first</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Memory Usage</strong></td>
-                                <td>Linear, may waste space</td>
-                                <td>Circular, space efficient</td>
-                                <td>Linear, flexible</td>
-                                <td>Heap-based, dynamic</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Order</strong></td>
-                                <td>FIFO (First In, First Out)</td>
-                                <td>FIFO (First In, First Out)</td>
-                                <td>Flexible (FIFO/LIFO)</td>
-                                <td>Priority-based</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Enqueue Time</strong></td>
-                                <td>O(1)</td>
-                                <td>O(1)</td>
-                                <td>O(1)</td>
-                                <td>O(log n)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Dequeue Time</strong></td>
-                                <td>O(1)</td>
-                                <td>O(1)</td>
-                                <td>O(1)</td>
-                                <td>O(log n)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Space Complexity</strong></td>
-                                <td>O(n)</td>
-                                <td>O(n)</td>
-                                <td>O(n)</td>
-                                <td>O(n)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Use Cases</strong></td>
-                                <td>Task scheduling, BFS</td>
-                                <td>Buffer management, OS scheduling</td>
-                                <td>Undo/Redo operations, sliding window</td>
-                                <td>Dijkstra's algorithm, task scheduling</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Advantages</strong></td>
-                                <td>Simple implementation</td>
-                                <td>No memory waste, efficient</td>
-                                <td>Maximum flexibility</td>
-                                <td>Automatic ordering by priority</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Disadvantages</strong></td>
-                                <td>Memory waste after dequeue</td>
-                                <td>Fixed size limitation</td>
-                                <td>More complex than simple queue</td>
-                                <td>Higher time complexity, more memory</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Implementation</strong></td>
-                                <td>Array or Linked List</td>
-                                <td>Array with modular arithmetic</td>
-                                <td>Doubly Linked List or Dynamic Array</td>
-                                <td>Heap (Binary Tree)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Best For</strong></td>
-                                <td>Simple FIFO operations</td>
-                                <td>Fixed-size buffer applications</td>
-                                <td>Flexible insertion/deletion needs</td>
-                                <td>Priority-based processing</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    </footer>
 
     <script>
-        // Data Structure Implementations
-        class Stack {
-            constructor() { this.items = []; }
-            push(element) { this.items.push(element); }
-            pop() { return this.isEmpty() ? null : this.items.pop(); }
-            peek() { return this.isEmpty() ? null : this.items[this.items.length - 1]; }
-            isEmpty() { return this.items.length === 0; }
-            size() { return this.items.length; }
-            clear() { this.items = []; }
-        }
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        class SimpleQueue {
-            constructor() { this.items = []; }
-            enqueue(element) { this.items.push(element); }
-            dequeue() { return this.isEmpty() ? null : this.items.shift(); }
-            front() { return this.isEmpty() ? null : this.items[0]; }
-            rear() { return this.isEmpty() ? null : this.items[this.items.length - 1]; }
-            isEmpty() { return this.items.length === 0; }
-            size() { return this.items.length; }
-            clear() { this.items = []; }
-        }
-
-        class CircularQueue {
-            constructor(maxSize = 8) {
-                this.items = new Array(maxSize);
-                this.maxSize = maxSize;
-                this.front = -1;
-                this.rear = -1;
-                this.count = 0;
-            }
-
-            enqueue(element) {
-                if (this.isFull()) return false;
-                if (this.isEmpty()) {
-                    this.front = 0;
-                    this.rear = 0;
-                } else {
-                    this.rear = (this.rear + 1) % this.maxSize;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
                 }
-                this.items[this.rear] = element;
-                this.count++;
-                return true;
-            }
-
-            dequeue() {
-                if (this.isEmpty()) return null;
-                const item = this.items[this.front];
-                this.items[this.front] = undefined;
-                if (this.count === 1) {
-                    this.front = -1;
-                    this.rear = -1;
-                } else {
-                    this.front = (this.front + 1) % this.maxSize;
-                }
-                this.count--;
-                return item;
-            }
-
-            frontElement() { return this.isEmpty() ? null : this.items[this.front]; }
-            rearElement() { return this.isEmpty() ? null : this.items[this.rear]; }
-            isEmpty() { return this.count === 0; }
-            isFull() { return this.count === this.maxSize; }
-            size() { return this.count; }
-            clear() {
-                this.items = new Array(this.maxSize);
-                this.front = -1;
-                this.rear = -1;
-                this.count = 0;
-            }
-        }
-
-        class Deque {
-            constructor() { this.items = []; }
-            addFront(element) { this.items.unshift(element); }
-            addRear(element) { this.items.push(element); }
-            removeFront() { return this.isEmpty() ? null : this.items.shift(); }
-            removeRear() { return this.isEmpty() ? null : this.items.pop(); }
-            front() { return this.isEmpty() ? null : this.items[0]; }
-            rear() { return this.isEmpty() ? null : this.items[this.items.length - 1]; }
-            isEmpty() { return this.items.length === 0; }
-            size() { return this.items.length; }
-            clear() { this.items = []; }
-        }
-
-        class PriorityQueue {
-            constructor() { this.items = []; }
-
-            enqueue(element, priority) {
-                const item = { element, priority };
-                let added = false;
-
-                for (let i = 0; i < this.items.length; i++) {
-                    if (item.priority < this.items[i].priority) {
-                        this.items.splice(i, 0, item);
-                        added = true;
-                        break;
-                    }
-                }
-
-                if (!added) {
-                    this.items.push(item);
-                }
-            }
-
-            dequeue() { return this.isEmpty() ? null : this.items.shift(); }
-            peek() { return this.isEmpty() ? null : this.items[0]; }
-            isEmpty() { return this.items.length === 0; }
-            size() { return this.items.length; }
-            clear() { this.items = []; }
-        }
-
-        // Initialize data structures
-        const stack = new Stack();
-        const queue = new SimpleQueue();
-        const circularQueue = new CircularQueue(8);
-        const deque = new Deque();
-        const priorityQueue = new PriorityQueue();
-
-        // Tab Management
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
             });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        }, observerOptions);
 
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+        document.querySelectorAll('.fade-in-up').forEach((el) => observer.observe(el));
+
+        // Mobile menu
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
         }
 
-        // Stack Functions
-        function pushStack() {
-            const input = document.getElementById('stackInput');
-            const value = input.value.trim();
-            if (!value) { alert('Please enter a value'); return; }
-
-            stack.push(value);
-            input.value = '';
-            updateStackDisplay();
-            logOperation('stackLog', `PUSH: ${value}`);
+        // Copy code
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').innerText;
+            navigator.clipboard.writeText(code);
+            const original = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => btn.innerText = original, 2000);
         }
 
-        function popStack() {
-            const popped = stack.pop();
-            if (popped === null) {
-                alert('Stack is empty!');
-                logOperation('stackLog', 'POP: Stack is empty');
-                return;
-            }
-            updateStackDisplay();
-            logOperation('stackLog', `POP: ${popped}`);
-        }
+        // Circular Queue Implementation
+        const circularSize = 8;
+        let circularQueue = new Array(circularSize).fill(null);
+        let circularFront = -1;
+        let circularRear = -1;
 
-        function peekStack() {
-            const top = stack.peek();
-            if (top === null) {
-                alert('Stack is empty!');
-                logOperation('stackLog', 'PEEK: Stack is empty');
-            } else {
-                alert(`Top element: ${top}`);
-                logOperation('stackLog', `PEEK: ${top}`);
-            }
-        }
+        function renderCircularQueue() {
+            const container = document.getElementById('circular-slots');
+            const frontLabel = document.getElementById('circular-front');
+            const rearLabel = document.getElementById('circular-rear');
+            const fillText = document.getElementById('circular-fill-text');
+            const fillCircle = document.getElementById('circular-fill');
 
-        function clearStack() {
-            stack.clear();
-            updateStackDisplay();
-            logOperation('stackLog', 'CLEAR: Stack cleared');
-        }
+            container.innerHTML = '';
 
-        function updateStackDisplay() {
-            const viz = document.getElementById('stackViz');
-            const items = stack.items;
+            // Calculate positions in circle
+            const radius = 100;
+            const centerX = 140;
+            const centerY = 140;
 
-            if (items.length === 0) {
-                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Stack is empty</div>';
-            } else {
-                viz.innerHTML = items.map(item =>
-                    `<div class="stack-item">${item}</div>`
-                ).join('');
-            }
+            for (let i = 0; i < circularSize; i++) {
+                const angle = (i * 360 / circularSize - 90) * Math.PI / 180;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
 
-            document.getElementById('stackSize').textContent = stack.size();
-            document.getElementById('stackTop').textContent = stack.peek() || 'None';
-            document.getElementById('stackEmpty').textContent = stack.isEmpty();
-        }
+                const slot = document.createElement('div');
+                const hasValue = circularQueue[i] !== null;
+                const isFront = i === circularFront;
+                const isRear = i === circularRear;
 
-        // Simple Queue Functions
-        function enqueue() {
-            const input = document.getElementById('queueInput');
-            const value = input.value.trim();
-            if (!value) { alert('Please enter a value'); return; }
+                let classes = 'absolute w-12 h-12 rounded-full flex items-center justify-center font-mono font-bold text-sm transition-all duration-300 ';
+                if (hasValue) {
+                    classes += 'bg-blue-500 text-white shadow-lg scale-110 ';
+                } else {
+                    classes += 'bg-gray-100 text-gray-400 border-2 border-gray-200 ';
+                }
 
-            queue.enqueue(value);
-            input.value = '';
-            updateQueueDisplay();
-            logOperation('queueLog', `ENQUEUE: ${value}`);
-        }
+                slot.className = classes;
+                slot.style.left = (x - 24) + 'px';
+                slot.style.top = (y - 24) + 'px';
+                slot.textContent = hasValue ? circularQueue[i] : i;
 
-        function dequeue() {
-            const dequeued = queue.dequeue();
-            if (dequeued === null) {
-                alert('Queue is empty!');
-                logOperation('queueLog', 'DEQUEUE: Queue is empty');
-                return;
-            }
-            updateQueueDisplay();
-            logOperation('queueLog', `DEQUEUE: ${dequeued}`);
-        }
+                // Add indicators
+                if (isFront && hasValue) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-green-600 whitespace-nowrap';
+                    indicator.textContent = 'F';
+                    slot.appendChild(indicator);
+                }
+                if (isRear && hasValue) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-purple-600 whitespace-nowrap';
+                    indicator.textContent = 'R';
+                    slot.appendChild(indicator);
+                }
 
-        function frontQueue() {
-            const front = queue.front();
-            if (front === null) {
-                alert('Queue is empty!');
-                logOperation('queueLog', 'FRONT: Queue is empty');
-            } else {
-                alert(`Front element: ${front}`);
-                logOperation('queueLog', `FRONT: ${front}`);
-            }
-        }
-
-        function rearQueue() {
-            const rear = queue.rear();
-            if (rear === null) {
-                alert('Queue is empty!');
-                logOperation('queueLog', 'REAR: Queue is empty');
-            } else {
-                alert(`Rear element: ${rear}`);
-                logOperation('queueLog', `REAR: ${rear}`);
-            }
-        }
-
-        function clearQueue() {
-            queue.clear();
-            updateQueueDisplay();
-            logOperation('queueLog', 'CLEAR: Queue cleared');
-        }
-
-        function updateQueueDisplay() {
-            const viz = document.getElementById('queueViz');
-            const items = queue.items;
-
-            if (items.length === 0) {
-                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Queue is empty</div>';
-            } else {
-                let html = '<span style="font-size: 12px; color: #e74c3c; margin-right: 10px;">FRONT →</span>';
-                html += items.map(item =>
-                    `<div class="queue-item">${item}</div>`
-                ).join('<span class="arrow">→</span>');
-                html += '<span style="font-size: 12px; color: #e74c3c; margin-left: 10px;">← REAR</span>';
-                viz.innerHTML = html;
+                container.appendChild(slot);
             }
 
-            document.getElementById('queueSize').textContent = queue.size();
-            document.getElementById('queueFront').textContent = queue.front() || 'None';
-            document.getElementById('queueRear').textContent = queue.rear() || 'None';
-            document.getElementById('queueEmpty').textContent = queue.isEmpty();
+            frontLabel.textContent = circularFront;
+            rearLabel.textContent = circularRear;
+
+            // Update fill percentage
+            let count = 0;
+            if (circularFront !== -1) {
+                if (circularRear >= circularFront) {
+                    count = circularRear - circularFront + 1;
+                } else {
+                    count = circularSize - circularFront + circularRear + 1;
+                }
+            }
+            const percentage = Math.round((count / circularSize) * 100);
+            fillText.textContent = percentage + '%';
+            fillCircle.style.strokeDashoffset = 754 - (754 * percentage / 100);
         }
 
-        // Circular Queue Functions
         function circularEnqueue() {
-            const input = document.getElementById('circularInput');
+            const input = document.getElementById('circular-input');
             const value = input.value.trim();
-            if (!value) { alert('Please enter a value'); return; }
+            const status = document.getElementById('circular-status');
 
-            if (circularQueue.isFull()) {
-                alert('Circular queue is full!');
-                logOperation('circularLog', 'ENQUEUE: Queue is full');
+            if (!value) {
+                status.textContent = 'Please enter a value';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
                 return;
             }
 
-            circularQueue.enqueue(value);
+            if ((circularRear + 1) % circularSize === circularFront) {
+                status.textContent = 'Queue is Full!';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+                return;
+            }
+
+            if (circularFront === -1) {
+                circularFront = 0;
+                circularRear = 0;
+            } else {
+                circularRear = (circularRear + 1) % circularSize;
+            }
+
+            circularQueue[circularRear] = value;
+            renderCircularQueue();
             input.value = '';
-            updateCircularDisplay();
-            logOperation('circularLog', `ENQUEUE: ${value}`);
+            input.focus();
+
+            status.textContent = `Enqueued ${value} at position ${circularRear}`;
+            status.className = 'mt-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
         }
 
         function circularDequeue() {
-            const dequeued = circularQueue.dequeue();
-            if (dequeued === null) {
-                alert('Circular queue is empty!');
-                logOperation('circularLog', 'DEQUEUE: Queue is empty');
+            const status = document.getElementById('circular-status');
+
+            if (circularFront === -1) {
+                status.textContent = 'Queue is Empty!';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
                 return;
             }
-            updateCircularDisplay();
-            logOperation('circularLog', `DEQUEUE: ${dequeued}`);
-        }
 
-        function circularFront() {
-            const front = circularQueue.frontElement();
-            if (front === null) {
-                alert('Circular queue is empty!');
-                logOperation('circularLog', 'FRONT: Queue is empty');
+            const value = circularQueue[circularFront];
+            circularQueue[circularFront] = null;
+
+            if (circularFront === circularRear) {
+                circularFront = -1;
+                circularRear = -1;
             } else {
-                alert(`Front element: ${front}`);
-                logOperation('circularLog', `FRONT: ${front}`);
+                circularFront = (circularFront + 1) % circularSize;
             }
+
+            renderCircularQueue();
+            status.textContent = `Dequeued ${value}`;
+            status.className = 'mt-4 p-3 bg-blue-50 text-blue-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
         }
 
-        function circularRear() {
-            const rear = circularQueue.rearElement();
-            if (rear === null) {
-                alert('Circular queue is empty!');
-                logOperation('circularLog', 'REAR: Queue is empty');
-            } else {
-                alert(`Rear element: ${rear}`);
-                logOperation('circularLog', `REAR: ${rear}`);
-            }
+        function circularReset() {
+            circularQueue = new Array(circularSize).fill(null);
+            circularFront = -1;
+            circularRear = -1;
+            renderCircularQueue();
+            document.getElementById('circular-status').textContent = 'Reset complete';
+            document.getElementById('circular-status').className = 'mt-4 p-3 bg-gray-50 text-gray-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
         }
 
-        function clearCircular() {
-            circularQueue.clear();
-            updateCircularDisplay();
-            logOperation('circularLog', 'CLEAR: Circular queue cleared');
-        }
+        // Priority Queue Implementation
+        let priorityQueue = [];
 
-        function updateCircularDisplay() {
-            const viz = document.getElementById('circularViz');
-            const queue = circularQueue;
+        function renderPriorityQueue() {
+            const container = document.getElementById('priority-container');
+            container.innerHTML = '';
 
-            if (queue.isEmpty()) {
-                viz.innerHTML = `
-                    <div class="circular-queue">
-                        <div style="color: #7f8c8d; font-style: italic; text-align: center;">Circular Queue<br>(Max 8 items)</div>
-                    </div>
+            // Sort by priority for display (highest first)
+            const sorted = [...priorityQueue].sort((a, b) => b.priority - a.priority);
+
+            sorted.forEach((item, index) => {
+                const bar = document.createElement('div');
+                const height = 20 + (item.priority * 20);
+                const colors = {
+                    1: 'bg-gray-400',
+                    2: 'bg-blue-400',
+                    3: 'bg-purple-500',
+                    4: 'bg-red-500'
+                };
+
+                bar.className = `priority-item w-12 ${colors[item.priority]} rounded-t-lg flex flex-col items-center justify-end pb-2 text-white text-xs font-bold transition-all duration-500`;
+                bar.style.height = height + '%';
+                bar.innerHTML = `
+                    <span class="mb-1">${item.value}</span>
+                    <span class="text-[10px] opacity-75">P${item.priority}</span>
                 `;
-            } else {
-                let html = '<div class="circular-queue">';
 
-                // Create 8 positions in circle
-                for (let i = 0; i < 8; i++) {
-                    const angle = (i * 45) - 90; // Start from top
-                    const x = Math.cos(angle * Math.PI / 180) * 90;
-                    const y = Math.sin(angle * Math.PI / 180) * 90;
-
-                    if (queue.items[i] !== undefined) {
-                        html += `<div class="circular-item" style="transform: translate(${x}px, ${y}px);">${queue.items[i]}`;
-                        if (i === queue.front) html += '<div class="front-pointer" title="Front"></div>';
-                        if (i === queue.rear) html += '<div class="rear-pointer" title="Rear"></div>';
-                        html += '</div>';
-                    }
+                if (index === 0) {
+                    bar.classList.add('ring-4', 'ring-yellow-300');
                 }
 
-                html += '</div>';
-                viz.innerHTML = html;
-            }
-
-            document.getElementById('circularSize').textContent = queue.size();
-            document.getElementById('circularFrontIdx').textContent = queue.front;
-            document.getElementById('circularRearIdx').textContent = queue.rear;
-            document.getElementById('circularFull').textContent = queue.isFull();
+                container.appendChild(bar);
+            });
         }
 
-        // Deque Functions
-        function addFront() {
-            const input = document.getElementById('dequeInput');
-            const value = input.value.trim();
-            if (!value) { alert('Please enter a value'); return; }
-
-            deque.addFront(value);
-            input.value = '';
-            updateDequeDisplay();
-            logOperation('dequeLog', `ADD_FRONT: ${value}`);
-        }
-
-        function addRear() {
-            const input = document.getElementById('dequeInput');
-            const value = input.value.trim();
-            if (!value) { alert('Please enter a value'); return; }
-
-            deque.addRear(value);
-            input.value = '';
-            updateDequeDisplay();
-            logOperation('dequeLog', `ADD_REAR: ${value}`);
-        }
-
-        function removeFront() {
-            const removed = deque.removeFront();
-            if (removed === null) {
-                alert('Deque is empty!');
-                logOperation('dequeLog', 'REMOVE_FRONT: Deque is empty');
-                return;
-            }
-            updateDequeDisplay();
-            logOperation('dequeLog', `REMOVE_FRONT: ${removed}`);
-        }
-
-        function removeRear() {
-            const removed = deque.removeRear();
-            if (removed === null) {
-                alert('Deque is empty!');
-                logOperation('dequeLog', 'REMOVE_REAR: Deque is empty');
-                return;
-            }
-            updateDequeDisplay();
-            logOperation('dequeLog', `REMOVE_REAR: ${removed}`);
-        }
-
-        function clearDeque() {
-            deque.clear();
-            updateDequeDisplay();
-            logOperation('dequeLog', 'CLEAR: Deque cleared');
-        }
-
-        function updateDequeDisplay() {
-            const viz = document.getElementById('dequeViz');
-            const items = deque.items;
-
-            if (items.length === 0) {
-                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Deque is empty</div>';
-            } else {
-                let html = '<span style="font-size: 12px; color: #9b59b6; margin-right: 10px;">FRONT ↔</span>';
-                html += items.map(item =>
-                    `<div class="deque-item">${item}</div>`
-                ).join('<span class="arrow">↔</span>');
-                html += '<span style="font-size: 12px; color: #9b59b6; margin-left: 10px;">↔ REAR</span>';
-                viz.innerHTML = html;
-            }
-
-            document.getElementById('dequeSize').textContent = deque.size();
-            document.getElementById('dequeFront').textContent = deque.front() || 'None';
-            document.getElementById('dequeRear').textContent = deque.rear() || 'None';
-            document.getElementById('dequeEmpty').textContent = deque.isEmpty();
-        }
-
-        // Priority Queue Functions
         function priorityEnqueue() {
-            const input = document.getElementById('priorityInput');
-            const prioritySelect = document.getElementById('prioritySelect');
-            const value = input.value.trim();
-            const priority = parseInt(prioritySelect.value);
+            const valueInput = document.getElementById('priority-value');
+            const priorityInput = document.getElementById('priority-level');
+            const status = document.getElementById('priority-status');
 
-            if (!value) { alert('Please enter a value'); return; }
+            const value = valueInput.value.trim();
+            const priority = parseInt(priorityInput.value);
 
-            priorityQueue.enqueue(value, priority);
-            input.value = '';
-            updatePriorityDisplay();
-            logOperation('priorityLog', `ENQUEUE: ${value} (Priority ${priority})`);
+            if (!value) {
+                status.textContent = 'Please enter a value';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+                return;
+            }
+
+            priorityQueue.push({ value, priority });
+            renderPriorityQueue();
+            valueInput.value = '';
+            valueInput.focus();
+
+            status.textContent = `Added ${value} with priority ${priority}`;
+            status.className = 'mt-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
         }
 
         function priorityDequeue() {
-            const dequeued = priorityQueue.dequeue();
-            if (dequeued === null) {
-                alert('Priority queue is empty!');
-                logOperation('priorityLog', 'DEQUEUE: Queue is empty');
+            const status = document.getElementById('priority-status');
+
+            if (priorityQueue.length === 0) {
+                status.textContent = 'Queue is empty';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
                 return;
             }
-            updatePriorityDisplay();
-            logOperation('priorityLog', `DEQUEUE: ${dequeued.element} (Priority ${dequeued.priority})`);
+
+            // Find highest priority
+            let maxIdx = 0;
+            for (let i = 1; i < priorityQueue.length; i++) {
+                if (priorityQueue[i].priority > priorityQueue[maxIdx].priority) {
+                    maxIdx = i;
+                }
+            }
+
+            const item = priorityQueue[maxIdx];
+            priorityQueue.splice(maxIdx, 1);
+            renderPriorityQueue();
+
+            status.textContent = `Extracted ${item.value} (Priority ${item.priority})`;
+            status.className = 'mt-4 p-3 bg-purple-50 text-purple-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
         }
 
-        function priorityPeek() {
-            const top = priorityQueue.peek();
-            if (top === null) {
-                alert('Priority queue is empty!');
-                logOperation('priorityLog', 'PEEK: Queue is empty');
+        function priorityReset() {
+            priorityQueue = [];
+            renderPriorityQueue();
+            document.getElementById('priority-status').textContent = 'Priority queue cleared';
+            document.getElementById('priority-status').className = 'mt-4 p-3 bg-gray-50 text-gray-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+        }
+
+        // Deque Implementation
+        let deque = [];
+
+        function renderDeque() {
+            const container = document.getElementById('deque-container');
+            container.innerHTML = '';
+
+            deque.forEach((item, index) => {
+                const div = document.createElement('div');
+                const isFront = index === 0;
+                const isRear = index === deque.length - 1;
+
+                let classes = 'deque-item px-4 py-3 rounded-lg font-mono font-semibold text-lg shadow-sm transition-all duration-300 ';
+                if (isFront && isRear) {
+                    classes += 'bg-gradient-to-r from-pink-500 to-pink-600 text-white';
+                } else if (isFront) {
+                    classes += 'bg-pink-500 text-white';
+                } else if (isRear) {
+                    classes += 'bg-pink-400 text-white';
+                } else {
+                    classes += 'bg-gray-100 text-gray-700 border border-gray-200';
+                }
+
+                div.className = classes;
+                div.textContent = item;
+                container.appendChild(div);
+            });
+        }
+
+        function dequePushFront() {
+            const input = document.getElementById('deque-input');
+            const value = input.value.trim();
+            const status = document.getElementById('deque-status');
+
+            if (!value) {
+                status.textContent = 'Please enter a value';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+                return;
+            }
+
+            deque.unshift(value);
+            renderDeque();
+            input.value = '';
+
+            status.textContent = `Pushed ${value} to front`;
+            status.className = 'mt-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+
+            // Animate first element
+            setTimeout(() => {
+                const items = document.querySelectorAll('.deque-item');
+                if (items.length > 0) items[0].classList.add('add-front');
+            }, 10);
+        }
+
+        function dequePushRear() {
+            const input = document.getElementById('deque-input');
+            const value = input.value.trim();
+            const status = document.getElementById('deque-status');
+
+            if (!value) {
+                status.textContent = 'Please enter a value';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+                return;
+            }
+
+            deque.push(value);
+            renderDeque();
+            input.value = '';
+
+            status.textContent = `Pushed ${value} to rear`;
+            status.className = 'mt-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+
+            setTimeout(() => {
+                const items = document.querySelectorAll('.deque-item');
+                if (items.length > 0) items[items.length - 1].classList.add('add-rear');
+            }, 10);
+        }
+
+        function dequePopFront() {
+            const status = document.getElementById('deque-status');
+
+            if (deque.length === 0) {
+                status.textContent = 'Deque is empty';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+                return;
+            }
+
+            const items = document.querySelectorAll('.deque-item');
+            if (items.length > 0) items[0].classList.add('remove');
+
+            const value = deque[0];
+            setTimeout(() => {
+                deque.shift();
+                renderDeque();
+                status.textContent = `Popped ${value} from front`;
+                status.className = 'mt-4 p-3 bg-blue-50 text-blue-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+            }, 300);
+        }
+
+        function dequePopRear() {
+            const status = document.getElementById('deque-status');
+
+            if (deque.length === 0) {
+                status.textContent = 'Deque is empty';
+                status.className = 'mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+                return;
+            }
+
+            const items = document.querySelectorAll('.deque-item');
+            if (items.length > 0) items[items.length - 1].classList.add('remove');
+
+            const value = deque[deque.length - 1];
+            setTimeout(() => {
+                deque.pop();
+                renderDeque();
+                status.textContent = `Popped ${value} from rear`;
+                status.className = 'mt-4 p-3 bg-blue-50 text-blue-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+            }, 300);
+        }
+
+        function dequeReset() {
+            deque = [];
+            renderDeque();
+            document.getElementById('deque-status').textContent = 'Deque cleared';
+            document.getElementById('deque-status').className = 'mt-4 p-3 bg-gray-50 text-gray-600 rounded-lg text-sm text-center mono min-h-[44px] flex items-center justify-center';
+        }
+
+        // Palindrome Checker
+        function checkPalindrome() {
+            const input = document.getElementById('palindrome-input');
+            const result = document.getElementById('palindrome-result');
+            const text = input.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            if (!text) {
+                result.textContent = '';
+                return;
+            }
+
+            const deque = text.split('');
+            let isPalindrome = true;
+
+            while (deque.length > 1) {
+                if (deque.shift() !== deque.pop()) {
+                    isPalindrome = false;
+                    break;
+                }
+            }
+
+            if (isPalindrome) {
+                result.textContent = '✓ Palindrome!';
+                result.className = 'mt-3 text-center text-sm font-medium text-green-600';
             } else {
-                alert(`Highest priority element: ${top.element} (Priority ${top.priority})`);
-                logOperation('priorityLog', `PEEK: ${top.element} (Priority ${top.priority})`);
+                result.textContent = '✗ Not a palindrome';
+                result.className = 'mt-3 text-center text-sm font-medium text-red-600';
             }
         }
 
-        function clearPriority() {
-            priorityQueue.clear();
-            updatePriorityDisplay();
-            logOperation('priorityLog', 'CLEAR: Priority queue cleared');
-        }
+        // Initialize
+        window.addEventListener('load', () => {
+            renderCircularQueue();
+            renderPriorityQueue();
+            renderDeque();
+        });
 
-        function updatePriorityDisplay() {
-            const viz = document.getElementById('priorityViz');
-            const items = priorityQueue.items;
-
-            if (items.length === 0) {
-                viz.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Priority queue is empty</div>';
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-sm');
             } else {
-                let html = '<span style="font-size: 12px; color: #f39c12; margin-right: 10px;">HIGH →</span>';
-                html += items.map(item =>
-                    `<div class="priority-item">${item.element}<div class="priority-badge">${item.priority}</div></div>`
-                ).join('<span class="arrow">→</span>');
-                html += '<span style="font-size: 12px; color: #f39c12; margin-left: 10px;">← LOW</span>';
-                viz.innerHTML = html;
+                navbar.classList.remove('shadow-sm');
             }
-
-            document.getElementById('prioritySize').textContent = priorityQueue.size();
-            const topItem = priorityQueue.peek();
-            document.getElementById('priorityTop').textContent = topItem ? `${topItem.element} (P${topItem.priority})` : 'None';
-            document.getElementById('priorityEmpty').textContent = priorityQueue.isEmpty();
-        }
-
-        function logOperation(logId, operation) {
-            const log = document.getElementById(logId);
-            const timestamp = new Date().toLocaleTimeString();
-            log.innerHTML += `[${timestamp}] ${operation}\n`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        // Enter key support
-        document.getElementById('stackInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') pushStack();
         });
-        document.getElementById('queueInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') enqueue();
-        });
-        document.getElementById('circularInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') circularEnqueue();
-        });
-        document.getElementById('dequeInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') addRear();
-        });
-        document.getElementById('priorityInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') priorityEnqueue();
-        });
-
-        // Initialize displays
-        updateStackDisplay();
-        updateQueueDisplay();
-        updateCircularDisplay();
-        updateDequeDisplay();
-        updatePriorityDisplay();
     </script>
 </body>
 
