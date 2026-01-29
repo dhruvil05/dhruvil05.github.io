@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probability in Data Science - Interactive Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        nav select:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .formula {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+
+        .example {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .example h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        ul,
+        ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .quiz {
+            background: #fff3e0;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .quiz h4 {
+            color: #f57c00;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .note {
+            background: #f3e5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #9c27b0;
+        }
+
+        .note strong {
+            color: #7b1fa2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-buttons button:first-child {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .nav-buttons button:last-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 25px 20px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            h3 {
+                font-size: 1.3em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+
+        .progress {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Probability in Data Science</h1>
+            <p>Your Complete Interactive Learning Guide</p>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </header>
+
+        <nav>
+            <select id="topicSelect" onchange="changeSection()">
+                <option value="0">1. Introduction to Probability</option>
+                <option value="1">2. Types of Probability</option>
+                <option value="2">3. Calculating Probability</option>
+                <option value="3">4. Types of Experiments & Sample Space</option>
+                <option value="4">5. Basic Rules of Probability</option>
+                <option value="5">6. Complement Rule</option>
+                <option value="6">7. Addition Rule</option>
+                <option value="7">8. Multiplication Rule</option>
+                <option value="8">9. Independent vs Dependent Events</option>
+                <option value="9">10. Conditional Probability</option>
+                <option value="10">11. Law of Total Probability</option>
+                <option value="11">12. Bayes' Theorem</option>
+                <option value="12">13. Practice Questions</option>
+            </select>
+        </nav>
+
+        <div class="content">
+            <!-- Section 1: Introduction -->
+            <div class="section active" data-section="0">
+                <h2>What is Probability?</h2>
+
+                <p>Probability is a mathematical way to measure <span class="highlight">how likely something is to
+                        happen</span>. Think of it as a number between 0 and 1 that tells us the chance of an event
+                    occurring.</p>
+
+                <div class="formula">
+                    Probability Scale:<br>
+                    0 = Impossible (will never happen)<br>
+                    0.5 = Equally likely (50-50 chance)<br>
+                    1 = Certain (will definitely happen)
+                </div>
+
+                <h3>Simple Examples</h3>
+                <ul>
+                    <li><strong>Tossing a coin:</strong> Getting heads has a probability of 0.5 (50%)</li>
+                    <li><strong>Rolling a die:</strong> Getting a 6 has a probability of 1/6 ≈ 0.167 (16.7%)</li>
+                    <li><strong>Drawing a card:</strong> Getting a heart has a probability of 13/52 = 0.25 (25%)</li>
+                </ul>
+
+                <h3>Why Probability Matters in Data Science</h3>
+                <p>Probability is the <span class="highlight">foundation of data science</span>. It helps us:</p>
+
+                <ol>
+                    <li><strong>Handle Uncertainty:</strong> Real-world data is messy and unpredictable. Probability
+                        helps us make sense of it.</li>
+                    <li><strong>Make Predictions:</strong> We can predict customer behavior, stock prices, or weather
+                        patterns.</li>
+                    <li><strong>Evaluate Risk:</strong> Companies use probability to assess risks before making
+                        decisions.</li>
+                    <li><strong>Build Machine Learning Models:</strong> Many algorithms like Naive Bayes, logistic
+                        regression, and neural networks rely on probability.</li>
+                </ol>
+
+                <div class="example">
+                    <h4>Real-World Business Scenarios</h4>
+                    <p><strong>Marketing:</strong> What's the probability that a customer will click on an ad?</p>
+                    <p><strong>Manufacturing:</strong> What's the probability that a product will fail within one year?
+                    </p>
+                    <p><strong>Insurance:</strong> What's the probability of a car accident based on driver history?</p>
+                    <p><strong>Finance:</strong> What's the probability of detecting fraudulent transactions?</p>
+                </div>
+
+                <div class="note">
+                    <strong>Key Takeaway:</strong> Probability isn't just theory—it's a practical tool used every day in
+                    business, science, and technology to make better decisions when we can't be 100% certain about
+                    outcomes.
+                </div>
+            </div>
+
+            <!-- Section 2: Types of Probability -->
+            <div class="section" data-section="1">
+                <h2>Types of Probability</h2>
+
+                <h3>1. Theoretical Probability</h3>
+                <p>Theoretical probability is based on <span class="highlight">what should happen in theory</span>,
+                    using logic and mathematics. We calculate it when we know all possible outcomes.</p>
+
+                <div class="formula">
+                    Theoretical Probability = Favorable Outcomes / Total Possible Outcomes
+                </div>
+
+                <div class="example">
+                    <h4>Example: Fair Coin</h4>
+                    <p>A fair coin has 2 sides: Heads and Tails</p>
+                    <p>P(Heads) = 1/2 = 0.5</p>
+                    <p>We don't need to flip the coin 1000 times to know this—it's based on the structure of the coin.
+                    </p>
+                </div>
+
+                <h3>2. Empirical (Experimental) Probability</h3>
+                <p>Empirical probability is based on <span class="highlight">actual observations and experiments</span>.
+                    We collect data and see what actually happens.</p>
+
+                <div class="formula">
+                    Empirical Probability = Number of Times Event Occurred / Total Number of Trials
+                </div>
+
+                <div class="example">
+                    <h4>Example: Ad Click Rate</h4>
+                    <p>You run an online ad campaign and track results:</p>
+                    <ul>
+                        <li>Total impressions: 10,000</li>
+                        <li>Number of clicks: 250</li>
+                    </ul>
+                    <p>P(Click) = 250/10,000 = 0.025 = 2.5%</p>
+                    <p>This is based on real data, not theory.</p>
+                </div>
+
+                <h3>Comparing Both Types</h3>
+                <table>
+                    <tr>
+                        <th>Theoretical Probability</th>
+                        <th>Empirical Probability</th>
+                    </tr>
+                    <tr>
+                        <td>Based on logic and reasoning</td>
+                        <td>Based on actual experiments</td>
+                    </tr>
+                    <tr>
+                        <td>Works with fair/ideal conditions</td>
+                        <td>Works with real-world data</td>
+                    </tr>
+                    <tr>
+                        <td>Example: Rolling a fair die</td>
+                        <td>Example: Customer conversion rates</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>In Data Science:</strong> We often start with theoretical probability to build models, then
+                    use empirical probability to validate and improve them with real data.
+                </div>
+            </div>
+
+            <!-- Section 3: Calculating Probability -->
+            <div class="section" data-section="2">
+                <h2>Calculating Probability</h2>
+
+                <p>The basic formula for probability is simple but powerful:</p>
+
+                <div class="formula">
+                    P(E) = Number of Favorable Outcomes / Total Number of Possible Outcomes
+                </div>
+
+                <p>Where:</p>
+                <ul>
+                    <li><strong>P(E)</strong> = Probability of event E happening</li>
+                    <li><strong>Favorable Outcomes</strong> = Outcomes that satisfy what we're looking for</li>
+                    <li><strong>Total Outcomes</strong> = All possible outcomes in the sample space</li>
+                </ul>
+
+                <h3>Step-by-Step Example</h3>
+                <div class="example">
+                    <h4>Problem: Rolling a Die</h4>
+                    <p><strong>Question:</strong> What is the probability of rolling a 3 on a fair six-sided die?</p>
+
+                    <p><strong>Step 1:</strong> Identify total possible outcomes</p>
+                    <p>A die has 6 faces: {1, 2, 3, 4, 5, 6}</p>
+                    <p>Total outcomes = 6</p>
+
+                    <p><strong>Step 2:</strong> Identify favorable outcomes</p>
+                    <p>We want to roll a 3, so there's only 1 favorable outcome</p>
+                    <p>Favorable outcomes = 1</p>
+
+                    <p><strong>Step 3:</strong> Apply the formula</p>
+                    <p>P(rolling a 3) = 1/6 ≈ 0.1667 or 16.67%</p>
+                </div>
+
+                <h3>More Examples</h3>
+
+                <div class="example">
+                    <h4>Rolling an Even Number</h4>
+                    <p>Even numbers on a die: {2, 4, 6} = 3 favorable outcomes</p>
+                    <p>Total outcomes = 6</p>
+                    <p>P(even number) = 3/6 = 0.5 or 50%</p>
+                </div>
+
+                <div class="example">
+                    <h4>Drawing a Heart from Cards</h4>
+                    <p>A standard deck has 52 cards, 13 are hearts</p>
+                    <p>P(heart) = 13/52 = 1/4 = 0.25 or 25%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Quick Practice</h4>
+                    <p><strong>Question 1:</strong> What is the probability of rolling a 5 on a fair six-sided die?</p>
+                    <p><em>Answer: 1/6 ≈ 0.167 or 16.67%</em></p>
+
+                    <p><strong>Question 2:</strong> Two dice are rolled. What is the probability that at least one shows
+                        a 4?</p>
+                    <p><em>Hint: It's easier to calculate the probability that neither shows a 4, then subtract from
+                            1.</em></p>
+                    <p><em>Answer: P(at least one 4) = 1 - P(no 4s) = 1 - (5/6 × 5/6) = 1 - 25/36 = 11/36 ≈ 0.306 or
+                            30.6%</em></p>
+                </div>
+            </div>
+
+            <!-- Section 4: Types of Experiments & Sample Space -->
+            <div class="section" data-section="3">
+                <h2>Types of Experiments & Sample Space</h2>
+
+                <h3>Types of Experiments</h3>
+
+                <p><strong>1. Deterministic Experiments</strong></p>
+                <p>These experiments <span class="highlight">always produce the same result</span> under identical
+                    conditions. There's no uncertainty.</p>
+                <div class="example">
+                    <h4>Examples</h4>
+                    <ul>
+                        <li>Boiling water at 100°C (at sea level) always turns to steam</li>
+                        <li>2 + 2 always equals 4</li>
+                        <li>Dropping a ball always makes it fall down (due to gravity)</li>
+                    </ul>
+                </div>
+
+                <p><strong>2. Probabilistic (Random) Experiments</strong></p>
+                <p>These experiments have <span class="highlight">uncertain outcomes</span> that can vary even under
+                    identical conditions.</p>
+                <div class="example">
+                    <h4>Examples</h4>
+                    <ul>
+                        <li>Tossing a coin (could be heads or tails)</li>
+                        <li>Rolling a die (could be any number 1-6)</li>
+                        <li>Drawing a card from a shuffled deck</li>
+                        <li>Whether it will rain tomorrow</li>
+                    </ul>
+                </div>
+
+                <h3>Sample Space</h3>
+                <p>The <span class="highlight">sample space</span> is the set of all possible outcomes of a
+                    probabilistic experiment. We usually denote it with the letter <strong>S</strong>.</p>
+
+                <h3>Sample Space for Common Experiments</h3>
+
+                <div class="example">
+                    <h4>1. Rolling a Single Die</h4>
+                    <p>S = {1, 2, 3, 4, 5, 6}</p>
+                    <p>Total outcomes = 6</p>
+                </div>
+
+                <div class="example">
+                    <h4>2. Tossing a Single Coin</h4>
+                    <p>S = {Heads, Tails} or {H, T}</p>
+                    <p>Total outcomes = 2</p>
+                </div>
+
+                <div class="example">
+                    <h4>3. Tossing Two Coins</h4>
+                    <p>S = {(H,H), (H,T), (T,H), (T,T)}</p>
+                    <p>Total outcomes = 4</p>
+                </div>
+
+                <h3>Formulas for Quick Calculation</h3>
+
+                <div class="formula">
+                    <strong>For Coins:</strong><br>
+                    Number of outcomes = 2ⁿ<br>
+                    (where n = number of coins)<br><br>
+
+                    Example: 3 coins → 2³ = 8 outcomes<br><br>
+
+                    <strong>For Dice:</strong><br>
+                    Number of outcomes = 6ⁿ<br>
+                    (where n = number of dice)<br><br>
+
+                    Example: 2 dice → 6² = 36 outcomes
+                </div>
+
+                <h3>Sample Space for Cards</h3>
+                <p>A standard deck contains <span class="highlight">52 cards</span>:</p>
+
+                <table>
+                    <tr>
+                        <th>Color</th>
+                        <th>Suit</th>
+                        <th>Cards</th>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Red (26 cards)</td>
+                        <td>♥️ Hearts</td>
+                        <td>A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K</td>
+                    </tr>
+                    <tr>
+                        <td>♦️ Diamonds</td>
+                        <td>A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Black (26 cards)</td>
+                        <td>♠️ Spades</td>
+                        <td>A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K</td>
+                    </tr>
+                    <tr>
+                        <td>♣️ Clubs</td>
+                        <td>A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>Key Point:</strong> Understanding sample space is crucial because it tells us the
+                    denominator in probability calculations. If you know the sample space, you can calculate the
+                    probability of any event within it.
+                </div>
+            </div>
+
+            <!-- Section 5: Basic Rules -->
+            <div class="section" data-section="4">
+                <h2>Basic Rules of Probability</h2>
+
+                <h3>Important Definitions</h3>
+
+                <p><strong>Experiment:</strong> An action that produces one or more outcomes (e.g., rolling a die,
+                    drawing a card)</p>
+
+                <p><strong>Outcome:</strong> A single result from an experiment (e.g., rolling a 3)</p>
+
+                <p><strong>Sample Space (S):</strong> All possible outcomes</p>
+
+                <p><strong>Event (E):</strong> A subset of the sample space—one or more outcomes we're interested in</p>
+
+                <div class="example">
+                    <h4>Example: Rolling a Die</h4>
+                    <p>Sample Space: S = {1, 2, 3, 4, 5, 6}</p>
+                    <p>Event (rolling an even number): E = {2, 4, 6}</p>
+                    <p>P(E) = 3/6 = 0.5</p>
+                </div>
+
+                <h3>Special Types of Events</h3>
+
+                <p><strong>1. Mutually Exclusive Events</strong></p>
+                <p>Two events that <span class="highlight">cannot happen at the same time</span>.</p>
+                <div class="formula">
+                    P(A ∩ B) = 0
+                </div>
+                <div class="example">
+                    <h4>Example</h4>
+                    <p>Rolling a 2 and rolling a 5 on a single die roll</p>
+                    <p>These events cannot both occur—the die can only show one number at a time</p>
+                </div>
+
+                <p><strong>2. Independent Events</strong></p>
+                <p>Two events where <span class="highlight">one doesn't affect the other</span>.</p>
+                <div class="formula">
+                    P(A ∩ B) = P(A) × P(B)
+                </div>
+                <div class="example">
+                    <h4>Example</h4>
+                    <p>Tossing two coins—getting heads on the first coin doesn't change the probability of getting heads
+                        on the second coin</p>
+                </div>
+
+                <p><strong>3. Certain Event</strong></p>
+                <p>An event that <span class="highlight">will definitely happen</span>.</p>
+                <div class="formula">
+                    P(Certain Event) = 1
+                </div>
+                <div class="example">
+                    <h4>Example</h4>
+                    <p>Rolling a number between 1 and 6 on a standard die</p>
+                </div>
+
+                <p><strong>4. Impossible Event</strong></p>
+                <p>An event that <span class="highlight">cannot happen</span>.</p>
+                <div class="formula">
+                    P(Impossible Event) = 0
+                </div>
+                <div class="example">
+                    <h4>Example</h4>
+                    <p>Rolling a 7 on a standard six-sided die</p>
+                </div>
+
+                <p><strong>5. Exhaustive Events</strong></p>
+                <p>A set of events that <span class="highlight">cover all possible outcomes</span>—at least one must
+                    occur.</p>
+                <div class="example">
+                    <h4>Example</h4>
+                    <p>For a die roll: {1,2,3} and {4,5,6} are exhaustive because together they cover all outcomes</p>
+                </div>
+
+                <h3>Probability Notation</h3>
+                <ul>
+                    <li><strong>P(A ∪ B):</strong> Probability of A OR B occurring (union)</li>
+                    <li><strong>P(A ∩ B):</strong> Probability of A AND B occurring (intersection)</li>
+                    <li><strong>P(A'):</strong> Probability of A NOT occurring (complement)</li>
+                </ul>
+            </div>
+
+            <!-- Section 6: Complement Rule -->
+            <div class="section" data-section="5">
+                <h2>The Complement Rule</h2>
+
+                <p>The complement of an event A is simply <span class="highlight">the event that A does NOT
+                        occur</span>.</p>
+
+                <p><strong>Notation:</strong> We write it as A' or Aᶜ (read as "A complement")</p>
+
+                <div class="formula">
+                    P(A') = 1 - P(A)
+                </div>
+
+                <p>This makes sense because:</p>
+                <ul>
+                    <li>Either event A happens, or it doesn't</li>
+                    <li>These two possibilities cover all outcomes</li>
+                    <li>Their probabilities must add up to 1 (certainty)</li>
+                </ul>
+
+                <h3>Why Is This Useful?</h3>
+                <p>Sometimes it's easier to calculate the probability that something <strong>doesn't happen</strong>,
+                    then subtract from 1.</p>
+
+                <div class="example">
+                    <h4>Example 1: Weather Forecast</h4>
+                    <p>If the probability of rain today is 0.3:</p>
+                    <p>P(Rain) = 0.3</p>
+                    <p>P(No Rain) = 1 - 0.3 = 0.7</p>
+                    <p>There's a 70% chance it won't rain.</p>
+                </div>
+
+                <div class="example">
+                    <h4>Example 2: Rolling a Die</h4>
+                    <p>What's the probability of NOT rolling a 6?</p>
+                    <p>P(rolling a 6) = 1/6</p>
+                    <p>P(not rolling a 6) = 1 - 1/6 = 5/6 ≈ 0.833</p>
+                </div>
+
+                <div class="example">
+                    <h4>Example 3: Card Draw</h4>
+                    <p>What's the probability of NOT drawing a spade?</p>
+                    <p>P(spade) = 13/52 = 1/4</p>
+                    <p>P(not spade) = 1 - 1/4 = 3/4 = 0.75</p>
+                </div>
+
+                <h3>Real-World Application</h3>
+                <div class="example">
+                    <h4>Quality Control in Manufacturing</h4>
+                    <p>A factory knows that 2% of products are defective:</p>
+                    <p>P(Defective) = 0.02</p>
+                    <p>P(Not Defective) = 1 - 0.02 = 0.98</p>
+                    <p>So 98% of products pass quality control.</p>
+                </div>
+
+                <div class="note">
+                    <strong>Pro Tip:</strong> When you see problems asking for "at least one" or "at most," the
+                    complement rule is often the fastest approach. Calculate the opposite scenario first, then subtract
+                    from 1.
+                </div>
+            </div>
+
+            <!-- Section 7: Addition Rule -->
+            <div class="section" data-section="6">
+                <h2>The Addition Rule</h2>
+
+                <p>The addition rule helps us find the probability of <span class="highlight">event A OR event B
+                        occurring</span>.</p>
+
+                <h3>General Addition Rule</h3>
+                <div class="formula">
+                    P(A or B) = P(A) + P(B) - P(A and B)
+                </div>
+
+                <p><strong>Why subtract P(A and B)?</strong></p>
+                <p>Because when we add P(A) + P(B), we count the overlap twice. We need to subtract it once to get the
+                    correct answer.</p>
+
+                <div class="example">
+                    <h4>Visual Understanding</h4>
+                    <p>Imagine two overlapping circles:</p>
+                    <ul>
+                        <li>Left circle = Event A</li>
+                        <li>Right circle = Event B</li>
+                        <li>Overlapping area = Both A and B</li>
+                    </ul>
+                    <p>If we just add the circles, we count the overlap twice!</p>
+                </div>
+
+                <h3>Example with Numbers</h3>
+                <div class="example">
+                    <h4>Problem</h4>
+                    <p>P(A) = 0.4</p>
+                    <p>P(B) = 0.5</p>
+                    <p>P(A and B) = 0.2</p>
+                    <p>Find P(A or B)</p>
+
+                    <p><strong>Solution:</strong></p>
+                    <p>P(A or B) = 0.4 + 0.5 - 0.2 = 0.7</p>
+                </div>
+
+                <h3>Special Case: Mutually Exclusive Events</h3>
+                <p>When events cannot happen together, P(A and B) = 0</p>
+                <div class="formula">
+                    P(A or B) = P(A) + P(B)
+                </div>
+
+                <div class="example">
+                    <h4>Example: Rolling a Die</h4>
+                    <p>What's the probability of rolling a 2 OR a 5?</p>
+                    <p>These events are mutually exclusive (can't roll both)</p>
+                    <p>P(2) = 1/6</p>
+                    <p>P(5) = 1/6</p>
+                    <p>P(2 or 5) = 1/6 + 1/6 = 2/6 = 1/3</p>
+                </div>
+
+                <h3>Real-World Example</h3>
+                <div class="example">
+                    <h4>Card Drawing</h4>
+                    <p>What's the probability of drawing a red card OR a queen?</p>
+                    <p>P(Red card) = 26/52 = 1/2</p>
+                    <p>P(Queen) = 4/52 = 1/13</p>
+                    <p>P(Red and Queen) = 2/52 = 1/26 (red queens: hearts and diamonds)</p>
+                    <p>P(Red or Queen) = 1/2 + 1/13 - 1/26 = 13/26 + 2/26 - 1/26 = 14/26 = 7/13</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Practice Problem</h4>
+                    <p>A card is drawn from a deck. What's the probability of drawing a red card OR a queen?</p>
+                    <p><em>Answer: 7/13 ≈ 0.538 or 53.8%</em></p>
+                </div>
+            </div>
+
+            <!-- Section 8: Multiplication Rule -->
+            <div class="section" data-section="7">
+                <h2>The Multiplication Rule</h2>
+
+                <p>The multiplication rule helps us find the probability that <span class="highlight">two events occur
+                        together</span>.</p>
+
+                <h3>For Independent Events</h3>
+                <p>When events don't affect each other:</p>
+                <div class="formula">
+                    P(A and B) = P(A) × P(B)
+                </div>
+
+                <div class="example">
+                    <h4>Example: Rolling a Die Twice</h4>
+                    <p>Event A: Rolling a 3 on first throw</p>
+                    <p>Event B: Rolling an even number on second throw</p>
+                    <p>P(A) = 1/6</p>
+                    <p>P(B) = 3/6 = 1/2 (can roll 2, 4, or 6)</p>
+                    <p>P(A and B) = 1/6 × 1/2 = 1/12 ≈ 0.083</p>
+                </div>
+
+                <div class="example">
+                    <h4>Example: Tossing Two Coins</h4>
+                    <p>What's the probability of getting heads on both coins?</p>
+                    <p>P(Heads on first) = 1/2</p>
+                    <p>P(Heads on second) = 1/2</p>
+                    <p>P(Both heads) = 1/2 × 1/2 = 1/4 = 0.25</p>
+                </div>
+
+                <h3>For Dependent Events</h3>
+                <p>When one event affects the probability of the other:</p>
+                <div class="formula">
+                    P(A and B) = P(A) × P(B | A)
+                </div>
+                <p>Read as: "Probability of A times probability of B given A"</p>
+
+                <div class="example">
+                    <h4>Example: Drawing Without Replacement</h4>
+                    <p>A bag contains 5 red and 3 blue balls. Two balls are drawn without replacement.</p>
+                    <p>What's the probability both are red?</p>
+
+                    <p><strong>Event A:</strong> First ball is red</p>
+                    <p>P(A) = 5/8</p>
+
+                    <p><strong>Event B:</strong> Second ball is red</p>
+                    <p>After removing one red ball: 4 red left out of 7 total</p>
+                    <p>P(B | A) = 4/7</p>
+
+                    <p>P(Both red) = 5/8 × 4/7 = 20/56 = 5/14 ≈ 0.357</p>
+                </div>
+
+                <div class="example">
+                    <h4>Example: Card Drawing</h4>
+                    <p>What's the probability of drawing two aces without replacement?</p>
+                    <p>P(First ace) = 4/52</p>
+                    <p>P(Second ace | First ace) = 3/51 (only 3 aces left in 51 cards)</p>
+                    <p>P(Two aces) = 4/52 × 3/51 = 12/2652 = 1/221 ≈ 0.0045</p>
+                </div>
+
+                <h3>Comparing With and Without Replacement</h3>
+                <table>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Type</th>
+                        <th>Formula</th>
+                    </tr>
+                    <tr>
+                        <td>Drawing WITH replacement</td>
+                        <td>Independent</td>
+                        <td>P(A) × P(B)</td>
+                    </tr>
+                    <tr>
+                        <td>Drawing WITHOUT replacement</td>
+                        <td>Dependent</td>
+                        <td>P(A) × P(B|A)</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>Key Point:</strong> Always ask yourself: "Does the first event change the probability of the
+                    second?" If yes, events are dependent. If no, they're independent.
+                </div>
+            </div>
+
+            <!-- Section 9: Independent vs Dependent -->
+            <div class="section" data-section="8">
+                <h2>Independent vs Dependent Events</h2>
+
+                <h3>Independent Events</h3>
+                <p><span class="highlight">The outcome of one event does not affect the other.</span></p>
+
+                <div class="example">
+                    <h4>Examples of Independent Events</h4>
+                    <ul>
+                        <li><strong>Tossing two coins:</strong> Getting heads on the first doesn't change the
+                            probability of heads on the second</li>
+                        <li><strong>Rolling two dice:</strong> What you roll on die 1 doesn't affect die 2</li>
+                        <li><strong>Drawing with replacement:</strong> You put the card back, so each draw is
+                            independent</li>
+                        <li><strong>Weather in different cities:</strong> Rain in New York doesn't directly affect rain
+                            in Tokyo</li>
+                    </ul>
+                </div>
+
+                <h3>Dependent Events</h3>
+                <p><span class="highlight">One event affects the probability of the other.</span></p>
+
+                <div class="example">
+                    <h4>Examples of Dependent Events</h4>
+                    <ul>
+                        <li><strong>Drawing without replacement:</strong> Once you remove a card, the probabilities
+                            change for the next draw</li>
+                        <li><strong>Traffic:</strong> If there's an accident on the highway, the probability of delay
+                            increases</li>
+                        <li><strong>Sports:</strong> If a star player is injured, the team's probability of winning
+                            decreases</li>
+                        <li><strong>Medicine:</strong> Taking one medication might affect how another medication works
+                        </li>
+                    </ul>
+                </div>
+
+                <h3>Testing for Independence</h3>
+                <p>Two events A and B are independent if and only if:</p>
+                <div class="formula">
+                    P(A and B) = P(A) × P(B)
+                </div>
+
+                <div class="example">
+                    <h4>Example: Are These Independent?</h4>
+                    <p>You flip a coin and roll a die.</p>
+                    <p>Event A: Coin shows heads → P(A) = 1/2</p>
+                    <p>Event B: Die shows 6 → P(B) = 1/6</p>
+                    <p>P(A and B) = P(A) × P(B) = 1/2 × 1/6 = 1/12</p>
+                    <p><strong>Yes, they're independent!</strong> The coin flip doesn't affect the die roll.</p>
+                </div>
+
+                <h3>Common Mistake</h3>
+                <div class="note">
+                    <strong>Warning:</strong> Don't confuse "mutually exclusive" with "independent"!
+                    <ul>
+                        <li><strong>Mutually exclusive:</strong> Events cannot happen together (if A occurs, B cannot)
+                        </li>
+                        <li><strong>Independent:</strong> Events don't affect each other (whether A occurs doesn't
+                            change P(B))</li>
+                    </ul>
+                    <p>In fact, mutually exclusive events are ALWAYS dependent (except when one has probability 0)!</p>
+                </div>
+
+                <h3>Real-World Example</h3>
+                <div class="example">
+                    <h4>Email Marketing Campaign</h4>
+                    <p><strong>Scenario 1 - Independent:</strong> Two customers receiving the same email. Whether
+                        Customer A opens it doesn't affect whether Customer B opens it.</p>
+
+                    <p><strong>Scenario 2 - Dependent:</strong> The same customer receiving multiple emails. If they
+                        opened the first email, they're more likely to open future emails (positive correlation).</p>
+                </div>
+            </div>
+
+            <!-- Section 10: Conditional Probability -->
+            <div class="section" data-section="9">
+                <h2>Conditional Probability</h2>
+
+                <p>Conditional probability is the probability of an event A occurring, <span class="highlight">given
+                        that another event B has already occurred</span>.</p>
+
+                <div class="formula">
+                    P(A | B) = P(A and B) / P(B)
+                </div>
+                <p>Read as: "Probability of A given B"</p>
+
+                <h3>Why Is This Important?</h3>
+                <p>In real life, we often get new information that changes probabilities. Conditional probability lets
+                    us <span class="highlight">update our beliefs based on what we know</span>.</p>
+
+                <div class="example">
+                    <h4>Simple Example: Ball Selection</h4>
+                    <p>You have a box with:</p>
+                    <ul>
+                        <li>5 red balls</li>
+                        <li>3 blue balls</li>
+                        <li>2 green balls</li>
+                    </ul>
+                    <p>You're told the ball picked is NOT green. What's the probability it's red?</p>
+
+                    <p><strong>Solution:</strong></p>
+                    <p>Event A = ball is red</p>
+                    <p>Event B = ball is not green</p>
+                    <p>If not green, we have 8 balls (5 red + 3 blue)</p>
+                    <p>P(Red | Not Green) = 5/8 = 0.625</p>
+                </div>
+
+                <h3>Using the Formula</h3>
+                <div class="example">
+                    <h4>Example: Card Drawing</h4>
+                    <p>A card is drawn from a deck. Given that it's a face card (J, Q, K), what's the probability it's a
+                        King?</p>
+
+                    <p>P(King | Face Card) = ?</p>
+                    <p>Total face cards = 12 (3 face cards × 4 suits)</p>
+                    <p>Kings among face cards = 4</p>
+                    <p>P(King | Face Card) = 4/12 = 1/3</p>
+                </div>
+
+                <h3>Real-World Application</h3>
+                <div class="example">
+                    <h4>Student Performance</h4>
+                    <p>A class has:</p>
+                    <ul>
+                        <li>60% boys, 40% girls</li>
+                        <li>30% of boys play football</li>
+                        <li>10% of girls play football</li>
+                    </ul>
+
+                    <p><strong>Question:</strong> If a randomly selected student plays football, what's the probability
+                        they're a boy?</p>
+
+                    <p><strong>Step 1:</strong> Find P(Football)</p>
+                    <p>P(F) = P(F|Boy)×P(Boy) + P(F|Girl)×P(Girl)</p>
+                    <p>P(F) = 0.3×0.6 + 0.1×0.4 = 0.18 + 0.04 = 0.22</p>
+
+                    <p><strong>Step 2:</strong> Find P(Boy|Football)</p>
+                    <p>P(Boy|F) = P(F|Boy)×P(Boy) / P(F)</p>
+                    <p>P(Boy|F) = 0.18 / 0.22 ≈ 0.818 or 81.8%</p>
+                </div>
+
+                <div class="note">
+                    <strong>Common Mistakes:</strong>
+                    <ul>
+                        <li>Don't confuse P(A|B) with P(B|A) — they're usually different!</li>
+                        <li>Always remember to divide by P(B)</li>
+                        <li>Make sure P(B) > 0 (can't condition on impossible events)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 11: Law of Total Probability -->
+            <div class="section" data-section="10">
+                <h2>Law of Total Probability</h2>
+
+                <p>The Law of Total Probability helps us find the probability of an event by <span
+                        class="highlight">breaking it down into simpler pieces</span>.</p>
+
+                <div class="formula">
+                    P(A) = P(A|B₁)×P(B₁) + P(A|B₂)×P(B₂) + ... + P(A|Bₙ)×P(Bₙ)
+                </div>
+
+                <h3>When Can We Use This Law?</h3>
+                <p>We need three conditions:</p>
+
+                <ol>
+                    <li><strong>Partition of Sample Space:</strong> Events B₁, B₂, ..., Bₙ must be:
+                        <ul>
+                            <li>Mutually exclusive (no overlap)</li>
+                            <li>Collectively exhaustive (cover everything)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Known Probabilities:</strong> We must know P(Bᵢ) for each event</li>
+                    <li><strong>Known Conditional Probabilities:</strong> We must know P(A|Bᵢ) for each event</li>
+                </ol>
+
+                <h3>Simple Analogy</h3>
+                <div class="example">
+                    <h4>Manufacturing from Multiple Factories</h4>
+                    <p>A company makes products in 3 factories:</p>
+                    <ul>
+                        <li>Factory 1: Produces 50% of all products, 2% are defective</li>
+                        <li>Factory 2: Produces 30% of all products, 3% are defective</li>
+                        <li>Factory 3: Produces 20% of all products, 5% are defective</li>
+                    </ul>
+
+                    <p><strong>Question:</strong> What's the overall probability a random product is defective?</p>
+
+                    <p><strong>Solution:</strong></p>
+                    <p>P(Defective) = P(D|F1)×P(F1) + P(D|F2)×P(F2) + P(D|F3)×P(F3)</p>
+                    <p>P(Defective) = 0.02×0.50 + 0.03×0.30 + 0.05×0.20</p>
+                    <p>P(Defective) = 0.010 + 0.009 + 0.010 = 0.029 or 2.9%</p>
+                </div>
+
+                <h3>Another Example</h3>
+                <div class="example">
+                    <h4>Disease Testing</h4>
+                    <p>A disease affects 1% of the population.</p>
+                    <p>A test for the disease:</p>
+                    <ul>
+                        <li>Returns positive 99% of the time if person has disease</li>
+                        <li>Returns positive 5% of the time if person doesn't have disease (false positive)</li>
+                    </ul>
+
+                    <p><strong>Question:</strong> What's the probability of getting a positive test?</p>
+
+                    <p>P(Positive) = P(Pos|Disease)×P(Disease) + P(Pos|No Disease)×P(No Disease)</p>
+                    <p>P(Positive) = 0.99×0.01 + 0.05×0.99</p>
+                    <p>P(Positive) = 0.0099 + 0.0495 = 0.0594 or 5.94%</p>
+                </div>
+
+                <div class="note">
+                    <strong>Key Insight:</strong> The Law of Total Probability is like calculating a weighted average.
+                    Each scenario contributes to the total probability based on how likely it is to occur.
+                </div>
+            </div>
+
+            <!-- Section 12: Bayes' Theorem -->
+            <div class="section" data-section="11">
+                <h2>Bayes' Theorem</h2>
+
+                <p>Bayes' Theorem is one of the most powerful tools in probability and statistics. It lets us <span
+                        class="highlight">reverse conditional probabilities</span>.</p>
+
+                <div class="formula">
+                    P(A | B) = [P(B | A) × P(A)] / P(B)
+                </div>
+
+                <p>Or in expanded form:</p>
+                <div class="formula">
+                    P(A | B) = [P(B | A) × P(A)] / [P(B | A) × P(A) + P(B | Not A) × P(Not A)]
+                </div>
+
+                <h3>What Does It Mean?</h3>
+                <ul>
+                    <li><strong>P(A | B):</strong> What we want to find (posterior probability)</li>
+                    <li><strong>P(B | A):</strong> What we know (likelihood)</li>
+                    <li><strong>P(A):</strong> Prior probability (what we believed before seeing B)</li>
+                    <li><strong>P(B):</strong> Total probability of observing B</li>
+                </ul>
+
+                <h3>Why Is This Powerful?</h3>
+                <p>Often we know P(B|A) but want to find P(A|B). Bayes' Theorem lets us flip it!</p>
+
+                <div class="example">
+                    <h4>Classic Example: Medical Testing</h4>
+                    <p>A disease affects 1% of the population.</p>
+                    <p>A test for the disease:</p>
+                    <ul>
+                        <li>If you have the disease, test is positive 99% of the time</li>
+                        <li>If you don't have the disease, test is positive 5% of the time</li>
+                    </ul>
+
+                    <p><strong>You test positive. What's the probability you have the disease?</strong></p>
+
+                    <p><strong>Given:</strong></p>
+                    <p>P(Disease) = 0.01</p>
+                    <p>P(No Disease) = 0.99</p>
+                    <p>P(Positive | Disease) = 0.99</p>
+                    <p>P(Positive | No Disease) = 0.05</p>
+
+                    <p><strong>Step 1:</strong> Calculate P(Positive)</p>
+                    <p>P(Pos) = 0.99×0.01 + 0.05×0.99 = 0.0099 + 0.0495 = 0.0594</p>
+
+                    <p><strong>Step 2:</strong> Apply Bayes' Theorem</p>
+                    <p>P(Disease | Positive) = 0.0099 / 0.0594 ≈ 0.167 or 16.7%</p>
+
+                    <p><strong>Surprising Result:</strong> Even with a positive test, there's only a 16.7% chance you
+                        have the disease! This is because the disease is rare, and false positives are common.</p>
+                </div>
+
+                <h3>Proof of Bayes' Theorem</h3>
+                <div class="example">
+                    <h4>Derivation</h4>
+                    <p>Start with conditional probability definition:</p>
+                    <p>(1) P(A | B) = P(A and B) / P(B)</p>
+                    <p>(2) P(B | A) = P(A and B) / P(A)</p>
+
+                    <p>From equation (2):</p>
+                    <p>P(A and B) = P(B | A) × P(A)</p>
+
+                    <p>Substitute into equation (1):</p>
+                    <p>P(A | B) = [P(B | A) × P(A)] / P(B)</p>
+
+                    <p>This is Bayes' Theorem! ✓</p>
+                </div>
+
+                <h3>Real-World Applications</h3>
+                <ul>
+                    <li><strong>Spam Filtering:</strong> Given this email contains certain words, what's the probability
+                        it's spam?</li>
+                    <li><strong>Medical Diagnosis:</strong> Given these symptoms, what's the probability of this
+                        disease?</li>
+                    <li><strong>Machine Learning:</strong> Naive Bayes classifiers use this for text classification</li>
+                    <li><strong>Weather Forecasting:</strong> Given current conditions, what's the probability of rain?
+                    </li>
+                    <li><strong>Criminal Justice:</strong> Given this evidence, what's the probability of guilt?</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Thomas Bayes:</strong> This theorem is named after Reverend Thomas Bayes (1701-1761), an
+                    English statistician and philosopher. It's the foundation of Bayesian statistics, which treats
+                    probability as a measure of belief that updates with new evidence.
+                </div>
+            </div>
+
+            <!-- Section 13: Practice Questions -->
+            <div class="section" data-section="12">
+                <h2>Practice Questions</h2>
+
+                <div class="quiz">
+                    <h4>Question 1: Die Roll</h4>
+                    <p>You roll a fair six-sided die. What is the probability of getting an even number?</p>
+                    <p><strong>Answer:</strong> Even numbers are {2, 4, 6} = 3 outcomes</p>
+                    <p>P(even) = 3/6 = 1/2 = 0.5 or 50%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 2: Two Coins</h4>
+                    <p>Two coins are tossed. Find the sample space and the probability of getting at least one head.</p>
+                    <p><strong>Sample Space:</strong> {HH, HT, TH, TT}</p>
+                    <p><strong>Answer:</strong> At least one head = {HH, HT, TH} = 3 outcomes</p>
+                    <p>P(at least one head) = 3/4 = 0.75 or 75%</p>
+                    <p><em>Alternative:</em> P(at least one head) = 1 - P(no heads) = 1 - 1/4 = 3/4</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 3: Two Dice Sum</h4>
+                    <p>Two six-sided dice are rolled. What is the probability that the sum is 7?</p>
+                    <p><strong>Ways to get 7:</strong> (1,6), (2,5), (3,4), (4,3), (5,2), (6,1) = 6 ways</p>
+                    <p><strong>Total outcomes:</strong> 6 × 6 = 36</p>
+                    <p>P(sum = 7) = 6/36 = 1/6 ≈ 0.167 or 16.7%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 4: Ball Selection</h4>
+                    <p>A bag contains 3 red, 2 blue, and 5 green balls. What is the probability of randomly selecting a
+                        red ball?</p>
+                    <p><strong>Total balls:</strong> 3 + 2 + 5 = 10</p>
+                    <p>P(red) = 3/10 = 0.3 or 30%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 5: Card Drawing</h4>
+                    <p>A card is drawn at random from a deck. Find the probability of:</p>
+                    <p><strong>a) Getting a heart</strong></p>
+                    <p>P(heart) = 13/52 = 1/4 = 0.25 or 25%</p>
+
+                    <p><strong>b) Getting a face card</strong></p>
+                    <p>Face cards: J, Q, K in 4 suits = 12 cards</p>
+                    <p>P(face card) = 12/52 = 3/13 ≈ 0.231 or 23.1%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 6: Not Green</h4>
+                    <p>A box contains 4 red, 3 green, and 2 blue balls. One ball is picked at random. What is the
+                        probability that the ball is not green?</p>
+                    <p><strong>Total balls:</strong> 4 + 3 + 2 = 9</p>
+                    <p>P(green) = 3/9 = 1/3</p>
+                    <p>P(not green) = 1 - 1/3 = 2/3 ≈ 0.667 or 66.7%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 7: Multiple of 3 or 5</h4>
+                    <p>A number is chosen at random from {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}. What is the probability that
+                        the number is a multiple of 3 or 5?</p>
+                    <p><strong>Multiples of 3:</strong> {3, 6, 9} = 3 numbers</p>
+                    <p><strong>Multiples of 5:</strong> {5, 10} = 2 numbers</p>
+                    <p><strong>Common:</strong> None</p>
+                    <p>P(3 or 5) = 5/10 = 1/2 = 0.5 or 50%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 8: With Replacement</h4>
+                    <p>A bag contains 6 white and 4 black balls. Two balls are drawn with replacement. What is the
+                        probability that both are white?</p>
+                    <p><strong>Total balls:</strong> 10</p>
+                    <p>P(first white) = 6/10 = 3/5</p>
+                    <p>P(second white) = 6/10 = 3/5 (replaced, so same)</p>
+                    <p>P(both white) = 3/5 × 3/5 = 9/25 = 0.36 or 36%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 9: Student Knowledge</h4>
+                    <p>A student knows the answer to 70% of questions on a test. If one question is selected at random,
+                        what is the probability that the student doesn't know the answer?</p>
+                    <p>P(knows) = 0.70</p>
+                    <p>P(doesn't know) = 1 - 0.70 = 0.30 or 30%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 10: Red Card or Queen</h4>
+                    <p>A card is drawn from a standard deck. What is the probability of drawing a red card or a queen?
+                    </p>
+                    <p>P(red) = 26/52 = 1/2</p>
+                    <p>P(queen) = 4/52 = 1/13</p>
+                    <p>P(red and queen) = 2/52 = 1/26 (2 red queens)</p>
+                    <p>P(red or queen) = 1/2 + 1/13 - 1/26 = 13/26 + 2/26 - 1/26 = 14/26 = 7/13 ≈ 0.538 or 53.8%</p>
+                </div>
+
+                <div class="quiz">
+                    <h4>Question 11: Two Dice - Both Even</h4>
+                    <p>If two dice are rolled, what is the probability that both show even numbers?</p>
+                    <p>P(first even) = 3/6 = 1/2</p>
+                    <p>P(second even) = 3/6 = 1/2</p>
+                    <p>P(both even) = 1/2 × 1/2 = 1/4 = 0.25 or 25%</p>
+                </div>
+
+                <h3>Your Turn!</h3>
+                <div class="note">
+                    <strong>Challenge Problems:</strong>
+                    <ol>
+                        <li>List three real-world problems in data science where probability is involved</li>
+                        <li>Think of an example from your daily life where two events are dependent</li>
+                        <li>Calculate the probability of getting exactly 2 heads when tossing 3 coins</li>
+                        <li>A manufacturing process has 3 machines. Machine A produces 50% of items with 2% defect rate,
+                            Machine B produces 30% with 3% defect rate, and Machine C produces 20% with 4% defect rate.
+                            If an item is defective, what's the probability it came from Machine C?</li>
+                    </ol>
+                </div>
+
+                <div class="example">
+                    <h4>Summary of Key Concepts</h4>
+                    <p>Congratulations! You've learned:</p>
+                    <ul>
+                        <li>✓ What probability is and why it matters in data science</li>
+                        <li>✓ Theoretical vs empirical probability</li>
+                        <li>✓ How to calculate basic probabilities</li>
+                        <li>✓ Sample spaces for coins, dice, and cards</li>
+                        <li>✓ Complement rule: P(A') = 1 - P(A)</li>
+                        <li>✓ Addition rule: P(A or B) = P(A) + P(B) - P(A and B)</li>
+                        <li>✓ Multiplication rule for independent and dependent events</li>
+                        <li>✓ Conditional probability: P(A|B) = P(A and B) / P(B)</li>
+                        <li>✓ Law of Total Probability</li>
+                        <li>✓ Bayes' Theorem</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 30px;">
+            <div class="nav-buttons">
+                <button onclick="previousSection()" id="prevBtn">← Previous</button>
+                <button onclick="nextSection()" id="nextBtn">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 0;
+        const totalSections = 13;
+
+        function showSection(index) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            sections[index].classList.add('active');
+
+            currentSection = index;
+            document.getElementById('topicSelect').value = index;
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = (index === 0);
+            document.getElementById('nextBtn').disabled = (index === totalSections - 1);
+
+            // Update progress bar
+            const progress = ((index + 1) / totalSections) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changeSection() {
+            const select = document.getElementById('topicSelect');
+            showSection(parseInt(select.value));
+        }
+
+        function nextSection() {
+            if (currentSection < totalSections - 1) {
+                showSection(currentSection + 1);
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 0) {
+                showSection(currentSection - 1);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowRight') {
+                nextSection();
+            } else if (event.key === 'ArrowLeft') {
+                previousSection();
+            }
+        });
+
+        // Initialize
+        showSection(0);
+    </script>
+</body>
+
+</html>
