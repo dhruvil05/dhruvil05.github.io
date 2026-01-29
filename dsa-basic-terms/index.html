@@ -4,1771 +4,1191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSA Fundamentals - Interactive Guide</title>
+    <title>DSA Fundamentals | Interactive Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
         }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
 
-        .navigation {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
         }
 
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
         }
 
-        .nav-btn:hover,
-        .nav-btn.active {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        /* Animation classes */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
 
-        .section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            display: none;
-            animation: fadeIn 0.5s ease-in;
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .section.active {
-            display: block;
+        .stagger-1 {
+            transition-delay: 0.1s;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .stagger-2 {
+            transition-delay: 0.2s;
         }
 
-        .section h2 {
-            color: #4a5568;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-            font-size: 2rem;
+        .stagger-3 {
+            transition-delay: 0.3s;
         }
 
+        /* Card hover effects */
         .concept-card {
-            background: linear-gradient(135deg, #f7fafc, #edf2f7);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 5px solid #667eea;
-        }
-
-        .visualization {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .array-visual {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 5px;
-            margin: 15px 0;
-        }
-
-        .array-element {
-            width: 50px;
-            height: 50px;
-            background: #e2e8f0;
-            border: 2px solid #cbd5e0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
             transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Code block styling */
+        .code-block {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
             position: relative;
-        }
-
-        .array-element.highlight {
-            background: #667eea;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .array-element.found {
-            background: #48bb78;
-            color: white;
-        }
-
-        .array-index {
-            position: absolute;
-            top: -25px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .stack-visual {
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .stack-element {
-            width: 120px;
-            height: 40px;
-            background: #e2e8f0;
-            border: 2px solid #cbd5e0;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .stack-element.top {
-            background: #667eea;
-            color: white;
-        }
-
-        .queue-visual {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            justify-content: center;
-        }
-
-        .queue-element {
-            width: 60px;
-            height: 40px;
-            background: #e2e8f0;
-            border: 2px solid #cbd5e0;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .queue-element.front {
-            background: #48bb78;
-            color: white;
-        }
-
-        .queue-element.rear {
-            background: #ed8936;
-            color: white;
-        }
-
-        .tree-visual {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .tree-level {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .tree-node {
-            width: 40px;
-            height: 40px;
-            background: #e2e8f0;
-            border: 2px solid #cbd5e0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            position: relative;
-        }
-
-        .tree-node.visited {
-            background: #667eea;
-            color: white;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 20px 0;
-            justify-content: center;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .input-group input {
-            padding: 8px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 5px;
-            font-size: 14px;
-            text-align: center;
-            width: 100px;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .code-example {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            overflow-x: auto;
-            margin: 15px 0;
-            font-size: 14px;
-        }
-
-        .explanation {
-            background: #e6fffa;
-            border-left: 4px solid #38b2ac;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .performance-info {
-            background: #fff5f5;
-            border-left: 4px solid #e53e3e;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .step-counter {
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            margin: 10px 0;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .navigation {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .nav-btn {
-                width: 200px;
-            }
-
-            .section {
-                padding: 20px;
-            }
-
-            .array-element {
-                width: 40px;
-                height: 40px;
-                font-size: 12px;
-            }
-
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 150px;
-            }
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .comparison-table th,
-        .comparison-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
-        .comparison-table th {
-            background: #667eea;
+        .concept-card:hover .code-block::before {
+            transform: scaleX(1);
+        }
+
+        /* Navigation active state */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #000;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Array visualization */
+        .array-element {
+            transition: all 0.3s ease;
+        }
+
+        .array-element:hover {
+            transform: scale(1.1);
+            background: #3b82f6;
             color: white;
-            font-weight: bold;
         }
 
-        .comparison-table tr:hover {
-            background: #f7fafc;
+        /* Tree node animation */
+        .tree-node {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tree-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Pulse animation for highlights */
+        @keyframes pulse-soft {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .animate-pulse-soft {
+            animation: pulse-soft 2s ease-in-out infinite;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Interactive demo areas */
+        .demo-area {
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Floating elements animation */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .float-anim {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Tab transitions */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🚀 DSA Fundamentals</h1>
-            <p>Master Data Structures and Algorithms with Interactive Examples</p>
-        </div>
+<body class="bg-white text-gray-900 antialiased">
 
-        <div class="navigation">
-            <button class="nav-btn active" onclick="showSection('arrays')">Arrays</button>
-            <button class="nav-btn" onclick="showSection('strings')">Strings</button>
-            <button class="nav-btn" onclick="showSection('stacks')">Stacks</button>
-            <button class="nav-btn" onclick="showSection('queues')">Queues</button>
-            <button class="nav-btn" onclick="showSection('recursion')">Recursion</button>
-            <button class="nav-btn" onclick="showSection('sorting')">Sorting</button>
-            <button class="nav-btn" onclick="showSection('searching')">Searching</button>
-        </div>
-
-        <!-- Arrays Section -->
-        <div id="arrays" class="section active">
-            <h2>📊 Arrays</h2>
-
-            <div class="concept-card">
-                <h3>What is an Array?</h3>
-                <p><strong>Think of it like:</strong> A row of numbered boxes where you can store items. Each box has a
-                    specific position (index) starting from 0.</p>
-
-                <div class="explanation">
-                    <strong>Real-life example:</strong> Like a parking lot with numbered spaces. Space 0, Space 1, Space
-                    2... Each space can hold exactly one car.
-                </div>
-            </div>
-
-            <div class="visualization">
-                <h4>Array Visualization</h4>
-                <div class="array-visual" id="arrayVis">
-                    <div class="array-element"><span class="array-index">0</span>10</div>
-                    <div class="array-element"><span class="array-index">1</span>25</div>
-                    <div class="array-element"><span class="array-index">2</span>5</div>
-                    <div class="array-element"><span class="array-index">3</span>40</div>
-                    <div class="array-element"><span class="array-index">4</span>15</div>
-                </div>
-
-                <div class="controls">
-                    <div class="input-group">
-                        <label>Index:</label>
-                        <input type="number" id="arrayIndex" min="0" max="4" value="0">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50 transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">DSA</span>
                     </div>
-                    <button class="btn" onclick="accessArrayElement()">Access Element</button>
-                    <button class="btn" onclick="resetArray()">Reset</button>
+                    <span class="font-semibold text-lg tracking-tight">Fundamentals</span>
+                </div>
+
+                <div class="hidden md:flex space-x-8">
+                    <a href="#arrays"
+                        class="nav-link text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Arrays</a>
+                    <a href="#linked-lists"
+                        class="nav-link text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Linked
+                        Lists</a>
+                    <a href="#stacks"
+                        class="nav-link text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Stacks</a>
+                    <a href="#queues"
+                        class="nav-link text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Queues</a>
+                    <a href="#trees"
+                        class="nav-link text-sm font-medium text-gray-600 hover:text-black transition-colors" target="_self">Trees</a>
+                </div>
+
+                <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#arrays"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md" target="_self">Arrays</a>
+                <a href="#linked-lists"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md" target="_self">Linked
+                    Lists</a>
+                <a href="#stacks"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md" target="_self">Stacks</a>
+                <a href="#queues"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md" target="_self">Queues</a>
+                <a href="#trees"
+                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md" target="_self">Trees</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto fade-in-up">
+            <div
+                class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-600 mb-6 border border-gray-200">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                Interactive Learning
+            </div>
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                Data Structures &<br>
+                <span class="gradient-text">Algorithms</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+                Master the building blocks of efficient programming. Visualize, interact, and understand core concepts
+                through minimalist design and clear explanations.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#arrays"
+                    class="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-black rounded-full hover:bg-gray-800 transition-all transform hover:scale-105">
+                    Start Learning
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </a>
+                <button onclick="scrollToSection('complexity')"
+                    class="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-all">
+                    View Complexity Chart
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Big O Complexity Overview -->
+    <section id="complexity" class="py-20 bg-gray-50/50 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="fade-in-up mb-12">
+                <h2 class="text-3xl font-bold mb-4">Time Complexity Overview</h2>
+                <p class="text-gray-600 max-w-2xl">Understanding Big O notation is crucial for analyzing algorithm
+                    efficiency. Lower is better.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="concept-card bg-white p-6 rounded-2xl border border-gray-200 fade-in-up stagger-1">
+                    <div class="text-4xl font-bold text-green-600 mb-2">O(1)</div>
+                    <h3 class="font-semibold text-lg mb-2">Constant Time</h3>
+                    <p class="text-gray-600 text-sm">Execution time stays the same regardless of input size. The holy
+                        grail of algorithms.</p>
+                    <div class="mt-4 flex gap-2">
+                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-md font-mono">Array
+                            Access</span>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-md font-mono">Hash Map</span>
+                    </div>
+                </div>
+
+                <div class="concept-card bg-white p-6 rounded-2xl border border-gray-200 fade-in-up stagger-2">
+                    <div class="text-4xl font-bold text-blue-600 mb-2">O(log n)</div>
+                    <h3 class="font-semibold text-lg mb-2">Logarithmic</h3>
+                    <p class="text-gray-600 text-sm">Doubling the input barely increases runtime. Highly efficient for
+                        large datasets.</p>
+                    <div class="mt-4 flex gap-2">
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md font-mono">Binary
+                            Search</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md font-mono">BST Ops</span>
+                    </div>
+                </div>
+
+                <div class="concept-card bg-white p-6 rounded-2xl border border-gray-200 fade-in-up stagger-3">
+                    <div class="text-4xl font-bold text-yellow-600 mb-2">O(n)</div>
+                    <h3 class="font-semibold text-lg mb-2">Linear Time</h3>
+                    <p class="text-gray-600 text-sm">Runtime grows proportionally with input size. Acceptable for most
+                        operations.</p>
+                    <div class="mt-4 flex gap-2">
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-md font-mono">Linear
+                            Search</span>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-md font-mono">Array
+                            Traversal</span>
+                    </div>
+                </div>
+
+                <div class="concept-card bg-white p-6 rounded-2xl border border-gray-200 fade-in-up stagger-3">
+                    <div class="text-4xl font-bold text-red-600 mb-2">O(n²)</div>
+                    <h3 class="font-semibold text-lg mb-2">Quadratic</h3>
+                    <p class="text-gray-600 text-sm">Performance degrades rapidly with larger inputs. Avoid for large
+                        datasets.</p>
+                    <div class="mt-4 flex gap-2">
+                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-mono">Bubble Sort</span>
+                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-md font-mono">Nested Loops</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Arrays Section -->
+    <section id="arrays" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="fade-in-up">
+                <div
+                    class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-blue-600 uppercase bg-blue-50 rounded-full">
+                    Linear Data Structure</div>
+                <h2 class="text-4xl font-bold mb-6">Arrays</h2>
+                <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                    The simplest and most widely used data structure. Elements are stored in <strong>contiguous memory
+                        locations</strong>, allowing instant access via index.
+                </p>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start">
+                        <div
+                            class="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-1">
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-semibold">Fast Access</h4>
+                            <p class="text-sm text-gray-600">O(1) time to access any element by index</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div
+                            class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-1">
+                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-semibold">Fixed Size</h4>
+                            <p class="text-sm text-gray-600">Insertion and deletion are expensive O(n) operations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block rounded-xl p-4 mono text-sm">
+                    <div class="flex items-center justify-between mb-2 text-xs text-gray-400">
+                        <span>JavaScript</span>
+                        <button onclick="copyCode(this)" class="hover:text-gray-600">Copy</button>
+                    </div>
+                    <pre class="text-gray-800 overflow-x-auto"><code>// Declaration & Initialization
+const arr = [10, 20, 30, 40, 50];
+
+// Access (O(1))
+console.log(arr[2]); // 30
+
+// Insert at end (O(1))
+arr.push(60);
+
+// Search (O(n))
+const index = arr.indexOf(30);</code></pre>
                 </div>
             </div>
 
-            <div class="code-example">
-                // Creating an array
-                let numbers = [10, 25, 5, 40, 15];
-
-                // Accessing elements (0-based indexing)
-                console.log(numbers[0]); // Output: 10
-                console.log(numbers[2]); // Output: 5
-
-                // Adding elements
-                numbers.push(30); // Adds 30 to the end
-
-                // Array length
-                console.log(numbers.length); // Output: 6
-            </div>
-
-            <div class="performance-info">
-                <strong>Comparison:</strong><br>
-                • Linear Search: O(n) - Must check every element in worst case<br>
-                • Binary Search: O(log n) - Eliminates half the data each step<br>
-                • Binary search only works on sorted arrays!<br>
-                • For 1 million items: Linear might take 1M steps, Binary takes only 20!
+            <div class="fade-in-up stagger-2">
+                <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+                    <h3 class="text-sm font-semibold text-gray-500 mb-6 uppercase tracking-wider">Interactive
+                        Visualization</h3>
+                    <div class="demo-area flex items-center justify-center">
+                        <div class="flex gap-2" id="array-viz">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                    <div class="mt-6 flex gap-2 justify-center">
+                        <button onclick="arrayAction('access')"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors">Access
+                            Index 2</button>
+                        <button onclick="arrayAction('insert')"
+                            class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition-colors">Push
+                            Element</button>
+                        <button onclick="arrayAction('reset')"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors">Reset</button>
+                    </div>
+                    <div id="array-explanation" class="mt-4 text-center text-sm text-gray-600 min-h-[20px]"></div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Linked Lists Section -->
+    <section id="linked-lists" class="py-24 bg-gray-50/30 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1 fade-in-up">
+                    <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+                        <h3 class="text-sm font-semibold text-gray-500 mb-6 uppercase tracking-wider">Node Structure
+                        </h3>
+                        <div class="demo-area flex flex-col items-center justify-center space-y-8">
+                            <div class="flex items-center gap-4" id="linked-list-viz">
+                                <!-- Generated by JS -->
+                            </div>
+                            <div class="text-center text-sm text-gray-500" id="linked-list-info">
+                                Each node contains data and a pointer to the next node
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-2 justify-center">
+                            <button onclick="linkedListAction('append')"
+                                class="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm font-medium transition-colors">Append
+                                Node</button>
+                            <button onclick="linkedListAction('remove')"
+                                class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors">Remove
+                                Last</button>
+                            <button onclick="linkedListAction('reset')"
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2 fade-in-up stagger-2">
+                    <div
+                        class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-purple-600 uppercase bg-purple-50 rounded-full">
+                        Dynamic Data Structure</div>
+                    <h2 class="text-4xl font-bold mb-6">Linked Lists</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        A sequence of nodes where each node points to the next. Unlike arrays, elements are not stored
+                        contiguously, allowing efficient insertion and deletion.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="p-4 bg-white rounded-xl border border-gray-200">
+                            <div class="text-2xl font-bold text-purple-600 mb-1">O(1)</div>
+                            <div class="text-sm font-medium text-gray-900">Insert/Delete</div>
+                            <div class="text-xs text-gray-500">At beginning</div>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl border border-gray-200">
+                            <div class="text-2xl font-bold text-gray-600 mb-1">O(n)</div>
+                            <div class="text-sm font-medium text-gray-900">Search</div>
+                            <div class="text-xs text-gray-500">Linear traversal</div>
+                        </div>
+                    </div>
+
+                    <div class="code-block rounded-xl p-4 mono text-sm">
+                        <div class="flex items-center justify-between mb-2 text-xs text-gray-400">
+                            <span>Structure</span>
+                        </div>
+                        <pre class="text-gray-800 overflow-x-auto"><code>class Node {
+    constructor(data) {
+        this.data = data;
+        this.next = null;  // Pointer to next node
+    }
+}
+
+class LinkedList {
+    constructor() {
+        this.head = null;
+        this.size = 0;
+    }
+    
+    // O(1) insertion at head
+    prepend(data) {
+        const newNode = new Node(data);
+        newNode.next = this.head;
+        this.head = newNode;
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stacks & Queues -->
+    <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Stack -->
+            <div id="stacks" class="fade-in-up">
+                <div class="concept-card bg-white rounded-2xl border border-gray-200 p-8 h-full">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <div
+                                class="inline-block px-3 py-1 mb-2 text-xs font-semibold tracking-wider text-orange-600 uppercase bg-orange-50 rounded-full">
+                                LIFO</div>
+                            <h2 class="text-3xl font-bold">Stack</h2>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 15l7-7 7 7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-6">Last In, First Out. Think of a stack of plates. Operations happen only
+                        at the top.</p>
+
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6 flex justify-center">
+                        <div class="flex flex-col-reverse gap-2" id="stack-viz" style="min-height: 200px;">
+                            <div
+                                class="w-32 h-12 bg-orange-200 border-2 border-orange-300 rounded flex items-center justify-center font-mono text-sm">
+                                Bottom</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 mb-6">
+                        <button onclick="stackAction('push')"
+                            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors">Push</button>
+                        <button onclick="stackAction('pop')"
+                            class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">Pop</button>
+                    </div>
+
+                    <div class="code-block rounded-lg p-3 mono text-xs">
+                        <pre class="text-gray-800"><code>// Operations
+stack.push(item);  // O(1) - Add to top
+stack.pop();       // O(1) - Remove top
+stack.peek();      // O(1) - View top
+
+// Use cases: Undo, Browser History, 
+// Function Call Stack</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Queue -->
+            <div id="queues" class="fade-in-up stagger-2">
+                <div class="concept-card bg-white rounded-2xl border border-gray-200 p-8 h-full">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <div
+                                class="inline-block px-3 py-1 mb-2 text-xs font-semibold tracking-wider text-teal-600 uppercase bg-teal-50 rounded-full">
+                                FIFO</div>
+                            <h2 class="text-3xl font-bold">Queue</h2>
+                        </div>
+                        <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-6">First In, First Out. Like a line at a ticket counter. Fair and orderly
+                        processing.</p>
+
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6 overflow-hidden">
+                        <div class="flex items-center gap-2" id="queue-viz">
+                            <div
+                                class="flex-shrink-0 w-20 h-12 bg-teal-200 border-2 border-teal-300 rounded flex items-center justify-center font-mono text-xs">
+                                Front</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 mb-6">
+                        <button onclick="queueAction('enqueue')"
+                            class="flex-1 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">Enqueue</button>
+                        <button onclick="queueAction('dequeue')"
+                            class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">Dequeue</button>
+                    </div>
+
+                    <div class="code-block rounded-lg p-3 mono text-xs">
+                        <pre class="text-gray-800"><code>// Operations
+queue.enqueue(item);  // O(1) - Add to rear
+queue.dequeue();      // O(1) - Remove front
+queue.front();        // O(1) - View front
+
+// Use cases: Print Spooling, 
+// CPU Scheduling, BFS</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trees Section -->
+    <section id="trees" class="py-24 bg-gray-50/30 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+                <div
+                    class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-green-600 uppercase bg-green-50 rounded-full">
+                    Hierarchical Structure</div>
+                <h2 class="text-4xl font-bold mb-4">Binary Search Trees</h2>
+                <p class="text-lg text-gray-600">
+                    A node-based structure where each node has at most two children. Left child is smaller, right child
+                    is larger. Enables efficient searching.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 fade-in-up">
+                    <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+                        <h3 class="text-sm font-semibold text-gray-500 mb-6 uppercase tracking-wider">Tree Visualization
+                        </h3>
+                        <div class="demo-area flex items-center justify-center overflow-auto"
+                            style="min-height: 300px;">
+                            <svg id="tree-svg" width="600" height="300" class="w-full max-w-2xl">
+                                <!-- Tree drawn by JS -->
+                            </svg>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-2 justify-center">
+                            <button onclick="treeAction('insert', 25)"
+                                class="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium transition-colors">Insert
+                                25</button>
+                            <button onclick="treeAction('insert', 75)"
+                                class="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium transition-colors">Insert
+                                75</button>
+                            <button onclick="treeAction('insert', 35)"
+                                class="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium transition-colors">Insert
+                                35</button>
+                            <button onclick="treeAction('search', 50)"
+                                class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition-colors">Search
+                                50</button>
+                            <button onclick="treeAction('reset')"
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors">Reset</button>
+                        </div>
+                        <div id="tree-status" class="mt-4 text-center text-sm text-gray-600 font-mono"></div>
+                    </div>
+                </div>
+
+                <div class="fade-in-up stagger-2 space-y-6">
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 class="font-semibold mb-4">Properties</h3>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span>Left subtree contains only nodes with values lesser than the parent</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span>Right subtree contains only nodes with values greater than the parent</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span>Both left and right subtrees must also be binary search trees</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 class="font-semibold mb-4">Complexity</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="text-sm font-medium">Search</span>
+                                <span class="mono text-sm text-green-600 font-semibold">O(log n)</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="text-sm font-medium">Insert</span>
+                                <span class="mono text-sm text-green-600 font-semibold">O(log n)</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="text-sm font-medium">Delete</span>
+                                <span class="mono text-sm text-green-600 font-semibold">O(log n)</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">* Assuming balanced tree. Worst case O(n) for skewed tree.
+                        </p>
+                    </div>
+
+                    <div class="code-block rounded-xl p-4 mono text-xs">
+                        <pre class="text-gray-800"><code>class TreeNode {
+    constructor(val) {
+        this.val = val;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+// Inorder traversal
+// Left -> Root -> Right
+// Gives sorted order</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sorting Algorithms -->
+    <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center mb-16 fade-in-up">
+            <h2 class="text-4xl font-bold mb-4">Sorting Algorithms</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Visual comparison of different sorting approaches. Click to see
+                them in action.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="concept-card bg-white rounded-2xl border border-gray-200 p-6 fade-in-up">
+                <h3 class="text-xl font-bold mb-2">Bubble Sort</h3>
+                <p class="text-gray-600 text-sm mb-4">Repeatedly steps through the list, compares adjacent elements and
+                    swaps them if they are in the wrong order.</p>
+                <div class="flex gap-2 mb-4">
+                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded font-mono">O(n²)</span>
+                    <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Simple</span>
+                </div>
+                <button onclick="startSortDemo('bubble')"
+                    class="w-full py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">Visualize</button>
+            </div>
+
+            <div class="concept-card bg-white rounded-2xl border border-gray-200 p-6 fade-in-up stagger-1">
+                <h3 class="text-xl font-bold mb-2">Quick Sort</h3>
+                <p class="text-gray-600 text-sm mb-4">Divide and conquer algorithm. Picks an element as pivot and
+                    partitions the array around it.</p>
+                <div class="flex gap-2 mb-4">
+                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded font-mono">O(n log n)</span>
+                    <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Efficient</span>
+                </div>
+                <button onclick="startSortDemo('quick')"
+                    class="w-full py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">Visualize</button>
+            </div>
+
+            <div class="concept-card bg-white rounded-2xl border border-gray-200 p-6 fade-in-up stagger-2">
+                <h3 class="text-xl font-bold mb-2">Merge Sort</h3>
+                <p class="text-gray-600 text-sm mb-4">Divides the array into halves, sorts them and then merges them
+                    back together.</p>
+                <div class="flex gap-2 mb-4">
+                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded font-mono">O(n log n)</span>
+                    <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Stable</span>
+                </div>
+                <button onclick="startSortDemo('merge')"
+                    class="w-full py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">Visualize</button>
+            </div>
+        </div>
+
+        <!-- Sorting Visualization Area -->
+        <div id="sort-viz-container" class="mt-8 bg-white rounded-2xl border border-gray-200 p-8 hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-semibold" id="sort-title">Sorting Visualization</h3>
+                <button onclick="closeSortDemo()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="h-64 flex items-end justify-center gap-1" id="sort-bars">
+                <!-- Bars generated by JS -->
+            </div>
+            <div class="mt-4 text-center text-sm text-gray-600" id="sort-status"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                            <span class="text-black font-bold text-sm">DSA</span>
+                        </div>
+                        <span class="font-semibold text-lg">Fundamentals</span>
+                    </div>
+                    <p class="text-gray-400 text-sm max-w-sm">
+                        Mastering data structures and algorithms through interactive visualization and clear, concise
+                        explanations.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Topics</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#arrays" class="hover:text-white transition-colors">Arrays</a></li>
+                        <li><a href="#linked-lists" class="hover:text-white transition-colors">Linked Lists</a></li>
+                        <li><a href="#stacks" class="hover:text-white transition-colors">Stacks & Queues</a></li>
+                        <li><a href="#trees" class="hover:text-white transition-colors">Trees</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Big O Cheatsheet</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Practice Problems</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Visualizations</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2024 DSA Fundamentals. Educational purposes.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <span class="sr-only">GitHub</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // Global variables
-        let currentArray = [10, 25, 5, 40, 15];
-        let currentString = "HELLO";
-        let stack = [10, 20, 30];
-        let queue = [10, 20, 30, 40];
-        let sortArray = [64, 34, 25, 12, 22];
-        let searchArray = [5, 12, 25, 34, 64];
-        let isAnimating = false;
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        // Navigation
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // Remove active class from all nav buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-
-            // Add active class to clicked button
-            event.target.classList.add('active');
-        }
-
-        // Arrays Functions
-        function accessArrayElement() {
-            const indexInput = safeGetElement('arrayIndex');
-            if (!indexInput) return;
-
-            const index = parseInt(indexInput.value);
-            const elements = document.querySelectorAll('#arrayVis .array-element');
-
-            // Reset all elements
-            elements.forEach(el => el.classList.remove('highlight'));
-
-            // Highlight selected element
-            if (index >= 0 && index < elements.length) {
-                elements[index].classList.add('highlight');
-            }
-        }
-
-        function resetArray() {
-            const elements = document.querySelectorAll('#arrayVis .array-element');
-            elements.forEach(el => el.classList.remove('highlight'));
-        }
-
-        // Strings Functions
-        function updateString() {
-            const inputElement = safeGetElement('stringInput');
-            const container = safeGetElement('stringVis');
-            if (!inputElement || !container) return;
-
-            const input = inputElement.value.toUpperCase();
-            container.innerHTML = '';
-
-            for (let i = 0; i < input.length && i < 10; i++) {
-                const element = document.createElement('div');
-                element.className = 'array-element';
-                element.innerHTML = `<span class="array-index">${i}</span>${input[i]}`;
-                container.appendChild(element);
-            }
-            currentString = input;
-        }
-
-        function reverseString() {
-            const inputElement = safeGetElement('stringInput');
-            if (!inputElement) return;
-
-            const reversed = currentString.split('').reverse().join('');
-            inputElement.value = reversed;
-            updateString();
-        }
-
-        // Stack Functions
-        function pushStack() {
-            const inputElement = safeGetElement('stackInput');
-            if (!inputElement) return;
-
-            const value = inputElement.value;
-            if (value && stack.length < 6) {
-                stack.push(parseInt(value));
-                updateStackDisplay();
-                inputElement.value = parseInt(value) + 10;
-            }
-        }
-
-        function popStack() {
-            if (stack.length > 0) {
-                stack.pop();
-                updateStackDisplay();
-            }
-        }
-
-        function resetStack() {
-            stack = [10, 20, 30];
-            updateStackDisplay();
-            const inputElement = safeGetElement('stackInput');
-            if (inputElement) inputElement.value = 40;
-        }
-
-        // Queue Functions
-        function enqueue() {
-            const inputElement = safeGetElement('queueInput');
-            if (!inputElement) return;
-
-            const value = inputElement.value;
-            if (value && queue.length < 8) {
-                queue.push(parseInt(value));
-                updateQueueDisplay();
-                inputElement.value = parseInt(value) + 10;
-            }
-        }
-
-        function dequeue() {
-            if (queue.length > 0) {
-                queue.shift();
-                updateQueueDisplay();
-            }
-        }
-
-        function resetQueue() {
-            queue = [10, 20, 30, 40];
-            updateQueueDisplay();
-            const inputElement = safeGetElement('queueInput');
-            if (inputElement) inputElement.value = 50;
-        }
-
-        // Recursion Functions
-        function calculateFactorial() {
-            const inputElement = safeGetElement('factorialInput');
-            if (!inputElement) return;
-
-            const n = parseInt(inputElement.value);
-            const result = factorial(n);
-            safeSetTextContent('recursionResult', `${n}! = ${result}`);
-
-            // Show the breakdown
-            showFactorialBreakdown(n);
-        }
-
-        function factorial(n) {
-            if (n <= 1) return 1;
-            return n * factorial(n - 1);
-        }
-
-        function showFactorialBreakdown(n) {
-            const container = safeGetElement('recursionVis');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            const breakdown = document.createElement('div');
-            breakdown.style.textAlign = 'left';
-            breakdown.style.maxWidth = '400px';
-            breakdown.style.margin = '0 auto';
-
-            for (let i = n; i >= 1; i--) {
-                const line = document.createElement('div');
-                line.style.marginLeft = `${(n - i) * 20}px`;
-                if (i === 1) {
-                    line.textContent = `factorial(${i}) = 1 ← Base case`;
-                    line.style.color = '#e53e3e';
-                    line.style.fontWeight = 'bold';
-                } else {
-                    line.textContent = `factorial(${i}) = ${i} × factorial(${i - 1})`;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
                 }
-                breakdown.appendChild(line);
-            }
+            });
+        }, observerOptions);
 
-            container.appendChild(breakdown);
+        document.querySelectorAll('.fade-in-up').forEach((el) => observer.observe(el));
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
         }
 
-        function showFibonacci() {
-            const container = safeGetElement('recursionVis');
-            if (!container) return;
+        // Smooth scroll to section
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
 
+        // Copy code functionality
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').innerText;
+            navigator.clipboard.writeText(code);
+            const original = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => btn.innerText = original, 2000);
+        }
+
+        // Array Visualization
+        let arrayData = [10, 25, 40, 55, 70];
+        function renderArray() {
+            const container = document.getElementById('array-viz');
+            container.innerHTML = '';
+            arrayData.forEach((val, idx) => {
+                const el = document.createElement('div');
+                el.className = 'array-element w-16 h-16 bg-gray-100 border-2 border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer';
+                el.innerHTML = `
+                    <span class="text-lg font-bold text-gray-800">${val}</span>
+                    <span class="text-xs text-gray-500 mt-1">[${idx}]</span>
+                `;
+                el.onclick = () => highlightArrayElement(idx);
+                container.appendChild(el);
+            });
+        }
+
+        function highlightArrayElement(idx) {
+            const elements = document.querySelectorAll('.array-element');
+            elements.forEach((el, i) => {
+                if (i === idx) {
+                    el.style.background = '#3b82f6';
+                    el.style.color = 'white';
+                    el.style.borderColor = '#2563eb';
+                    el.querySelector('span').style.color = 'white';
+                    el.querySelector('span:last-child').style.color = '#bfdbfe';
+                } else {
+                    el.style.background = '#f3f4f6';
+                    el.style.color = '';
+                    el.style.borderColor = '#d1d5db';
+                    el.querySelector('span').style.color = '';
+                    el.querySelector('span:last-child').style.color = '';
+                }
+            });
+            document.getElementById('array-explanation').textContent = `Accessed index ${idx}: Value ${arrayData[idx]} (O(1) operation)`;
+        }
+
+        function arrayAction(action) {
+            const explanation = document.getElementById('array-explanation');
+            if (action === 'access') {
+                highlightArrayElement(2);
+            } else if (action === 'insert') {
+                const newVal = Math.floor(Math.random() * 100);
+                arrayData.push(newVal);
+                renderArray();
+                explanation.textContent = `Pushed ${newVal} to end. Amortized O(1).`;
+                setTimeout(() => {
+                    const elements = document.querySelectorAll('.array-element');
+                    elements[elements.length - 1].style.background = '#10b981';
+                    elements[elements.length - 1].style.color = 'white';
+                }, 100);
+            } else if (action === 'reset') {
+                arrayData = [10, 25, 40, 55, 70];
+                renderArray();
+                explanation.textContent = 'Array reset';
+            }
+        }
+
+        // Linked List Visualization
+        let linkedListData = [10, 25, 40];
+        function renderLinkedList() {
+            const container = document.getElementById('linked-list-viz');
+            container.innerHTML = '';
+            linkedListData.forEach((val, idx) => {
+                const node = document.createElement('div');
+                node.className = 'flex items-center';
+                node.innerHTML = `
+                    <div class="bg-purple-100 border-2 border-purple-300 rounded-lg p-3 min-w-[80px] text-center">
+                        <div class="text-xs text-purple-600 mb-1">Node</div>
+                        <div class="font-bold text-purple-900">${val}</div>
+                    </div>
+                    ${idx < linkedListData.length - 1 ? `
+                        <div class="mx-2 text-purple-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </div>
+                    ` : '<div class="mx-2 text-gray-400 text-2xl">∅</div>'}
+                `;
+                container.appendChild(node);
+            });
+        }
+
+        function linkedListAction(action) {
+            const info = document.getElementById('linked-list-info');
+            if (action === 'append') {
+                const newVal = Math.floor(Math.random() * 100);
+                linkedListData.push(newVal);
+                renderLinkedList();
+                info.textContent = `Appended ${newVal} to end. Traversed O(n) to find tail.`;
+            } else if (action === 'remove') {
+                if (linkedListData.length > 0) {
+                    const removed = linkedListData.pop();
+                    renderLinkedList();
+                    info.textContent = `Removed ${removed} from end.`;
+                }
+            } else if (action === 'reset') {
+                linkedListData = [10, 25, 40];
+                renderLinkedList();
+                info.textContent = 'Each node contains data and a pointer to the next node';
+            }
+        }
+
+        // Stack Visualization
+        let stackData = [30, 20, 10];
+        function renderStack() {
+            const container = document.getElementById('stack-viz');
+            container.innerHTML = '';
+            stackData.slice().reverse().forEach((val, idx) => {
+                const el = document.createElement('div');
+                el.className = `w-32 h-12 ${idx === 0 ? 'bg-orange-500 text-white border-orange-600' : 'bg-orange-200 border-orange-300'} border-2 rounded flex items-center justify-center font-mono text-sm transition-all duration-300`;
+                el.textContent = val;
+                if (idx === 0) el.classList.add('animate-pulse-soft');
+                container.appendChild(el);
+            });
+        }
+
+        function stackAction(action) {
+            if (action === 'push') {
+                const newVal = Math.floor(Math.random() * 100);
+                stackData.push(newVal);
+                renderStack();
+            } else if (action === 'pop') {
+                if (stackData.length > 0) {
+                    stackData.pop();
+                    renderStack();
+                }
+            }
+        }
+
+        // Queue Visualization
+        let queueData = [10, 20, 30];
+        function renderQueue() {
+            const container = document.getElementById('queue-viz');
+            container.innerHTML = '';
+            queueData.forEach((val, idx) => {
+                const el = document.createElement('div');
+                el.className = `flex-shrink-0 w-20 h-12 ${idx === 0 ? 'bg-teal-500 text-white border-teal-600' : 'bg-teal-200 border-teal-300'} border-2 rounded flex items-center justify-center font-mono text-sm transition-all duration-300`;
+                el.textContent = val;
+                container.appendChild(el);
+            });
+        }
+
+        function queueAction(action) {
+            if (action === 'enqueue') {
+                const newVal = Math.floor(Math.random() * 100);
+                queueData.push(newVal);
+                renderQueue();
+            } else if (action === 'dequeue') {
+                if (queueData.length > 0) {
+                    queueData.shift();
+                    renderQueue();
+                }
+            }
+        }
+
+        // Tree Visualization
+        let treeNodes = [
+            { val: 50, x: 300, y: 40, left: 30, right: 70 },
+            { val: 30, x: 150, y: 120, left: 20, right: 40 },
+            { val: 70, x: 450, y: 120, left: 60, right: 80 },
+            { val: 20, x: 75, y: 200, left: null, right: null },
+            { val: 40, x: 225, y: 200, left: null, right: null },
+            { val: 60, x: 375, y: 200, left: null, right: null },
+            { val: 80, x: 525, y: 200, left: null, right: null }
+        ];
+
+        function renderTree() {
+            const svg = document.getElementById('tree-svg');
+            svg.innerHTML = '';
+
+            // Draw connections
+            treeNodes.forEach(node => {
+                if (node.left) {
+                    const leftChild = treeNodes.find(n => n.val === node.left);
+                    if (leftChild) drawLine(svg, node.x, node.y + 20, leftChild.x, leftChild.y - 20);
+                }
+                if (node.right) {
+                    const rightChild = treeNodes.find(n => n.val === node.right);
+                    if (rightChild) drawLine(svg, node.x, node.y + 20, rightChild.x, rightChild.y - 20);
+                }
+            });
+
+            // Draw nodes
+            treeNodes.forEach(node => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.innerHTML = `
+                    <circle cx="${node.x}" cy="${node.y}" r="25" fill="white" stroke="#10b981" stroke-width="3" class="tree-node"/>
+                    <text x="${node.x}" y="${node.y + 5}" text-anchor="middle" font-family="monospace" font-size="14" fill="#065f46">${node.val}</text>
+                `;
+                svg.appendChild(g);
+            });
+        }
+
+        function drawLine(svg, x1, y1, x2, y2) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#d1d5db');
+            line.setAttribute('stroke-width', '2');
+            svg.appendChild(line);
+        }
+
+        function treeAction(action, val) {
+            const status = document.getElementById('tree-status');
+            if (action === 'insert') {
+                status.textContent = `Inserting ${val}: Compare with root, go ${val < 50 ? 'left' : 'right'}... O(log n) comparisons`;
+                status.classList.add('text-green-600');
+                setTimeout(() => status.classList.remove('text-green-600'), 2000);
+            } else if (action === 'search') {
+                status.textContent = `Searching for ${val}: Found at root! O(1) best case`;
+                status.classList.add('text-blue-600');
+                setTimeout(() => status.classList.remove('text-blue-600'), 2000);
+            } else if (action === 'reset') {
+                status.textContent = '';
+            }
+        }
+
+        // Sorting Visualization
+        let sortInterval;
+        function startSortDemo(type) {
+            document.getElementById('sort-viz-container').classList.remove('hidden');
+            document.getElementById('sort-title').textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' Sort';
+            const container = document.getElementById('sort-bars');
             container.innerHTML = '';
 
-            const fibDisplay = document.createElement('div');
-            fibDisplay.style.textAlign = 'center';
-
-            const sequence = [];
-            for (let i = 0; i <= 8; i++) {
-                sequence.push(fibonacci(i));
+            // Generate random bars
+            const bars = [];
+            for (let i = 0; i < 20; i++) {
+                const height = Math.floor(Math.random() * 80) + 20;
+                const bar = document.createElement('div');
+                bar.className = 'bg-gray-800 rounded-t transition-all duration-300';
+                bar.style.width = '20px';
+                bar.style.height = height + '%';
+                bar.dataset.value = height;
+                container.appendChild(bar);
+                bars.push(bar);
             }
 
-            fibDisplay.innerHTML = `
-                <h4>Fibonacci Sequence</h4>
-                <p>Each number is the sum of the two preceding ones</p>
-                <div style="font-size: 1.2rem; margin: 15px 0;">
-                    ${sequence.join(', ')}
-                </div>
-                <p>fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)</p>
-            `;
+            document.getElementById('sort-status').textContent = 'Sorting...';
 
-            container.appendChild(fibDisplay);
-            safeSetTextContent('recursionResult', `Fibonacci sequence generated!`);
+            if (type === 'bubble') {
+                bubbleSort(bars);
+            } else if (type === 'quick') {
+                document.getElementById('sort-status').textContent = 'Quick Sort visualization (simplified)';
+            } else {
+                document.getElementById('sort-status').textContent = 'Merge Sort visualization (simplified)';
+            }
         }
 
-        function fibonacci(n) {
-            if (n <= 1) return n;
-            return fibonacci(n - 1) + fibonacci(n - 2);
-        }
+        async function bubbleSort(bars) {
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-        // Sorting Functions
-        async function startBubbleSort() {
-            if (isAnimating) return;
-            isAnimating = true;
+            for (let i = 0; i < bars.length; i++) {
+                for (let j = 0; j < bars.length - i - 1; j++) {
+                    bars[j].style.background = '#f59e0b';
+                    bars[j + 1].style.background = '#f59e0b';
+                    await delay(100);
 
-            const elements = document.querySelectorAll('#sortVis .array-element');
-            const arr = [...sortArray];
-            let steps = 0;
+                    const val1 = parseInt(bars[j].dataset.value);
+                    const val2 = parseInt(bars[j + 1].dataset.value);
 
-            for (let i = 0; i < arr.length; i++) {
-                for (let j = 0; j < arr.length - 1; j++) {
-                    steps++;
-
-                    // Highlight elements being compared
-                    elements[j].classList.add('highlight');
-                    elements[j + 1].classList.add('highlight');
-
-                    safeSetTextContent('sortSteps', `Step ${steps}: Comparing ${arr[j]} and ${arr[j + 1]}`);
-
-                    await sleep(1000);
-
-                    if (arr[j] > arr[j + 1]) {
-                        // Swap
-                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                        elements[j].textContent = arr[j];
-                        elements[j + 1].textContent = arr[j + 1];
-
-                        safeSetTextContent('sortSteps', `Step ${steps}: Swapped! Now: ${arr.join(', ')}`);
-                        await sleep(1000);
+                    if (val1 > val2) {
+                        const temp = bars[j].style.height;
+                        bars[j].style.height = bars[j + 1].style.height;
+                        bars[j + 1].style.height = temp;
+                        bars[j].dataset.value = val2;
+                        bars[j + 1].dataset.value = val1;
                     }
 
-                    // Remove highlights
-                    elements[j].classList.remove('highlight');
-                    elements[j + 1].classList.remove('highlight');
+                    bars[j].style.background = '#1f2937';
+                    bars[j + 1].style.background = '#1f2937';
                 }
+                bars[bars.length - i - 1].style.background = '#10b981';
             }
-
-            // Show completion
-            elements.forEach(el => el.classList.add('found'));
-            safeSetTextContent('sortSteps', `Sorting complete! Array is now sorted in ${steps} steps.`);
-            sortArray = arr;
-            isAnimating = false;
+            document.getElementById('sort-status').textContent = 'Sorted! O(n²) time complexity';
         }
 
-        function generateRandomArray() {
-            sortArray = [];
-            for (let i = 0; i < 5; i++) {
-                sortArray.push(Math.floor(Math.random() * 90) + 10);
+        function closeSortDemo() {
+            document.getElementById('sort-viz-container').classList.add('hidden');
+            if (sortInterval) clearInterval(sortInterval);
+        }
+
+        // Initialize all visualizations
+        window.addEventListener('load', () => {
+            renderArray();
+            renderLinkedList();
+            renderStack();
+            renderQueue();
+            renderTree();
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-sm');
+            } else {
+                navbar.classList.remove('shadow-sm');
             }
-            updateSortDisplay();
-        }
-
-        function resetSorting() {
-            sortArray = [64, 34, 25, 12, 22];
-            updateSortDisplay();
-            safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
-            isAnimating = false;
-        }
-
-        // Searching Functions
-        async function linearSearch() {
-            if (isAnimating) return;
-            isAnimating = true;
-
-            const inputElement = safeGetElement('searchInput');
-            if (!inputElement) return;
-
-            const target = parseInt(inputElement.value);
-            const elements = document.querySelectorAll('#searchVis .array-element');
-            let found = false;
-            let steps = 0;
-
-            // Reset elements
-            elements.forEach(el => {
-                el.classList.remove('highlight', 'found');
-            });
-
-            for (let i = 0; i < searchArray.length; i++) {
-                steps++;
-                elements[i].classList.add('highlight');
-                safeSetTextContent('searchSteps', `Step ${steps}: Checking ${searchArray[i]}`);
-
-                await sleep(800);
-
-                if (searchArray[i] === target) {
-                    elements[i].classList.remove('highlight');
-                    elements[i].classList.add('found');
-                    safeSetTextContent('searchSteps', `Found ${target} at index ${i} in ${steps} steps!`);
-                    found = true;
-                    break;
-                } else {
-                    elements[i].classList.remove('highlight');
-                }
-            }
-
-            if (!found) {
-                safeSetTextContent('searchSteps', `${target} not found after checking all ${steps} elements.`);
-            }
-
-            isAnimating = false;
-        }
-
-        async function binarySearch() {
-            if (isAnimating) return;
-            isAnimating = true;
-
-            const inputElement = safeGetElement('searchInput');
-            if (!inputElement) return;
-
-            const target = parseInt(inputElement.value);
-            const elements = document.querySelectorAll('#searchVis .array-element');
-            let left = 0;
-            let right = searchArray.length - 1;
-            let found = false;
-            let steps = 0;
-
-            // Reset elements
-            elements.forEach(el => {
-                el.classList.remove('highlight', 'found');
-            });
-
-            while (left <= right) {
-                steps++;
-                const mid = Math.floor((left + right) / 2);
-
-                elements[mid].classList.add('highlight');
-                safeSetTextContent('searchSteps', `Step ${steps}: Checking middle element ${searchArray[mid]} at index ${mid}`);
-
-                await sleep(1000);
-
-                if (searchArray[mid] === target) {
-                    elements[mid].classList.remove('highlight');
-                    elements[mid].classList.add('found');
-                    safeSetTextContent('searchSteps', `Found ${target} at index ${mid} in just ${steps} steps!`);
-                    found = true;
-                    break;
-                } else if (searchArray[mid] < target) {
-                    safeSetTextContent('searchSteps', `${searchArray[mid]} < ${target}, search right half`);
-                    left = mid + 1;
-                } else {
-                    safeSetTextContent('searchSteps', `${searchArray[mid]} > ${target}, search left half`);
-                    right = mid - 1;
-                }
-
-                elements[mid].classList.remove('highlight');
-                await sleep(500);
-            }
-
-            if (!found) {
-                safeSetTextContent('searchSteps', `${target} not found after ${steps} smart steps.`);
-            }
-
-            isAnimating = false;
-        }
-
-        function resetSearch() {
-            const elements = document.querySelectorAll('#searchVis .array-element');
-            elements.forEach(el => {
-                el.classList.remove('highlight', 'found');
-            });
-            safeSetTextContent('searchSteps', 'Enter a number and choose search method');
-            isAnimating = false;
-        }
-
-        // Utility function
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // Safe element access function
-        function safeGetElement(id) {
-            const element = document.getElementById(id);
-            if (!element) {
-                console.warn(`Element with id '${id}' not found`);
-                return null;
-            }
-            return element;
-        }
-
-        // Safe innerHTML update
-        function safeSetInnerHTML(id, content) {
-            const element = safeGetElement(id);
-            if (element) {
-                element.innerHTML = content;
-            }
-        }
-
-        // Safe textContent update
-        function safeSetTextContent(id, content) {
-            const element = safeGetElement(id);
-            if (element) {
-                element.textContent = content;
-            }
-        }
-
-        // Updated Stack Functions with null checks
-        function updateStackDisplay() {
-            const container = safeGetElement('stackVis');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            stack.forEach((value, index) => {
-                const element = document.createElement('div');
-                element.className = 'stack-element';
-                if (index === stack.length - 1) {
-                    element.classList.add('top');
-                }
-                element.textContent = value;
-                container.appendChild(element);
-            });
-
-            safeSetTextContent('stackSteps', `Stack Size: ${stack.length}`);
-        }
-
-        // Updated Queue Functions with null checks
-        function updateQueueDisplay() {
-            const container = safeGetElement('queueVis');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            queue.forEach((value, index) => {
-                const element = document.createElement('div');
-                element.className = 'queue-element';
-                if (index === 0) element.classList.add('front');
-                if (index === queue.length - 1) element.classList.add('rear');
-                element.textContent = value;
-                container.appendChild(element);
-            });
-
-            safeSetTextContent('queueSteps', `Queue Size: ${queue.length}`);
-        }
-
-        // Updated Sort Display with null checks
-        function updateSortDisplay() {
-            const container = safeGetElement('sortVis');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            sortArray.forEach(value => {
-                const element = document.createElement('div');
-                element.className = 'array-element';
-                element.textContent = value;
-                container.appendChild(element);
-            });
-        }
-
-        // Initialize displays when DOM is ready
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize all displays
-            if (safeGetElement('stackVis')) updateStackDisplay();
-            if (safeGetElement('queueVis')) updateQueueDisplay();
-            if (safeGetElement('sortVis')) updateSortDisplay();
         });
     </script>
-</body>
-
-</html>
-<strong>Time Complexity:</strong><br>
-• Access by index: O(1) - Super fast!<br>
-• Search for value: O(n) - Must check each element<br>
-• Insert at end: O(1) - Just add it<br>
-• Insert at beginning: O(n) - Must shift all elements
-</div>
-</div>
-
-<!-- Strings Section -->
-<div id="strings" class="section">
-    <h2>🔤 Strings</h2>
-
-    <div class="concept-card">
-        <h3>What is a String?</h3>
-        <p><strong>Think of it like:</strong> A sequence of characters (letters, numbers, symbols) arranged in order.
-            Like beads on a string!</p>
-
-        <div class="explanation">
-            <strong>Real-life example:</strong> Your name written on paper. Each letter has a position: H-E-L-L-O
-            (positions 0,1,2,3,4)
-        </div>
-    </div>
-
-    <div class="visualization">
-        <h4>String Visualization</h4>
-        <div class="array-visual" id="stringVis">
-            <div class="array-element"><span class="array-index">0</span>H</div>
-            <div class="array-element"><span class="array-index">1</span>E</div>
-            <div class="array-element"><span class="array-index">2</span>L</div>
-            <div class="array-element"><span class="array-index">3</span>L</div>
-            <div class="array-element"><span class="array-index">4</span>O</div>
-        </div>
-
-        <div class="controls">
-            <div class="input-group">
-                <label>Enter Text:</label>
-                <input type="text" id="stringInput" value="HELLO" maxlength="10">
-            </div>
-            <button class="btn" onclick="updateString()">Update String</button>
-            <button class="btn" onclick="reverseString()">Reverse</button>
-        </div>
-    </div>
-
-    <div class="code-example">
-        // Creating strings
-        let greeting = "Hello";
-        let name = "World";
-
-        // String operations
-        console.log(greeting + " " + name); // "Hello World"
-        console.log(greeting.length); // 5
-        console.log(greeting[0]); // "H"
-
-        // Useful string methods
-        console.log(greeting.toUpperCase()); // "HELLO"
-        console.log(greeting.slice(1, 4)); // "ell"
-        console.log(greeting.includes("ell")); // true
-    </div>
-
-    <div class="performance-info">
-        <strong>Common Operations:</strong><br>
-        • Access character: O(1)<br>
-        • Search substring: O(n*m)<br>
-        • Concatenation: O(n+m)<br>
-        • Length: O(1)
-    </div>
-</div>
-
-<!-- Stacks Section -->
-<div id="stacks" class="section">
-    <h2>📚 Stacks</h2>
-
-    <div class="concept-card">
-        <h3>What is a Stack?</h3>
-        <p><strong>Think of it like:</strong> A stack of plates. You can only add or remove plates from the top. Last
-            In, First Out (LIFO).</p>
-
-        <div class="explanation">
-            <strong>Real-life examples:</strong> Stack of books, undo function in software, browser back button
-        </div>
-    </div>
-
-    <div class="visualization">
-        <h4>Stack Operations</h4>
-        <div class="stack-visual" id="stackVis">
-            <div class="stack-element">10</div>
-            <div class="stack-element">20</div>
-            <div class="stack-element top">30</div>
-        </div>
-        <p>👆 Top of Stack</p>
-
-        <div class="controls">
-            <div class="input-group">
-                <label>Value:</label>
-                <input type="number" id="stackInput" value="40">
-            </div>
-            <button class="btn" onclick="pushStack()">Push (Add)</button>
-            <button class="btn" onclick="popStack()">Pop (Remove)</button>
-            <button class="btn" onclick="resetStack()">Reset</button>
-        </div>
-
-        <div class="step-counter" id="stackSteps">Stack Size: 3</div>
-    </div>
-
-    <div class="code-example">
-        // Stack implementation using array
-        let stack = [];
-
-        // Push (add to top)
-        stack.push(10);
-        stack.push(20);
-        stack.push(30);
-        console.log(stack); // [10, 20, 30]
-
-        // Pop (remove from top)
-        let top = stack.pop(); // Returns 30
-        console.log(top); // 30
-        console.log(stack); // [10, 20]
-
-        // Peek (look at top without removing)
-        console.log(stack[stack.length - 1]); // 20
-    </div>
-
-    <div class="performance-info">
-        <strong>Time Complexity:</strong><br>
-        • Push: O(1)<br>
-        • Pop: O(1)<br>
-        • Peek: O(1)<br>
-        • Search: O(n)
-    </div>
-</div>
-
-<!-- Queues Section -->
-<div id="queues" class="section">
-    <h2>🚶‍♂️ Queues</h2>
-
-    <div class="concept-card">
-        <h3>What is a Queue?</h3>
-        <p><strong>Think of it like:</strong> A line at a coffee shop. First person in line gets served first. First In,
-            First Out (FIFO).</p>
-
-        <div class="explanation">
-            <strong>Real-life examples:</strong> Printer queue, traffic lights, customer service lines
-        </div>
-    </div>
-
-    <div class="visualization">
-        <h4>Queue Operations</h4>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span>👈 Front (Remove)</span>
-            <span>Rear (Add) 👉</span>
-        </div>
-        <div class="queue-visual" id="queueVis">
-            <div class="queue-element front">10</div>
-            <div class="queue-element">20</div>
-            <div class="queue-element">30</div>
-            <div class="queue-element rear">40</div>
-        </div>
-
-        <div class="controls">
-            <div class="input-group">
-                <label>Value:</label>
-                <input type="number" id="queueInput" value="50">
-            </div>
-            <button class="btn" onclick="enqueue()">Enqueue (Add)</button>
-            <button class="btn" onclick="dequeue()">Dequeue (Remove)</button>
-            <button class="btn" onclick="resetQueue()">Reset</button>
-        </div>
-
-        <div class="step-counter" id="queueSteps">Queue Size: 4</div>
-    </div>
-
-    <div class="code-example">
-        // Queue implementation using array
-        let queue = [];
-
-        // Enqueue (add to rear)
-        queue.push(10);
-        queue.push(20);
-        queue.push(30);
-        console.log(queue); // [10, 20, 30]
-
-        // Dequeue (remove from front)
-        let first = queue.shift(); // Returns 10
-        console.log(first); // 10
-        console.log(queue); // [20, 30]
-
-        // Peek front
-        console.log(queue[0]); // 20
-    </div>
-
-    <div class="performance-info">
-        <strong>Time Complexity:</strong><br>
-        • Enqueue: O(1)<br>
-        • Dequeue: O(1) with proper implementation<br>
-        • Peek: O(1)<br>
-        • Search: O(n)
-    </div>
-</div>
-
-<!-- Recursion Section -->
-<div id="recursion" class="section">
-    <h2>🔄 Recursion</h2>
-
-    <div class="concept-card">
-        <h3>What is Recursion?</h3>
-        <p><strong>Think of it like:</strong> A function that calls itself to solve smaller versions of the same
-            problem. Like Russian nesting dolls!</p>
-
-        <div class="explanation">
-            <strong>Real-life example:</strong> Looking for your keys by checking one room, then asking someone else to
-            check the remaining rooms the same way.
-        </div>
-    </div>
-
-    <div class="visualization">
-        <h4>Factorial Example: 5!</h4>
-        <div id="recursionVis">
-            <div style="text-align: left; max-width: 400px; margin: 0 auto;">
-                <div>factorial(5) = 5 × factorial(4)</div>
-                <div style="margin-left: 20px;">factorial(4) = 4 × factorial(3)</div>
-                <div style="margin-left: 40px;">factorial(3) = 3 × factorial(2)</div>
-                <div style="margin-left: 60px;">factorial(2) = 2 × factorial(1)</div>
-                <div style="margin-left: 80px;">factorial(1) = 1 ← Base case</div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <div class="input-group">
-                <label>Calculate factorial of:</label>
-                <input type="number" id="factorialInput" value="5" min="1" max="10">
-            </div>
-            <button class="btn" onclick="calculateFactorial()">Calculate</button>
-            <button class="btn" onclick="showFibonacci()">Show Fibonacci</button>
-        </div>
-
-        <div class="step-counter" id="recursionResult">Result: 120</div>
-    </div>
-
-    <div class="code-example">
-        // Factorial using recursion
-        function factorial(n) {
-        // Base case - stops the recursion
-        if (n <= 1) { return 1; } // Recursive case - function calls itself return n * factorial(n - 1); }
-            console.log(factorial(5)); // 120 // Fibonacci sequence function fibonacci(n) { if (n <=1) return n; return
-            fibonacci(n - 1) + fibonacci(n - 2); } console.log(fibonacci(6)); // 8 </div>
-
-            <div class="performance-info">
-                <strong>Key Concepts:</strong><br>
-                • Base Case: Condition that stops recursion<br>
-                • Recursive Case: Function calls itself<br>
-                • Stack Space: Each call uses memory<br>
-                • Can be slower than iterative solutions
-            </div>
-    </div>
-
-    <!-- Sorting Section -->
-    <div id="sorting" class="section">
-        <h2>🔀 Sorting</h2>
-
-        <div class="concept-card">
-            <h3>What is Sorting?</h3>
-            <p><strong>Think of it like:</strong> Arranging books on a shelf by height, or organizing cards in your hand
-                by number.</p>
-
-            <div class="explanation">
-                <strong>Why sort?</strong> Makes searching faster, data looks organized, many algorithms work better on
-                sorted data.
-            </div>
-        </div>
-
-        <div class="visualization">
-            <h4>Bubble Sort Visualization</h4>
-            <div class="array-visual" id="sortVis">
-                <div class="array-element">64</div>
-                <div class="array-element">34</div>
-                <div class="array-element">25</div>
-                <div class="array-element">12</div>
-                <div class="array-element">22</div>
-            </div>
-
-            <div class="controls">
-                <button class="btn" onclick="startBubbleSort()">Start Bubble Sort</button>
-                <button class="btn" onclick="generateRandomArray()">New Random Array</button>
-                <button class="btn" onclick="resetSorting()">Reset</button>
-            </div>
-
-            <div class="step-counter" id="sortSteps">Click "Start Bubble Sort" to begin</div>
-        </div>
-
-        <div class="code-example">
-            // Bubble Sort - Simple but slow
-            function bubbleSort(arr) {
-            for (let i = 0; i < arr.length; i++) { for (let j=0; j < arr.length - 1; j++) { // Compare adjacent elements
-                if (arr[j]> arr[j + 1]) {
-                // Swap if they're in wrong order
-                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                }
-                }
-                }
-                return arr;
-                }
-
-                // Quick Sort - Much faster
-                function quickSort(arr) {
-                if (arr.length <= 1) return arr; const pivot=arr[arr.length - 1]; const left=arr.filter(x=> x < pivot);
-                        const right=arr.filter(x=> x > pivot);
-
-                        return [...quickSort(left), pivot, ...quickSort(right)];
-                        }
-        </div>
-
-        <table class="comparison-table">
-            <thead>
-                <tr>
-                    <th>Algorithm</th>
-                    <th>Time Complexity</th>
-                    <th>Best For</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Bubble Sort</td>
-                    <td>O(n²)</td>
-                    <td>Learning</td>
-                    <td>Repeatedly swaps adjacent elements</td>
-                </tr>
-                <tr>
-                    <td>Quick Sort</td>
-                    <td>O(n log n)</td>
-                    <td>General use</td>
-                    <td>Divide and conquer approach</td>
-                </tr>
-                <tr>
-                    <td>Merge Sort</td>
-                    <td>O(n log n)</td>
-                    <td>Stable sorting</td>
-                    <td>Divides array, then merges sorted parts</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Searching Section -->
-    <div id="searching" class="section">
-        <h2>🔍 Searching</h2>
-
-        <div class="concept-card">
-            <h3>What is Searching?</h3>
-            <p><strong>Think of it like:</strong> Finding a specific book in a library, or looking for a friend's phone
-                number in your contacts.</p>
-
-            <div class="explanation">
-                <strong>Two main types:</strong> Linear (check each item) and Binary (smart jumping for sorted lists).
-            </div>
-        </div>
-
-        <div class="visualization">
-            <h4>Search Algorithms</h4>
-            <div class="array-visual" id="searchVis">
-                <div class="array-element">5</div>
-                <div class="array-element">12</div>
-                <div class="array-element">25</div>
-                <div class="array-element">34</div>
-                <div class="array-element">64</div>
-            </div>
-
-            <div class="controls">
-                <div class="input-group">
-                    <label>Search for:</label>
-                    <input type="number" id="searchInput" value="25">
-                </div>
-                <button class="btn" onclick="linearSearch()">Linear Search</button>
-                <button class="btn" onclick="binarySearch()">Binary Search</button>
-                <button class="btn" onclick="resetSearch()">Reset</button>
-            </div>
-
-            <div class="step-counter" id="searchSteps">Enter a number and choose search method</div>
-        </div>
-
-        <div class="code-example">
-            // Linear Search - Check each element one by one
-            function linearSearch(arr, target) {
-            for (let i = 0; i < arr.length; i++) { if (arr[i]===target) { return i; // Found at index i } } return -1;
-                // Not found } // Binary Search - Only works on sorted arrays function binarySearch(arr, target) { let
-                left=0; let right=arr.length - 1; while (left <=right) { let mid=Math.floor((left + right) / 2); if
-                (arr[mid]===target) { return mid; // Found! } else if (arr[mid] < target) { left=mid + 1; // Search
-                right half } else { right=mid - 1; // Search left half } } return -1; // Not found } </div>
-
-                <div class="performance-info">
-                    <strong>Time Complexity:</strong><br>
-                    • Linear Search: O(n) - Must check each element<br>
-                    • Binary Search: O(log n) - Smart jumping, only works on sorted arrays
-                </div>
-        </div>
-    </div>
-</div>
-
-<footer>
-    <p>© 2023 DSA Basics. All rights reserved.</p>
-</footer>
-
-<script>
-    // Global variables
-    let currentString = 'HELLO';
-    let stack = [10, 20, 30];
-    let queue = [10, 20, 30, 40];
-    let sortArray = [64, 34, 25, 12, 22];
-    let searchArray = [5, 12, 25, 34, 64];
-    let isAnimating = false;
-
-    // Navigation function
-    function showSection(event, sectionId) {
-        event.preventDefault();
-
-        // Hide all sections
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
-
-        // Remove active class from all buttons
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        // Show the selected section
-        const section = document.getElementById(sectionId);
-        section.classList.add('active');
-        // Add active class to the clicked button
-        event.currentTarget.classList.add('active');
-    }
-    // Initialize the first section as active
-    document.addEventListener('DOMContentLoaded', () => {
-        const firstSection = document.querySelector('.section');
-        firstSection.classList.add('active');
-    });
-    // String Functions
-    function updateString() {
-        const inputElement = safeGetElement('stringInput');
-        if (!inputElement) return;
-
-        const input = inputElement.value;
-        const container = safeGetElement('stringVis');
-        if (!container) return;
-
-        // Clear previous visualization
-        container.innerHTML = '';
-
-        // Create new visualization
-        for (let i = 0; i < input.length; i++) {
-            const charElement = document.createElement('div');
-            charElement.classList.add('char');
-            charElement.textContent = input[i];
-            container.appendChild(charElement);
-        }
-    }
-    function reverseString() {
-        const inputElement = safeGetElement('stringInput');
-        if (!inputElement) return;
-
-        const reversed = inputElement.value.split('').reverse().join('');
-        inputElement.value = reversed;
-        updateString();
-    }
-    // Stack Functions
-    function pushStack() {
-        const inputElement = safeGetElement('stackInput');
-        if (!inputElement) return;
-
-        const value = inputElement.value;
-        if (value && stack.length < 5) {
-            stack.push(parseInt(value));
-            updateStackVisualization();
-        }
-    }
-    function popStack() {
-        if (stack.length > 0) {
-            stack.pop();
-            updateStackDisplay();
-        }
-    }
-    function resetStack() {
-        stack = [10, 20, 30];
-        updateStackDisplay();
-        const inputElement = safeGetElement('stackInput');
-        if (inputElement) inputElement.value = 40;
-    }
-    function updateStackVisualization() {
-        const container = safeGetElement('stackVis');
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        stack.forEach((value, index) => {
-            const element = document.createElement('div');
-            element.className = 'stack-element';
-            if (index === stack.length - 1) {
-                element.classList.add('top');
-            }
-            element.textContent = value;
-            container.appendChild(element);
-        });
-
-        safeSetTextContent('stackSteps', `Stack Size: ${stack.length}`);
-    }
-    // Queue Functions
-    function enqueue() {
-        const inputElement = safeGetElement('queueInput');
-        if (!inputElement) return;
-
-        const value = inputElement.value;
-        if (value && queue.length < 5) {
-            queue.push(parseInt(value));
-            updateQueueDisplay();
-        }
-    }
-    function dequeue() {
-        if (queue.length > 0) {
-            queue.shift();
-            updateQueueDisplay();
-        }
-    }
-    function resetQueue() {
-        queue = [10, 20, 30, 40];
-        updateQueueDisplay();
-        const inputElement = safeGetElement('queueInput');
-        if (inputElement) inputElement.value = 50;
-    }
-    function updateQueueDisplay() {
-        const container = safeGetElement('queueVis');
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        queue.forEach((value, index) => {
-            const element = document.createElement('div');
-            element.className = 'queue-element';
-            if (index === 0) element.classList.add('front');
-            if (index === queue.length - 1) element.classList.add('rear');
-            element.textContent = value;
-            container.appendChild(element);
-        });
-
-        safeSetTextContent('queueSteps', `Queue Size: ${queue.length}`);
-    }
-    // Recursion Functions
-    function calculateFactorial() {
-        const inputElement = safeGetElement('factorialInput');
-        if (!inputElement) return;
-
-        const number = parseInt(inputElement.value);
-        const result = factorial(number);
-        safeSetTextContent('factorialResult', `Factorial of ${number} is ${result}`);
-    }
-
-    function factorial(n) {
-        if (n === 0) return 1;
-        return n * factorial(n - 1);
-    }
-    function showFibonacci() {
-        const inputElement = safeGetElement('factorialInput');
-        if (!inputElement) return;
-
-        const n = parseInt(inputElement.value);
-        const sequence = [];
-        for (let i = 0; i <= n; i++) {
-            sequence.push(fibonacci(i));
-        }
-
-        const container = safeGetElement('recursionVis');
-        if (!container) return;
-
-        // Clear previous content
-        container.innerHTML = '';
-
-        // Create Fibonacci display
-        const fibDisplay = document.createElement('div');
-        fibDisplay.style.textAlign = 'left';
-        fibDisplay.style.maxWidth = '400px';
-        fibDisplay.style.margin = '0 auto';
-        sequence.forEach((num, index) => {
-            const line = document.createElement('div');
-            line.textContent = `fibonacci(${index}) = ${num}`;
-            fibDisplay.appendChild(line);
-        });
-        container.appendChild(fibDisplay);
-        safeSetTextContent('recursionResult', `Fibonacci sequence up to ${n}: ${sequence.join(', ')}`);
-    }
-    // Sorting Functions
-    async function startBubbleSort() {
-        const array = [5, 3, 8, 4, 2];
-        const container = safeGetElement('sortingVis');
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        for (let i = 0; i < array.length - 1; i++) {
-            for (let j = 0; j < array.length - i - 1; j++) {
-                if (array[j] > array[j + 1]) {
-                    // Swap elements
-                    [array[j], array[j + 1]] = [array[j + 1], array[j]];
-                }
-                await new Promise(resolve => setTimeout(resolve, 500));
-                updateSortingVisualization(container, array, j, j + 1);
-            }
-        }
-    }
-    function updateSortingVisualization(container, arr, highlightIndex1, highlightIndex2) {
-        container.innerHTML = '';
-        arr.forEach((value, index) => {
-            const element = document.createElement('div');
-            element.className = 'array-element';
-            element.textContent = value;
-            if (index === highlightIndex1 || index === highlightIndex2) {
-                element.classList.add('highlight');
-            }
-            container.appendChild(element);
-        });
-    }
-    function generateRandomArray() {
-        sortArray = [];
-        for (let i = 0; i < 5; i++) {
-            sortArray.push(Math.floor(Math.random() * 90) + 10);
-        }
-        updateSortDisplay();
-        safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
-        isAnimating = false;
-    }
-    function resetSorting() {
-        sortArray = [64, 34, 25, 12, 22];
-        updateSortDisplay();
-        safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
-        isAnimating = false;
-    }
-    // Searching Functions
-    async function linearSearch() {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        const inputElement = safeGetElement('searchInput');
-        if (!inputElement) return;
-
-        const target = parseInt(inputElement.value);
-        searchArray = Array.from(document.querySelectorAll('#searchVis .array-element')).map(Element => +Element.textContent);
-        const elements = document.querySelectorAll('#searchVis .array-element');
-
-        for (let i = 0; i < elements.length; i++) {
-            if (searchArray[i] === target) {
-                elements[i].classList.add('found');
-                safeSetTextContent('searchResult', `Found ${target} at index ${i}`);
-                isAnimating = false;
-                return;
-            }
-            await new Promise(resolve => setTimeout(resolve, 500));
-            elements[i].classList.add('checked');
-        }
-
-        safeSetTextContent('searchResult', `Did not find ${target}`);
-        isAnimating = false;
-    }
-    async function linearSearchSmart() {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        const inputElement = safeGetElement('searchInput');
-        if (!inputElement) return;
-
-        const target = parseInt(inputElement.value);
-        const elements = document.querySelectorAll('#searchVis .array-element');
-        let found = false;
-        let steps = 0;
-
-        // Reset elements
-        elements.forEach(el => {
-            el.classList.remove('highlight', 'found');
-        });
-
-        for (let i = 0; i < elements.length; i++) {
-            steps++;
-            elements[i].classList.add('highlight');
-            safeSetTextContent('searchSteps', `Step ${steps}: Checking element ${searchArray[i]} at index ${i}`);
-
-            await sleep(1000);
-
-            if (searchArray[i] === target) {
-                elements[i].classList.remove('highlight');
-                elements[i].classList.add('found');
-                safeSetTextContent('searchSteps', `Found ${target} at index ${i} in just ${steps} steps!`);
-                found = true;
-                break;
-            } else {
-                safeSetTextContent('searchSteps', `${searchArray[i]} is not ${target}, continue searching`);
-            }
-
-            elements[i].classList.remove('highlight');
-            await sleep(500);
-        }
-
-        if (!found) {
-            safeSetTextContent('searchSteps', `Did not find ${target} in ${steps} steps.`);
-        }
-
-        isAnimating = false;
-    }
-    async function binarySearch() {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        const inputElement = safeGetElement('searchInput');
-        if (!inputElement) return;
-
-        const target = parseInt(inputElement.value);
-        searchArray = Array.from(document.querySelectorAll('#searchVis .array-element')).map(Element => +Element.textContent);
-        searchArray.sort((a, b) => a - b); // Ensure the array is sorted
-        const elements = document.querySelectorAll('#searchVis .array-element');
-
-        let left = 0;
-        let right = searchArray.length - 1;
-        let found = false;
-        let steps = 0;
-
-        // Reset elements
-        elements.forEach(el => {
-            el.classList.remove('highlight', 'found');
-        });
-
-        while (left <= right) {
-            steps++;
-            const mid = Math.floor((left + right) / 2);
-            elements[mid].classList.add('highlight');
-            safeSetTextContent('searchSteps', `Step ${steps}: Checking middle element ${searchArray[mid]} at index ${mid}`);
-
-            await sleep(1000);
-
-            if (searchArray[mid] === target) {
-                elements[mid].classList.remove('highlight');
-                elements[mid].classList.add('found');
-                safeSetTextContent('searchSteps', `Found ${target} at index ${mid} in just ${steps} smart steps!`);
-                found = true;
-                break;
-            } else if (searchArray[mid] < target) {
-                safeSetTextContent('searchSteps', `${searchArray[mid]} < ${target}, search right half`);
-                left = mid + 1;
-            } else {
-                safeSetTextContent('searchSteps', `${searchArray[mid]} > ${target}, search left half`);
-                right = mid - 1;
-            }
-
-            elements[mid].classList.remove('highlight');
-            await sleep(500);
-        }
-
-        if (!found) {
-            safeSetTextContent('searchSteps', `Did not find ${target} in ${steps} steps.`);
-        }
-
-        isAnimating = false;
-    }
-    function resetSearch() {
-        searchArray = [5, 12, 25, 34, 64];
-        const container = safeGetElement('searchVis');
-        if (!container) return;
-
-        container.innerHTML = '';
-        searchArray.forEach(value => {
-            const element = document.createElement('div');
-            element.className = 'array-element';
-            element.textContent = value;
-            container.appendChild(element);
-        });
-
-        safeSetTextContent('searchSteps', 'Enter a number and choose search method');
-        safeSetTextContent('searchResult', '');
-        isAnimating = false;
-    }
-    // Utility functions for safe DOM access
-    function safeGetElement(id) {
-        return document.getElementById(id);
-    }
-    function safeSetTextContent(id, value) {
-        const element = safeGetElement(id);
-        if (element) {
-            element.textContent = value;
-        }
-    }
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    // Sorting Functions
-    function updateSortDisplay() {
-        const container = safeGetEElement('sortVis');
-        if (!container) return;
-        container.innerHTML = '';
-        sortArray.forEach(value => {
-            const element = document.createElement('div');
-            element.className = 'array-element';
-            element.textContent = value;
-            container.appendChild(element);
-        });
-        sortArray.sort((a, b) => a - b);
-        safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
-    }
-    // Event listeners for DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => {
-        updateSortDisplay();
-    });
-    // Initialize sections
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-    });
-    document.querySelector('.section').classList.add('active');
-    // Initialize search
-    resetSearch();
-    // Initialize stack and queue
-    updateStackVisualization();
-    updateQueueVisualization();
-    updateQueueDisplay();
-    // Initialize string
-    updateStringDisplay();
-    updateString();
-    // Initialize recursion
-    updateRecursionVisualization();
-    calculateFactorial();
-    showFibonacci();
-        // });
-</script>
 </body>
 
 </html>

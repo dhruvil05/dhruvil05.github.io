@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Fundamentals - Interactive Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .navigation {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .visualization {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .array-visual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin: 15px 0;
+        }
+
+        .array-element {
+            width: 50px;
+            height: 50px;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .array-element.highlight {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .array-element.found {
+            background: #48bb78;
+            color: white;
+        }
+
+        .array-index {
+            position: absolute;
+            top: -25px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .stack-visual {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stack-element {
+            width: 120px;
+            height: 40px;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .stack-element.top {
+            background: #667eea;
+            color: white;
+        }
+
+        .queue-visual {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .queue-element {
+            width: 60px;
+            height: 40px;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .queue-element.front {
+            background: #48bb78;
+            color: white;
+        }
+
+        .queue-element.rear {
+            background: #ed8936;
+            color: white;
+        }
+
+        .tree-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .tree-level {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .tree-node {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .tree-node.visited {
+            background: #667eea;
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .input-group input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            width: 100px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .explanation {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .performance-info {
+            background: #fff5f5;
+            border-left: 4px solid #e53e3e;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .step-counter {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-btn {
+                width: 200px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .array-element {
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 150px;
+            }
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:hover {
+            background: #f7fafc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 DSA Fundamentals</h1>
+            <p>Master Data Structures and Algorithms with Interactive Examples</p>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showSection('arrays')">Arrays</button>
+            <button class="nav-btn" onclick="showSection('strings')">Strings</button>
+            <button class="nav-btn" onclick="showSection('stacks')">Stacks</button>
+            <button class="nav-btn" onclick="showSection('queues')">Queues</button>
+            <button class="nav-btn" onclick="showSection('recursion')">Recursion</button>
+            <button class="nav-btn" onclick="showSection('sorting')">Sorting</button>
+            <button class="nav-btn" onclick="showSection('searching')">Searching</button>
+        </div>
+
+        <!-- Arrays Section -->
+        <div id="arrays" class="section active">
+            <h2>📊 Arrays</h2>
+
+            <div class="concept-card">
+                <h3>What is an Array?</h3>
+                <p><strong>Think of it like:</strong> A row of numbered boxes where you can store items. Each box has a
+                    specific position (index) starting from 0.</p>
+
+                <div class="explanation">
+                    <strong>Real-life example:</strong> Like a parking lot with numbered spaces. Space 0, Space 1, Space
+                    2... Each space can hold exactly one car.
+                </div>
+            </div>
+
+            <div class="visualization">
+                <h4>Array Visualization</h4>
+                <div class="array-visual" id="arrayVis">
+                    <div class="array-element"><span class="array-index">0</span>10</div>
+                    <div class="array-element"><span class="array-index">1</span>25</div>
+                    <div class="array-element"><span class="array-index">2</span>5</div>
+                    <div class="array-element"><span class="array-index">3</span>40</div>
+                    <div class="array-element"><span class="array-index">4</span>15</div>
+                </div>
+
+                <div class="controls">
+                    <div class="input-group">
+                        <label>Index:</label>
+                        <input type="number" id="arrayIndex" min="0" max="4" value="0">
+                    </div>
+                    <button class="btn" onclick="accessArrayElement()">Access Element</button>
+                    <button class="btn" onclick="resetArray()">Reset</button>
+                </div>
+            </div>
+
+            <div class="code-example">
+                // Creating an array
+                let numbers = [10, 25, 5, 40, 15];
+
+                // Accessing elements (0-based indexing)
+                console.log(numbers[0]); // Output: 10
+                console.log(numbers[2]); // Output: 5
+
+                // Adding elements
+                numbers.push(30); // Adds 30 to the end
+
+                // Array length
+                console.log(numbers.length); // Output: 6
+            </div>
+
+            <div class="performance-info">
+                <strong>Comparison:</strong><br>
+                • Linear Search: O(n) - Must check every element in worst case<br>
+                • Binary Search: O(log n) - Eliminates half the data each step<br>
+                • Binary search only works on sorted arrays!<br>
+                • For 1 million items: Linear might take 1M steps, Binary takes only 20!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentArray = [10, 25, 5, 40, 15];
+        let currentString = "HELLO";
+        let stack = [10, 20, 30];
+        let queue = [10, 20, 30, 40];
+        let sortArray = [64, 34, 25, 12, 22];
+        let searchArray = [5, 12, 25, 34, 64];
+        let isAnimating = false;
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Arrays Functions
+        function accessArrayElement() {
+            const indexInput = safeGetElement('arrayIndex');
+            if (!indexInput) return;
+
+            const index = parseInt(indexInput.value);
+            const elements = document.querySelectorAll('#arrayVis .array-element');
+
+            // Reset all elements
+            elements.forEach(el => el.classList.remove('highlight'));
+
+            // Highlight selected element
+            if (index >= 0 && index < elements.length) {
+                elements[index].classList.add('highlight');
+            }
+        }
+
+        function resetArray() {
+            const elements = document.querySelectorAll('#arrayVis .array-element');
+            elements.forEach(el => el.classList.remove('highlight'));
+        }
+
+        // Strings Functions
+        function updateString() {
+            const inputElement = safeGetElement('stringInput');
+            const container = safeGetElement('stringVis');
+            if (!inputElement || !container) return;
+
+            const input = inputElement.value.toUpperCase();
+            container.innerHTML = '';
+
+            for (let i = 0; i < input.length && i < 10; i++) {
+                const element = document.createElement('div');
+                element.className = 'array-element';
+                element.innerHTML = `<span class="array-index">${i}</span>${input[i]}`;
+                container.appendChild(element);
+            }
+            currentString = input;
+        }
+
+        function reverseString() {
+            const inputElement = safeGetElement('stringInput');
+            if (!inputElement) return;
+
+            const reversed = currentString.split('').reverse().join('');
+            inputElement.value = reversed;
+            updateString();
+        }
+
+        // Stack Functions
+        function pushStack() {
+            const inputElement = safeGetElement('stackInput');
+            if (!inputElement) return;
+
+            const value = inputElement.value;
+            if (value && stack.length < 6) {
+                stack.push(parseInt(value));
+                updateStackDisplay();
+                inputElement.value = parseInt(value) + 10;
+            }
+        }
+
+        function popStack() {
+            if (stack.length > 0) {
+                stack.pop();
+                updateStackDisplay();
+            }
+        }
+
+        function resetStack() {
+            stack = [10, 20, 30];
+            updateStackDisplay();
+            const inputElement = safeGetElement('stackInput');
+            if (inputElement) inputElement.value = 40;
+        }
+
+        // Queue Functions
+        function enqueue() {
+            const inputElement = safeGetElement('queueInput');
+            if (!inputElement) return;
+
+            const value = inputElement.value;
+            if (value && queue.length < 8) {
+                queue.push(parseInt(value));
+                updateQueueDisplay();
+                inputElement.value = parseInt(value) + 10;
+            }
+        }
+
+        function dequeue() {
+            if (queue.length > 0) {
+                queue.shift();
+                updateQueueDisplay();
+            }
+        }
+
+        function resetQueue() {
+            queue = [10, 20, 30, 40];
+            updateQueueDisplay();
+            const inputElement = safeGetElement('queueInput');
+            if (inputElement) inputElement.value = 50;
+        }
+
+        // Recursion Functions
+        function calculateFactorial() {
+            const inputElement = safeGetElement('factorialInput');
+            if (!inputElement) return;
+
+            const n = parseInt(inputElement.value);
+            const result = factorial(n);
+            safeSetTextContent('recursionResult', `${n}! = ${result}`);
+
+            // Show the breakdown
+            showFactorialBreakdown(n);
+        }
+
+        function factorial(n) {
+            if (n <= 1) return 1;
+            return n * factorial(n - 1);
+        }
+
+        function showFactorialBreakdown(n) {
+            const container = safeGetElement('recursionVis');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const breakdown = document.createElement('div');
+            breakdown.style.textAlign = 'left';
+            breakdown.style.maxWidth = '400px';
+            breakdown.style.margin = '0 auto';
+
+            for (let i = n; i >= 1; i--) {
+                const line = document.createElement('div');
+                line.style.marginLeft = `${(n - i) * 20}px`;
+                if (i === 1) {
+                    line.textContent = `factorial(${i}) = 1 ← Base case`;
+                    line.style.color = '#e53e3e';
+                    line.style.fontWeight = 'bold';
+                } else {
+                    line.textContent = `factorial(${i}) = ${i} × factorial(${i - 1})`;
+                }
+                breakdown.appendChild(line);
+            }
+
+            container.appendChild(breakdown);
+        }
+
+        function showFibonacci() {
+            const container = safeGetElement('recursionVis');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const fibDisplay = document.createElement('div');
+            fibDisplay.style.textAlign = 'center';
+
+            const sequence = [];
+            for (let i = 0; i <= 8; i++) {
+                sequence.push(fibonacci(i));
+            }
+
+            fibDisplay.innerHTML = `
+                <h4>Fibonacci Sequence</h4>
+                <p>Each number is the sum of the two preceding ones</p>
+                <div style="font-size: 1.2rem; margin: 15px 0;">
+                    ${sequence.join(', ')}
+                </div>
+                <p>fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)</p>
+            `;
+
+            container.appendChild(fibDisplay);
+            safeSetTextContent('recursionResult', `Fibonacci sequence generated!`);
+        }
+
+        function fibonacci(n) {
+            if (n <= 1) return n;
+            return fibonacci(n - 1) + fibonacci(n - 2);
+        }
+
+        // Sorting Functions
+        async function startBubbleSort() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const elements = document.querySelectorAll('#sortVis .array-element');
+            const arr = [...sortArray];
+            let steps = 0;
+
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr.length - 1; j++) {
+                    steps++;
+
+                    // Highlight elements being compared
+                    elements[j].classList.add('highlight');
+                    elements[j + 1].classList.add('highlight');
+
+                    safeSetTextContent('sortSteps', `Step ${steps}: Comparing ${arr[j]} and ${arr[j + 1]}`);
+
+                    await sleep(1000);
+
+                    if (arr[j] > arr[j + 1]) {
+                        // Swap
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        elements[j].textContent = arr[j];
+                        elements[j + 1].textContent = arr[j + 1];
+
+                        safeSetTextContent('sortSteps', `Step ${steps}: Swapped! Now: ${arr.join(', ')}`);
+                        await sleep(1000);
+                    }
+
+                    // Remove highlights
+                    elements[j].classList.remove('highlight');
+                    elements[j + 1].classList.remove('highlight');
+                }
+            }
+
+            // Show completion
+            elements.forEach(el => el.classList.add('found'));
+            safeSetTextContent('sortSteps', `Sorting complete! Array is now sorted in ${steps} steps.`);
+            sortArray = arr;
+            isAnimating = false;
+        }
+
+        function generateRandomArray() {
+            sortArray = [];
+            for (let i = 0; i < 5; i++) {
+                sortArray.push(Math.floor(Math.random() * 90) + 10);
+            }
+            updateSortDisplay();
+        }
+
+        function resetSorting() {
+            sortArray = [64, 34, 25, 12, 22];
+            updateSortDisplay();
+            safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
+            isAnimating = false;
+        }
+
+        // Searching Functions
+        async function linearSearch() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const inputElement = safeGetElement('searchInput');
+            if (!inputElement) return;
+
+            const target = parseInt(inputElement.value);
+            const elements = document.querySelectorAll('#searchVis .array-element');
+            let found = false;
+            let steps = 0;
+
+            // Reset elements
+            elements.forEach(el => {
+                el.classList.remove('highlight', 'found');
+            });
+
+            for (let i = 0; i < searchArray.length; i++) {
+                steps++;
+                elements[i].classList.add('highlight');
+                safeSetTextContent('searchSteps', `Step ${steps}: Checking ${searchArray[i]}`);
+
+                await sleep(800);
+
+                if (searchArray[i] === target) {
+                    elements[i].classList.remove('highlight');
+                    elements[i].classList.add('found');
+                    safeSetTextContent('searchSteps', `Found ${target} at index ${i} in ${steps} steps!`);
+                    found = true;
+                    break;
+                } else {
+                    elements[i].classList.remove('highlight');
+                }
+            }
+
+            if (!found) {
+                safeSetTextContent('searchSteps', `${target} not found after checking all ${steps} elements.`);
+            }
+
+            isAnimating = false;
+        }
+
+        async function binarySearch() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const inputElement = safeGetElement('searchInput');
+            if (!inputElement) return;
+
+            const target = parseInt(inputElement.value);
+            const elements = document.querySelectorAll('#searchVis .array-element');
+            let left = 0;
+            let right = searchArray.length - 1;
+            let found = false;
+            let steps = 0;
+
+            // Reset elements
+            elements.forEach(el => {
+                el.classList.remove('highlight', 'found');
+            });
+
+            while (left <= right) {
+                steps++;
+                const mid = Math.floor((left + right) / 2);
+
+                elements[mid].classList.add('highlight');
+                safeSetTextContent('searchSteps', `Step ${steps}: Checking middle element ${searchArray[mid]} at index ${mid}`);
+
+                await sleep(1000);
+
+                if (searchArray[mid] === target) {
+                    elements[mid].classList.remove('highlight');
+                    elements[mid].classList.add('found');
+                    safeSetTextContent('searchSteps', `Found ${target} at index ${mid} in just ${steps} steps!`);
+                    found = true;
+                    break;
+                } else if (searchArray[mid] < target) {
+                    safeSetTextContent('searchSteps', `${searchArray[mid]} < ${target}, search right half`);
+                    left = mid + 1;
+                } else {
+                    safeSetTextContent('searchSteps', `${searchArray[mid]} > ${target}, search left half`);
+                    right = mid - 1;
+                }
+
+                elements[mid].classList.remove('highlight');
+                await sleep(500);
+            }
+
+            if (!found) {
+                safeSetTextContent('searchSteps', `${target} not found after ${steps} smart steps.`);
+            }
+
+            isAnimating = false;
+        }
+
+        function resetSearch() {
+            const elements = document.querySelectorAll('#searchVis .array-element');
+            elements.forEach(el => {
+                el.classList.remove('highlight', 'found');
+            });
+            safeSetTextContent('searchSteps', 'Enter a number and choose search method');
+            isAnimating = false;
+        }
+
+        // Utility function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Safe element access function
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element with id '${id}' not found`);
+                return null;
+            }
+            return element;
+        }
+
+        // Safe innerHTML update
+        function safeSetInnerHTML(id, content) {
+            const element = safeGetElement(id);
+            if (element) {
+                element.innerHTML = content;
+            }
+        }
+
+        // Safe textContent update
+        function safeSetTextContent(id, content) {
+            const element = safeGetElement(id);
+            if (element) {
+                element.textContent = content;
+            }
+        }
+
+        // Updated Stack Functions with null checks
+        function updateStackDisplay() {
+            const container = safeGetElement('stackVis');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            stack.forEach((value, index) => {
+                const element = document.createElement('div');
+                element.className = 'stack-element';
+                if (index === stack.length - 1) {
+                    element.classList.add('top');
+                }
+                element.textContent = value;
+                container.appendChild(element);
+            });
+
+            safeSetTextContent('stackSteps', `Stack Size: ${stack.length}`);
+        }
+
+        // Updated Queue Functions with null checks
+        function updateQueueDisplay() {
+            const container = safeGetElement('queueVis');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            queue.forEach((value, index) => {
+                const element = document.createElement('div');
+                element.className = 'queue-element';
+                if (index === 0) element.classList.add('front');
+                if (index === queue.length - 1) element.classList.add('rear');
+                element.textContent = value;
+                container.appendChild(element);
+            });
+
+            safeSetTextContent('queueSteps', `Queue Size: ${queue.length}`);
+        }
+
+        // Updated Sort Display with null checks
+        function updateSortDisplay() {
+            const container = safeGetElement('sortVis');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            sortArray.forEach(value => {
+                const element = document.createElement('div');
+                element.className = 'array-element';
+                element.textContent = value;
+                container.appendChild(element);
+            });
+        }
+
+        // Initialize displays when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all displays
+            if (safeGetElement('stackVis')) updateStackDisplay();
+            if (safeGetElement('queueVis')) updateQueueDisplay();
+            if (safeGetElement('sortVis')) updateSortDisplay();
+        });
+    </script>
+</body>
+
+</html>
+<strong>Time Complexity:</strong><br>
+• Access by index: O(1) - Super fast!<br>
+• Search for value: O(n) - Must check each element<br>
+• Insert at end: O(1) - Just add it<br>
+• Insert at beginning: O(n) - Must shift all elements
+</div>
+</div>
+
+<!-- Strings Section -->
+<div id="strings" class="section">
+    <h2>🔤 Strings</h2>
+
+    <div class="concept-card">
+        <h3>What is a String?</h3>
+        <p><strong>Think of it like:</strong> A sequence of characters (letters, numbers, symbols) arranged in order.
+            Like beads on a string!</p>
+
+        <div class="explanation">
+            <strong>Real-life example:</strong> Your name written on paper. Each letter has a position: H-E-L-L-O
+            (positions 0,1,2,3,4)
+        </div>
+    </div>
+
+    <div class="visualization">
+        <h4>String Visualization</h4>
+        <div class="array-visual" id="stringVis">
+            <div class="array-element"><span class="array-index">0</span>H</div>
+            <div class="array-element"><span class="array-index">1</span>E</div>
+            <div class="array-element"><span class="array-index">2</span>L</div>
+            <div class="array-element"><span class="array-index">3</span>L</div>
+            <div class="array-element"><span class="array-index">4</span>O</div>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label>Enter Text:</label>
+                <input type="text" id="stringInput" value="HELLO" maxlength="10">
+            </div>
+            <button class="btn" onclick="updateString()">Update String</button>
+            <button class="btn" onclick="reverseString()">Reverse</button>
+        </div>
+    </div>
+
+    <div class="code-example">
+        // Creating strings
+        let greeting = "Hello";
+        let name = "World";
+
+        // String operations
+        console.log(greeting + " " + name); // "Hello World"
+        console.log(greeting.length); // 5
+        console.log(greeting[0]); // "H"
+
+        // Useful string methods
+        console.log(greeting.toUpperCase()); // "HELLO"
+        console.log(greeting.slice(1, 4)); // "ell"
+        console.log(greeting.includes("ell")); // true
+    </div>
+
+    <div class="performance-info">
+        <strong>Common Operations:</strong><br>
+        • Access character: O(1)<br>
+        • Search substring: O(n*m)<br>
+        • Concatenation: O(n+m)<br>
+        • Length: O(1)
+    </div>
+</div>
+
+<!-- Stacks Section -->
+<div id="stacks" class="section">
+    <h2>📚 Stacks</h2>
+
+    <div class="concept-card">
+        <h3>What is a Stack?</h3>
+        <p><strong>Think of it like:</strong> A stack of plates. You can only add or remove plates from the top. Last
+            In, First Out (LIFO).</p>
+
+        <div class="explanation">
+            <strong>Real-life examples:</strong> Stack of books, undo function in software, browser back button
+        </div>
+    </div>
+
+    <div class="visualization">
+        <h4>Stack Operations</h4>
+        <div class="stack-visual" id="stackVis">
+            <div class="stack-element">10</div>
+            <div class="stack-element">20</div>
+            <div class="stack-element top">30</div>
+        </div>
+        <p>👆 Top of Stack</p>
+
+        <div class="controls">
+            <div class="input-group">
+                <label>Value:</label>
+                <input type="number" id="stackInput" value="40">
+            </div>
+            <button class="btn" onclick="pushStack()">Push (Add)</button>
+            <button class="btn" onclick="popStack()">Pop (Remove)</button>
+            <button class="btn" onclick="resetStack()">Reset</button>
+        </div>
+
+        <div class="step-counter" id="stackSteps">Stack Size: 3</div>
+    </div>
+
+    <div class="code-example">
+        // Stack implementation using array
+        let stack = [];
+
+        // Push (add to top)
+        stack.push(10);
+        stack.push(20);
+        stack.push(30);
+        console.log(stack); // [10, 20, 30]
+
+        // Pop (remove from top)
+        let top = stack.pop(); // Returns 30
+        console.log(top); // 30
+        console.log(stack); // [10, 20]
+
+        // Peek (look at top without removing)
+        console.log(stack[stack.length - 1]); // 20
+    </div>
+
+    <div class="performance-info">
+        <strong>Time Complexity:</strong><br>
+        • Push: O(1)<br>
+        • Pop: O(1)<br>
+        • Peek: O(1)<br>
+        • Search: O(n)
+    </div>
+</div>
+
+<!-- Queues Section -->
+<div id="queues" class="section">
+    <h2>🚶‍♂️ Queues</h2>
+
+    <div class="concept-card">
+        <h3>What is a Queue?</h3>
+        <p><strong>Think of it like:</strong> A line at a coffee shop. First person in line gets served first. First In,
+            First Out (FIFO).</p>
+
+        <div class="explanation">
+            <strong>Real-life examples:</strong> Printer queue, traffic lights, customer service lines
+        </div>
+    </div>
+
+    <div class="visualization">
+        <h4>Queue Operations</h4>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>👈 Front (Remove)</span>
+            <span>Rear (Add) 👉</span>
+        </div>
+        <div class="queue-visual" id="queueVis">
+            <div class="queue-element front">10</div>
+            <div class="queue-element">20</div>
+            <div class="queue-element">30</div>
+            <div class="queue-element rear">40</div>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label>Value:</label>
+                <input type="number" id="queueInput" value="50">
+            </div>
+            <button class="btn" onclick="enqueue()">Enqueue (Add)</button>
+            <button class="btn" onclick="dequeue()">Dequeue (Remove)</button>
+            <button class="btn" onclick="resetQueue()">Reset</button>
+        </div>
+
+        <div class="step-counter" id="queueSteps">Queue Size: 4</div>
+    </div>
+
+    <div class="code-example">
+        // Queue implementation using array
+        let queue = [];
+
+        // Enqueue (add to rear)
+        queue.push(10);
+        queue.push(20);
+        queue.push(30);
+        console.log(queue); // [10, 20, 30]
+
+        // Dequeue (remove from front)
+        let first = queue.shift(); // Returns 10
+        console.log(first); // 10
+        console.log(queue); // [20, 30]
+
+        // Peek front
+        console.log(queue[0]); // 20
+    </div>
+
+    <div class="performance-info">
+        <strong>Time Complexity:</strong><br>
+        • Enqueue: O(1)<br>
+        • Dequeue: O(1) with proper implementation<br>
+        • Peek: O(1)<br>
+        • Search: O(n)
+    </div>
+</div>
+
+<!-- Recursion Section -->
+<div id="recursion" class="section">
+    <h2>🔄 Recursion</h2>
+
+    <div class="concept-card">
+        <h3>What is Recursion?</h3>
+        <p><strong>Think of it like:</strong> A function that calls itself to solve smaller versions of the same
+            problem. Like Russian nesting dolls!</p>
+
+        <div class="explanation">
+            <strong>Real-life example:</strong> Looking for your keys by checking one room, then asking someone else to
+            check the remaining rooms the same way.
+        </div>
+    </div>
+
+    <div class="visualization">
+        <h4>Factorial Example: 5!</h4>
+        <div id="recursionVis">
+            <div style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <div>factorial(5) = 5 × factorial(4)</div>
+                <div style="margin-left: 20px;">factorial(4) = 4 × factorial(3)</div>
+                <div style="margin-left: 40px;">factorial(3) = 3 × factorial(2)</div>
+                <div style="margin-left: 60px;">factorial(2) = 2 × factorial(1)</div>
+                <div style="margin-left: 80px;">factorial(1) = 1 ← Base case</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label>Calculate factorial of:</label>
+                <input type="number" id="factorialInput" value="5" min="1" max="10">
+            </div>
+            <button class="btn" onclick="calculateFactorial()">Calculate</button>
+            <button class="btn" onclick="showFibonacci()">Show Fibonacci</button>
+        </div>
+
+        <div class="step-counter" id="recursionResult">Result: 120</div>
+    </div>
+
+    <div class="code-example">
+        // Factorial using recursion
+        function factorial(n) {
+        // Base case - stops the recursion
+        if (n <= 1) { return 1; } // Recursive case - function calls itself return n * factorial(n - 1); }
+            console.log(factorial(5)); // 120 // Fibonacci sequence function fibonacci(n) { if (n <=1) return n; return
+            fibonacci(n - 1) + fibonacci(n - 2); } console.log(fibonacci(6)); // 8 </div>
+
+            <div class="performance-info">
+                <strong>Key Concepts:</strong><br>
+                • Base Case: Condition that stops recursion<br>
+                • Recursive Case: Function calls itself<br>
+                • Stack Space: Each call uses memory<br>
+                • Can be slower than iterative solutions
+            </div>
+    </div>
+
+    <!-- Sorting Section -->
+    <div id="sorting" class="section">
+        <h2>🔀 Sorting</h2>
+
+        <div class="concept-card">
+            <h3>What is Sorting?</h3>
+            <p><strong>Think of it like:</strong> Arranging books on a shelf by height, or organizing cards in your hand
+                by number.</p>
+
+            <div class="explanation">
+                <strong>Why sort?</strong> Makes searching faster, data looks organized, many algorithms work better on
+                sorted data.
+            </div>
+        </div>
+
+        <div class="visualization">
+            <h4>Bubble Sort Visualization</h4>
+            <div class="array-visual" id="sortVis">
+                <div class="array-element">64</div>
+                <div class="array-element">34</div>
+                <div class="array-element">25</div>
+                <div class="array-element">12</div>
+                <div class="array-element">22</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="startBubbleSort()">Start Bubble Sort</button>
+                <button class="btn" onclick="generateRandomArray()">New Random Array</button>
+                <button class="btn" onclick="resetSorting()">Reset</button>
+            </div>
+
+            <div class="step-counter" id="sortSteps">Click "Start Bubble Sort" to begin</div>
+        </div>
+
+        <div class="code-example">
+            // Bubble Sort - Simple but slow
+            function bubbleSort(arr) {
+            for (let i = 0; i < arr.length; i++) { for (let j=0; j < arr.length - 1; j++) { // Compare adjacent elements
+                if (arr[j]> arr[j + 1]) {
+                // Swap if they're in wrong order
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                }
+                }
+                }
+                return arr;
+                }
+
+                // Quick Sort - Much faster
+                function quickSort(arr) {
+                if (arr.length <= 1) return arr; const pivot=arr[arr.length - 1]; const left=arr.filter(x=> x < pivot);
+                        const right=arr.filter(x=> x > pivot);
+
+                        return [...quickSort(left), pivot, ...quickSort(right)];
+                        }
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Time Complexity</th>
+                    <th>Best For</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bubble Sort</td>
+                    <td>O(n²)</td>
+                    <td>Learning</td>
+                    <td>Repeatedly swaps adjacent elements</td>
+                </tr>
+                <tr>
+                    <td>Quick Sort</td>
+                    <td>O(n log n)</td>
+                    <td>General use</td>
+                    <td>Divide and conquer approach</td>
+                </tr>
+                <tr>
+                    <td>Merge Sort</td>
+                    <td>O(n log n)</td>
+                    <td>Stable sorting</td>
+                    <td>Divides array, then merges sorted parts</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Searching Section -->
+    <div id="searching" class="section">
+        <h2>🔍 Searching</h2>
+
+        <div class="concept-card">
+            <h3>What is Searching?</h3>
+            <p><strong>Think of it like:</strong> Finding a specific book in a library, or looking for a friend's phone
+                number in your contacts.</p>
+
+            <div class="explanation">
+                <strong>Two main types:</strong> Linear (check each item) and Binary (smart jumping for sorted lists).
+            </div>
+        </div>
+
+        <div class="visualization">
+            <h4>Search Algorithms</h4>
+            <div class="array-visual" id="searchVis">
+                <div class="array-element">5</div>
+                <div class="array-element">12</div>
+                <div class="array-element">25</div>
+                <div class="array-element">34</div>
+                <div class="array-element">64</div>
+            </div>
+
+            <div class="controls">
+                <div class="input-group">
+                    <label>Search for:</label>
+                    <input type="number" id="searchInput" value="25">
+                </div>
+                <button class="btn" onclick="linearSearch()">Linear Search</button>
+                <button class="btn" onclick="binarySearch()">Binary Search</button>
+                <button class="btn" onclick="resetSearch()">Reset</button>
+            </div>
+
+            <div class="step-counter" id="searchSteps">Enter a number and choose search method</div>
+        </div>
+
+        <div class="code-example">
+            // Linear Search - Check each element one by one
+            function linearSearch(arr, target) {
+            for (let i = 0; i < arr.length; i++) { if (arr[i]===target) { return i; // Found at index i } } return -1;
+                // Not found } // Binary Search - Only works on sorted arrays function binarySearch(arr, target) { let
+                left=0; let right=arr.length - 1; while (left <=right) { let mid=Math.floor((left + right) / 2); if
+                (arr[mid]===target) { return mid; // Found! } else if (arr[mid] < target) { left=mid + 1; // Search
+                right half } else { right=mid - 1; // Search left half } } return -1; // Not found } </div>
+
+                <div class="performance-info">
+                    <strong>Time Complexity:</strong><br>
+                    • Linear Search: O(n) - Must check each element<br>
+                    • Binary Search: O(log n) - Smart jumping, only works on sorted arrays
+                </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2023 DSA Basics. All rights reserved.</p>
+</footer>
+
+<script>
+    // Global variables
+    let currentString = 'HELLO';
+    let stack = [10, 20, 30];
+    let queue = [10, 20, 30, 40];
+    let sortArray = [64, 34, 25, 12, 22];
+    let searchArray = [5, 12, 25, 34, 64];
+    let isAnimating = false;
+
+    // Navigation function
+    function showSection(event, sectionId) {
+        event.preventDefault();
+
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Remove active class from all buttons
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        // Show the selected section
+        const section = document.getElementById(sectionId);
+        section.classList.add('active');
+        // Add active class to the clicked button
+        event.currentTarget.classList.add('active');
+    }
+    // Initialize the first section as active
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstSection = document.querySelector('.section');
+        firstSection.classList.add('active');
+    });
+    // String Functions
+    function updateString() {
+        const inputElement = safeGetElement('stringInput');
+        if (!inputElement) return;
+
+        const input = inputElement.value;
+        const container = safeGetElement('stringVis');
+        if (!container) return;
+
+        // Clear previous visualization
+        container.innerHTML = '';
+
+        // Create new visualization
+        for (let i = 0; i < input.length; i++) {
+            const charElement = document.createElement('div');
+            charElement.classList.add('char');
+            charElement.textContent = input[i];
+            container.appendChild(charElement);
+        }
+    }
+    function reverseString() {
+        const inputElement = safeGetElement('stringInput');
+        if (!inputElement) return;
+
+        const reversed = inputElement.value.split('').reverse().join('');
+        inputElement.value = reversed;
+        updateString();
+    }
+    // Stack Functions
+    function pushStack() {
+        const inputElement = safeGetElement('stackInput');
+        if (!inputElement) return;
+
+        const value = inputElement.value;
+        if (value && stack.length < 5) {
+            stack.push(parseInt(value));
+            updateStackVisualization();
+        }
+    }
+    function popStack() {
+        if (stack.length > 0) {
+            stack.pop();
+            updateStackDisplay();
+        }
+    }
+    function resetStack() {
+        stack = [10, 20, 30];
+        updateStackDisplay();
+        const inputElement = safeGetElement('stackInput');
+        if (inputElement) inputElement.value = 40;
+    }
+    function updateStackVisualization() {
+        const container = safeGetElement('stackVis');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        stack.forEach((value, index) => {
+            const element = document.createElement('div');
+            element.className = 'stack-element';
+            if (index === stack.length - 1) {
+                element.classList.add('top');
+            }
+            element.textContent = value;
+            container.appendChild(element);
+        });
+
+        safeSetTextContent('stackSteps', `Stack Size: ${stack.length}`);
+    }
+    // Queue Functions
+    function enqueue() {
+        const inputElement = safeGetElement('queueInput');
+        if (!inputElement) return;
+
+        const value = inputElement.value;
+        if (value && queue.length < 5) {
+            queue.push(parseInt(value));
+            updateQueueDisplay();
+        }
+    }
+    function dequeue() {
+        if (queue.length > 0) {
+            queue.shift();
+            updateQueueDisplay();
+        }
+    }
+    function resetQueue() {
+        queue = [10, 20, 30, 40];
+        updateQueueDisplay();
+        const inputElement = safeGetElement('queueInput');
+        if (inputElement) inputElement.value = 50;
+    }
+    function updateQueueDisplay() {
+        const container = safeGetElement('queueVis');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        queue.forEach((value, index) => {
+            const element = document.createElement('div');
+            element.className = 'queue-element';
+            if (index === 0) element.classList.add('front');
+            if (index === queue.length - 1) element.classList.add('rear');
+            element.textContent = value;
+            container.appendChild(element);
+        });
+
+        safeSetTextContent('queueSteps', `Queue Size: ${queue.length}`);
+    }
+    // Recursion Functions
+    function calculateFactorial() {
+        const inputElement = safeGetElement('factorialInput');
+        if (!inputElement) return;
+
+        const number = parseInt(inputElement.value);
+        const result = factorial(number);
+        safeSetTextContent('factorialResult', `Factorial of ${number} is ${result}`);
+    }
+
+    function factorial(n) {
+        if (n === 0) return 1;
+        return n * factorial(n - 1);
+    }
+    function showFibonacci() {
+        const inputElement = safeGetElement('factorialInput');
+        if (!inputElement) return;
+
+        const n = parseInt(inputElement.value);
+        const sequence = [];
+        for (let i = 0; i <= n; i++) {
+            sequence.push(fibonacci(i));
+        }
+
+        const container = safeGetElement('recursionVis');
+        if (!container) return;
+
+        // Clear previous content
+        container.innerHTML = '';
+
+        // Create Fibonacci display
+        const fibDisplay = document.createElement('div');
+        fibDisplay.style.textAlign = 'left';
+        fibDisplay.style.maxWidth = '400px';
+        fibDisplay.style.margin = '0 auto';
+        sequence.forEach((num, index) => {
+            const line = document.createElement('div');
+            line.textContent = `fibonacci(${index}) = ${num}`;
+            fibDisplay.appendChild(line);
+        });
+        container.appendChild(fibDisplay);
+        safeSetTextContent('recursionResult', `Fibonacci sequence up to ${n}: ${sequence.join(', ')}`);
+    }
+    // Sorting Functions
+    async function startBubbleSort() {
+        const array = [5, 3, 8, 4, 2];
+        const container = safeGetElement('sortingVis');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        for (let i = 0; i < array.length - 1; i++) {
+            for (let j = 0; j < array.length - i - 1; j++) {
+                if (array[j] > array[j + 1]) {
+                    // Swap elements
+                    [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+                updateSortingVisualization(container, array, j, j + 1);
+            }
+        }
+    }
+    function updateSortingVisualization(container, arr, highlightIndex1, highlightIndex2) {
+        container.innerHTML = '';
+        arr.forEach((value, index) => {
+            const element = document.createElement('div');
+            element.className = 'array-element';
+            element.textContent = value;
+            if (index === highlightIndex1 || index === highlightIndex2) {
+                element.classList.add('highlight');
+            }
+            container.appendChild(element);
+        });
+    }
+    function generateRandomArray() {
+        sortArray = [];
+        for (let i = 0; i < 5; i++) {
+            sortArray.push(Math.floor(Math.random() * 90) + 10);
+        }
+        updateSortDisplay();
+        safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
+        isAnimating = false;
+    }
+    function resetSorting() {
+        sortArray = [64, 34, 25, 12, 22];
+        updateSortDisplay();
+        safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
+        isAnimating = false;
+    }
+    // Searching Functions
+    async function linearSearch() {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const inputElement = safeGetElement('searchInput');
+        if (!inputElement) return;
+
+        const target = parseInt(inputElement.value);
+        searchArray = Array.from(document.querySelectorAll('#searchVis .array-element')).map(Element => +Element.textContent);
+        const elements = document.querySelectorAll('#searchVis .array-element');
+
+        for (let i = 0; i < elements.length; i++) {
+            if (searchArray[i] === target) {
+                elements[i].classList.add('found');
+                safeSetTextContent('searchResult', `Found ${target} at index ${i}`);
+                isAnimating = false;
+                return;
+            }
+            await new Promise(resolve => setTimeout(resolve, 500));
+            elements[i].classList.add('checked');
+        }
+
+        safeSetTextContent('searchResult', `Did not find ${target}`);
+        isAnimating = false;
+    }
+    async function linearSearchSmart() {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const inputElement = safeGetElement('searchInput');
+        if (!inputElement) return;
+
+        const target = parseInt(inputElement.value);
+        const elements = document.querySelectorAll('#searchVis .array-element');
+        let found = false;
+        let steps = 0;
+
+        // Reset elements
+        elements.forEach(el => {
+            el.classList.remove('highlight', 'found');
+        });
+
+        for (let i = 0; i < elements.length; i++) {
+            steps++;
+            elements[i].classList.add('highlight');
+            safeSetTextContent('searchSteps', `Step ${steps}: Checking element ${searchArray[i]} at index ${i}`);
+
+            await sleep(1000);
+
+            if (searchArray[i] === target) {
+                elements[i].classList.remove('highlight');
+                elements[i].classList.add('found');
+                safeSetTextContent('searchSteps', `Found ${target} at index ${i} in just ${steps} steps!`);
+                found = true;
+                break;
+            } else {
+                safeSetTextContent('searchSteps', `${searchArray[i]} is not ${target}, continue searching`);
+            }
+
+            elements[i].classList.remove('highlight');
+            await sleep(500);
+        }
+
+        if (!found) {
+            safeSetTextContent('searchSteps', `Did not find ${target} in ${steps} steps.`);
+        }
+
+        isAnimating = false;
+    }
+    async function binarySearch() {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const inputElement = safeGetElement('searchInput');
+        if (!inputElement) return;
+
+        const target = parseInt(inputElement.value);
+        searchArray = Array.from(document.querySelectorAll('#searchVis .array-element')).map(Element => +Element.textContent);
+        searchArray.sort((a, b) => a - b); // Ensure the array is sorted
+        const elements = document.querySelectorAll('#searchVis .array-element');
+
+        let left = 0;
+        let right = searchArray.length - 1;
+        let found = false;
+        let steps = 0;
+
+        // Reset elements
+        elements.forEach(el => {
+            el.classList.remove('highlight', 'found');
+        });
+
+        while (left <= right) {
+            steps++;
+            const mid = Math.floor((left + right) / 2);
+            elements[mid].classList.add('highlight');
+            safeSetTextContent('searchSteps', `Step ${steps}: Checking middle element ${searchArray[mid]} at index ${mid}`);
+
+            await sleep(1000);
+
+            if (searchArray[mid] === target) {
+                elements[mid].classList.remove('highlight');
+                elements[mid].classList.add('found');
+                safeSetTextContent('searchSteps', `Found ${target} at index ${mid} in just ${steps} smart steps!`);
+                found = true;
+                break;
+            } else if (searchArray[mid] < target) {
+                safeSetTextContent('searchSteps', `${searchArray[mid]} < ${target}, search right half`);
+                left = mid + 1;
+            } else {
+                safeSetTextContent('searchSteps', `${searchArray[mid]} > ${target}, search left half`);
+                right = mid - 1;
+            }
+
+            elements[mid].classList.remove('highlight');
+            await sleep(500);
+        }
+
+        if (!found) {
+            safeSetTextContent('searchSteps', `Did not find ${target} in ${steps} steps.`);
+        }
+
+        isAnimating = false;
+    }
+    function resetSearch() {
+        searchArray = [5, 12, 25, 34, 64];
+        const container = safeGetElement('searchVis');
+        if (!container) return;
+
+        container.innerHTML = '';
+        searchArray.forEach(value => {
+            const element = document.createElement('div');
+            element.className = 'array-element';
+            element.textContent = value;
+            container.appendChild(element);
+        });
+
+        safeSetTextContent('searchSteps', 'Enter a number and choose search method');
+        safeSetTextContent('searchResult', '');
+        isAnimating = false;
+    }
+    // Utility functions for safe DOM access
+    function safeGetElement(id) {
+        return document.getElementById(id);
+    }
+    function safeSetTextContent(id, value) {
+        const element = safeGetElement(id);
+        if (element) {
+            element.textContent = value;
+        }
+    }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    // Sorting Functions
+    function updateSortDisplay() {
+        const container = safeGetEElement('sortVis');
+        if (!container) return;
+        container.innerHTML = '';
+        sortArray.forEach(value => {
+            const element = document.createElement('div');
+            element.className = 'array-element';
+            element.textContent = value;
+            container.appendChild(element);
+        });
+        sortArray.sort((a, b) => a - b);
+        safeSetTextContent('sortSteps', 'Click "Start Bubble Sort" to begin');
+    }
+    // Event listeners for DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSortDisplay();
+    });
+    // Initialize sections
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.querySelector('.section').classList.add('active');
+    // Initialize search
+    resetSearch();
+    // Initialize stack and queue
+    updateStackVisualization();
+    updateQueueVisualization();
+    updateQueueDisplay();
+    // Initialize string
+    updateStringDisplay();
+    updateString();
+    // Initialize recursion
+    updateRecursionVisualization();
+    calculateFactorial();
+    showFibonacci();
+        // });
+</script>
+</body>
+
+</html>
