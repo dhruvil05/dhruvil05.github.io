@@ -366,15 +366,15 @@
 
             <div class="flex flex-wrap justify-center gap-3">
                 <a href="#circular"
-                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-200" target="_self">
                     Circular Queue
                 </a>
                 <a href="#priority"
-                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-purple-600 rounded-full hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">
+                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-purple-600 rounded-full hover:bg-purple-700 transition-all shadow-lg shadow-purple-200" target="_self">
                     Priority Queue
                 </a>
                 <a href="#deque"
-                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-pink-600 rounded-full hover:bg-pink-700 transition-all shadow-lg shadow-pink-200">
+                    class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-pink-600 rounded-full hover:bg-pink-700 transition-all shadow-lg shadow-pink-200" target="_self">
                     Deque
                 </a>
             </div>
@@ -1274,8 +1274,8 @@
                 }
 
                 slot.className = classes;
-                slot.style.left = (x - 24) + 'px';
-                slot.style.top = (y - 24) + 'px';
+                slot.style.left = (x + 95) + 'px';
+                slot.style.top = (y - 5) + 'px';
                 slot.textContent = hasValue ? circularQueue[i] : i;
 
                 // Add indicators
