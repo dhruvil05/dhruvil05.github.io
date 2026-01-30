@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumPy Interactive Handbook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .content-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 25px 0 15px;
+        }
+
+        h4 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin: 20px 0 10px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-block code {
+            color: #9cdcfe;
+        }
+
+        .output-box {
+            background: #f0f0f0;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .key-points {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .key-points h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+
+        .key-points ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .key-points li {
+            margin: 8px 0;
+        }
+
+        ul,
+        ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            min-width: 500px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .exercise-box {
+            background: #fff9e6;
+            border: 2px solid #ffd700;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .exercise-box h4 {
+            color: #e67e00;
+            margin-top: 0;
+        }
+
+        strong {
+            color: #764ba2;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.3em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px 15px;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 0.85em;
+            }
+
+            .code-block {
+                font-size: 0.8em;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-tabs {
+                gap: 8px;
+            }
+
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .scroll-top:hover {
+            background: #764ba2;
+            transform: translateY(-5px);
+        }
+
+        .scroll-top.visible {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 NumPy Interactive Handbook</h1>
+            <p class="subtitle">Master Numerical Computing in Python</p>
+        </header>
+
+        <div class="nav-tabs" id="navTabs"></div>
+        <div id="content"></div>
+    </div>
+
+    <button class="scroll-top" id="scrollTop">↑</button>
+
+    <script>
+        const topics = [
+            {
+                id: 'intro',
+                title: 'Why NumPy?',
+                content: `
+                    <h2>Why Use NumPy?</h2>
+                    
+                    <p>Python lists are flexible but slow for numerical computing. NumPy solves these problems and provides powerful array operations.</p>
+
+                    <h3>Problems with Python Lists</h3>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>Memory Inefficiency:</strong> Store elements as pointers instead of a continuous block of memory</li>
+                            <li><strong>No Vectorization:</strong> Lack vectorized operations, relying on slow loops instead</li>
+                            <li><strong>High Overhead:</strong> Significant overhead due to dynamic typing</li>
+                        </ul>
+                    </div>
+
+                    <h3>NumPy's Superpowers 🚀</h3>
+                    <div class="key-points">
+                        <ul>
+                            <li>⚡ <strong>Faster than Python lists</strong> - C-optimized backend</li>
+                            <li>💾 <strong>Uses less memory</strong> - Efficient storage in contiguous memory blocks</li>
+                            <li>🔢 <strong>Vectorized operations</strong> - No explicit loops needed</li>
+                            <li>🧮 <strong>Built-in mathematical functions</strong> - Ready-to-use advanced operations</li>
+                        </ul>
+                    </div>
+
+                    <h3>NumPy vs. Python Lists – Performance Test</h3>
+                    <p>Let's compare Python lists with NumPy arrays using a simple example of adding two lists/arrays:</p>
+
+                    <div class="code-block">import numpy as np
+import time
+
+# Python list approach
+size = 1_000_000
+list1 = list(range(size))
+list2 = list(range(size))
+
+start = time.time()
+result = [x + y for x, y in zip(list1, list2)]
+end = time.time()
+print("Python list addition time:", end - start)
+
+# NumPy array approach
+arr1 = np.array(list1)
+arr2 = np.array(list2)
+
+start = time.time()
+result = arr1 + arr2  # Vectorized operation
+end = time.time()
+print("NumPy array addition time:", end - start)</div>
+
+                    <div class="info-box">
+                        <strong>Key Takeaway:</strong> NumPy is significantly faster because it performs operations in C, avoiding Python loops. NumPy can be <strong>10-100x faster</strong> than pure Python!
+                    </div>
+
+                    <h3>Creating NumPy Arrays</h3>
+                    <p>NumPy stores data in a contiguous memory block, making access faster than lists. The <code>shape</code> attribute shows the dimensions of an array.</p>
+
+                    <div class="code-block">import numpy as np
+
+# Creating a 1D NumPy array
+arr1 = np.array([1, 2, 3, 4, 5])
+print(arr1)
+
+# Creating a 2D NumPy array
+arr2 = np.array([[1, 2, 3], [4, 5, 6]])
+print(arr2)
+
+# Checking type and shape
+print("Type:", type(arr1))
+print("Shape:", arr2.shape)</div>
+
+                    <h3>Memory Efficiency – NumPy vs. Lists</h3>
+                    <p>Let's check memory consumption:</p>
+
+                    <div class="code-block">import sys
+
+list_data = list(range(1000))
+numpy_data = np.array(list_data)
+
+print("Python list size:", sys.getsizeof(list_data) * len(list_data), "bytes")
+print("NumPy array size:", numpy_data.nbytes, "bytes")</div>
+
+                    <p>NumPy arrays use significantly less memory compared to Python lists.</p>
+
+                    <h3>Vectorization – No More Loops!</h3>
+                    <p>NumPy avoids loops by applying operations to entire arrays at once using SIMD (Single Instruction, Multiple Data) and other low-level optimizations. SIMD is a CPU-level optimization provided by modern processors.</p>
+
+                    <h4>Example: Squaring Elements</h4>
+                    <div class="code-block"># Python list (loop-based)
+list_squares = [x ** 2 for x in list1]
+
+# NumPy (vectorized)
+numpy_squares = arr1 ** 2  # Much cleaner and faster!</div>
+
+                    <div class="key-points">
+                        <h4>Summary 🎯</h4>
+                        <ul>
+                            <li>NumPy is faster than Python lists because it is optimized in C</li>
+                            <li>It consumes less memory due to efficient storage</li>
+                            <li>It provides vectorized operations, removing the need for slow loops</li>
+                            <li>Essential for data science and machine learning workflows</li>
+                        </ul>
+                    </div>
+
+                    <div class="exercise-box">
+                        <h4>Exercises for Practice 📝</h4>
+                        <ol>
+                            <li>Create a NumPy array with values from 10 to 100 and print its shape</li>
+                            <li>Compare the time taken to multiply two Python lists vs. two NumPy arrays</li>
+                            <li>Find the memory size of a NumPy array with 1 million elements</li>
+                        </ol>
+                    </div>
+                `
+            },
+            {
+                id: 'creating',
+                title: 'Creating Arrays',
+                content: `
+                    <h2>Creating NumPy Arrays</h2>
+
+                    <h3>Why NumPy Arrays?</h3>
+                    <div class="key-points">
+                        <ul>
+                            <li>⚡ Faster than Python lists (C-optimized)</li>
+                            <li>💾 Memory-efficient (contiguous block storage)</li>
+                            <li>🔄 Support vectorized operations with SIMD</li>
+                            <li>🤖 Used in ML, Data Science, and AI</li>
+                        </ul>
+                    </div>
+
+                    <h3>1. Creating Arrays from Python Lists</h3>
+                    <div class="code-block">import numpy as np
+
+# 1D array
+arr1 = np.array([1, 2, 3, 4, 5])
+print(arr1)  # [1 2 3 4 5]
+
+# 2D array
+arr2 = np.array([[1, 2, 3], [4, 5, 6]])
+print(arr2)
+# [[1 2 3]
+#  [4 5 6]]</div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Important:</strong> Unlike lists, all elements in a NumPy array must have the same data type.
+                    </div>
+
+                    <h3>2. Creating Arrays from Scratch</h3>
+                    <p>NumPy offers powerful shortcuts to create arrays without loops:</p>
+
+                    <div class="code-block"># 3x3 array of zeros
+np.zeros((3, 3))
+
+# 2x4 array of ones
+np.ones((2, 4))
+
+# 2x2 array filled with 7
+np.full((2, 2), 7)
+
+# 4x4 identity matrix
+np.eye(4)
+
+# Array from 1 to 9 with step of 2 (like range)
+np.arange(1, 10, 2)  # [1, 3, 5, 7, 9]
+
+# 5 evenly spaced values from 0 to 1
+np.linspace(0, 1, 5)  # [0. 0.25 0.5 0.75 1.]</div>
+
+                    <div class="info-box">
+                        <strong>Key Takeaway:</strong> NumPy offers powerful shortcuts to create arrays without loops!
+                    </div>
+
+                    <h3>3. Checking Array Properties</h3>
+                    <p>NumPy arrays are strongly typed, meaning all elements share the same data type:</p>
+
+                    <div class="code-block">arr = np.array([[10, 20, 30], [40, 50, 60]])
+
+print("Shape:", arr.shape)       # (2, 3) → 2 rows, 3 columns
+print("Size:", arr.size)         # 6 → total elements
+print("Dimensions:", arr.ndim)   # 2 → 2D array
+print("Data type:", arr.dtype)   # int64 (or int32 on Windows)</div>
+
+                    <h3>4. Changing Data Types</h3>
+                    <p>Efficient memory usage by choosing the right data type:</p>
+
+                    <div class="code-block"># Explicit type specification
+arr = np.array([1, 2, 3], dtype=np.float32)
+print(arr.dtype)  # float32
+
+# Convert between types
+arr_int = arr.astype(np.int32)
+print(arr_int)  # [1 2 3]</div>
+
+                    <h3>5. Reshaping and Flattening Arrays</h3>
+                    <div class="code-block">arr = np.array([[1, 2, 3], [4, 5, 6]])
+print(arr.shape)  # (2, 3)
+
+# Change shape
+reshaped = arr.reshape((3, 2))
+print(reshaped)
+# [[1 2]
+#  [3 4]
+#  [5 6]]
+
+# Convert 2D → 1D
+flattened = arr.flatten()
+print(flattened)  # [1 2 3 4 5 6]</div>
+
+                    <div class="exercise-box">
+                        <h4>Practice Exercises 📝</h4>
+                        <ol>
+                            <li>Create a 3×3 array filled with random numbers and print its shape</li>
+                            <li>Convert an array of floats [1.1, 2.2, 3.3] into integers</li>
+                            <li>Use fancy indexing to extract even numbers from [1, 2, 3, 4, 5, 6]</li>
+                            <li>Reshape a 1D array of size 9 into a 3×3 matrix</li>
+                            <li>Use boolean masking to filter numbers greater than 50 in an array</li>
+                        </ol>
+                    </div>
+                `
+            },
+            {
+                id: 'indexing',
+                title: 'Indexing & Slicing',
+                content: `
+                    <h2>Indexing and Slicing</h2>
+
+                    <h3>1. Basic Indexing (Same as Python Lists)</h3>
+                    <div class="code-block">arr = np.array([10, 20, 30, 40])
+
+print(arr[0])   # 10 (first element)
+print(arr[-1])  # 40 (last element)</div>
+
+                    <h3>2. Slicing (Extracting Parts of an Array)</h3>
+                    <div class="code-block">arr = np.array([10, 20, 30, 40, 50])
+
+print(arr[1:4])  # [20 30 40] (slice from index 1 to 3)
+print(arr[:3])   # [10 20 30] (first 3 elements)
+print(arr[::2])  # [10 30 50] (every 2nd element)</div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Critical: Slicing Returns a View, Not a Copy!</strong>
+                        <p>This might seem counterintuitive since Python lists create copies when sliced. But in NumPy, slicing returns a <strong>view</strong> of the original array. Both the sliced array and the original array share the same data in memory, so changes in the slice affect the original array.</p>
+                        
+                        <div class="code-block">sliced = arr[1:4]
+sliced[0] = 999
+print(arr)  # [10 999 30 40 50] - Original changed!</div>
+
+                        <p><strong>Why does this happen?</strong></p>
+                        <ul>
+                            <li><strong>Memory Efficiency:</strong> Avoids unnecessary copies, making operations faster and saving memory</li>
+                            <li><strong>Performance:</strong> Enables faster access and manipulation of large datasets without duplicating data</li>
+                        </ul>
+                        
+                        <p><strong>Solution:</strong> Use <code>.copy()</code> if you need an independent copy:</p>
+                        <div class="code-block">sliced = arr[1:4].copy()  # Now independent</div>
+                    </div>
+
+                    <h3>3. Fancy Indexing (Select Multiple Elements)</h3>
+                    <div class="code-block">arr = np.array([10, 20, 30, 40, 50])
+idx = [0, 2, 4]  # Indices to select
+
+print(arr[idx])  # [10 30 50]</div>
+
+                    <h3>4. Boolean Masking (Filter Data)</h3>
+                    <p>This is a powerful way to filter large datasets efficiently!</p>
+
+                    <div class="code-block">arr = np.array([10, 20, 30, 40, 50])
+
+# Create a boolean mask (condition: values greater than 25)
+mask = arr > 25  # [False False True True True]
+
+# Apply mask to filter
+print(arr[mask])  # [30 40 50]</div>
+
+                    <div class="key-points">
+                        <h4>Summary 🎯</h4>
+                        <ul>
+                            <li>NumPy arrays are faster, memory-efficient alternatives to lists</li>
+                            <li>You can create arrays using np.array(), np.zeros(), np.ones(), etc.</li>
+                            <li>Indexing & slicing allow efficient data manipulation</li>
+                            <li>Reshaping & flattening change array structures without copying data</li>
+                            <li>Fancy indexing & boolean masking help filter and access specific data</li>
+                        </ul>
+                    </div>
+
+                    <div class="exercise-box">
+                        <h4>Practice Exercises 📝</h4>
+                        <ol>
+                            <li>Use fancy indexing to extract even numbers from [1, 2, 3, 4, 5, 6]</li>
+                            <li>Use boolean masking to filter numbers greater than 50 in an array</li>
+                            <li>Create a slice, modify it, and observe the effect on the original array</li>
+                            <li>Use .copy() to create an independent copy and verify it doesn't affect the original</li>
+                        </ol>
+                    </div>
+                `
+            },
+            {
+                id: 'multidim',
+                title: 'Multidimensional Arrays',
+                content: `
+                    <h2>Multidimensional Indexing and Axis</h2>
+
+                    <p>NumPy allows you to efficiently work with multidimensional arrays, where indexing and axis manipulation play a crucial role. Understanding how indexing works across multiple dimensions is essential for data science and machine learning tasks.</p>
+
+                    <h3>1. Understanding Axes in NumPy</h3>
+                    <p>Each dimension in a NumPy array is called an <strong>axis</strong>. Axes are numbered starting from 0:</p>
+
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>1D array</strong> → 1 axis (axis 0)</li>
+                            <li><strong>2D array</strong> → 2 axes (axis 0 = rows, axis 1 = columns)</li>
+                            <li><strong>3D array</strong> → 3 axes (axis 0 = depth, axis 1 = rows, axis 2 = columns)</li>
+                        </ul>
+                    </div>
+
+                    <h4>Example: Axes in a 2D Array</h4>
+                    <div class="code-block">import numpy as np
+
+arr = np.array([[1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9]])
+print(arr)</div>
+
+                    <div class="output-box">[[1 2 3]
+ [4 5 6]
+ [7 8 9]]</div>
+
+                    <p><strong>Understanding Axes:</strong></p>
+                    <ul>
+                        <li><strong>Axis 0 (rows):</strong> Operations move down the columns</li>
+                        <li><strong>Axis 1 (columns):</strong> Operations move across the rows</li>
+                    </ul>
+
+                    <h4>Summing along axes:</h4>
+                    <div class="code-block">print(np.sum(arr, axis=0))  # Sum along rows (down each column)
+print(np.sum(arr, axis=1))  # Sum along columns (across each row)</div>
+
+                    <div class="output-box">[12 15 18]  # Column-wise sum (1+4+7, 2+5+8, 3+6+9)
+[ 6 15 24]  # Row-wise sum (1+2+3, 4+5+6, 7+8+9)</div>
+
+                    <h3>2. Indexing in Multidimensional Arrays</h3>
+                    <p>You can access elements using row and column indices:</p>
+
+                    <div class="code-block"># Accessing an element
+print(arr[1, 2])  # Row index 1, Column index 2 → Output: 6</div>
+
+                    <p>You can also use slicing to extract parts of an array:</p>
+
+                    <div class="code-block">print(arr[0:2, 1:3])  # Extracts first 2 rows and last 2 columns</div>
+
+                    <div class="output-box">[[2 3]
+ [5 6]]</div>
+
+                    <h3>3. Indexing in 3D Arrays</h3>
+                    <p>For 3D arrays, the first index refers to the "depth" (sheets of data):</p>
+
+                    <div class="code-block">arr3D = np.array([[[1, 2, 3], [4, 5, 6]],
+                  [[7, 8, 9], [10, 11, 12]]])
+
+# Output of arr3D.shape is → (depth, rows, columns)
+print(arr3D.shape)  # Output: (2, 2, 3)
+
+# First sheet, second row, third column
+print(arr3D[0, 1, 2])  # Output: 6
+
+# Get the first row from both sheets
+print(arr3D[:, 0, :])</div>
+
+                    <div class="output-box">(2, 2, 3)
+6
+[[ 1  2  3]
+ [ 7  8  9]]</div>
+
+                    <h3>4. Practical Example: Selecting Data Along Axes</h3>
+                    <div class="code-block"># Get all rows of the first column
+first_col = arr[:, 0]
+print(first_col)  # Output: [1 4 7]
+
+# Get the first row from each "sheet" in a 3D array
+first_rows = arr3D[:, 0, :]
+print(first_rows)</div>
+
+                    <div class="output-box">[1 4 7]
+
+[[ 1  2  3]
+ [ 7  8  9]]</div>
+
+                    <h3>5. Changing Data Along an Axis</h3>
+                    <div class="code-block"># Replace all elements in column 1 with 0
+arr[:, 1] = 0
+print(arr)</div>
+
+                    <div class="output-box">[[1 0 3]
+ [4 0 6]
+ [7 0 9]]</div>
+
+                    <div class="key-points">
+                        <h4>Summary 🎯</h4>
+                        <ul>
+                            <li>Axis 0 = rows (vertical movement), Axis 1 = columns (horizontal movement)</li>
+                            <li>Indexing works as arr[row, column] for 2D arrays and arr[depth, row, column] for 3D arrays</li>
+                            <li>Slicing allows extracting subarrays</li>
+                            <li>Operations along axes help efficiently manipulate data without loops</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'datatypes',
+                title: 'Data Types',
+                content: `
+                    <h2>Data Types in NumPy</h2>
+
+                    <h3>1. Introduction to NumPy Data Types</h3>
+                    <p>NumPy arrays are <strong>homogeneous</strong>, meaning they can only store elements of the same type. This is different from Python lists, which can hold mixed data types.</p>
+
+                    <p>NumPy supports various data types (also called dtypes), and understanding them is crucial for optimizing memory usage and performance.</p>
+
+                    <h4>Common Data Types in NumPy:</h4>
+                    <div class="comparison-table">
+                        <table>
+                            <tr>
+                                <th>Data Type</th>
+                                <th>Description</th>
+                                <th>Memory Size</th>
+                            </tr>
+                            <tr>
+                                <td>int32, int64</td>
+                                <td>Integer types with different bit sizes</td>
+                                <td>4 or 8 bytes</td>
+                            </tr>
+                            <tr>
+                                <td>float32, float64</td>
+                                <td>Floating-point types with different precision</td>
+                                <td>4 or 8 bytes</td>
+                            </tr>
+                            <tr>
+                                <td>bool</td>
+                                <td>Boolean data type</td>
+                                <td>1 byte</td>
+                            </tr>
+                            <tr>
+                                <td>complex64, complex128</td>
+                                <td>Complex number types</td>
+                                <td>8 or 16 bytes</td>
+                            </tr>
+                            <tr>
+                                <td>object</td>
+                                <td>For storing objects (e.g., Python objects, strings)</td>
+                                <td>Varies</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <p>You can check the dtype of a NumPy array using the <code>.dtype</code> attribute:</p>
+
+                    <div class="code-block">import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+print(arr.dtype)  # Output: int64 (or int32 depending on the system)
+
+arr = np.array([1.5, 2.7, 3.9])
+print(arr.dtype)  # Output: float64</div>
+
+                    <h3>2. Changing Data Types</h3>
+                    <p>You can cast (convert) the data type of an array using the <code>.astype()</code> method. This is useful when you need to change the type for a specific operation or when you want to reduce memory usage.</p>
+
+                    <h4>Example: Changing Data Types</h4>
+                    <div class="code-block">arr = np.array([1.5, 2.7, 3.9])
+print(arr.dtype)  # Output: float64
+
+arr_int = arr.astype(np.int32)  # Converting float to int
+print(arr_int)       # Output: [1 2 3]
+print(arr_int.dtype) # Output: int32</div>
+
+                    <h4>Example: Downcasting to Save Memory</h4>
+                    <div class="code-block">arr_large = np.array([1000000, 2000000, 3000000], dtype=np.int64)
+arr_small = arr_large.astype(np.int32)  # Downcasting to a smaller dtype
+
+print(arr_small)       # Output: [1000000 2000000 3000000]
+print(arr_small.dtype) # Output: int32</div>
+
+                    <h3>3. Why Data Types Matter in NumPy</h3>
+                    <p>The choice of data type affects:</p>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>Memory Usage:</strong> Smaller data types use less memory</li>
+                            <li><strong>Performance:</strong> Operations on smaller data types are faster due to less data being processed</li>
+                            <li><strong>Precision:</strong> Choosing the appropriate data type ensures that you don't lose precision (e.g., using float32 instead of float64 if you don't need that extra precision)</li>
+                        </ul>
+                    </div>
+
+                    <h4>Example: Memory Usage</h4>
+                    <div class="code-block">arr_int64 = np.array([1, 2, 3], dtype=np.int64)
+arr_int32 = np.array([1, 2, 3], dtype=np.int32)
+
+print(arr_int64.nbytes)  # Output: 24 bytes (3 elements * 8 bytes each)
+print(arr_int32.nbytes)  # Output: 12 bytes (3 elements * 4 bytes each)</div>
+
+                    <h3>4. String Data Type in NumPy</h3>
+                    <p>Although NumPy arrays typically store numerical data, you can also store strings by using the <code>dtype='str'</code> or <code>dtype='U'</code> (Unicode string) format. However, working with strings in NumPy is less efficient than using lists or Python's built-in string types.</p>
+
+                    <h4>Example: String Array</h4>
+                    <div class="code-block">arr = np.array(['apple', 'banana', 'cherry'], dtype='U10')  # Unicode string array
+print(arr)  # ['apple' 'banana' 'cherry']</div>
+
+                    <h3>5. Complex Numbers</h3>
+                    <p>NumPy also supports complex numbers, which consist of a real and imaginary part. You can store complex numbers using <code>complex64</code> or <code>complex128</code> data types.</p>
+
+                    <h4>Example: Complex Numbers</h4>
+                    <div class="code-block">arr = np.array([1 + 2j, 3 + 4j, 5 + 6j], dtype='complex128')
+print(arr)  # [1.+2.j 3.+4.j 5.+6.j]</div>
+
+                    <h3>6. Object Data Type</h3>
+                    <p>If you need to store mixed or complex data types (e.g., Python objects), you can use <code>dtype='object'</code>. However, this type sacrifices performance, so it should only be used when absolutely necessary.</p>
+
+                    <h4>Example: Object Data Type</h4>
+                    <div class="code-block">arr = np.array([{'a': 1}, [1, 2, 3], 'hello'], dtype=object)
+print(arr)  # [{'a': 1} list([1, 2, 3]) 'hello']</div>
+
+                    <h3>7. Choosing the Right Data Type</h3>
+                    <p>Choosing the correct data type is essential for:</p>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>Optimizing memory:</strong> Using the smallest data type that fits your data</li>
+                            <li><strong>Improving performance:</strong> Smaller types generally lead to faster operations</li>
+                            <li><strong>Ensuring precision:</strong> Avoid truncating or losing important decimal places or values</li>
+                        </ul>
+                    </div>
+
+                    <div class="key-points">
+                        <h4>Summary 🎯</h4>
+                        <ul>
+                            <li>NumPy arrays are homogeneous, meaning all elements must be of the same type</li>
+                            <li>Use <code>.astype()</code> to change data types and optimize memory and performance</li>
+                            <li>The choice of data type affects memory usage, performance, and precision</li>
+                            <li>Be mindful of complex numbers and object data types, which can increase memory usage and reduce performance</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'broadcasting',
+                title: 'Broadcasting & Vectorization',
+                content: `
+                    <h2>Broadcasting in NumPy</h2>
+
+                    <p>Now, we'll explore how to make your code faster with vectorization and broadcasting in NumPy. These techniques are key to boosting performance in numerical operations by avoiding slow loops and memory inefficiency.</p>
+
+                    <h3>1. Why Loops Are Slow</h3>
+                    <p>In Python, loops are typically slow because:</p>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>Python's interpreter:</strong> Every iteration of the loop requires Python to interpret the loop logic, which is inherently slower than lower-level, compiled code</li>
+                            <li><strong>High overhead:</strong> Each loop iteration in Python involves additional overhead for function calls, memory access, and index management</li>
+                        </ul>
+                    </div>
+
+                    <p>While Python loops are convenient, they don't take advantage of the optimized memory and computation that libraries like NumPy provide.</p>
+
+                    <h4>Example: Looping Over Arrays in Python</h4>
+                    <div class="code-block">import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+result = []
+
+# Using a loop to square each element (slow)
+for num in arr:
+    result.append(num ** 2)
+    
+print(result)  # Output: [1, 4, 9, 16, 25]</div>
+
+                    <p>This works, but it's not efficient. Each loop iteration is slow, especially with large datasets.</p>
+
+                    <h3>2. Vectorization: Fixing the Loop Problem</h3>
+                    <p>Vectorization allows you to perform operations on entire arrays at once, instead of iterating over elements one by one. This is made possible by NumPy's optimized C-based backend that executes operations in compiled code, which is much faster than Python loops.</p>
+
+                    <p>Vectorized operations are also more readable and compact, making your code easier to maintain.</p>
+
+                    <h4>Example: Vectorized Operation</h4>
+                    <div class="code-block">arr = np.array([1, 2, 3, 4, 5])
+result = arr ** 2  # Vectorized operation
+print(result)  # Output: [1 4 9 16 25]</div>
+
+                    <p>Here, the operation is applied to all elements of the array simultaneously, and it's much faster than looping over the array.</p>
+
+                    <h4>Why is it Faster?</h4>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>Low-level implementation:</strong> NumPy's vectorized operations are implemented in C (compiled language), which is much faster than Python loops</li>
+                            <li><strong>Batch processing:</strong> NumPy processes multiple elements in parallel using SIMD (Single Instruction, Multiple Data), allowing multiple operations to be done simultaneously</li>
+                        </ul>
+                    </div>
+
+                    <h3>3. Broadcasting: Scaling Arrays Without Extra Memory</h3>
+                    <p>Broadcasting is a powerful feature of NumPy that allows you to perform operations on arrays of different shapes without creating copies. It "stretches" smaller arrays across larger arrays in a memory-efficient way, avoiding the overhead of creating multiple copies of data.</p>
+
+                    <h4>Example: Broadcasting with Scalar</h4>
+                    <p>Broadcasting is often used when you want to perform an operation on an array and a scalar value (e.g., add a number to all elements of an array).</p>
+
+                    <div class="code-block">arr = np.array([1, 2, 3, 4, 5])
+result = arr + 10  # Broadcasting: 10 is added to all elements
+print(result)  # Output: [11 12 13 14 15]</div>
+
+                    <p>Here, the scalar 10 is "broadcast" across the entire array, and no extra memory is used.</p>
+
+                    <h3>4. Broadcasting with Arrays of Different Shapes</h3>
+                    <p>Broadcasting becomes more powerful when you apply operations on arrays of different shapes. NumPy automatically adjusts the shapes of arrays to make them compatible for element-wise operations, without actually copying the data.</p>
+
+                    <h4>Example: Broadcasting with Two Arrays</h4>
+                    <div class="code-block">arr1 = np.array([1, 2, 3])
+arr2 = np.array([10, 20, 30])
+
+result = arr1 + arr2  # Element-wise addition
+print(result)  # Output: [11 22 33]</div>
+
+                    <p>NumPy automatically aligns the two arrays and performs element-wise addition, treating them as if they have the same shape.</p>
+
+                    <h4>Example: Broadcasting a 2D Array and a 1D Array</h4>
+                    <div class="code-block">arr1 = np.array([[1, 2, 3], 
+                 [4, 5, 6]])
+arr2 = np.array([1, 2, 3])
+
+result = arr1 + arr2  # Broadcasting arr2 across arr1
+print(result)
+# Output:
+# [[2 4 6]
+#  [5 7 9]]</div>
+
+                    <p>In this case, <code>arr2</code> is broadcast across the rows of <code>arr1</code>, adding [1, 2, 3] to each row.</p>
+
+                    <h4>How Broadcasting Works</h4>
+                    <div class="info-box">
+                        <ol>
+                            <li><strong>Dimensions must be compatible:</strong> The size of the trailing dimensions of the arrays must be either the same or one of them must be 1</li>
+                            <li><strong>Stretching arrays:</strong> If the shapes are compatible, NumPy stretches the smaller array to match the larger one, element-wise, without copying data</li>
+                        </ol>
+                    </div>
+
+                    <h3>5. Hands-on: Applying Broadcasting to Real-World Scenarios</h3>
+                    <p>Let's apply broadcasting to a real-world scenario: scaling data in machine learning.</p>
+
+                    <h4>Example: Normalizing Data Using Broadcasting</h4>
+                    <p>Imagine you have a dataset where each row represents a sample and each column represents a feature. You can normalize the data by subtracting the mean of each column and dividing by the standard deviation.</p>
+
+                    <div class="code-block"># Simulating a dataset (5 samples, 3 features)
+data = np.array([[10, 20, 30],
+                 [15, 25, 35],
+                 [20, 30, 40],
+                 [25, 35, 45],
+                 [30, 40, 50]])
+
+# Calculating mean and standard deviation for each feature (column)
+mean = data.mean(axis=0)
+std = data.std(axis=0)
+
+# Normalizing the data using broadcasting
+normalized_data = (data - mean) / std
+print(normalized_data)</div>
+
+                    <p>In this case, broadcasting allows you to subtract the mean and divide by the standard deviation for each feature without needing loops or creating copies of the data.</p>
+
+                    <div class="key-points">
+                        <h4>Summary 🎯</h4>
+                        <ul>
+                            <li>Loops are slow because Python's interpreter adds overhead, making iteration less efficient</li>
+                            <li>Vectorization allows you to apply operations to entire arrays at once, greatly improving performance by utilizing NumPy's optimized C backend</li>
+                            <li>Broadcasting enables operations between arrays of different shapes by automatically stretching the smaller array to match the shape of the larger array, without creating additional copies</li>
+                            <li>Real-world use: Broadcasting can be used in data science tasks, such as normalizing datasets, without sacrificing memory or performance</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 'functions',
+                title: 'Mathematical Functions',
+                content: `
+                    <h2>Built-in Mathematical Functions in NumPy</h2>
+
+                    <p>Here are some common NumPy methods that are frequently used for statistical and mathematical operations:</p>
+
+                    <h3>1. Statistical Functions</h3>
+                    
+                    <h4>Basic Statistics:</h4>
+                    <div class="code-block">import numpy as np
+
+arr = np.array([10, 20, 30, 40, 50])
+
+# Mean (average)
+np.mean(arr)      # 30.0
+
+# Standard deviation
+np.std(arr)       # Measures spread of data
+
+# Variance
+np.var(arr)       # Square of standard deviation
+
+# Median
+np.median(arr)    # Middle value</div>
+
+                    <h4>Min, Max, and Sum:</h4>
+                    <div class="code-block"># Minimum value
+np.min(arr)       # Smallest element
+
+# Maximum value
+np.max(arr)       # Largest element
+
+# Sum of all elements
+np.sum(arr)       # Total of all elements
+
+# Product of all elements
+np.prod(arr)      # Multiply all elements together</div>
+
+                    <h3>2. Finding Indices</h3>
+                    <div class="code-block"># Index of minimum value
+np.argmin(arr)    # Returns position of min value
+
+# Index of maximum value
+np.argmax(arr)    # Returns position of max value</div>
+
+                    <h3>3. Percentiles</h3>
+                    <div class="code-block"># 50th percentile (median)
+np.percentile(arr, 50)   # Value at 50% mark
+
+# For example, to find the 90th percentile:
+np.percentile(arr, 90)</div>
+
+                    <h3>4. Array Manipulation Functions</h3>
+                    <div class="code-block"># Unique elements
+arr2 = np.array([1, 2, 2, 3, 3, 3, 4])
+np.unique(arr2)   # Returns [1 2 3 4]
+
+# Differences between consecutive elements
+arr3 = np.array([1, 3, 6, 10])
+np.diff(arr3)     # Returns [2 3 4]
+
+# Cumulative sum
+np.cumsum(arr3)   # Returns [1 4 10 20]</div>
+
+                    <h3>5. Generating Ranges</h3>
+                    <div class="code-block"># Create evenly spaced numbers
+np.linspace(0, 10, 5)  # 5 numbers from 0 to 10
+# Returns [0.  2.5  5.  7.5 10.]</div>
+
+                    <h3>6. Logarithmic and Exponential Functions</h3>
+                    <div class="code-block">arr = np.array([1, 2, 3, 4])
+
+# Natural logarithm
+np.log(arr)
+
+# Exponential (e^x)
+np.exp(arr)</div>
+
+                    <h3>7. Correlation Coefficient</h3>
+                    <div class="code-block">arr1 = np.array([1, 2, 3, 4, 5])
+arr2 = np.array([2, 4, 6, 8, 10])
+
+# Compute correlation coefficient matrix
+np.corrcoef(arr1, arr2)</div>
+
+                    <h3>Complete List of Common NumPy Methods</h3>
+                    <div class="comparison-table">
+                        <table>
+                            <tr>
+                                <th>Function</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <td>np.mean(arr)</td>
+                                <td>Compute the mean (average) of an array</td>
+                            </tr>
+                            <tr>
+                                <td>np.std(arr)</td>
+                                <td>Compute the standard deviation</td>
+                            </tr>
+                            <tr>
+                                <td>np.var(arr)</td>
+                                <td>Compute the variance</td>
+                            </tr>
+                            <tr>
+                                <td>np.min(arr)</td>
+                                <td>Find minimum value</td>
+                            </tr>
+                            <tr>
+                                <td>np.max(arr)</td>
+                                <td>Find maximum value</td>
+                            </tr>
+                            <tr>
+                                <td>np.sum(arr)</td>
+                                <td>Sum of all elements</td>
+                            </tr>
+                            <tr>
+                                <td>np.prod(arr)</td>
+                                <td>Product of all elements</td>
+                            </tr>
+                            <tr>
+                                <td>np.median(arr)</td>
+                                <td>Compute the median</td>
+                            </tr>
+                            <tr>
+                                <td>np.percentile(arr, 50)</td>
+                                <td>Compute percentile (e.g., 50th)</td>
+                            </tr>
+                            <tr>
+                                <td>np.argmin(arr)</td>
+                                <td>Index of minimum value</td>
+                            </tr>
+                            <tr>
+                                <td>np.argmax(arr)</td>
+                                <td>Index of maximum value</td>
+                            </tr>
+                            <tr>
+                                <td>np.corrcoef(arr1, arr2)</td>
+                                <td>Correlation coefficient matrix</td>
+                            </tr>
+                            <tr>
+                                <td>np.unique(arr)</td>
+                                <td>Find unique elements</td>
+                            </tr>
+                            <tr>
+                                <td>np.diff(arr)</td>
+                                <td>Compute differences</td>
+                            </tr>
+                            <tr>
+                                <td>np.cumsum(arr)</td>
+                                <td>Cumulative sum</td>
+                            </tr>
+                            <tr>
+                                <td>np.linspace(0, 10, 5)</td>
+                                <td>Evenly spaced numbers</td>
+                            </tr>
+                            <tr>
+                                <td>np.log(arr)</td>
+                                <td>Natural logarithm</td>
+                            </tr>
+                            <tr>
+                                <td>np.exp(arr)</td>
+                                <td>Exponential function</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Note:</strong> These methods are used for performing mathematical and statistical operations with NumPy. They are all vectorized and highly optimized for performance.
+                    </div>
+
+                    <div class="key-points">
+                        <h4>Summary 🎯</h4>
+                        <ul>
+                            <li>NumPy provides comprehensive built-in functions for statistics and mathematics</li>
+                            <li>All functions are vectorized for maximum performance</li>
+                            <li>Use these functions instead of writing loops for better efficiency</li>
+                            <li>Functions work on entire arrays at once</li>
+                        </ul>
+                    </div>
+                `
+            }
+        ];
+
+        // Initialize navigation and content
+        const navTabs = document.getElementById('navTabs');
+        const content = document.getElementById('content');
+
+        topics.forEach((topic, index) => {
+            // Create tab button
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn' + (index === 0 ? ' active' : '');
+            btn.textContent = topic.title;
+            btn.onclick = () => showContent(topic.id);
+            navTabs.appendChild(btn);
+
+            // Create content section
+            const section = document.createElement('div');
+            section.className = 'content-section' + (index === 0 ? ' active' : '');
+            section.id = topic.id;
+            section.innerHTML = topic.content;
+            content.appendChild(section);
+        });
+
+        function showContent(id) {
+            // Update tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Scroll to top button
+        const scrollTopBtn = document.getElementById('scrollTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+
+</html>

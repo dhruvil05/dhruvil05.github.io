@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-height: 500px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #f5576c;
+        }
+
+        .tip-box strong {
+            color: #c44569;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .code-block .keyword {
+            color: #ff79c6;
+        }
+
+        .code-block .string {
+            color: #50fa7b;
+        }
+
+        .code-block .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .code-block .function {
+            color: #8be9fd;
+        }
+
+        .visual-example {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        ul,
+        ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: #fef5e7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #d35400;
+        }
+
+        .interactive-demo {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+
+        button.demo-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        button.demo-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .canvas-area {
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            margin-top: 15px;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .nav-tabs {
+                padding: 15px;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 0.85em;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .comparison-table {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Data Visualization Mastery</h1>
+            <p class="subtitle">Master Matplotlib & Seaborn - From Basics to Advanced</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('intro')">Introduction</button>
+            <button class="tab-btn" onclick="showTab('matplotlib')">Matplotlib Basics</button>
+            <button class="tab-btn" onclick="showTab('plots')">Line & Bar Charts</button>
+            <button class="tab-btn" onclick="showTab('pie-stack')">Pie & Stack Plots</button>
+            <button class="tab-btn" onclick="showTab('hist-scatter')">Histogram & Scatter</button>
+            <button class="tab-btn" onclick="showTab('subplots')">Subplots</button>
+            <button class="tab-btn" onclick="showTab('seaborn')">Seaborn</button>
+        </div>
+
+        <div class="content-area">
+            <!-- Introduction Tab -->
+            <div id="intro" class="tab-content active">
+                <h2>🎯 Why Data Visualization Matters</h2>
+
+                <div class="info-box">
+                    <h3>Data visualization is the bridge between raw data and human understanding</h3>
+                    <p>When done right, it helps us:</p>
+                    <ul>
+                        <li>✨ Reveal patterns, trends, and correlations in the data</li>
+                        <li>💬 Communicate insights clearly to stakeholders</li>
+                        <li>⚡ Speed up decision-making by simplifying complex datasets</li>
+                        <li>📖 Make data storytelling engaging and accessible to all</li>
+                    </ul>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 John Tukey's Wisdom:</strong> "The greatest value of a picture is when it forces us to
+                    notice what we never expected to see."
+                </div>
+
+                <h3>Exploratory vs Explanatory Visualizations</h3>
+
+                <div class="visual-example">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Exploratory</th>
+                                <th>Explanatory</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Goal</strong></td>
+                                <td>Find insights</td>
+                                <td>Communicate insights</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Audience</strong></td>
+                                <td>Analyst / Data Scientist</td>
+                                <td>Stakeholders / Public</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Style</strong></td>
+                                <td>Raw, fast, flexible</td>
+                                <td>Polished, focused, clean</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Examples</strong></td>
+                                <td>Pair plots, correlation heatmaps</td>
+                                <td>Bar charts in presentations</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>🎨 5 Basic Principles of Good Visualizations</h3>
+
+                <div class="info-box">
+                    <ol>
+                        <li><strong>Clarity:</strong> Avoid clutter. Use labels, legends, and proper axis scales</li>
+                        <li><strong>Context:</strong> What is being measured? Over what time frame? In what units?</li>
+                        <li><strong>Focus:</strong> Highlight the key insight using colors and annotations</li>
+                        <li><strong>Storytelling:</strong> Don't just show data — tell a story. Guide the viewer</li>
+                        <li><strong>Accessibility:</strong> Use color palettes that enhance readability for all viewers
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> Always ask yourself: "What is the ONE thing I want the viewer to
+                    understand from this visual?"
+                </div>
+            </div>
+
+            <!-- Matplotlib Basics Tab -->
+            <div id="matplotlib" class="tab-content">
+                <h2>📈 Introduction to Matplotlib</h2>
+
+                <div class="info-box">
+                    <h3>What is matplotlib.pyplot?</h3>
+                    <p><span class="highlight">matplotlib.pyplot</span> is a module in Matplotlib — it's like a
+                        paintbrush for your data.</p>
+                    <p>We usually import it as <strong>plt</strong> to save typing!</p>
+                </div>
+
+                <div class="code-block">
+                    <span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+                    <span class="comment"># Create a simple plot</span>
+                    plt.<span class="function">plot</span>([<span class="string">1, 2, 3</span>], [<span
+                        class="string">4, 5, 6</span>])
+                    plt.<span class="function">show</span>() <span class="comment"># Display the plot</span>
+                </div>
+
+                <h3>🎮 Interacting with Plots</h3>
+                <p>When a plot appears, you can:</p>
+                <ul>
+                    <li>🔍 Zoom In/Out</li>
+                    <li>✋ Pan around</li>
+                    <li>⬅️ Use arrows to navigate history</li>
+                    <li>🏠 Reset to home view</li>
+                    <li>💾 Save as PNG using the disk icon</li>
+                </ul>
+
+                <h3>📊 Real Example: Cricket Player Runs Over Time</h3>
+
+                <div class="code-block">
+                    years = [<span class="string">1990, 1992, 1994, 1996, 1998, 2000, 2003, 2005, 2007, 2010</span>]
+                    runs = [<span class="string">500, 700, 1100, 1500, 1800, 1200, 1700, 1300, 900, 1500</span>]
+
+                    plt.<span class="function">plot</span>(years, runs)
+                    plt.<span class="function">xlabel</span>(<span class="string">"Year"</span>)
+                    plt.<span class="function">ylabel</span>(<span class="string">"Runs Scored"</span>)
+                    plt.<span class="function">title</span>(<span class="string">"Sachin Tendulkar's Yearly
+                        Runs"</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>🎨 Customization Options</h3>
+
+                <div class="info-box">
+                    <h4>Format Strings</h4>
+                    <div class="code-block">
+                        plt.<span class="function">plot</span>(years, runs, <span class="string">'ro--'</span>) <span
+                            class="comment"># red circles with dashed lines</span>
+                        plt.<span class="function">plot</span>(years, runs, <span class="string">'g^:'</span>) <span
+                            class="comment"># green triangles dotted</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>Color and Line Styles</h4>
+                    <div class="code-block">
+                        plt.<span class="function">plot</span>(years, runs,
+                        color=<span class="string">'orange'</span>,
+                        linestyle=<span class="string">'--'</span>,
+                        linewidth=<span class="string">3</span>,
+                        label=<span class="string">"Player 1"</span>)
+                        plt.<span class="function">legend</span>()
+                        plt.<span class="function">grid</span>(<span class="keyword">True</span>)
+                        plt.<span class="function">tight_layout</span>()
+                    </div>
+                </div>
+
+                <h3>🎭 Plot Styles</h3>
+                <div class="code-block">
+                    <span class="comment"># See all available styles</span>
+                    <span class="keyword">print</span>(plt.style.available)
+
+                    <span class="comment"># Apply a style</span>
+                    plt.style.<span class="function">use</span>(<span class="string">"ggplot"</span>)
+                    plt.style.<span class="function">use</span>(<span class="string">"seaborn-v0_8-bright"</span>)
+
+                    <span class="comment"># XKCD Comic Style!</span>
+                    <span class="keyword">with</span> plt.<span class="function">xkcd</span>():
+                    plt.<span class="function">plot</span>(years, runs)
+                    plt.<span class="function">title</span>(<span class="string">"Epic Battle!"</span>)
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 Pro Tips:</strong>
+                    <ul>
+                        <li>Always start with simple plots</li>
+                        <li>Add labels and legends early</li>
+                        <li>Use <code>plt.grid()</code> and <code>plt.tight_layout()</code> for readability</li>
+                        <li>Try different styles to find what works best</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Line & Bar Charts Tab -->
+            <div id="plots" class="tab-content">
+                <h2>📊 Bar Charts</h2>
+
+                <div class="info-box">
+                    <p>Bar charts are perfect for comparing quantities across categories. They're easy to read and
+                        powerful for visual analysis.</p>
+                </div>
+
+                <h3>Basic Vertical Bar Chart</h3>
+                <div class="code-block">
+                    years = [<span class="string">1990, 1992, 1994, 1996, 1998, 2000</span>]
+                    runs = [<span class="string">500, 700, 1100, 1500, 1800, 1200</span>]
+
+                    plt.<span class="function">bar</span>(years, runs, edgecolor=<span class="string">'black'</span>)
+                    plt.<span class="function">xlabel</span>(<span class="string">"Year"</span>)
+                    plt.<span class="function">ylabel</span>(<span class="string">"Runs Scored"</span>)
+                    plt.<span class="function">title</span>(<span class="string">"Yearly Performance"</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>🎯 Side-by-Side Comparison</h3>
+                <div class="code-block">
+                    <span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+                    sachin = [<span class="string">500, 700, 1100, 1500, 1800</span>]
+                    kohli = [<span class="string">0, 500, 800, 1100, 1300</span>]
+                    sehwag = [<span class="string">0, 200, 900, 1400, 1600</span>]
+
+                    x = np.<span class="function">arange</span>(<span class="function">len</span>(years))
+                    width = <span class="string">0.25</span>
+
+                    plt.<span class="function">bar</span>(x - width, sachin, width, label=<span
+                        class="string">"Sachin"</span>)
+                    plt.<span class="function">bar</span>(x, sehwag, width, label=<span class="string">"Sehwag"</span>)
+                    plt.<span class="function">bar</span>(x + width, kohli, width, label=<span
+                        class="string">"Kohli"</span>)
+
+                    plt.<span class="function">xticks</span>(x, years)
+                    plt.<span class="function">legend</span>()
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <div class="tip-box">
+                    <strong>🔍 Why use xticks()?</strong><br>
+                    By default, plt.bar() uses numeric x-values (0, 1, 2, ...). We use plt.xticks() to set the correct
+                    category labels like years or names.
+                </div>
+
+                <h3>↔️ Horizontal Bar Charts</h3>
+                <div class="code-block">
+                    players = [<span class="string">"Sachin", "Sehwag", "Kohli", "Yuvraj"</span>]
+                    total_runs = [<span class="string">5600, 4100, 2400, 3700</span>]
+
+                    plt.<span class="function">barh</span>(players, total_runs, color=<span
+                        class="string">"skyblue"</span>)
+                    plt.<span class="function">xlabel</span>(<span class="string">"Total Runs in First 5 Years"</span>)
+                    plt.<span class="function">title</span>(<span class="string">"Performance Comparison"</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>📝 Adding Value Labels</h3>
+                <div class="code-block">
+                    players = [<span class="string">"Sachin", "Sehwag", "Kohli"</span>]
+                    runs = [<span class="string">1500, 1200, 1800</span>]
+
+                    plt.<span class="function">bar</span>(players, runs, color=<span class="string">"skyblue"</span>)
+
+                    <span class="comment"># Add labels on top</span>
+                    <span class="keyword">for</span> i <span class="keyword">in</span> <span
+                        class="function">range</span>(<span class="function">len</span>(players)):
+                    plt.<span class="function">text</span>(i, runs[i] + <span class="string">50</span>, <span
+                        class="function">str</span>(runs[i]), ha=<span class="string">'center'</span>)
+
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>📋 Quick Reference</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>plt.bar()</code></td>
+                            <td>Vertical bars for categorical comparison</td>
+                        </tr>
+                        <tr>
+                            <td><code>plt.barh()</code></td>
+                            <td>Horizontal bars (great for long labels)</td>
+                        </tr>
+                        <tr>
+                            <td><code>width=</code></td>
+                            <td>Control thickness/spacing of bars</td>
+                        </tr>
+                        <tr>
+                            <td><code>edgecolor=</code></td>
+                            <td>Add borders to bars</td>
+                        </tr>
+                        <tr>
+                            <td><code>plt.xticks()</code></td>
+                            <td>Replace index numbers with real labels</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pie & Stack Plots Tab -->
+            <div id="pie-stack" class="tab-content">
+                <h2>🥧 Pie Charts</h2>
+
+                <div class="info-box">
+                    <p>Pie charts show part-to-whole relationships. They're visually appealing but best used with
+                        <strong>fewer categories</strong> (3-6 slices ideal).</p>
+                </div>
+
+                <h3>Basic Pie Chart</h3>
+                <div class="code-block">
+                    labels = [<span class="string">"Sachin", "Sehwag", "Kohli", "Yuvraj"</span>]
+                    runs = [<span class="string">18000, 8000, 12000, 9500</span>]
+
+                    plt.<span class="function">pie</span>(runs, labels=labels, autopct=<span
+                        class="string">'%1.1f%%'</span>)
+                    plt.<span class="function">title</span>(<span class="string">"Career Runs Distribution"</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>🎨 Customization Options</h3>
+                <div class="code-block">
+                    colors = [<span class="string">'#ff9999','#66b3ff','#99ff99','#ffcc99'</span>]
+                    explode = [<span class="string">0.1, 0, 0, 0</span>] <span class="comment"># Pull out first
+                        slice</span>
+
+                    plt.<span class="function">pie</span>(
+                    runs,
+                    labels=labels,
+                    colors=colors,
+                    explode=explode,
+                    autopct=<span class="string">'%1.1f%%'</span>,
+                    shadow=<span class="keyword">True</span>,
+                    startangle=<span class="string">140</span>,
+                    wedgeprops={<span class="string">'edgecolor'</span>: <span class="string">'black'</span>}
+                    )
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>📊 Key Parameters</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>labels</code></td>
+                            <td>Label each slice</td>
+                        </tr>
+                        <tr>
+                            <td><code>colors</code></td>
+                            <td>Customize slice colors</td>
+                        </tr>
+                        <tr>
+                            <td><code>explode</code></td>
+                            <td>Pull out slices for emphasis</td>
+                        </tr>
+                        <tr>
+                            <td><code>autopct</code></td>
+                            <td>Show percentage text ('%1.1f%%')</td>
+                        </tr>
+                        <tr>
+                            <td><code>shadow</code></td>
+                            <td>Add 3D-like depth</td>
+                        </tr>
+                        <tr>
+                            <td><code>startangle</code></td>
+                            <td>Rotate pie chart</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tip-box">
+                    <strong>⚠️ When to Avoid Pie Charts:</strong>
+                    <ul>
+                        <li>Too many categories (>6 slices)</li>
+                        <li>When precise comparison is needed</li>
+                        <li>When values are similar in size</li>
+                        <li><strong>Better alternatives:</strong> Bar charts or horizontal bar charts</li>
+                    </ul>
+                </div>
+
+                <h2>📚 Stack Plots</h2>
+
+                <div class="info-box">
+                    <p>Stack plots show how multiple quantities change over time, stacked on top of each other. Perfect
+                        for tracking composition over time!</p>
+                </div>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>⏱️ Time spent on different activities over days</li>
+                    <li>👥 Distribution of tasks by team members</li>
+                    <li>📈 Website traffic sources over time</li>
+                    <li>💰 Budget allocation across departments</li>
+                </ul>
+
+                <h3>Stack Plot Example</h3>
+                <div class="code-block">
+                    days = [<span class="string">1, 2, 3, 4, 5, 6, 7</span>]
+                    studying = [<span class="string">3, 4, 3, 5, 4, 3, 4</span>]
+                    playing = [<span class="string">2, 2, 1, 1, 2, 3, 2</span>]
+                    watching_tv = [<span class="string">2, 1, 2, 2, 1, 1, 1</span>]
+                    sleeping = [<span class="string">5, 5, 6, 5, 6, 5, 5</span>]
+
+                    labels = [<span class="string">'Studying', 'Playing', 'Watching TV', 'Sleeping'</span>]
+                    colors = [<span class="string">'skyblue', 'lightgreen', 'gold', 'lightcoral'</span>]
+
+                    plt.<span class="function">stackplot</span>(days, studying, playing, watching_tv, sleeping,
+                    labels=labels, colors=colors, alpha=<span class="string">0.8</span>)
+                    plt.<span class="function">legend</span>(loc=<span class="string">'upper left'</span>)
+                    plt.<span class="function">title</span>(<span class="string">'Weekly Activity Tracker'</span>)
+                    plt.<span class="function">xlabel</span>(<span class="string">'Day'</span>)
+                    plt.<span class="function">ylabel</span>(<span class="string">'Hours'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 Stack Plot vs Pie Chart:</strong><br>
+                    • Use <strong>pie charts</strong> for a snapshot in time<br>
+                    • Use <strong>stack plots</strong> to see how data changes over time
+                </div>
+            </div>
+
+            <!-- Histogram & Scatter Tab -->
+            <div id="hist-scatter" class="tab-content">
+                <h2>📊 Histograms</h2>
+
+                <div class="info-box">
+                    <p>Histograms show the <strong>distribution</strong> of numerical data. They're essential for
+                        understanding data spread, detecting outliers, and seeing patterns.</p>
+                </div>
+
+                <h3>When to Use Histograms</h3>
+                <ul>
+                    <li>📈 Understand distribution of numerical data (age, salary, test scores)</li>
+                    <li>🔍 Detect skewness and outliers</li>
+                    <li>📐 Check if data is normally distributed</li>
+                    <li>🎯 Analyze frequency within specific ranges</li>
+                </ul>
+
+                <h3>Understanding Bins</h3>
+                <div class="info-box">
+                    <p>The <code>bins</code> argument controls how data is grouped:</p>
+                    <ul>
+                        <li><strong>Integer:</strong> Number of equal-width bins</li>
+                        <li><strong>List:</strong> Custom bin edges for specific ranges</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <span class="comment"># 10 equal-width bins</span>
+                    plt.<span class="function">hist</span>(ages, bins=<span class="string">10</span>, edgecolor=<span
+                        class="string">'black'</span>)
+
+                    <span class="comment"># Custom age groups</span>
+                    plt.<span class="function">hist</span>(ages, bins=[<span class="string">10, 20, 30, 40, 60,
+                        100</span>], edgecolor=<span class="string">'black'</span>)
+                </div>
+
+                <h3>Adding Reference Lines</h3>
+                <div class="code-block">
+                    <span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+                    ages = [<span class="string">22, 25, 47, 52, 46, 56, 55, 60, 34, 43, ...</span>]
+                    bins = [<span class="string">10, 20, 30, 40, 50, 60, 70</span>]
+
+                    plt.<span class="function">hist</span>(ages, bins=bins, edgecolor=<span
+                        class="string">'black'</span>)
+                    plt.<span class="function">axvline</span>(np.<span class="function">mean</span>(ages), color=<span
+                        class="string">'red'</span>,
+                    linestyle=<span class="string">'--'</span>, linewidth=<span class="string">2</span>,
+                    label=<span class="string">'Average Age'</span>)
+                    plt.<span class="function">legend</span>()
+                    plt.<span class="function">title</span>(<span class="string">'Age Distribution with Mean'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <div class="tip-box">
+                    <strong>📝 Key Parameters:</strong><br>
+                    • <code>bins</code>: Number or custom edges<br>
+                    • <code>edgecolor</code>: Border color for bars<br>
+                    • <code>axvline</code>: Vertical reference line
+                </div>
+
+                <h2>🎯 Scatter Plots</h2>
+
+                <div class="info-box">
+                    <p>Scatter plots reveal <strong>relationships between two variables</strong>. They're perfect for
+                        finding correlations, patterns, and outliers.</p>
+                </div>
+
+                <h3>Basic Scatter Plot</h3>
+                <div class="code-block">
+                    study_hours = [<span class="string">1, 2, 3, 4, 5, 6, 7, 8, 9</span>]
+                    exam_scores = [<span class="string">40, 45, 50, 55, 60, 65, 75, 85, 90</span>]
+
+                    plt.<span class="function">scatter</span>(study_hours, exam_scores)
+                    plt.<span class="function">title</span>(<span class="string">'Study Hours vs Exam Score'</span>)
+                    plt.<span class="function">xlabel</span>(<span class="string">'Study Hours'</span>)
+                    plt.<span class="function">ylabel</span>(<span class="string">'Exam Score'</span>)
+                    plt.<span class="function">grid</span>(<span class="keyword">True</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>🎨 Adding Color & Size</h3>
+                <div class="code-block">
+                    <span class="comment"># Size based on score</span>
+                    sizes = [score * <span class="string">2</span> <span class="keyword">for</span> score <span
+                        class="keyword">in</span> exam_scores]
+
+                    <span class="comment"># Color based on performance</span>
+                    colors = [<span class="string">'red'</span> <span class="keyword">if</span> score < <span
+                        class="string">60</span> <span class="keyword">else</span> <span class="string">'green'</span>
+                        <span class="keyword">for</span> score <span class="keyword">in</span> exam_scores]
+
+                        plt.<span class="function">scatter</span>(study_hours, exam_scores, s=sizes, c=colors)
+                        plt.<span class="function">title</span>(<span class="string">'Colored & Sized Scatter
+                            Plot'</span>)
+                        plt.<span class="function">show</span>()
+                </div>
+
+                <h3>🌈 Using Colormaps</h3>
+                <div class="code-block">
+                    plt.<span class="function">scatter</span>(study_hours, exam_scores,
+                    c=exam_scores, cmap=<span class="string">'viridis'</span>)
+                    plt.<span class="function">colorbar</span>(label=<span class="string">'Score'</span>)
+                    plt.<span class="function">title</span>(<span class="string">'Scatter with Gradient Colors'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>📝 Adding Annotations</h3>
+                <div class="code-block">
+                    plt.<span class="function">scatter</span>(study_hours, exam_scores)
+
+                    <span class="keyword">for</span> i <span class="keyword">in</span> <span
+                        class="function">range</span>(<span class="function">len</span>(study_hours)):
+                    plt.<span class="function">annotate</span>(<span class="string">f'Student {i+1}'</span>,
+                    (study_hours[i], exam_scores[i]))
+
+                    plt.<span class="function">title</span>(<span class="string">'Scatter with Labels'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>👥 Multiple Groups</h3>
+                <div class="code-block">
+                    class_a_hours = [<span class="string">2, 4, 6, 8</span>]
+                    class_a_scores = [<span class="string">45, 55, 65, 85</span>]
+                    class_b_hours = [<span class="string">1, 3, 5, 7, 9</span>]
+                    class_b_scores = [<span class="string">40, 50, 60, 70, 90</span>]
+
+                    plt.<span class="function">scatter</span>(class_a_hours, class_a_scores,
+                    label=<span class="string">'Class A'</span>, color=<span class="string">'blue'</span>)
+                    plt.<span class="function">scatter</span>(class_b_hours, class_b_scores,
+                    label=<span class="string">'Class B'</span>, color=<span class="string">'orange'</span>)
+                    plt.<span class="function">legend</span>()
+                    plt.<span class="function">show</span>()
+                </div>
+            </div>
+
+            <!-- Subplots Tab -->
+            <div id="subplots" class="tab-content">
+                <h2>🎛️ Subplots - Multiple Plots in One Figure</h2>
+
+                <div class="info-box">
+                    <p>Subplots allow you to display multiple plots side-by-side or in a grid. Perfect for comparing
+                        datasets or showing different aspects of your data!</p>
+                </div>
+
+                <h3>Method 1: Using plt.subplot()</h3>
+                <div class="code-block">
+                    x = [<span class="string">1, 2, 3, 4, 5</span>]
+                    y1 = [i * <span class="string">2</span> <span class="keyword">for</span> i <span
+                        class="keyword">in</span> x]
+                    y2 = [i ** <span class="string">2</span> <span class="keyword">for</span> i <span
+                        class="keyword">in</span> x]
+
+                    <span class="comment"># Create 1 row, 2 columns</span>
+                    plt.<span class="function">subplot</span>(<span class="string">1, 2, 1</span>) <span
+                        class="comment"># (rows, cols, plot_number)</span>
+                    plt.<span class="function">plot</span>(x, y1)
+                    plt.<span class="function">title</span>(<span class="string">'Double of x'</span>)
+
+                    plt.<span class="function">subplot</span>(<span class="string">1, 2, 2</span>)
+                    plt.<span class="function">plot</span>(x, y2)
+                    plt.<span class="function">title</span>(<span class="string">'Square of x'</span>)
+
+                    plt.<span class="function">tight_layout</span>()
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>2×2 Grid of Subplots</h3>
+                <div class="code-block">
+                    y3 = [i ** <span class="string">0.5</span> <span class="keyword">for</span> i <span
+                        class="keyword">in</span> x]
+                    y4 = [<span class="string">10</span> - i <span class="keyword">for</span> i <span
+                        class="keyword">in</span> x]
+
+                    plt.<span class="function">figure</span>(figsize=(<span class="string">8, 6</span>))
+
+                    plt.<span class="function">subplot</span>(<span class="string">2, 2, 1</span>)
+                    plt.<span class="function">plot</span>(x, y1)
+                    plt.<span class="function">title</span>(<span class="string">'x * 2'</span>)
+
+                    plt.<span class="function">subplot</span>(<span class="string">2, 2, 2</span>)
+                    plt.<span class="function">plot</span>(x, y2)
+                    plt.<span class="function">title</span>(<span class="string">'x squared'</span>)
+
+                    plt.<span class="function">subplot</span>(<span class="string">2, 2, 3</span>)
+                    plt.<span class="function">plot</span>(x, y3)
+                    plt.<span class="function">title</span>(<span class="string">'sqrt(x)'</span>)
+
+                    plt.<span class="function">subplot</span>(<span class="string">2, 2, 4</span>)
+                    plt.<span class="function">plot</span>(x, y4)
+                    plt.<span class="function">title</span>(<span class="string">'10 - x'</span>)
+
+                    plt.<span class="function">tight_layout</span>()
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>Method 2: Using plt.subplots() (Recommended)</h3>
+                <div class="info-box">
+                    <p>This method is cleaner and more flexible. It returns a figure and axes objects.</p>
+                </div>
+
+                <div class="code-block">
+                    fig, axs = plt.<span class="function">subplots</span>(<span class="string">1, 2</span>,
+                    figsize=(<span class="string">10, 4</span>))
+
+                    <span class="comment"># Plot on first subplot</span>
+                    axs[<span class="string">0</span>].<span class="function">plot</span>(x, y1)
+                    axs[<span class="string">0</span>].<span class="function">set_title</span>(<span class="string">'x *
+                        2'</span>)
+
+                    <span class="comment"># Plot on second subplot</span>
+                    axs[<span class="string">1</span>].<span class="function">plot</span>(x, y2)
+                    axs[<span class="string">1</span>].<span class="function">set_title</span>(<span class="string">'x
+                        squared'</span>)
+
+                    fig.<span class="function">suptitle</span>(<span class="string">'Comparison Plots'</span>,
+                    fontsize=<span class="string">14</span>)
+                    fig.<span class="function">tight_layout</span>()
+                    fig.<span class="function">subplots_adjust</span>(top=<span class="string">0.85</span>) <span
+                        class="comment"># Prevent title overlap</span>
+                    fig.<span class="function">savefig</span>(<span class="string">'my_plots.png'</span>) <span
+                        class="comment"># Save as image</span>
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <div class="tip-box">
+                    <strong>🎯 Key Differences:</strong><br>
+                    • <code>axs</code> - for working on individual plots<br>
+                    • <code>fig</code> - for settings that apply to the whole figure
+                </div>
+
+                <h3>🔄 Looping Over Subplots</h3>
+                <div class="code-block">
+                    fig, axs = plt.<span class="function">subplots</span>(<span class="string">2, 2</span>,
+                    figsize=(<span class="string">8, 6</span>))
+
+                    ys = [y1, y2, y3, y4]
+                    titles = [<span class="string">'x * 2', 'x squared', 'sqrt(x)', '10 - x'</span>]
+
+                    <span class="keyword">for</span> i <span class="keyword">in</span> <span
+                        class="function">range</span>(<span class="string">2</span>):
+                    <span class="keyword">for</span> j <span class="keyword">in</span> <span
+                        class="function">range</span>(<span class="string">2</span>):
+                    idx = i * <span class="string">2</span> + j
+                    axs[i, j].<span class="function">plot</span>(x, ys[idx])
+                    axs[i, j].<span class="function">set_title</span>(titles[idx])
+
+                    plt.<span class="function">tight_layout</span>()
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <div class="info-box">
+                    <p><strong>This approach is ideal for:</strong></p>
+                    <ul>
+                        <li>Dynamic or repetitive data series</li>
+                        <li>Creating dashboards</li>
+                        <li>Comparing multiple datasets efficiently</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Seaborn Tab -->
+            <div id="seaborn" class="tab-content">
+                <h2>🎨 Introduction to Seaborn</h2>
+
+                <div class="info-box">
+                    <h3>What is Seaborn?</h3>
+                    <p>Seaborn is a Python library built on top of Matplotlib that makes it easier to create beautiful,
+                        complex visualizations.</p>
+                </div>
+
+                <h3>Why Choose Seaborn?</h3>
+                <ul>
+                    <li>✨ <strong>Less Code:</strong> High-level interface for complex plots</li>
+                    <li>🎨 <strong>Better Looking:</strong> Automatic styling and themes</li>
+                    <li>📊 <strong>DataFrame Ready:</strong> Works seamlessly with pandas</li>
+                    <li>🔧 <strong>Built-in Features:</strong> Statistical plots, color palettes, themes</li>
+                    <li>📦 <strong>Built-in Datasets:</strong> Practice data included</li>
+                </ul>
+
+                <h3>Setup & Installation</h3>
+                <div class="code-block">
+                    <span class="comment"># Install Seaborn</span>
+                    !pip install seaborn
+
+                    <span class="comment"># Import libraries</span>
+                    <span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+                    <span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+                </div>
+
+                <h3>🎭 Seaborn Themes</h3>
+                <div class="code-block">
+                    <span class="comment"># Set theme (styles: darkgrid, whitegrid, dark, white, ticks)</span>
+                    sns.<span class="function">set_theme</span>(style=<span class="string">"darkgrid"</span>)
+
+                    <span class="keyword">import</span> numpy <span class="keyword">as</span> np
+                    x = np.<span class="function">linspace</span>(<span class="string">0, 10, 100</span>)
+                    y = np.<span class="function">sin</span>(x)
+
+                    sns.<span class="function">lineplot</span>(x=x, y=y)
+                    plt.<span class="function">title</span>(<span class="string">'Beautiful Line Plot'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>📦 Built-in Datasets</h3>
+                <div class="info-box">
+                    <p>Seaborn includes real-world datasets for practice and learning!</p>
+                </div>
+
+                <div class="code-block">
+                    <span class="comment"># See all available datasets</span>
+                    <span class="keyword">print</span>(sns.<span class="function">get_dataset_names</span>())
+
+                    <span class="comment"># Load a dataset</span>
+                    tips = sns.<span class="function">load_dataset</span>(<span class="string">'tips'</span>)
+                    <span class="keyword">print</span>(tips.<span class="function">head</span>())
+                </div>
+
+                <h3>Common Datasets:</h3>
+                <ul>
+                    <li><code>tips</code> - Restaurant bills and tips</li>
+                    <li><code>iris</code> - Iris flower measurements</li>
+                    <li><code>titanic</code> - Titanic passenger data</li>
+                    <li><code>flights</code> - Flight passenger counts</li>
+                    <li><code>penguins</code> - Penguin species data</li>
+                </ul>
+
+                <h3>📊 Basic Plot Types</h3>
+
+                <h4>1. Line Plot</h4>
+                <div class="code-block">
+                    tips = sns.<span class="function">load_dataset</span>(<span class="string">'tips'</span>)
+                    sns.<span class="function">lineplot</span>(x=<span class="string">"total_bill"</span>, y=<span
+                        class="string">"tip"</span>, data=tips)
+                    plt.<span class="function">title</span>(<span class="string">'Line Plot Example'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h4>2. Scatter Plot with Color</h4>
+                <div class="code-block">
+                    sns.<span class="function">scatterplot</span>(x=<span class="string">"total_bill"</span>, y=<span
+                        class="string">"tip"</span>,
+                    hue=<span class="string">"time"</span>, data=tips)
+                    plt.<span class="function">title</span>(<span class="string">'Scatter Plot with Color by
+                        Time'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h4>3. Bar Plot</h4>
+                <div class="code-block">
+                    sns.<span class="function">barplot</span>(x=<span class="string">"day"</span>, y=<span
+                        class="string">"total_bill"</span>, data=tips)
+                    plt.<span class="function">title</span>(<span class="string">'Average Bill per Day'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h4>4. Box Plot (Distribution Analysis)</h4>
+                <div class="code-block">
+                    sns.<span class="function">boxplot</span>(x=<span class="string">"day"</span>, y=<span
+                        class="string">"total_bill"</span>, data=tips)
+                    plt.<span class="function">title</span>(<span class="string">'Boxplot of Total Bill per Day'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <div class="tip-box">
+                    <strong>📊 Boxplots show:</strong><br>
+                    • Median (middle line)<br>
+                    • Quartiles (box edges)<br>
+                    • Outliers (dots)<br>
+                    • Data spread
+                </div>
+
+                <h4>5. Heatmap (Correlation Matrix)</h4>
+                <div class="code-block">
+                    flights = sns.<span class="function">load_dataset</span>(<span class="string">'flights'</span>)
+                    pivot_table = flights.<span class="function">pivot</span>(<span class="string">"month"</span>, <span
+                        class="string">"year"</span>, <span class="string">"passengers"</span>)
+
+                    sns.<span class="function">heatmap</span>(pivot_table, annot=<span class="keyword">True</span>,
+                    fmt=<span class="string">"d"</span>, cmap=<span class="string">"YlGnBu"</span>)
+                    plt.<span class="function">title</span>(<span class="string">'Heatmap of Passengers'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>🐼 Working with Pandas DataFrames</h3>
+                <div class="code-block">
+                    <span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+                    df = pd.<span class="function">DataFrame</span>({
+                    <span class="string">"age"</span>: [<span class="string">22, 25, 47, 52, 46, 56, 55, 60, 34,
+                        43</span>],
+                    <span class="string">"salary"</span>: [<span class="string">25000, 27000, 52000, 60000, 58000,
+                        62000, 61000, 65000, 38000, 45000</span>],
+                    <span class="string">"gender"</span>: [<span class="string">"M", "F", "M", "F", "F",
+                        "M", "M", "F", "F", "M"</span>]
+                    })
+
+                    sns.<span class="function">scatterplot</span>(x=<span class="string">"age"</span>, y=<span
+                        class="string">"salary"</span>, hue=<span class="string">"gender"</span>, data=df)
+                    plt.<span class="function">title</span>(<span class="string">'Salary vs Age by Gender'</span>)
+                    plt.<span class="function">show</span>()
+                </div>
+
+                <h3>📋 Matplotlib vs Seaborn Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Matplotlib</th>
+                            <th>Seaborn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Default Styles</strong></td>
+                            <td>Basic</td>
+                            <td>Beautiful ✨</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Syntax Level</strong></td>
+                            <td>Low-level</td>
+                            <td>High-level</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DataFrame Support</strong></td>
+                            <td>Manual</td>
+                            <td>Native & Easy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complex Plots</strong></td>
+                            <td>Tedious</td>
+                            <td>Very Easy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Statistical Plots</strong></td>
+                            <td>Manual calculation</td>
+                            <td>Built-in</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Customization</strong></td>
+                            <td>Full control</td>
+                            <td>Smart defaults + customizable</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tip-box">
+                    <strong>💡 Best Practice:</strong><br>
+                    • Start with <strong>Seaborn</strong> for quick, beautiful plots<br>
+                    • Use <strong>Matplotlib</strong> for fine-tuning and customization<br>
+                    • Combine both for maximum power!
+                </div>
+
+                <h3>🎯 Final Recommendations</h3>
+                <div class="info-box">
+                    <ul>
+                        <li>📚 <strong>Learn Matplotlib basics</strong> - Foundation for customization</li>
+                        <li>🚀 <strong>Use Seaborn daily</strong> - Faster development, prettier results</li>
+                        <li>🔧 <strong>Combine both</strong> - Best of both worlds</li>
+                        <li>📊 <strong>Practice with real data</strong> - Use built-in datasets</li>
+                        <li>🎨 <strong>Experiment with styles</strong> - Find what works for you</li>
+                    </ul>
+                </div>
+
+                <div class="tip-box">
+                    <strong>🎓 Key Takeaway:</strong><br>
+                    In real-world Data Science projects, Seaborn saves hours of manual work by offering higher-level,
+                    smarter defaults. Start with Seaborn, customize with Matplotlib!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top of content area
+            document.querySelector('.content-area').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    </script>
+</body>
+
+</html>
