@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7th Sky - English Mastery</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind Config for Custom Colors/Fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-item.active {
+            color: #0284c7;
+            border-bottom: 2px solid #0284c7;
+        }
+
+        /* Hide sections by default, JS will toggle */
+        .section-content {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-200 selection:text-brand-900">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="showSection('home')">
+                    <div
+                        class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                        7</div>
+                    <span class="font-serif font-bold text-2xl text-slate-900 tracking-tight">7th Sky</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="showSection('grammar')"
+                        class="nav-item px-1 py-2 text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Grammar</button>
+                    <button onclick="showSection('speech')"
+                        class="nav-item px-1 py-2 text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Speech</button>
+                    <button onclick="showSection('vocab')"
+                        class="nav-item px-1 py-2 text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Vocabulary</button>
+                    <button onclick="showSection('lists')"
+                        class="nav-item px-1 py-2 text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Word
+                        Lists</button>
+                    <button onclick="showSection('extras')"
+                        class="nav-item px-1 py-2 text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Extras</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-slate-500 hover:text-slate-900 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="showSection('grammar')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Grammar</button>
+                <button onclick="showSection('speech')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Speech</button>
+                <button onclick="showSection('vocab')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Vocabulary</button>
+                <button onclick="showSection('lists')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Word
+                    Lists</button>
+                <button onclick="showSection('extras')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Extras</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
+
+        <!-- HOME SECTION -->
+        <section id="home" class="section-content active">
+            <div class="text-center py-20 lg:py-32">
+                <span
+                    class="inline-block py-1 px-3 rounded-full bg-brand-100 text-brand-600 text-sm font-semibold mb-4 animate-fade-in-up">Basic
+                    English Course</span>
+                <h1 class="text-5xl md:text-7xl font-serif font-bold text-slate-900 mb-6 tracking-tight animate-fade-in-up"
+                    style="animation-delay: 0.1s;">
+                    Master the <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-purple-600">Fundamentals</span>
+                </h1>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-500 animate-fade-in-up"
+                    style="animation-delay: 0.2s;">
+                    A comprehensive guide to English Grammar, Vocabulary, and Structure. Based on the 7th Sky
+                    curriculum, enhanced for the modern learner.
+                </p>
+                <div class="mt-10 flex justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <button onclick="showSection('grammar')"
+                        class="px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-brand-600 hover:bg-brand-700 md:text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        Start Learning
+                    </button>
+                    <button onclick="showSection('lists')"
+                        class="px-8 py-3 border border-slate-300 text-base font-medium rounded-full text-slate-700 bg-white hover:bg-slate-50 md:text-lg shadow-sm hover:shadow-md transition-all">
+                        Browse Lists
+                    </button>
+                </div>
+
+                <!-- Feature Grid -->
+                <div class="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-3">
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div
+                            class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4 mx-auto">
+                            <i class="fas fa-book-open text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900">Parts of Speech</h3>
+                        <p class="mt-2 text-slate-500">Nouns, Pronouns, Verbs, and more explained simply.</p>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div
+                            class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-4 mx-auto">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900">Tenses & Voices</h3>
+                        <p class="mt-2 text-slate-500">Master time references and sentence structures.</p>
+                    </div>
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div
+                            class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4 mx-auto">
+                            <i class="fas fa-comments text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900">Direct/Indirect</h3>
+                        <p class="mt-2 text-slate-500">Learn how to report speech correctly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRAMMAR SECTION -->
+        <section id="grammar" class="section-content">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-serif font-bold text-slate-900">Grammar Essentials</h2>
+                <p class="text-slate-500 mt-2">The building blocks of the English language.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- Parts of Speech Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-shapes text-brand-500"></i> Parts of Speech
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="group">
+                            <h4 class="font-bold text-slate-700">1. Noun <span
+                                    class="text-xs font-normal text-slate-400 ml-2">(Naming words)</span></h4>
+                            <ul class="mt-2 space-y-2 text-sm text-slate-600 pl-4 border-l-2 border-slate-200">
+                                <li><strong>Proper:</strong> Specific names (Rohit, Ahmedabad). <span
+                                        class="text-xs bg-slate-100 px-2 py-0.5 rounded">Capitalized</span></li>
+                                <li><strong>Common:</strong> General names (boy, city, table).</li>
+                                <li><strong>Abstract:</strong> Feelings (hunger, honesty).</li>
+                                <li><strong>Concrete:</strong> Touchable things (pencil, apple).</li>
+                                <li><strong>Countable/Uncountable:</strong> Many pens vs. Much tea.</li>
+                            </ul>
+                        </div>
+                        <div class="group">
+                            <h4 class="font-bold text-slate-700">2. Pronoun <span
+                                    class="text-xs font-normal text-slate-400 ml-2">(In place of noun)</span></h4>
+                            <div class="mt-2 grid grid-cols-2 gap-2 text-sm text-slate-600">
+                                <div class="bg-slate-50 p-2 rounded">I → My/Mine/Me</div>
+                                <div class="bg-slate-50 p-2 rounded">She → Her/Hers</div>
+                                <div class="bg-slate-50 p-2 rounded">He → His/Him</div>
+                                <div class="bg-slate-50 p-2 rounded">They → Their/Them</div>
+                            </div>
+                        </div>
+                        <div class="group">
+                            <h4 class="font-bold text-slate-700">3. Verb <span
+                                    class="text-xs font-normal text-slate-400 ml-2">(Action words)</span></h4>
+                            <p class="text-sm text-slate-600 mt-1"><strong>Action:</strong> Play, Walk, Run.</p>
+                            <p class="text-sm text-slate-600"><strong>Helping (To be):</strong> am, is, are, was, were.
+                            </p>
+                            <p class="text-sm text-slate-600"><strong>Modal:</strong> can, could, should, would, must.
+                            </p>
+                        </div>
+                        <div class="group">
+                            <h4 class="font-bold text-slate-700">4. Adjective <span
+                                    class="text-xs font-normal text-slate-400 ml-2">(Describing words)</span></h4>
+                            <p class="text-sm text-slate-600 mt-1">Says more about a noun. <br><span
+                                    class="italic text-slate-400">e.g., Blue colour, Garba dance.</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tenses Interactive -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-hourglass-half text-purple-500"></i> Tenses
+                        </h3>
+                        <div class="flex bg-slate-200 rounded-lg p-1">
+                            <button onclick="switchTense('simple')" id="btn-simple"
+                                class="px-3 py-1 rounded-md text-xs font-bold bg-white shadow text-slate-800 transition-all">Simple</button>
+                            <button onclick="switchTense('continuous')" id="btn-continuous"
+                                class="px-3 py-1 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 transition-all">Cont.</button>
+                            <button onclick="switchTense('perfect')" id="btn-perfect"
+                                class="px-3 py-1 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 transition-all">Perfect</button>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex-grow">
+                        <!-- Simple Tense Content -->
+                        <div id="tense-simple" class="tense-panel space-y-4">
+                            <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                <h4 class="font-bold text-blue-800 mb-2">Simple Present</h4>
+                                <p class="text-sm text-blue-700 mb-2">Used for habits, general truths.</p>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-blue-100">Sub + V1(s/es) + Obj</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: She <strong>writes</strong> a letter.</p>
+                            </div>
+                            <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                                <h4 class="font-bold text-purple-800 mb-2">Simple Past</h4>
+                                <p class="text-sm text-purple-700 mb-2">Completed actions in the past.</p>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-purple-100">Sub + V2 + Obj</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: She <strong>wrote</strong> a letter.</p>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+                                <h4 class="font-bold text-green-800 mb-2">Simple Future</h4>
+                                <p class="text-sm text-green-700 mb-2">Actions that will happen.</p>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-green-100">Sub + will/shall + V1 + Obj</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: She <strong>will write</strong> a letter.</p>
+                            </div>
+                        </div>
+
+                        <!-- Continuous Tense Content (Hidden by default) -->
+                        <div id="tense-continuous" class="tense-panel hidden space-y-4">
+                            <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                <h4 class="font-bold text-blue-800 mb-2">Present Continuous</h4>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-blue-100">am/is/are + V1+ing</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: I <strong>am preparing</strong> for IELTS.
+                                </p>
+                            </div>
+                            <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                                <h4 class="font-bold text-purple-800 mb-2">Past Continuous</h4>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-purple-100">was/were + V1+ing</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: They <strong>were playing</strong>.</p>
+                            </div>
+                        </div>
+
+                        <!-- Perfect Tense Content (Hidden by default) -->
+                        <div id="tense-perfect" class="tense-panel hidden space-y-4">
+                            <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                <h4 class="font-bold text-blue-800 mb-2">Present Perfect</h4>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-blue-100">have/has + V3</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: I <strong>have finished</strong> my work.</p>
+                            </div>
+                            <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                                <h4 class="font-bold text-purple-800 mb-2">Past Perfect</h4>
+                                <code
+                                    class="block bg-white p-2 rounded text-xs text-slate-600 border border-purple-100">had + V3</code>
+                                <p class="text-xs mt-2 text-slate-500">Eg: She <strong>had visited</strong> Agra.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voices & Sentences -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden lg:col-span-2">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-exchange-alt text-green-500"></i> Active & Passive Voice
+                        </h3>
+                    </div>
+                    <div class="p-6 grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-4">Conversion Formula</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 text-xs font-bold text-slate-500 uppercase">Simple Pres</div>
+                                    <div class="flex-1 bg-slate-100 p-2 rounded text-sm font-mono text-slate-700">Obj +
+                                        is/am/are + V3 + by + Sub</div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 text-xs font-bold text-slate-500 uppercase">Simple Past</div>
+                                    <div class="flex-1 bg-slate-100 p-2 rounded text-sm font-mono text-slate-700">Obj +
+                                        was/were + V3 + by + Sub</div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 text-xs font-bold text-slate-500 uppercase">Pres. Cont</div>
+                                    <div class="flex-1 bg-slate-100 p-2 rounded text-sm font-mono text-slate-700">Obj +
+                                        is/am/are + being + V3...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-slate-800 mb-2 text-sm">Example Conversion</h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="p-2 bg-white rounded border-l-4 border-blue-400 shadow-sm">
+                                    <span class="text-xs text-blue-500 font-bold block mb-1">ACTIVE</span>
+                                    She writes a letter.
+                                </div>
+                                <div class="flex justify-center"><i class="fas fa-arrow-down text-slate-400"></i></div>
+                                <div class="p-2 bg-white rounded border-l-4 border-green-400 shadow-sm">
+                                    <span class="text-xs text-green-500 font-bold block mb-1">PASSIVE</span>
+                                    A letter is written by her.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SPEECH SECTION -->
+        <section id="speech" class="section-content">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-10 text-center">
+                    <h2 class="text-3xl font-serif font-bold text-slate-900">Direct & Indirect Speech</h2>
+                    <p class="text-slate-500 mt-2">Reporting what someone said.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+                    <div class="p-8">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="flex-1 space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-2">Key Definitions</h3>
+                                    <ul class="list-disc list-inside text-slate-600 space-y-1">
+                                        <li><strong>Direct Speech:</strong> Exact words spoken (in quotes).</li>
+                                        <li><strong>Indirect Speech:</strong> Reporting the essence (no quotes).</li>
+                                        <li><strong>Reporting Verb (R.V):</strong> Say, Says, Told, Ask.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                                    <h4 class="font-bold text-yellow-800 mb-2">Rule 1: Universal Truth</h4>
+                                    <p class="text-sm text-yellow-700">If the reported speech expresses a universal
+                                        truth or habitual action, the tense <strong>does not change</strong>, regardless
+                                        of the Reporting Verb tense.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 w-full">
+                                <h3 class="text-lg font-bold text-slate-800 mb-4">Conversion Examples</h3>
+                                <div class="space-y-4">
+                                    <!-- Example 1 -->
+                                    <div class="border border-slate-200 rounded-lg overflow-hidden">
+                                        <div class="bg-slate-50 p-3 border-b border-slate-200 flex justify-between">
+                                            <span class="font-bold text-xs text-slate-500 uppercase">Direct</span>
+                                            <span class="text-xs text-slate-400">Present Tense RV</span>
+                                        </div>
+                                        <div class="p-3 text-sm text-slate-700">She <strong>says</strong>, "I am
+                                            hungry."</div>
+                                        <div class="bg-slate-50 p-3 border-t border-slate-200 flex justify-between">
+                                            <span class="font-bold text-xs text-brand-600 uppercase">Indirect</span>
+                                        </div>
+                                        <div class="p-3 text-sm text-slate-700">She <strong>says that</strong> she is
+                                            hungry.</div>
+                                    </div>
+
+                                    <!-- Example 2 -->
+                                    <div class="border border-slate-200 rounded-lg overflow-hidden">
+                                        <div class="bg-slate-50 p-3 border-b border-slate-200 flex justify-between">
+                                            <span class="font-bold text-xs text-slate-500 uppercase">Direct</span>
+                                            <span class="text-xs text-slate-400">Past Tense RV</span>
+                                        </div>
+                                        <div class="p-3 text-sm text-slate-700">She <strong>said</strong>, "I am
+                                            hungry."</div>
+                                        <div class="bg-slate-50 p-3 border-t border-slate-200 flex justify-between">
+                                            <span class="font-bold text-xs text-brand-600 uppercase">Indirect</span>
+                                        </div>
+                                        <div class="p-3 text-sm text-slate-700">She <strong>said that</strong> she
+                                            <strong>was</strong> hungry.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tense Change Table -->
+                        <div class="mt-8 pt-8 border-t border-slate-100">
+                            <h3 class="text-md font-bold text-slate-800 mb-4">Tense Changes in Indirect Speech</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm text-left text-slate-600">
+                                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                                        <tr>
+                                            <th class="px-4 py-2">Direct Tense</th>
+                                            <th class="px-4 py-2">Changes To</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <tr>
+                                            <td class="px-4 py-2">Simple Present</td>
+                                            <td class="px-4 py-2 font-medium text-slate-900">Simple Past</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2">Simple Past</td>
+                                            <td class="px-4 py-2 font-medium text-slate-900">Past Perfect</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2">Present Continuous</td>
+                                            <td class="px-4 py-2 font-medium text-slate-900">Past Continuous</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2">Will/Shall</td>
+                                            <td class="px-4 py-2 font-medium text-slate-900">Would/Should</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2">Can</td>
+                                            <td class="px-4 py-2 font-medium text-slate-900">Could</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VOCABULARY SECTION -->
+        <section id="vocab" class="section-content">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-serif font-bold text-slate-900">Vocabulary Builder</h2>
+                <p class="text-slate-500 mt-2">Expand your word power.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Vocab Card Template -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Persuade</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Verb</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">To convince someone to do something through reasoning or argument.
+                    </p>
+                    <div class="mt-3 text-xs text-brand-600 font-medium">Syn: Convince, Urge</div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Subsequently</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adverb</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">After a particular thing has happened; afterwards.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Cohesive</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adjective</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">Characterized by or causing cohesion; united or sticking together.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Gloomy</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adjective</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">Dark or poorly lit, especially so as to appear depressing or
+                        frightening.</p>
+                    <div class="mt-3 text-xs text-brand-600 font-medium">Syn: Dark, Dismal</div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Robust</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adjective</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">Strong and healthy; vigorous. (Also used for systems: robust
+                        economy).</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Fragile</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adjective</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">Easily broken or damaged; delicate.</p>
+                    <div class="mt-3 text-xs text-brand-600 font-medium">Syn: Brittle, Weak</div>
+                </div>
+
+                <!-- Added from PDF context -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Ambitious</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adjective</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">Having or showing a strong desire and determination to succeed.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-slate-800">Prevalent</h3>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Adjective</span>
+                    </div>
+                    <p class="text-slate-600 text-sm">Widespread in a particular area or at a particular time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTS SECTION -->
+        <section id="lists" class="section-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-serif font-bold text-slate-900">Word Lists</h2>
+                <p class="text-slate-500 mt-2">Common nouns for daily use.</p>
+
+                <!-- Search Bar -->
+                <div class="mt-6 max-w-md relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="listSearch" onkeyup="filterLists()"
+                        placeholder="Search fruits, vegetables, vehicles..."
+                        class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent shadow-sm">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Fruits -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-4 bg-red-50 border-b border-red-100">
+                        <h3 class="font-bold text-red-800 flex items-center gap-2"><i class="fas fa-apple-alt"></i>
+                            Fruits</h3>
+                    </div>
+                    <ul class="divide-y divide-slate-100 max-h-96 overflow-y-auto" id="fruit-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Vegetables -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-4 bg-green-50 border-b border-green-100">
+                        <h3 class="font-bold text-green-800 flex items-center gap-2"><i class="fas fa-carrot"></i>
+                            Vegetables</h3>
+                    </div>
+                    <ul class="divide-y divide-slate-100 max-h-96 overflow-y-auto" id="veg-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Vehicles -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-4 bg-blue-50 border-b border-blue-100">
+                        <h3 class="font-bold text-blue-800 flex items-center gap-2"><i class="fas fa-car"></i> Vehicles
+                        </h3>
+                    </div>
+                    <ul class="divide-y divide-slate-100 max-h-96 overflow-y-auto" id="vehicle-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXTRAS SECTION (New Content) -->
+        <section id="extras" class="section-content">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-serif font-bold text-slate-900">Essential Extras</h2>
+                <p class="text-slate-500 mt-2">Punctuation, Common Errors, and Idioms.</p>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Punctuation -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Punctuation Marks</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <div class="text-2xl font-serif font-bold text-slate-800">.</div>
+                            <div class="text-xs font-bold text-slate-500 uppercase mt-1">Full Stop</div>
+                            <div class="text-xs text-slate-400">Ends a statement.</div>
+                        </div>
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <div class="text-2xl font-serif font-bold text-slate-800">?</div>
+                            <div class="text-xs font-bold text-slate-500 uppercase mt-1">Question Mark</div>
+                            <div class="text-xs text-slate-400">Ends a question.</div>
+                        </div>
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <div class="text-2xl font-serif font-bold text-slate-800">!</div>
+                            <div class="text-xs font-bold text-slate-500 uppercase mt-1">Exclamation</div>
+                            <div class="text-xs text-slate-400">Strong feeling.</div>
+                        </div>
+                        <div class="text-center p-3 bg-slate-50 rounded-lg">
+                            <div class="text-2xl font-serif font-bold text-slate-800">,</div>
+                            <div class="text-xs font-bold text-slate-500 uppercase mt-1">Comma</div>
+                            <div class="text-xs text-slate-400">Short pause.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Errors -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">Common Mistakes</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-red-50 rounded border border-red-100">
+                                <span class="text-red-800 line-through">He <strong>don't</strong> know.</span>
+                                <i class="fas fa-arrow-right text-slate-400"></i>
+                                <span class="text-green-700 font-bold">He <strong>doesn't</strong> know.</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-red-50 rounded border border-red-100">
+                                <span class="text-red-800 line-through">I <strong>prefer</strong> to go
+                                    <strong>by</strong> bus.</span>
+                                <i class="fas fa-arrow-right text-slate-400"></i>
+                                <span class="text-green-700 font-bold">I prefer to go by bus.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">Useful Idioms</h3>
+                        <ul class="space-y-3">
+                            <li class="flex gap-3">
+                                <i class="fas fa-lightbulb text-yellow-500 mt-1"></i>
+                                <div>
+                                    <strong class="block text-slate-800">Break the ice</strong>
+                                    <span class="text-sm text-slate-500">To initiate conversation in a social
+                                        setting.</span>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <i class="fas fa-lightbulb text-yellow-500 mt-1"></i>
+                                <div>
+                                    <strong class="block text-slate-800">Hit the books</strong>
+                                    <span class="text-sm text-slate-500">To study hard.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
+            <p>&copy; 2023 7th Sky English. Designed for learning.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data for Lists ---
+        const fruits = [
+            "Apple", "Apricot", "Avocado", "Banana", "Cantaloupe", "Custard Apple",
+            "Gooseberry", "Grapes", "Guava", "Lychee", "Mango (Ripe)", "Mango (Unripe)",
+            "Orange", "Papaya", "Pear", "Pineapple", "Pomegranate", "Sapota",
+            "Sugar Cane", "Sweet Lime", "Watermelon", "Mulberry", "Kiwi", "Dates",
+            "Fig", "Coconut", "Dragon Fruit", "Almond", "Blueberry", "Cashews"
+        ];
+
+        const vegetables = [
+            "Brinjal (Eggplant)", "Cabbage", "Carrot", "Cauliflower", "Cucumber",
+            "Garlic", "Ginger", "Lady's Finger", "Onion", "Potato", "Tomato",
+            "Pumpkin", "Radish", "Ridge Gourd", "Snake Gourd", "Spinach",
+            "Sweet Potato", "Ivy Gourd", "Beetroot", "Bell Pepper", "Bitter Gourd",
+            "Bottle Gourd", "Cluster Beans", "Corn", "Mint Leaves", "Mushroom",
+            "Jackfruit", "Lemon"
+        ];
+
+        const vehicles = [
+            "Fire Engine", "Police Car", "Ambulance", "Sports Car", "Taxi/Cab",
+            "Limousine", "Excavator", "Bulldozer", "Steam Roller", "Crane",
+            "Tractor", "Cement Mixer", "Garbage Truck", "Dump Truck", "Van",
+            "Jeep", "Bus", "Double Decker Bus", "Train", "Freight Train",
+            "Subway/Metro", "Bicycle", "Motorcycle", "Scooter", "Auto Rickshaw",
+            "School Bus", "Airplane", "Helicopter", "Ship", "Speed Boat", "Submarine"
+        ];
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderList('fruit-list', fruits);
+            renderList('veg-list', vegetables);
+            renderList('vehicle-list', vehicles);
+        });
+
+        // --- Navigation Logic ---
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show target section
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Update Nav State (Desktop)
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+                // Simple check if onclick attribute contains the sectionId
+                if (el.getAttribute('onclick').includes(sectionId)) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- Tense Switcher Logic ---
+        function switchTense(type) {
+            // Hide all panels
+            document.querySelectorAll('.tense-panel').forEach(el => el.classList.add('hidden'));
+            // Show selected
+            document.getElementById(`tense-${type}`).classList.remove('hidden');
+
+            // Reset buttons
+            ['simple', 'continuous', 'perfect'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                btn.classList.remove('bg-white', 'shadow', 'text-slate-800');
+                btn.classList.add('text-slate-500');
+            });
+
+            // Activate clicked button
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.classList.remove('text-slate-500');
+            activeBtn.classList.add('bg-white', 'shadow', 'text-slate-800');
+        }
+
+        // --- List Rendering & Search ---
+        function renderList(elementId, items) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors list-item";
+                li.textContent = item;
+                container.appendChild(li);
+            });
+        }
+
+        function filterLists() {
+            const query = document.getElementById('listSearch').value.toLowerCase();
+
+            filterSingleList('fruit-list', query);
+            filterSingleList('veg-list', query);
+            filterSingleList('vehicle-list', query);
+        }
+
+        function filterSingleList(elementId, query) {
+            const list = document.getElementById(elementId);
+            const items = list.getElementsByTagName('li');
+
+            for (let i = 0; i < items.length; i++) {
+                const text = items[i].textContent.toLowerCase();
+                if (text.includes(query)) {
+                    items[i].style.display = "";
+                } else {
+                    items[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
