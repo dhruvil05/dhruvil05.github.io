@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorKit - Minimalist Design Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #111;
+        }
+
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .swatch {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .swatch:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #111;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #111;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #eee;
+            border-radius: 2px;
+        }
+
+        .checkerboard {
+            background-image: linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%);
+            background-size: 10px 10px;
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Notification Toast -->
+    <div id="toast" class="copy-toast">Copied to clipboard!</div>
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-40 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500"></div>
+                <span class="font-semibold tracking-tight text-lg">ColorKit</span>
+            </div>
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-gray-500">
+                <a href="#harmonies" class="hover:text-black transition-colors" target="_self">Harmonies</a>
+                <a href="#gradients" class="hover:text-black transition-colors" target="_self">Gradients</a>
+                <a href="#gradients" class="hover:text-black transition-colors" target="_self">Accessibility</a>
+                <a href="#systems" class="hover:text-black transition-colors" target="_self">Systems</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pt-32 pb-20 px-6 max-w-7xl mx-auto space-y-24">
+
+        <!-- Hero -->
+        <section class="text-center max-w-2xl mx-auto space-y-6 gs-reveal">
+            <h1 class="text-5xl md:text-7xl font-medium tracking-tight leading-[1.1]">
+                Tools for <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600">Color</span>
+                Mastery
+            </h1>
+            <p class="text-xl text-gray-500 font-light">
+                A minimalist workspace for generating palettes, checking contrast, and building design systems.
+            </p>
+            <div class="pt-4">
+                <button onclick="generateRandomHero()"
+                    class="px-6 py-3 bg-black text-white rounded-full text-sm font-medium hover:scale-105 transition-transform active:scale-95">
+                    Surprise Me
+                </button>
+            </div>
+            <div id="hero-palette" class="flex justify-center gap-4 pt-8 h-16">
+                <!-- Hero swatches injected here -->
+            </div>
+        </section>
+
+        <!-- 1. Color Harmonies -->
+        <section id="harmonies" class="gs-reveal scroll-mt-28">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-medium">Harmonies</h2>
+                    <p class="text-gray-500">Generate mathematically pleasing color relationships.</p>
+                </div>
+                <div class="flex items-center gap-3 bg-gray-50 p-1.5 rounded-lg">
+                    <input type="color" id="harmony-base" value="#6366f1" oninput="updateHarmonies()">
+                    <span id="harmony-hex" class="text-sm font-mono text-gray-600 w-20">#6366f1</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Complementary -->
+                <div class="tool-card border border-gray-100 rounded-2xl p-6 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-medium text-gray-400">COMPLEMENTARY</span>
+                        <span class="text-xs text-gray-400">Opposite</span>
+                    </div>
+                    <div id="comp-output" class="h-24 rounded-xl flex overflow-hidden shadow-sm mb-4"></div>
+                    <p class="text-sm text-gray-500 leading-relaxed">High contrast. Best for buttons and calls to
+                        action.</p>
+                </div>
+
+                <!-- Triadic -->
+                <div class="tool-card border border-gray-100 rounded-2xl p-6 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-medium text-gray-400">TRIADIC</span>
+                        <span class="text-xs text-gray-400">Triangle</span>
+                    </div>
+                    <div id="triad-output" class="h-24 rounded-xl flex overflow-hidden shadow-sm mb-4"></div>
+                    <p class="text-sm text-gray-500 leading-relaxed">Balanced and vibrant. Great for complex interfaces.
+                    </p>
+                </div>
+
+                <!-- Analogous -->
+                <div class="tool-card border border-gray-100 rounded-2xl p-6 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-medium text-gray-400">ANALOGOUS</span>
+                        <span class="text-xs text-gray-400">Neighbors</span>
+                    </div>
+                    <div id="analog-output" class="h-24 rounded-xl flex overflow-hidden shadow-sm mb-4"></div>
+                    <p class="text-sm text-gray-500 leading-relaxed">Serene and comfortable. Ideal for backgrounds.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Gradients & Contrast -->
+        <section id="gradients" class="grid grid-cols-1 lg:grid-cols-2 gap-8 gs-reveal scroll-mt-28">
+
+            <!-- Gradient Builder -->
+            <div class="tool-card border border-gray-100 rounded-2xl p-8 bg-white flex flex-col justify-between">
+                <div>
+                    <h2 class="text-2xl font-medium mb-2">Gradient Builder</h2>
+                    <p class="text-gray-500 mb-8">Create smooth CSS transitions.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-4">
+                            <input type="color" id="grad-1" value="#667eea" oninput="updateGradient()">
+                            <input type="range" id="grad-angle" min="0" max="360" value="135"
+                                oninput="updateGradient()">
+                            <input type="color" id="grad-2" value="#764ba2" oninput="updateGradient()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 space-y-4">
+                    <div id="grad-preview" class="h-40 w-full rounded-2xl shadow-inner transition-all duration-300">
+                    </div>
+                    <div class="relative group">
+                        <code id="grad-css"
+                            class="block w-full bg-gray-50 p-4 rounded-xl text-xs font-mono text-gray-600 overflow-x-auto cursor-pointer"
+                            onclick="copyToClipboard(this.innerText)">
+                            background: linear-gradient(135deg, #667eea, #764ba2);
+                        </code>
+                        <span
+                            class="absolute right-4 top-4 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Click
+                            to Copy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contrast Checker -->
+            <div class="tool-card border border-gray-100 rounded-2xl p-8 bg-white flex flex-col">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-medium mb-2">Contrast Check</h2>
+                    <p class="text-gray-500">Ensure accessibility compliance (WCAG).</p>
+                </div>
+
+                <div class="flex gap-4 mb-8">
+                    <div class="flex-1">
+                        <label class="block text-xs font-medium text-gray-400 mb-2 uppercase">Text</label>
+                        <div
+                            class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-transparent focus-within:border-gray-200 transition-colors">
+                            <input type="color" id="contrast-text" value="#ffffff" oninput="updateContrast()">
+                            <input type="text" id="contrast-text-hex"
+                                class="bg-transparent text-sm w-full outline-none font-mono" value="#ffffff"
+                                onchange="updateContrastFromInput()">
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-medium text-gray-400 mb-2 uppercase">Background</label>
+                        <div
+                            class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-transparent focus-within:border-gray-200 transition-colors">
+                            <input type="color" id="contrast-bg" value="#6366f1" oninput="updateContrast()">
+                            <input type="text" id="contrast-bg-hex"
+                                class="bg-transparent text-sm w-full outline-none font-mono" value="#6366f1"
+                                onchange="updateContrastFromInput()">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contrast-preview"
+                    class="flex-1 rounded-2xl flex flex-col items-center justify-center text-center p-6 transition-colors duration-300 mb-6 relative overflow-hidden">
+                    <h3 class="text-3xl font-bold mb-2">Large Text</h3>
+                    <p class="text-base opacity-90">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div id="badge-aa"
+                        class="bg-gray-50 rounded-xl p-4 text-center border border-gray-100 transition-colors">
+                        <div class="text-xs text-gray-400 uppercase font-bold mb-1">WCAG AA</div>
+                        <div class="text-lg font-medium">Pass</div>
+                    </div>
+                    <div id="badge-aaa"
+                        class="bg-gray-50 rounded-xl p-4 text-center border border-gray-100 transition-colors">
+                        <div class="text-xs text-gray-400 uppercase font-bold mb-1">WCAG AAA</div>
+                        <div class="text-lg font-medium">Pass</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Shades & Mix -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 gs-reveal">
+
+            <!-- Shades Generator -->
+            <div class="tool-card border border-gray-100 rounded-2xl p-8 bg-white">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-medium">Shades</h2>
+                        <p class="text-gray-500">Tints and shades generator.</p>
+                    </div>
+                    <input type="color" id="shades-base" value="#6366f1" oninput="updateShades()">
+                </div>
+                <div id="shades-container" class="space-y-2">
+                    <!-- Shades injected via JS -->
+                </div>
+            </div>
+
+            <!-- Color Mixer -->
+            <div class="tool-card border border-gray-100 rounded-2xl p-8 bg-white">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-medium">Mixer</h2>
+                    <p class="text-gray-500">Blend two colors smoothly.</p>
+                </div>
+
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-1">
+                        <input type="color" id="mix-1" class="w-full h-12 rounded-lg cursor-pointer" value="#ff0000"
+                            oninput="updateMix()">
+                    </div>
+                    <div class="flex-1 px-2">
+                        <input type="range" id="mix-ratio" min="0" max="100" value="50" oninput="updateMix()">
+                        <div class="text-center text-xs text-gray-400 mt-1"><span id="mix-percent">50</span>%</div>
+                    </div>
+                    <div class="flex-1">
+                        <input type="color" id="mix-2" class="w-full h-12 rounded-lg cursor-pointer" value="#0000ff"
+                            oninput="updateMix()">
+                    </div>
+                </div>
+
+                <div id="mix-result"
+                    class="h-24 rounded-xl flex items-center justify-center text-white font-medium shadow-sm transition-colors duration-100">
+                    Result
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Converter & Image -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 gs-reveal">
+
+            <!-- Converter -->
+            <div class="tool-card border border-gray-100 rounded-2xl p-8 bg-white lg:col-span-1">
+                <h2 class="text-2xl font-medium mb-6">Converter</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-medium text-gray-400 uppercase">HEX</label>
+                        <input type="text" id="conv-hex"
+                            class="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 font-mono mt-1 outline-none focus:border-gray-300 transition-colors"
+                            value="#6366f1" oninput="convertColor('hex')">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-400 uppercase">RGB</label>
+                        <input type="text" id="conv-rgb"
+                            class="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 font-mono mt-1 outline-none focus:border-gray-300 transition-colors"
+                            value="rgb(99, 102, 241)" oninput="convertColor('rgb')">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-400 uppercase">HSL</label>
+                        <input type="text" id="conv-hsl"
+                            class="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 font-mono mt-1 outline-none focus:border-gray-300 transition-colors"
+                            value="hsl(239, 84%, 67%)" oninput="convertColor('hsl')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Extractor -->
+            <div class="tool-card border border-gray-100 rounded-2xl p-8 bg-white lg:col-span-2 flex flex-col">
+                <h2 class="text-2xl font-medium mb-2">Image Palette</h2>
+                <p class="text-gray-500 mb-6">Extract dominant colors from an image.</p>
+
+                <div class="flex-1 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden"
+                    id="drop-zone">
+                    <input type="file" id="img-upload" class="absolute inset-0 opacity-0 cursor-pointer"
+                        accept="image/*" onchange="handleImageUpload(event)">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-gray-600">Click to upload or drag and drop</p>
+                    <p class="text-xs text-gray-400 mt-1">SVG, PNG, JPG or GIF</p>
+                </div>
+                <div id="img-palette-result" class="flex gap-2 mt-4 h-12 hidden">
+                    <!-- Extracted colors -->
+                </div>
+                <canvas id="img-canvas" class="hidden"></canvas>
+            </div>
+        </section>
+
+        <!-- 5. CSS Systems -->
+        <section id="systems" class="gs-reveal scroll-mt-28">
+            <h2 class="text-2xl font-medium mb-6">CSS System Generator</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white border border-gray-100 p-4 rounded-xl flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase w-16">Primary</span>
+                    <input type="color" id="sys-primary" value="#3b82f6" oninput="updateSystem()">
+                    <span class="text-xs font-mono text-gray-500" id="sys-primary-hex">#3b82f6</span>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase w-16">Secondary</span>
+                    <input type="color" id="sys-secondary" value="#8b5cf6" oninput="updateSystem()">
+                    <span class="text-xs font-mono text-gray-500" id="sys-secondary-hex">#8b5cf6</span>
+                </div>
+                <div class="bg-white border border-gray-100 p-4 rounded-xl flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase w-16">Accent</span>
+                    <input type="color" id="sys-accent" value="#ec4899" oninput="updateSystem()">
+                    <span class="text-xs font-mono text-gray-500" id="sys-accent-hex">#ec4899</span>
+                </div>
+            </div>
+            <div class="bg-gray-900 rounded-2xl p-8 relative group overflow-hidden">
+                <button onclick="copyToClipboard(document.getElementById('css-output').innerText)"
+                    class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg backdrop-blur-sm transition-colors">
+                    Copy CSS
+                </button>
+                <pre class="text-sm font-mono text-gray-300 overflow-x-auto"><code id="css-output">
+:root {
+  --color-primary: #3b82f6;
+  --color-primary-rgb: 59, 130, 246;
+  --color-secondary: #8b5cf6;
+  --color-secondary-rgb: 139, 92, 246;
+  --color-accent: #ec4899;
+  --color-accent-rgb: 236, 72, 153;
+}</code></pre>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-gray-100 py-12 text-center text-gray-400 text-sm">
+        <p>&copy; 2023 ColorKit. Open Source Tool.</p>
+    </footer>
+
+    <script>
+        // --- Utilities ---
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255, g /= 255, b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+
+        function getLuminance(r, g, b) {
+            const a = [r, g, b].map(function (v) {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        }
+
+        function getContrastRatio(rgb1, rgb2) {
+            const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+            const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+            const brightest = Math.max(lum1, lum2);
+            const darkest = Math.min(lum1, lum2);
+            return (brightest + 0.05) / (darkest + 0.05);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(-50%) translateY(100px)';
+                }, 2000);
+            });
+        }
+
+        // --- Logic Implementation ---
+
+        // 1. Harmonies
+        function updateHarmonies() {
+            const hex = document.getElementById('harmony-base').value;
+            document.getElementById('harmony-hex').innerText = hex;
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            // Complementary (Hue + 180)
+            const compHsl = { ...hsl, h: (hsl.h + 180) % 360 };
+            const compRgb = hslToRgb(compHsl.h, compHsl.s, compHsl.l);
+            const compHex = rgbToHex(compRgb.r, compRgb.g, compRgb.b);
+            renderSwatchGroup('comp-output', [hex, compHex]);
+
+            // Triadic (Hue + 120, + 240)
+            const tri1 = hslToRgb((hsl.h + 120) % 360, hsl.s, hsl.l);
+            const tri2 = hslToRgb((hsl.h + 240) % 360, hsl.s, hsl.l);
+            renderSwatchGroup('triad-output', [hex, rgbToHex(tri1.r, tri1.g, tri1.b), rgbToHex(tri2.r, tri2.g, tri2.b)]);
+
+            // Analogous (Hue - 30, + 30)
+            const ana1 = hslToRgb((hsl.h - 30 + 360) % 360, hsl.s, hsl.l);
+            const ana2 = hslToRgb((hsl.h + 30) % 360, hsl.s, hsl.l);
+            renderSwatchGroup('analog-output', [rgbToHex(ana1.r, ana1.g, ana1.b), hex, rgbToHex(ana2.r, ana2.g, ana2.b)]);
+        }
+
+        function renderSwatchGroup(id, colors) {
+            const container = document.getElementById(id);
+            container.innerHTML = '';
+            colors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'swatch flex-1 h-full';
+                div.style.backgroundColor = color;
+                div.onclick = () => copyToClipboard(color);
+                div.title = "Click to copy " + color;
+                container.appendChild(div);
+            });
+        }
+
+        // 2. Gradient
+        function updateGradient() {
+            const c1 = document.getElementById('grad-1').value;
+            const c2 = document.getElementById('grad-2').value;
+            const angle = document.getElementById('grad-angle').value;
+            const css = `background: linear-gradient(${angle}deg, ${c1}, ${c2});`;
+
+            document.getElementById('grad-preview').style.background = `linear-gradient(${angle}deg, ${c1}, ${c2})`;
+            document.getElementById('grad-css').innerText = css;
+        }
+
+        // 3. Contrast
+        function updateContrast() {
+            const tHex = document.getElementById('contrast-text').value;
+            const bHex = document.getElementById('contrast-bg').value;
+
+            document.getElementById('contrast-text-hex').value = tHex;
+            document.getElementById('contrast-bg-hex').value = bHex;
+
+            const tRgb = hexToRgb(tHex);
+            const bRgb = hexToRgb(bHex);
+
+            const ratio = getContrastRatio(tRgb, bRgb).toFixed(2);
+
+            const preview = document.getElementById('contrast-preview');
+            preview.style.backgroundColor = bHex;
+            preview.style.color = tHex;
+
+            const badgeAA = document.getElementById('badge-aa');
+            const badgeAAA = document.getElementById('badge-aaa');
+
+            // WCAG Logic
+            // AA: 4.5:1 for normal text, 3:1 for large text
+            // AAA: 7:1 for normal text, 4.5:1 for large text
+
+            const passAA = ratio >= 4.5;
+            const passAAA = ratio >= 7;
+
+            updateBadge(badgeAA, passAA, ratio);
+            updateBadge(badgeAAA, passAAA, ratio);
+        }
+
+        function updateContrastFromInput() {
+            const tHex = document.getElementById('contrast-text-hex').value;
+            const bHex = document.getElementById('contrast-bg-hex').value;
+            if (tHex.match(/^#[0-9A-F]{6}$/i)) document.getElementById('contrast-text').value = tHex;
+            if (bHex.match(/^#[0-9A-F]{6}$/i)) document.getElementById('contrast-bg').value = bHex;
+            updateContrast();
+        }
+
+        function updateBadge(el, pass, ratio) {
+            if (pass) {
+                el.className = "bg-green-50 border-green-100 text-green-700 rounded-xl p-4 text-center border transition-colors";
+                el.querySelector('div:last-child').innerText = "Pass";
+            } else {
+                el.className = "bg-red-50 border-red-100 text-red-700 rounded-xl p-4 text-center border transition-colors";
+                el.querySelector('div:last-child').innerText = "Fail";
+            }
+        }
+
+        // 4. Shades
+        function updateShades() {
+            const hex = document.getElementById('shades-base').value;
+            const rgb = hexToRgb(hex);
+            const container = document.getElementById('shades-container');
+            container.innerHTML = '';
+
+            // Generate 10 steps (Very Light to Very Dark)
+            for (let i = 0; i <= 10; i++) {
+                const factor = i / 10; // 0 to 1
+                // Simple mix with white (tint) or black (shade)
+                // Actually, let's do a proper scale: mix with white for i<5, mix with black for i>5
+
+                let r, g, b;
+                if (i < 5) {
+                    // Mix with white (255)
+                    const mix = i / 5; // 0 to 1
+                    r = Math.round(255 + (rgb.r - 255) * (1 - mix));
+                    g = Math.round(255 + (rgb.g - 255) * (1 - mix));
+                    b = Math.round(255 + (rgb.b - 255) * (1 - mix));
+                } else {
+                    // Mix with black (0)
+                    const mix = (i - 5) / 5; // 0 to 1
+                    r = Math.round(rgb.r * (1 - mix));
+                    g = Math.round(rgb.g * (1 - mix));
+                    b = Math.round(rgb.b * (1 - mix));
+                }
+
+                const newHex = rgbToHex(r, g, b);
+
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 group cursor-pointer";
+                row.onclick = () => copyToClipboard(newHex);
+                row.innerHTML = `
+                    <div class="w-12 h-8 rounded shadow-sm border border-gray-100 transition-transform group-hover:scale-110" style="background-color: ${newHex}"></div>
+                    <span class="text-xs font-mono text-gray-500 group-hover:text-black">${newHex}</span>
+                `;
+                container.appendChild(row);
+            }
+        }
+
+        // 5. Mixer
+        function updateMix() {
+            const c1 = document.getElementById('mix-1').value;
+            const c2 = document.getElementById('mix-2').value;
+            const ratio = document.getElementById('mix-ratio').value;
+            document.getElementById('mix-percent').innerText = ratio;
+
+            const rgb1 = hexToRgb(c1);
+            const rgb2 = hexToRgb(c2);
+
+            const r = Math.round(rgb1.r + (rgb2.r - rgb1.r) * (ratio / 100));
+            const g = Math.round(rgb1.g + (rgb2.g - rgb1.g) * (ratio / 100));
+            const b = Math.round(rgb1.b + (rgb2.b - rgb1.b) * (ratio / 100));
+
+            const resultHex = rgbToHex(r, g, b);
+            const resultEl = document.getElementById('mix-result');
+            resultEl.style.backgroundColor = resultHex;
+            resultEl.innerText = resultHex;
+
+            // Auto text color
+            const lum = getLuminance(r, g, b);
+            resultEl.style.color = lum > 0.5 ? '#000' : '#fff';
+        }
+
+        // 6. Converter
+        function convertColor(source) {
+            let r, g, b;
+
+            if (source === 'hex') {
+                const hex = document.getElementById('conv-hex').value;
+                if (!hex.match(/^#[0-9A-F]{6}$/i)) return;
+                const rgb = hexToRgb(hex);
+                r = rgb.r; g = rgb.g; b = rgb.b;
+                document.getElementById('conv-rgb').value = `rgb(${r}, ${g}, ${b})`;
+            } else if (source === 'rgb') {
+                const val = document.getElementById('conv-rgb').value;
+                const match = val.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+                if (!match) return;
+                r = parseInt(match[1]); g = parseInt(match[2]); b = parseInt(match[3]);
+                document.getElementById('conv-hex').value = rgbToHex(r, g, b);
+            } else if (source === 'hsl') {
+                // Reverse calc not implemented for simplicity in this demo, just updates others
+                // In a full app, parse HSL input
+                return;
+            }
+
+            const hsl = rgbToHsl(r, g, b);
+            document.getElementById('conv-hsl').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+            // Sync hex if not source
+            if (source !== 'hex') document.getElementById('conv-hex').value = rgbToHex(r, g, b);
+        }
+
+        // 7. Image Extractor (Simplified)
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.getElementById('img-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    // Very basic extraction: sample corners and center
+                    // In a real app, use a quantization library like quantize.js
+                    const w = canvas.width, h = canvas.height;
+                    const points = [
+                        { x: 0, y: 0 }, { x: w, y: 0 }, { x: 0, y: h }, { x: w, y: h }, { x: w / 2, y: h / 2 }
+                    ];
+
+                    const container = document.getElementById('img-palette-result');
+                    container.innerHTML = '';
+                    container.classList.remove('hidden');
+
+                    points.forEach(p => {
+                        const pData = ctx.getImageData(p.x, p.y, 1, 1).data;
+                        const hex = rgbToHex(pData[0], pData[1], pData[2]);
+
+                        const div = document.createElement('div');
+                        div.className = 'flex-1 rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform';
+                        div.style.backgroundColor = hex;
+                        div.onclick = () => copyToClipboard(hex);
+                        container.appendChild(div);
+                    });
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // 8. CSS System
+        function updateSystem() {
+            const p = document.getElementById('sys-primary').value;
+            const s = document.getElementById('sys-secondary').value;
+            const a = document.getElementById('sys-accent').value;
+
+            document.getElementById('sys-primary-hex').innerText = p;
+            document.getElementById('sys-secondary-hex').innerText = s;
+            document.getElementById('sys-accent-hex').innerText = a;
+
+            const pRgb = hexToRgb(p);
+            const sRgb = hexToRgb(s);
+            const aRgb = hexToRgb(a);
+
+            const css = `:root {
+  --color-primary: ${p};
+  --color-primary-rgb: ${pRgb.r}, ${pRgb.g}, ${pRgb.b};
+  --color-secondary: ${s};
+  --color-secondary-rgb: ${sRgb.r}, ${sRgb.g}, ${sRgb.b};
+  --color-accent: ${a};
+  --color-accent-rgb: ${aRgb.r}, ${aRgb.g}, ${aRgb.b};
+}`;
+            document.getElementById('css-output').innerText = css;
+        }
+
+        // Hero Animation
+        function generateRandomHero() {
+            const container = document.getElementById('hero-palette');
+            container.innerHTML = '';
+            const colors = [];
+            for (let i = 0; i < 5; i++) {
+                colors.push(rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)));
+            }
+
+            colors.forEach((c, i) => {
+                const div = document.createElement('div');
+                div.className = 'w-12 h-12 rounded-full shadow-lg cursor-pointer scale-0';
+                div.style.backgroundColor = c;
+                div.onclick = () => copyToClipboard(c);
+                container.appendChild(div);
+
+                gsap.to(div, { scale: 1, duration: 0.5, delay: i * 0.1, ease: "back.out(1.7)" });
+            });
+        }
+
+        // Initialization
+        window.onload = () => {
+            updateHarmonies();
+            updateGradient();
+            updateContrast();
+            updateShades();
+            updateMix();
+            updateSystem();
+            generateRandomHero();
+
+            // GSAP Scroll Animations
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.gs-reveal').forEach(elem => {
+                gsap.from(elem, {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: elem,
+                        start: "top 85%",
+                    }
+                });
+            });
+        };
+
+    </script>
+</body>
+
+</html>
