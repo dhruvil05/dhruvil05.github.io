@@ -4,355 +4,988 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>call(), bind(), and apply() Methods</title>
+    <title>JavaScript call(), apply(), bind() - Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#0f172a',
+                        accent: '#3b82f6',
+                        'accent-light': '#60a5fa',
+                        'code-bg': '#f8fafc',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h2 {
-            color: #34495e;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-top: 30px;
-        }
-
-        .method-section {
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .code-block {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            margin: 10px 0;
-            overflow-x: auto;
-            white-space: pre-wrap;
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
         }
 
-        .output {
-            background-color: #27ae60;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-family: monospace;
+        .method-card {
+            transition: all 0.3s ease;
         }
 
-        .syntax {
-            background-color: #e74c3c;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-weight: bold;
+        .method-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        .key-points {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
         }
 
-        .demo-section {
-            background-color: #e8f4fd;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+        .output-line {
+            opacity: 0;
+            animation: fadeIn 0.3s ease-out forwards;
         }
 
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
+        .syntax-highlight .keyword {
+            color: #c678dd;
         }
 
-        button:hover {
-            background-color: #2980b9;
+        .syntax-highlight .function {
+            color: #61afef;
         }
 
-        #output {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            border-radius: 5px;
-            font-family: monospace;
-            min-height: 100px;
-            white-space: pre-wrap;
+        .syntax-highlight .string {
+            color: #98c379;
+        }
+
+        .syntax-highlight .comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .syntax-highlight .number {
+            color: #d19a66;
+        }
+
+        .syntax-highlight .operator {
+            color: #56b6c2;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <h1>JavaScript call(), bind(), and apply() Methods</h1>
+<body class="bg-white text-slate-800 font-sans antialiased">
 
-        <div class="method-section">
-            <h2>1. call() Method</h2>
-            <div class="syntax">
-                Syntax: functionName.call(thisContext, arg1, arg2, ...)
-            </div>
-            <p><strong>Purpose:</strong> Calls a function immediately with a specific <code>this</code> context and
-                individual arguments.</p>
-
-            <div class="code-block">// Example 1: Basic call() usage
-                const person1 = {
-                name: "Alice",
-                age: 25
-                };
-
-                const person2 = {
-                name: "Bob",
-                age: 30
-                };
-
-                function introduce(greeting, profession) {
-                return `${greeting}! I'm ${this.name}, ${this.age} years old, and I'm a ${profession}.`;
-                }
-
-                // Using call() to set 'this' context
-                console.log(introduce.call(person1, "Hello", "Developer"));
-                // Output: "Hello! I'm Alice, 25 years old, and I'm a Developer."
-
-                console.log(introduce.call(person2, "Hi", "Designer"));
-                // Output: "Hi! I'm Bob, 30 years old, and I'm a Designer."</div>
-
-            <div class="key-points">
-                <strong>Key Points:</strong>
-                <ul>
-                    <li>Executes the function immediately</li>
-                    <li>First parameter sets the <code>this</code> context</li>
-                    <li>Remaining parameters are passed as individual arguments</li>
-                </ul>
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden bg-white border-b border-slate-100">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-purple-50/30 pointer-events-none">
+        </div>
+        <div class="max-w-5xl mx-auto px-6 py-20 relative z-10">
+            <div class="text-center space-y-6 animate-fade-in">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-4">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    JavaScript Deep Dive
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-slate-900">
+                    <span class="gradient-text">call()</span>,
+                    <span class="gradient-text">apply()</span>,
+                    <span class="gradient-text">bind()</span>
+                </h1>
+                <p class="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                    Master the three pillars of function context manipulation in JavaScript.
+                    Understand when and why to use each method with interactive examples.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mt-8 text-sm font-medium text-slate-500">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Immediate Execution
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        Context Binding
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                            </path>
+                        </svg>
+                        Argument Flexibility
+                    </span>
+                </div>
             </div>
         </div>
+    </header>
 
-        <div class="method-section">
-            <h2>2. apply() Method</h2>
-            <div class="syntax">
-                Syntax: functionName.apply(thisContext, [arg1, arg2, ...])
-            </div>
-            <p><strong>Purpose:</strong> Similar to call(), but takes arguments as an array.</p>
-
-            <div class="code-block">// Example 2: apply() with array of arguments
-                function calculateSum(a, b, c) {
-                console.log(`${this.name} is calculating: ${a} + ${b} + ${c} = ${a + b + c}`);
-                return a + b + c;
-                }
-
-                const calculator = {
-                name: "SuperCalculator"
-                };
-
-                const numbers = [10, 20, 30];
-
-                // Using apply() with array of arguments
-                calculateSum.apply(calculator, numbers);
-                // Output: "SuperCalculator is calculating: 10 + 20 + 30 = 60"
-
-                // Practical use case: Finding max value in array
-                const nums = [5, 2, 9, 1, 7];
-                const maxValue = Math.max.apply(null, nums);
-                console.log("Max value:", maxValue); // Output: 9</div>
-
-            <div class="key-points">
-                <strong>Key Points:</strong>
-                <ul>
-                    <li>Executes the function immediately</li>
-                    <li>First parameter sets the <code>this</code> context</li>
-                    <li>Second parameter must be an array of arguments</li>
-                    <li>Useful when you have arguments in array form</li>
-                </ul>
+    <!-- Quick Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="flex space-x-8 overflow-x-auto scrollbar-hide">
+                <button onclick="scrollToSection('call')"
+                    class="py-4 px-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors border-b-2 border-transparent hover:border-blue-600 whitespace-nowrap">
+                    call()
+                </button>
+                <button onclick="scrollToSection('apply')"
+                    class="py-4 px-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors border-b-2 border-transparent hover:border-blue-600 whitespace-nowrap">
+                    apply()
+                </button>
+                <button onclick="scrollToSection('bind')"
+                    class="py-4 px-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors border-b-2 border-transparent hover:border-blue-600 whitespace-nowrap">
+                    bind()
+                </button>
+                <button onclick="scrollToSection('playground')"
+                    class="py-4 px-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors border-b-2 border-transparent hover:border-blue-600 whitespace-nowrap">
+                    Interactive Playground
+                </button>
             </div>
         </div>
+    </nav>
 
-        <div class="method-section">
-            <h2>3. bind() Method</h2>
-            <div class="syntax">
-                Syntax: functionName.bind(thisContext, arg1, arg2, ...)
+    <main class="max-w-5xl mx-auto px-6 py-16 space-y-24">
+
+        <!-- call() Section -->
+        <section id="call" class="scroll-mt-24 animate-slide-up">
+            <div class="method-card bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="p-8 md:p-12">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600">
+                            1</div>
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-900">call() Method</h2>
+                            <p class="text-slate-500 mt-1">Execute immediately with specific context</p>
+                        </div>
+                    </div>
+
+                    <div class="prose prose-slate max-w-none mb-8">
+                        <p class="text-lg text-slate-600 leading-relaxed">
+                            The <code
+                                class="bg-slate-100 px-2 py-1 rounded text-blue-600 font-mono text-sm">call()</code>
+                            method invokes a function immediately while explicitly setting the <code
+                                class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-mono text-sm">this</code>
+                            context. Arguments are passed individually, making it ideal when you know the exact
+                            parameters beforehand.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-xl overflow-hidden mb-6 shadow-lg">
+                        <div class="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
+                            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Syntax</span>
+                            <button onclick="copyCode('call-syntax')"
+                                class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-x-auto">
+                            <pre id="call-syntax"
+                                class="font-mono text-sm leading-relaxed"><code class="syntax-highlight"><span class="function">functionName</span><span class="operator">.</span><span class="function">call</span><span class="operator">(</span><span class="keyword">thisContext</span><span class="operator">,</span> <span class="keyword">arg1</span><span class="operator">,</span> <span class="keyword">arg2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">)</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                            <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                                Example
+                            </h3>
+                            <pre class="font-mono text-sm text-slate-700 overflow-x-auto"><code>const person1 = {
+  name: "Alice",
+  age: 25
+};
+
+const person2 = {
+  name: "Bob", 
+  age: 30
+};
+
+function introduce(greeting, profession) {
+  return `${greeting}! I'm ${this.name}, 
+  ${this.age} years old, and I'm a ${profession}.`;
+}
+
+// Using call() to set 'this' context
+introduce.call(person1, "Hello", "Developer");
+// "Hello! I'm Alice, 25 years old..."
+
+introduce.call(person2, "Hi", "Designer");
+// "Hi! I'm Bob, 30 years old..."</code></pre>
+                        </div>
+                        <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                            <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                                    </path>
+                                </svg>
+                                Key Points
+                            </h3>
+                            <ul class="space-y-3 text-slate-700">
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
+                                    <span>Executes the function <strong>immediately</strong></span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
+                                    <span>First parameter sets the <code
+                                            class="bg-white px-1 rounded text-blue-600">this</code> context</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
+                                    <span>Remaining parameters passed as <strong>individual arguments</strong></span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
+                                    <span>Perfect for method borrowing between objects</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-8 py-4 border-t border-slate-200 flex items-center justify-between">
+                    <span class="text-sm text-slate-500">Use when: You know arguments beforehand</span>
+                    <button onclick="runDemo('call')"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105 font-medium text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Try it Live
+                    </button>
+                </div>
             </div>
-            <p><strong>Purpose:</strong> Creates a new function with a permanently bound <code>this</code> context.</p>
+        </section>
 
-            <div class="code-block">// Example 3: bind() creates new function
-                const user = {
-                name: "John",
-                greet: function(message) {
-                return `${message}, I'm ${this.name}!`;
-                }
-                };
+        <!-- apply() Section -->
+        <section id="apply" class="scroll-mt-24 animate-slide-up">
+            <div class="method-card bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="p-8 md:p-12">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-2xl font-bold text-purple-600">
+                            2</div>
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-900">apply() Method</h2>
+                            <p class="text-slate-500 mt-1">Execute with array of arguments</p>
+                        </div>
+                    </div>
 
-                // Problem: losing 'this' context
-                const greetFunction = user.greet;
-                // console.log(greetFunction("Hello")); // Error: this.name is undefined
+                    <div class="prose prose-slate max-w-none mb-8">
+                        <p class="text-lg text-slate-600 leading-relaxed">
+                            Similar to <code
+                                class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-mono text-sm">call()</code>,
+                            but accepts arguments as an <strong>array</strong>. This is particularly useful when working
+                            with dynamic argument lists or when you need to spread an array of values as function
+                            parameters.
+                        </p>
+                    </div>
 
-                // Solution: using bind()
-                const boundGreet = user.greet.bind(user);
-                console.log(boundGreet("Hello")); // Output: "Hello, I'm John!"
+                    <div class="bg-slate-900 rounded-xl overflow-hidden mb-6 shadow-lg">
+                        <div class="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
+                            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Syntax</span>
+                            <button onclick="copyCode('apply-syntax')"
+                                class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-x-auto">
+                            <pre id="apply-syntax"
+                                class="font-mono text-sm leading-relaxed"><code class="syntax-highlight"><span class="function">functionName</span><span class="operator">.</span><span class="function">apply</span><span class="operator">(</span><span class="keyword">thisContext</span><span class="operator">,</span> <span class="operator">[</span><span class="keyword">arg1</span><span class="operator">,</span> <span class="keyword">arg2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">]</span><span class="operator">)</span></code></pre>
+                        </div>
+                    </div>
 
-                // bind() with preset arguments (partial application)
-                function multiply(a, b, c) {
-                return `${this.name}: ${a} × ${b} × ${c} = ${a * b * c}`;
-                }
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                            <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                                Example
+                            </h3>
+                            <pre class="font-mono text-sm text-slate-700 overflow-x-auto"><code>function calculateSum(a, b, c) {
+  console.log(`${this.name} calculates: 
+  ${a} + ${b} + ${c} = ${a + b + c}`);
+  return a + b + c;
+}
 
-                const mathTeacher = { name: "Ms. Smith" };
-                const multiplyByTwo = multiply.bind(mathTeacher, 2);
+const calculator = {
+  name: "SuperCalculator"
+};
 
-                console.log(multiplyByTwo(3, 4)); // Output: "Ms. Smith: 2 × 3 × 4 = 24"</div>
+const numbers = [10, 20, 30];
 
-            <div class="key-points">
-                <strong>Key Points:</strong>
-                <ul>
-                    <li>Returns a new function (doesn't execute immediately)</li>
-                    <li>Permanently binds the <code>this</code> context</li>
-                    <li>Can preset some arguments (partial application)</li>
-                    <li>Useful for event handlers and callbacks</li>
-                </ul>
+// Using apply() with array
+calculateSum.apply(calculator, numbers);
+// "SuperCalculator calculates: 60"
+
+// Practical: Finding max in array
+const nums = [5, 2, 9, 1, 7];
+Math.max.apply(null, nums); // 9</code></pre>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-6 border border-purple-100">
+                            <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                                    </path>
+                                </svg>
+                                Key Points
+                            </h3>
+                            <ul class="space-y-3 text-slate-700">
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0"></span>
+                                    <span>Executes the function <strong>immediately</strong></span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0"></span>
+                                    <span>Second parameter must be an <strong>array</strong> of arguments</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0"></span>
+                                    <span>Ideal when arguments are already in array form</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0"></span>
+                                    <span>Can use <code class="bg-white px-1 rounded text-purple-600">null</code> for
+                                        thisContext when not needed</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-8 py-4 border-t border-slate-200 flex items-center justify-between">
+                    <span class="text-sm text-slate-500">Use when: Arguments are in an array</span>
+                    <button onclick="runDemo('apply')"
+                        class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all transform hover:scale-105 font-medium text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Try it Live
+                    </button>
+                </div>
             </div>
+        </section>
+
+        <!-- bind() Section -->
+        <section id="bind" class="scroll-mt-24 animate-slide-up">
+            <div class="method-card bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="p-8 md:p-12">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-600">
+                            3</div>
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-900">bind() Method</h2>
+                            <p class="text-slate-500 mt-1">Create bound function for later use</p>
+                        </div>
+                    </div>
+
+                    <div class="prose prose-slate max-w-none mb-8">
+                        <p class="text-lg text-slate-600 leading-relaxed">
+                            Unlike <code
+                                class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-mono text-sm">call()</code>
+                            and <code
+                                class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-mono text-sm">apply()</code>,
+                            <code
+                                class="bg-slate-100 px-2 py-1 rounded text-emerald-600 font-mono text-sm">bind()</code>
+                            doesn't execute immediately. Instead, it returns a <strong>new function</strong> with a
+                            permanently bound <code
+                                class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-mono text-sm">this</code>
+                            context. Perfect for callbacks and event handlers.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-xl overflow-hidden mb-6 shadow-lg">
+                        <div class="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
+                            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Syntax</span>
+                            <button onclick="copyCode('bind-syntax')"
+                                class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-x-auto">
+                            <pre id="bind-syntax"
+                                class="font-mono text-sm leading-relaxed"><code class="syntax-highlight"><span class="keyword">const</span> <span class="function">boundFunction</span> <span class="operator">=</span> <span class="function">functionName</span><span class="operator">.</span><span class="function">bind</span><span class="operator">(</span><span class="keyword">thisContext</span><span class="operator">,</span> <span class="keyword">arg1</span><span class="operator">,</span> <span class="keyword">arg2</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">)</span></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                            <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                                Example
+                            </h3>
+                            <pre class="font-mono text-sm text-slate-700 overflow-x-auto"><code>const user = {
+  name: "John",
+  greet: function(message) {
+    return `${message}, I'm ${this.name}!`;
+  }
+};
+
+// Problem: losing 'this' context
+const greetFunc = user.greet;
+// greetFunc("Hello") // Error: this.name undefined
+
+// Solution: bind()
+const boundGreet = user.greet.bind(user);
+boundGreet("Hello"); // "Hello, I'm John!"
+
+// Partial application
+function multiply(a, b, c) {
+  return `${this.name}: ${a}×${b}×${c}=${a*b*c}`;
+}
+
+const mathTeacher = { name: "Ms. Smith" };
+const multiplyByTwo = multiply.bind(mathTeacher, 2);
+
+multiplyByTwo(3, 4); // "Ms. Smith: 2×3×4=24"</code></pre>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-6 border border-emerald-100">
+                            <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                                    </path>
+                                </svg>
+                                Key Points
+                            </h3>
+                            <ul class="space-y-3 text-slate-700">
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></span>
+                                    <span>Returns a <strong>new function</strong> (doesn't execute immediately)</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></span>
+                                    <span>Permanently binds the <code
+                                            class="bg-white px-1 rounded text-emerald-600">this</code> context</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></span>
+                                    <span>Supports <strong>partial application</strong> (preset arguments)</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></span>
+                                    <span>Essential for event handlers and callbacks</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-8 py-4 border-t border-slate-200 flex items-center justify-between">
+                    <span class="text-sm text-slate-500">Use when: You need a function for later execution</span>
+                    <button onclick="runDemo('bind')"
+                        class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all transform hover:scale-105 font-medium text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Try it Live
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Playground -->
+        <section id="playground" class="scroll-mt-24 animate-slide-up">
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-lg">
+                <div class="p-8 md:p-12">
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-bold text-slate-900 mb-4">Interactive Playground</h2>
+                        <p class="text-slate-600 max-w-2xl mx-auto">Experiment with all three methods in real-time.
+                            Click the tabs to switch between methods and see the output instantly.</p>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="flex border-b border-slate-200 mb-6">
+                        <button onclick="switchTab('call')" id="tab-call"
+                            class="flex-1 py-3 px-4 text-center font-medium text-blue-600 border-b-2 border-blue-600 transition-colors">
+                            call()
+                        </button>
+                        <button onclick="switchTab('apply')" id="tab-apply"
+                            class="flex-1 py-3 px-4 text-center font-medium text-slate-500 hover:text-purple-600 transition-colors">
+                            apply()
+                        </button>
+                        <button onclick="switchTab('bind')" id="tab-bind"
+                            class="flex-1 py-3 px-4 text-center font-medium text-slate-500 hover:text-emerald-600 transition-colors">
+                            bind()
+                        </button>
+                    </div>
+
+                    <!-- Playground Content -->
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Code Editor -->
+                        <div class="space-y-4">
+                            <div class="bg-slate-900 rounded-xl overflow-hidden shadow-inner">
+                                <div
+                                    class="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+                                    <span class="text-xs font-medium text-slate-400">JavaScript</span>
+                                    <div class="flex gap-1.5">
+                                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                    </div>
+                                </div>
+                                <div class="p-4 font-mono text-sm leading-relaxed text-slate-300 overflow-x-auto"
+                                    id="playground-code">
+                                    <!-- Dynamic content -->
+                                </div>
+                            </div>
+                            <button onclick="executePlayground()"
+                                class="w-full py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Run Code
+                            </button>
+                        </div>
+
+                        <!-- Output Console -->
+                        <div class="bg-black rounded-xl overflow-hidden shadow-inner flex flex-col h-96">
+                            <div
+                                class="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
+                                <span
+                                    class="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    Console Output
+                                </span>
+                                <button onclick="clearOutput()"
+                                    class="text-xs text-slate-400 hover:text-white transition-colors">Clear</button>
+                            </div>
+                            <div id="console-output"
+                                class="flex-1 p-4 font-mono text-sm text-green-400 overflow-y-auto space-y-2">
+                                <div class="text-slate-500 italic">// Click "Run Code" to see output...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section class="animate-slide-up">
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="p-8 md:p-12">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-8 text-center">Quick Comparison</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b-2 border-slate-100">
+                                    <th class="py-4 px-6 font-semibold text-slate-900">Method</th>
+                                    <th class="py-4 px-6 font-semibold text-slate-900">Execution</th>
+                                    <th class="py-4 px-6 font-semibold text-slate-900">Arguments</th>
+                                    <th class="py-4 px-6 font-semibold text-slate-900">Returns</th>
+                                    <th class="py-4 px-6 font-semibold text-slate-900">Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-blue-50/50 transition-colors group">
+                                    <td class="py-4 px-6 font-mono font-semibold text-blue-600">call()</td>
+                                    <td class="py-4 px-6 text-slate-600">Immediate</td>
+                                    <td class="py-4 px-6 text-slate-600">Individual (arg1, arg2...)</td>
+                                    <td class="py-4 px-6 text-slate-600">Function result</td>
+                                    <td class="py-4 px-6 text-slate-600">Known arguments, method borrowing</td>
+                                </tr>
+                                <tr class="hover:bg-purple-50/50 transition-colors">
+                                    <td class="py-4 px-6 font-mono font-semibold text-purple-600">apply()</td>
+                                    <td class="py-4 px-6 text-slate-600">Immediate</td>
+                                    <td class="py-4 px-6 text-slate-600">Array [arg1, arg2...]</td>
+                                    <td class="py-4 px-6 text-slate-600">Function result</td>
+                                    <td class="py-4 px-6 text-slate-600">Dynamic arrays, variadic functions</td>
+                                </tr>
+                                <tr class="hover:bg-emerald-50/50 transition-colors">
+                                    <td class="py-4 px-6 font-mono font-semibold text-emerald-600">bind()</td>
+                                    <td class="py-4 px-6 text-slate-600">Delayed</td>
+                                    <td class="py-4 px-6 text-slate-600">Individual (preset possible)</td>
+                                    <td class="py-4 px-6 text-slate-600">New function</td>
+                                    <td class="py-4 px-6 text-slate-600">Callbacks, event handlers, partials</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pro Tips -->
+        <section class="animate-slide-up mb-20">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 md:p-12 text-white">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Pro Tips
+                </h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 border border-white/10">
+                        <h3 class="font-semibold mb-2 text-blue-300">Modern Alternative</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            With ES6, use the spread operator instead of <code
+                                class="bg-white/20 px-1 rounded">apply()</code>: <code
+                                class="bg-white/20 px-1 rounded">func(...args)</code> is cleaner than <code
+                                class="bg-white/20 px-1 rounded">func.apply(null, args)</code>.
+                        </p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 border border-white/10">
+                        <h3 class="font-semibold mb-2 text-purple-300">Arrow Functions</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Arrow functions don't have their own <code class="bg-white/20 px-1 rounded">this</code>, so
+                            <code class="bg-white/20 px-1 rounded">bind()</code> won't work on them. Use regular
+                            functions when you need to rebind context.
+                        </p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 border border-white/10">
+                        <h3 class="font-semibold mb-2 text-emerald-300">Performance</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <code class="bg-white/20 px-1 rounded">call()</code> is slightly faster than <code
+                                class="bg-white/20 px-1 rounded">apply()</code> because it avoids array iteration
+                            overhead. Use it when performance matters.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-slate-50 py-12">
+        <div class="max-w-5xl mx-auto px-6 text-center text-slate-500 text-sm">
+            <p>Built with modern web standards. Practice these methods to master JavaScript context manipulation. <a href="https://dhruvil05.github.io/bind-apply-call/old-index.html" target="_blank">View Old Version</a></p>
         </div>
-
-        <div class="demo-section">
-            <h2>Interactive Demo</h2>
-            <p>Click the buttons below to see these methods in action:</p>
-
-            <button onclick="demoCall()">Demo call()</button>
-            <button onclick="demoApply()">Demo apply()</button>
-            <button onclick="demoBind()">Demo bind()</button>
-            <button onclick="demoComparison()">Compare All Three</button>
-            <button onclick="clearOutput()">Clear Output</button>
-
-            <div id="output">Click a button above to see the output...</div>
-        </div>
-
-        <div class="method-section">
-            <h2>Key Differences Summary</h2>
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                <tr style="background-color: #3498db; color: white;">
-                    <th style="padding: 12px; border: 1px solid #ddd;">Method</th>
-                    <th style="padding: 12px; border: 1px solid #ddd;">Execution</th>
-                    <th style="padding: 12px; border: 1px solid #ddd;">Arguments</th>
-                    <th style="padding: 12px; border: 1px solid #ddd;">Use Case</th>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>call()</strong></td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Immediate</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Individual arguments</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">When you know arguments beforehand</td>
-                </tr>
-                <tr style="background-color: #f8f9fa;">
-                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>apply()</strong></td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Immediate</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Array of arguments</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">When arguments are in array form</td>
-                </tr>
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #ddd;"><strong>bind()</strong></td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Returns new function</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Individual arguments</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">Event handlers, callbacks, partial application
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
+    </footer>
 
     <script>
-        // Demo objects and functions
-        const demoObj1 = { name: "Alice", role: "Developer" };
-        const demoObj2 = { name: "Bob", role: "Designer" };
+        // Playground state
+        let currentTab = 'call';
 
-        function demoFunction(greeting, task) {
-            return `${greeting}! I'm ${this.name}, a ${this.role}. I'm working on ${task}.`;
+        const playgroundExamples = {
+            call: {
+                code: `<span class="text-slate-500">// Define objects and function</span>
+<span class="text-purple-400">const</span> person1 <span class="text-blue-400">=</span> {
+  name: <span class="text-green-400">"Alice"</span>,
+  age: <span class="text-orange-400">25</span>
+};
+
+<span class="text-purple-400">const</span> person2 <span class="text-blue-400">=</span> {
+  name: <span class="text-green-400">"Bob"</span>,
+  age: <span class="text-orange-400">30</span>
+};
+
+<span class="text-purple-400">function</span> <span class="text-yellow-300">introduce</span>(greeting, profession) {
+  <span class="text-purple-400">return</span> \`<span class="text-blue-400">\${</span>greeting<span class="text-blue-400">}</span>! I'm <span class="text-blue-400">\${</span><span class="text-purple-400">this</span>.name<span class="text-blue-400">}</span>, 
+  <span class="text-blue-400">\${</span><span class="text-purple-400">this</span>.age<span class="text-blue-400">}</span> years old, working as <span class="text-blue-400">\${</span>profession<span class="text-blue-400">}</span>.\`;
+}
+
+<span class="text-slate-500">// Execute with call()</span>
+<span class="text-purple-400">const</span> result1 <span class="text-blue-400">=</span> introduce.<span class="text-yellow-300">call</span>(person1, <span class="text-green-400">"Hello"</span>, <span class="text-green-400">"Developer"</span>);
+<span class="text-purple-400">const</span> result2 <span class="text-blue-400">=</span> introduce.<span class="text-yellow-300">call</span>(person2, <span class="text-green-400">"Hi"</span>, <span class="text-green-400">"Designer"</span>);
+
+console.<span class="text-yellow-300">log</span>(result1);
+console.<span class="text-yellow-300">log</span>(result2);`,
+                run: function () {
+                    const person1 = { name: "Alice", age: 25 };
+                    const person2 = { name: "Bob", age: 30 };
+                    function introduce(greeting, profession) {
+                        return `${greeting}! I'm ${this.name}, ${this.age} years old, working as ${profession}.`;
+                    }
+                    const result1 = introduce.call(person1, "Hello", "Developer");
+                    const result2 = introduce.call(person2, "Hi", "Designer");
+                    return [result1, result2];
+                }
+            },
+            apply: {
+                code: `<span class="text-slate-500">// Setup calculator object</span>
+<span class="text-purple-400">const</span> calculator <span class="text-blue-400">=</span> {
+  name: <span class="text-green-400">"SuperCalculator"</span>
+};
+
+<span class="text-purple-400">function</span> <span class="text-yellow-300">calculateSum</span>(a, b, c) {
+  <span class="text-purple-400">const</span> sum <span class="text-blue-400">=</span> a <span class="text-blue-400">+</span> b <span class="text-blue-400">+</span> c;
+  <span class="text-purple-400">return</span> \`<span class="text-blue-400">\${</span><span class="text-purple-400">this</span>.name<span class="text-blue-400">}</span>: <span class="text-blue-400">\${</span>a<span class="text-blue-400">}</span> + <span class="text-blue-400">\${</span>b<span class="text-blue-400">}</span> + <span class="text-blue-400">\${</span>c<span class="text-blue-400">}</span> = <span class="text-blue-400">\${</span>sum<span class="text-blue-400">}</span>\`;
+}
+
+<span class="text-purple-400">const</span> numbers <span class="text-blue-400">=</span> [<span class="text-orange-400">10</span>, <span class="text-orange-400">20</span>, <span class="text-orange-400">30</span>];
+
+<span class="text-slate-500">// Use apply() with array</span>
+<span class="text-purple-400">const</span> result <span class="text-blue-400">=</span> calculateSum.<span class="text-yellow-300">apply</span>(calculator, numbers);
+
+console.<span class="text-yellow-300">log</span>(result);
+
+<span class="text-slate-500">// Bonus: Math.max with apply</span>
+<span class="text-purple-400">const</span> maxVal <span class="text-blue-400">=</span> Math.max.<span class="text-yellow-300">apply</span>(<span class="text-purple-400">null</span>, [<span class="text-orange-400">5</span>, <span class="text-orange-400">2</span>, <span class="text-orange-400">9</span>, <span class="text-orange-400">1</span>, <span class="text-orange-400">7</span>]);
+console.<span class="text-yellow-300">log</span>(<span class="text-green-400">"Max value:"</span>, maxVal);`,
+                run: function () {
+                    const calculator = { name: "SuperCalculator" };
+                    function calculateSum(a, b, c) {
+                        const sum = a + b + c;
+                        return `${this.name}: ${a} + ${b} + ${c} = ${sum}`;
+                    }
+                    const numbers = [10, 20, 30];
+                    const result = calculateSum.apply(calculator, numbers);
+                    const maxVal = Math.max.apply(null, [5, 2, 9, 1, 7]);
+                    return [result, `Max value: ${maxVal}`];
+                }
+            },
+            bind: {
+                code: `<span class="text-slate-500">// Create user with method</span>
+<span class="text-purple-400">const</span> user <span class="text-blue-400">=</span> {
+  name: <span class="text-green-400">"John"</span>,
+  <span class="text-yellow-300">greet</span>: <span class="text-purple-400">function</span>(message) {
+    <span class="text-purple-400">return</span> \`<span class="text-blue-400">\${</span>message<span class="text-blue-400">}</span>, I'm <span class="text-blue-400">\${</span><span class="text-purple-400">this</span>.name<span class="text-blue-400">}</span>!\`;
+  }
+};
+
+<span class="text-slate-500">// Problem: Extracting method loses 'this'</span>
+<span class="text-purple-400">const</span> looseGreet <span class="text-blue-400">=</span> user.greet;
+<span class="text-slate-500">// looseGreet("Hello") -> Error: Cannot read property 'name'</span>
+
+<span class="text-slate-500">// Solution: Bind the context</span>
+<span class="text-purple-400">const</span> boundGreet <span class="text-blue-400">=</span> user.greet.<span class="text-yellow-300">bind</span>(user);
+console.<span class="text-yellow-300">log</span>(boundGreet(<span class="text-green-400">"Hello"</span>));
+
+<span class="text-slate-500">// Partial application (currying)</span>
+<span class="text-purple-400">function</span> <span class="text-yellow-300">multiply</span>(a, b, c) {
+  <span class="text-purple-400">return</span> \`<span class="text-blue-400">\${</span><span class="text-purple-400">this</span>.name<span class="text-blue-400">}</span>: <span class="text-blue-400">\${</span>a<span class="text-blue-400">}</span> × <span class="text-blue-400">\${</span>b<span class="text-blue-400">}</span> × <span class="text-blue-400">\${</span>c<span class="text-blue-400">}</span> = <span class="text-blue-400">\${</span>a <span class="text-blue-400">*</span> b <span class="text-blue-400">*</span> c<span class="text-blue-400">}</span>\`;
+}
+
+<span class="text-purple-400">const</span> teacher <span class="text-blue-400">=</span> { name: <span class="text-green-400">"Ms. Smith"</span> };
+<span class="text-purple-400">const</span> multiplyByTwo <span class="text-blue-400">=</span> multiply.<span class="text-yellow-300">bind</span>(teacher, <span class="text-orange-400">2</span>);
+
+console.<span class="text-yellow-300">log</span>(multiplyByTwo(<span class="text-orange-400">3</span>, <span class="text-orange-400">4</span>));`,
+                run: function () {
+                    const user = {
+                        name: "John",
+                        greet: function (message) {
+                            return `${message}, I'm ${this.name}!`;
+                        }
+                    };
+                    const boundGreet = user.greet.bind(user);
+                    const result1 = boundGreet("Hello");
+
+                    function multiply(a, b, c) {
+                        return `${this.name}: ${a} × ${b} × ${c} = ${a * b * c}`;
+                    }
+                    const teacher = { name: "Ms. Smith" };
+                    const multiplyByTwo = multiply.bind(teacher, 2);
+                    const result2 = multiplyByTwo(3, 4);
+
+                    return [result1, result2];
+                }
+            }
+        };
+
+        // Initialize playground
+        function initPlayground() {
+            const codeContainer = document.getElementById('playground-code');
+            if (codeContainer) {
+                codeContainer.innerHTML = playgroundExamples.call.code;
+            }
         }
 
-        function addToOutput(text) {
-            const output = document.getElementById('output');
-            output.textContent += text + '\n\n';
+        function switchTab(method) {
+            currentTab = method;
+
+            // Update tab styles
+            const tabs = ['call', 'apply', 'bind'];
+            const colors = { call: 'blue', apply: 'purple', bind: 'emerald' };
+
+            tabs.forEach(function (m) {
+                const tab = document.getElementById('tab-' + m);
+                if (tab) {
+                    if (m === method) {
+                        tab.className = 'flex-1 py-3 px-4 text-center font-medium text-' + colors[m] + '-600 border-b-2 border-' + colors[m] + '-600 transition-colors';
+                    } else {
+                        tab.className = 'flex-1 py-3 px-4 text-center font-medium text-slate-500 hover:text-slate-700 transition-colors';
+                    }
+                }
+            });
+
+            // Update code
+            const codeContainer = document.getElementById('playground-code');
+            if (codeContainer && playgroundExamples[method]) {
+                codeContainer.innerHTML = playgroundExamples[method].code;
+            }
+            clearOutput();
+        }
+
+        function executePlayground() {
+            const output = document.getElementById('console-output');
+            if (!output || !playgroundExamples[currentTab]) return;
+
+            const example = playgroundExamples[currentTab];
+            const results = example.run();
+
+            // Clear initial message if present
+            if (output.querySelector('.italic')) {
+                output.innerHTML = '';
+            }
+
+            results.forEach(function (result, index) {
+                setTimeout(function () {
+                    const line = document.createElement('div');
+                    line.className = 'output-line font-mono text-sm';
+                    line.innerHTML = '<span class="text-slate-500">></span> <span class="text-green-400">' + escapeHtml(result) + '</span>';
+                    output.appendChild(line);
+                    output.scrollTop = output.scrollHeight;
+                }, index * 200);
+            });
         }
 
         function clearOutput() {
-            document.getElementById('output').textContent = 'Output cleared. Click a button to see demos...\n\n';
+            const output = document.getElementById('console-output');
+            if (output) {
+                output.innerHTML = '<div class="text-slate-500 italic">// Click "Run Code" to see output...</div>';
+            }
         }
 
-        function demoCall() {
-            addToOutput('=== call() Demo ===');
-            const result1 = demoFunction.call(demoObj1, "Hello", "a React app");
-            const result2 = demoFunction.call(demoObj2, "Hi", "a website design");
-            addToOutput('call() Result 1: ' + result1);
-            addToOutput('call() Result 2: ' + result2);
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        function demoApply() {
-            addToOutput('=== apply() Demo ===');
-            const args1 = ["Hello", "debugging code"];
-            const args2 = ["Hi", "creating mockups"];
-            const result1 = demoFunction.apply(demoObj1, args1);
-            const result2 = demoFunction.apply(demoObj2, args2);
-            addToOutput('apply() Result 1: ' + result1);
-            addToOutput('apply() Result 2: ' + result2);
+        function copyCode(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const text = element.innerText;
+            navigator.clipboard.writeText(text).then(function () {
+                // Visual feedback
+                const btn = event.target.closest('button');
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = '<span class="text-green-400">Copied!</span>';
+                    setTimeout(function () {
+                        btn.innerHTML = original;
+                    }, 2000);
+                }
+            }).catch(function (err) {
+                console.error('Failed to copy:', err);
+            });
         }
 
-        function demoBind() {
-            addToOutput('=== bind() Demo ===');
-            const boundFunction1 = demoFunction.bind(demoObj1);
-            const boundFunction2 = demoFunction.bind(demoObj2, "Hey");
-
-            const result1 = boundFunction1("Hello", "testing features");
-            const result2 = boundFunction2("logo design"); // "Hey" is already bound
-
-            addToOutput('bind() Result 1: ' + result1);
-            addToOutput('bind() Result 2 (with preset arg): ' + result2);
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
-        function demoComparison() {
-            addToOutput('=== Comparison Demo ===');
-
-            // Same function, same context, same arguments - different methods
-            const context = { name: "Charlie", role: "Manager" };
-            const args = ["Greetings", "planning the project"];
-
-            const callResult = demoFunction.call(context, ...args);
-            const applyResult = demoFunction.apply(context, args);
-            const bindResult = demoFunction.bind(context)(...args);
-
-            addToOutput('call() result: ' + callResult);
-            addToOutput('apply() result: ' + applyResult);
-            addToOutput('bind() result: ' + bindResult);
-            addToOutput('All three produce the same result but work differently!');
+        function runDemo(type) {
+            scrollToSection('playground');
+            switchTab(type);
+            setTimeout(function () {
+                executePlayground();
+            }, 300);
         }
 
-        // Initialize output
-        clearOutput();
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPlayground);
+        } else {
+            initPlayground();
+        }
+
+        // Intersection Observer for animations
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-slide-up').forEach(function (el) {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(el);
+            });
+        });
     </script>
 </body>
 
