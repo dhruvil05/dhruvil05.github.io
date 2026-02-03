@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThrottlePromises & Currying Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .demo-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .demo-section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            color: #4facfe;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .concept-explanation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .interactive-demo {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        input {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 2px solid #333;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            background: rgba(79, 172, 254, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: #8b4513;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .curry-chain {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .curry-step {
+            background: #e3f2fd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid #2196f3;
+            color: #1976d2;
+            font-weight: bold;
+        }
+
+        .arrow {
+            color: #666;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Advanced JavaScript Concepts</h1>
+            <p class="subtitle">Interactive Demo: ThrottlePromises & Currying</p>
+        </header>
+
+        <!-- Throttle Promises Section -->
+        <div class="demo-section">
+            <h2>⚡ ThrottlePromises</h2>
+
+            <div class="concept-explanation">
+                <h3>What is ThrottlePromises?</h3>
+                <p><strong>ThrottlePromises</strong> is a technique to limit the number of concurrent asynchronous
+                    operations (promises) running at the same time. This prevents overwhelming servers, managing memory
+                    usage, and controlling resource consumption.</p>
+
+                <div class="code-block">async function throttlePromises(promises, limit) {
+                    const results = [];
+                    const executing = [];
+
+                    for (const promise of promises) {
+                    const p = Promise.resolve(promise).then(result => {
+                    executing.splice(executing.indexOf(p), 1);
+                    return result;
+                    });
+
+                    results.push(p);
+                    executing.push(p);
+
+                    if (executing.length >= limit) {
+                    await Promise.race(executing);
+                    }
+                    }
+
+                    return Promise.all(results);
+                    }</div>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Try ThrottlePromises</h3>
+                <div class="controls">
+                    <input type="number" id="requestCount" value="10" min="1" max="50" placeholder="Number of requests">
+                    <input type="number" id="throttleLimit" value="3" min="1" max="10" placeholder="Concurrent limit">
+                    <input type="number" id="delayMs" value="1000" min="100" max="5000" placeholder="Delay (ms)">
+                    <button onclick="runThrottleDemo()">Start Throttled Requests</button>
+                    <button onclick="runUnthrottledDemo()">Start Unthrottled</button>
+                    <button onclick="clearThrottleOutput()">Clear Output</button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <span class="stat-value" id="activeRequests">0</span>
+                        <span>Active Requests</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="completedRequests">0</span>
+                        <span>Completed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="totalTime">0</span>
+                        <span>Total Time (ms)</span>
+                    </div>
+                </div>
+
+                <div class="output" id="throttleOutput"></div>
+            </div>
+        </div>
+
+        <!-- Currying Section -->
+        <div class="demo-section">
+            <h2>🍛 Currying</h2>
+
+            <div class="concept-explanation">
+                <h3>What is Currying?</h3>
+                <p><strong>Currying</strong> is a functional programming technique that transforms a function with
+                    multiple arguments into a sequence of functions, each taking a single argument. It enables partial
+                    application and function composition.</p>
+
+                <div class="code-block">// Regular function
+                    function add(a, b, c) {
+                    return a + b + c;
+                    }
+
+                    // Curried version
+                    function curriedAdd(a) {
+                    return function(b) {
+                    return function(c) {
+                    return a + b + c;
+                    }
+                    }
+                    }
+
+                    // Usage: curriedAdd(1)(2)(3) = 6</div>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Try Currying</h3>
+
+                <div class="controls">
+                    <input type="number" id="curryA" placeholder="First number" value="5">
+                    <input type="number" id="curryB" placeholder="Second number" value="3">
+                    <input type="number" id="curryC" placeholder="Third number" value="2">
+                    <button onclick="demonstrateCurrying()">Show Currying Steps</button>
+                    <button onclick="clearCurryOutput()">Clear</button>
+                </div>
+
+                <div id="curryChain"></div>
+
+                <h4>Advanced Currying Examples:</h4>
+                <div class="controls">
+                    <input type="text" id="greeting" placeholder="Greeting" value="Hello">
+                    <input type="text" id="name" placeholder="Name" value="World">
+                    <button onclick="demonstrateGreeting()">Curried Greeting</button>
+                </div>
+
+                <div class="controls">
+                    <input type="number" id="discount" placeholder="Discount %" value="10">
+                    <input type="number" id="price" placeholder="Price" value="100">
+                    <button onclick="demonstrateDiscount()">Curried Discount</button>
+                </div>
+
+                <div class="output" id="curryOutput"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Throttle Promises Implementation
+        async function throttlePromises(promises, limit) {
+            const results = [];
+            const executing = [];
+
+            for (const promise of promises) {
+                const p = Promise.resolve(promise).then(result => {
+                    executing.splice(executing.indexOf(p), 1);
+                    updateStats();
+                    return result;
+                });
+
+                results.push(p);
+                executing.push(p);
+                updateStats();
+
+                if (executing.length >= limit) {
+                    await Promise.race(executing);
+                }
+            }
+
+            return Promise.all(results);
+        }
+
+        // Mock API request simulator
+        function mockApiRequest(id, delay) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(`Request ${id} completed after ${delay}ms`);
+                }, delay);
+            });
+        }
+
+        let activeCount = 0;
+        let completedCount = 0;
+        let startTime = 0;
+
+        function updateStats() {
+            document.getElementById('activeRequests').textContent = activeCount;
+            document.getElementById('completedRequests').textContent = completedCount;
+            document.getElementById('totalTime').textContent = Date.now() - startTime;
+        }
+
+        function logToOutput(message, isThrottle = true) {
+            const outputId = isThrottle ? 'throttleOutput' : 'curryOutput';
+            const output = document.getElementById(outputId);
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function runThrottleDemo() {
+            const requestCount = parseInt(document.getElementById('requestCount').value);
+            const limit = parseInt(document.getElementById('throttleLimit').value);
+            const delay = parseInt(document.getElementById('delayMs').value);
+
+            activeCount = 0;
+            completedCount = 0;
+            startTime = Date.now();
+
+            logToOutput(`🚀 Starting ${requestCount} throttled requests (limit: ${limit})`);
+
+            const promises = Array.from({ length: requestCount }, (_, i) => {
+                activeCount++;
+                return mockApiRequest(i + 1, delay).then(result => {
+                    completedCount++;
+                    activeCount--;
+                    logToOutput(`✅ ${result}`);
+                    return result;
+                });
+            });
+
+            try {
+                await throttlePromises(promises, limit);
+                logToOutput(`🎉 All throttled requests completed in ${Date.now() - startTime}ms`);
+            } catch (error) {
+                logToOutput(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function runUnthrottledDemo() {
+            const requestCount = parseInt(document.getElementById('requestCount').value);
+            const delay = parseInt(document.getElementById('delayMs').value);
+
+            activeCount = 0;
+            completedCount = 0;
+            startTime = Date.now();
+
+            logToOutput(`🚀 Starting ${requestCount} UNTHROTTLED requests`);
+
+            const promises = Array.from({ length: requestCount }, (_, i) => {
+                activeCount++;
+                return mockApiRequest(i + 1, delay).then(result => {
+                    completedCount++;
+                    activeCount--;
+                    logToOutput(`✅ ${result}`);
+                    return result;
+                });
+            });
+
+            try {
+                await Promise.all(promises);
+                logToOutput(`🎉 All unthrottled requests completed in ${Date.now() - startTime}ms`);
+            } catch (error) {
+                logToOutput(`❌ Error: ${error.message}`);
+            }
+        }
+
+        function clearThrottleOutput() {
+            document.getElementById('throttleOutput').innerHTML = '';
+            activeCount = 0;
+            completedCount = 0;
+            updateStats();
+        }
+
+        // Currying Implementation
+        function curry(fn) {
+            return function curried(...args) {
+                if (args.length >= fn.length) {
+                    return fn.apply(this, args);
+                } else {
+                    return function (...args2) {
+                        return curried.apply(this, args.concat(args2));
+                    };
+                }
+            };
+        }
+
+        // Example curried functions
+        const curriedAdd = curry((a, b, c) => a + b + c);
+        const curriedMultiply = curry((a, b, c) => a * b * c);
+        const curriedGreeting = curry((greeting, name) => `${greeting}, ${name}!`);
+        const curriedDiscount = curry((discount, price) => price * (1 - discount / 100));
+
+        function demonstrateCurrying() {
+            const a = parseFloat(document.getElementById('curryA').value) || 0;
+            const b = parseFloat(document.getElementById('curryB').value) || 0;
+            const c = parseFloat(document.getElementById('curryC').value) || 0;
+
+            // Show currying chain visually
+            const chainContainer = document.getElementById('curryChain');
+            chainContainer.innerHTML = `
+                <div class="curry-chain">
+                    <div class="curry-step">curriedAdd(${a})</div>
+                    <span class="arrow">→</span>
+                    <div class="curry-step">returns function</div>
+                    <span class="arrow">→</span>
+                    <div class="curry-step">call with (${b})</div>
+                    <span class="arrow">→</span>
+                    <div class="curry-step">returns function</div>
+                    <span class="arrow">→</span>
+                    <div class="curry-step">call with (${c})</div>
+                    <span class="arrow">→</span>
+                    <div class="curry-step">Result: ${a + b + c}</div>
+                </div>
+            `;
+
+            logToOutput(`🍛 Currying Demo:`, false);
+            logToOutput(`Step 1: curriedAdd(${a}) - returns a function`, false);
+            logToOutput(`Step 2: curriedAdd(${a})(${b}) - returns a function`, false);
+            logToOutput(`Step 3: curriedAdd(${a})(${b})(${c}) = ${curriedAdd(a)(b)(c)}`, false);
+            logToOutput(``, false);
+
+            // Show partial application
+            const addA = curriedAdd(a);
+            const addAB = addA(b);
+            logToOutput(`💡 Partial Application:`, false);
+            logToOutput(`const addA = curriedAdd(${a}) // Partially applied`, false);
+            logToOutput(`const addAB = addA(${b}) // Further applied`, false);
+            logToOutput(`addAB(${c}) = ${addAB(c)} // Final result`, false);
+            logToOutput(``, false);
+        }
+
+        function demonstrateGreeting() {
+            const greeting = document.getElementById('greeting').value || 'Hello';
+            const name = document.getElementById('name').value || 'World';
+
+            logToOutput(`👋 Curried Greeting Demo:`, false);
+            logToOutput(`curriedGreeting("${greeting}")("${name}") = "${curriedGreeting(greeting)(name)}"`, false);
+
+            // Show reusable greeting
+            logToOutput(``, false);
+            logToOutput(`💡 Reusable Pattern:`, false);
+            logToOutput(`const sayHello = curriedGreeting("${greeting}")`, false);
+            logToOutput(`sayHello("Alice") = "${curriedGreeting(greeting)("Alice")}"`, false);
+            logToOutput(`sayHello("Bob") = "${curriedGreeting(greeting)("Bob")}"`, false);
+            logToOutput(``, false);
+        }
+
+        function demonstrateDiscount() {
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+
+            logToOutput(`💰 Curried Discount Calculator:`, false);
+            logToOutput(`curriedDiscount(${discount})(${price}) = $${curriedDiscount(discount)(price).toFixed(2)}`, false);
+
+            // Show reusable discount function
+            logToOutput(``, false);
+            logToOutput(`💡 Reusable Discount Function:`, false);
+            logToOutput(`const apply${discount}PercentOff = curriedDiscount(${discount})`, false);
+            logToOutput(`apply${discount}PercentOff(50) = $${curriedDiscount(discount)(50).toFixed(2)}`, false);
+            logToOutput(`apply${discount}PercentOff(200) = $${curriedDiscount(discount)(200).toFixed(2)}`, false);
+            logToOutput(``, false);
+        }
+
+        function clearCurryOutput() {
+            document.getElementById('curryOutput').innerHTML = '';
+            document.getElementById('curryChain').innerHTML = '';
+        }
+
+        // Initialize stats
+        updateStats();
+    </script>
+</body>
+
+</html>

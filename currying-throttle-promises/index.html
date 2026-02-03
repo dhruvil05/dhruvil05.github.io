@@ -4,572 +4,880 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThrottlePromises & Currying Demo</title>
+    <title>Currying, Throttle & Promises | Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#0f172a',
+                        accent: '#3b82f6',
+                        'accent-light': '#60a5fa',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            padding: 30px;
-            text-align: center;
-            color: white;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .demo-section {
-            padding: 30px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .demo-section:last-child {
-            border-bottom: none;
-        }
-
-        h2 {
-            color: #4facfe;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .concept-explanation {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border-left: 4px solid #4facfe;
-        }
-
-        .interactive-demo {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        input {
-            padding: 10px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4facfe;
-        }
-
-        .output {
-            background: #1e1e1e;
-            color: #00ff00;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.4;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 15px;
-            border: 2px solid #333;
+            scroll-behavior: smooth;
         }
 
         .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            margin: 15px 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
             overflow-x: auto;
-            font-size: 13px;
-            line-height: 1.5;
         }
 
-        .highlight {
-            background: rgba(79, 172, 254, 0.2);
-            padding: 2px 4px;
-            border-radius: 3px;
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+        .card-hover {
+            transition: all 0.3s ease;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            color: #8b4513;
-            font-weight: bold;
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        .stat-value {
-            font-size: 1.5em;
-            display: block;
-            margin-bottom: 5px;
+        .nav-link {
+            position: relative;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #4facfe;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
         }
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+        .nav-link:hover::after {
+            width: 100%;
         }
 
-        .curry-chain {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin: 10px 0;
-            flex-wrap: wrap;
+        .demo-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+            border: 1px solid #bae6fd;
         }
 
-        .curry-step {
-            background: #e3f2fd;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 2px solid #2196f3;
-            color: #1976d2;
-            font-weight: bold;
+        .syntax-keyword {
+            color: #c678dd;
         }
 
-        .arrow {
-            color: #666;
-            font-size: 1.2em;
+        .syntax-function {
+            color: #61afef;
+        }
+
+        .syntax-string {
+            color: #98c379;
+        }
+
+        .syntax-comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .syntax-number {
+            color: #d19a66;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <header>
-            <h1>🚀 Advanced JavaScript Concepts</h1>
-            <p class="subtitle">Interactive Demo: ThrottlePromises & Currying</p>
-        </header>
+<body class="bg-white text-slate-800 antialiased">
 
-        <!-- Throttle Promises Section -->
-        <div class="demo-section">
-            <h2>⚡ ThrottlePromises</h2>
-
-            <div class="concept-explanation">
-                <h3>What is ThrottlePromises?</h3>
-                <p><strong>ThrottlePromises</strong> is a technique to limit the number of concurrent asynchronous
-                    operations (promises) running at the same time. This prevents overwhelming servers, managing memory
-                    usage, and controlling resource consumption.</p>
-
-                <div class="code-block">async function throttlePromises(promises, limit) {
-                    const results = [];
-                    const executing = [];
-
-                    for (const promise of promises) {
-                    const p = Promise.resolve(promise).then(result => {
-                    executing.splice(executing.indexOf(p), 1);
-                    return result;
-                    });
-
-                    results.push(p);
-                    executing.push(p);
-
-                    if (executing.length >= limit) {
-                    await Promise.race(executing);
-                    }
-                    }
-
-                    return Promise.all(results);
-                    }</div>
-            </div>
-
-            <div class="interactive-demo">
-                <h3>🎮 Try ThrottlePromises</h3>
-                <div class="controls">
-                    <input type="number" id="requestCount" value="10" min="1" max="50" placeholder="Number of requests">
-                    <input type="number" id="throttleLimit" value="3" min="1" max="10" placeholder="Concurrent limit">
-                    <input type="number" id="delayMs" value="1000" min="100" max="5000" placeholder="Delay (ms)">
-                    <button onclick="runThrottleDemo()">Start Throttled Requests</button>
-                    <button onclick="runUnthrottledDemo()">Start Unthrottled</button>
-                    <button onclick="clearThrottleOutput()">Clear Output</button>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        JS</div>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">Advanced JS</span>
                 </div>
-
-                <div class="stats">
-                    <div class="stat-card">
-                        <span class="stat-value" id="activeRequests">0</span>
-                        <span>Active Requests</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-value" id="completedRequests">0</span>
-                        <span>Completed</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-value" id="totalTime">0</span>
-                        <span>Total Time (ms)</span>
-                    </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#currying"
+                        class="nav-link text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Currying</a>
+                    <a href="#throttle"
+                        class="nav-link text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Throttle</a>
+                    <a href="#promises"
+                        class="nav-link text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Promises</a>
                 </div>
-
-                <div class="output" id="throttleOutput"></div>
+                <button class="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                    onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </div>
-
-        <!-- Currying Section -->
-        <div class="demo-section">
-            <h2>🍛 Currying</h2>
-
-            <div class="concept-explanation">
-                <h3>What is Currying?</h3>
-                <p><strong>Currying</strong> is a functional programming technique that transforms a function with
-                    multiple arguments into a sequence of functions, each taking a single argument. It enables partial
-                    application and function composition.</p>
-
-                <div class="code-block">// Regular function
-                    function add(a, b, c) {
-                    return a + b + c;
-                    }
-
-                    // Curried version
-                    function curriedAdd(a) {
-                    return function(b) {
-                    return function(c) {
-                    return a + b + c;
-                    }
-                    }
-                    }
-
-                    // Usage: curriedAdd(1)(2)(3) = 6</div>
-            </div>
-
-            <div class="interactive-demo">
-                <h3>🎮 Try Currying</h3>
-
-                <div class="controls">
-                    <input type="number" id="curryA" placeholder="First number" value="5">
-                    <input type="number" id="curryB" placeholder="Second number" value="3">
-                    <input type="number" id="curryC" placeholder="Third number" value="2">
-                    <button onclick="demonstrateCurrying()">Show Currying Steps</button>
-                    <button onclick="clearCurryOutput()">Clear</button>
-                </div>
-
-                <div id="curryChain"></div>
-
-                <h4>Advanced Currying Examples:</h4>
-                <div class="controls">
-                    <input type="text" id="greeting" placeholder="Greeting" value="Hello">
-                    <input type="text" id="name" placeholder="Name" value="World">
-                    <button onclick="demonstrateGreeting()">Curried Greeting</button>
-                </div>
-
-                <div class="controls">
-                    <input type="number" id="discount" placeholder="Discount %" value="10">
-                    <input type="number" id="price" placeholder="Price" value="100">
-                    <button onclick="demonstrateDiscount()">Curried Discount</button>
-                </div>
-
-                <div class="output" id="curryOutput"></div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#currying"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" target="_self">Currying</a>
+                <a href="#throttle"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" target="_self">Throttle</a>
+                <a href="#promises"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50" target="_self">Promises</a>
             </div>
         </div>
-    </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center animate-fade-in">
+            <div
+                class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold tracking-wide uppercase mb-6 border border-blue-100">
+                JavaScript Mastery
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                <span class="gradient-text">Currying</span>, <span class="gradient-text">Throttle</span> & <span
+                    class="gradient-text">Promises</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600 leading-relaxed">
+                Master three essential JavaScript patterns that elevate your code from functional to exceptional.
+                Interactive examples included.
+            </p>
+            <div class="mt-10 flex justify-center gap-4">
+                <a href="#currying"
+                    class="px-8 py-3 rounded-full bg-slate-900 text-white font-medium hover:bg-slate-800 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl" target="_self">
+                    Start Learning
+                </a>
+                <a href="#playground"
+                    class="px-8 py-3 rounded-full bg-white text-slate-900 font-medium border-2 border-slate-200 hover:border-slate-300 transition-all" target="_self">
+                    Try Playground
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Currying Section -->
+    <section id="currying" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="animate-slide-up">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 text-blue-600 font-bold">01</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Currying</h2>
+                    </div>
+                    <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                        Transform functions with multiple arguments into a sequence of functions, each taking a single
+                        argument.
+                        This functional programming technique enables partial application and code reusability.
+                    </p>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-900">Partial Application</h4>
+                                <p class="text-sm text-slate-600">Fix arguments progressively for reusable function
+                                    variants</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-900">Function Composition</h4>
+                                <p class="text-sm text-slate-600">Build complex logic from simple, testable functions
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-block p-4 font-mono text-sm">
+                        <pre><code><span class="syntax-keyword">const</span> <span class="syntax-function">multiply</span> = (a) => (b) => (c) => a * b * c;
+
+<span class="syntax-comment">// Usage</span>
+<span class="syntax-keyword">const</span> multiplyBy2 = <span class="syntax-function">multiply</span>(2);
+<span class="syntax-keyword">const</span> multiplyBy2And3 = <span class="syntax-function">multiplyBy2</span>(3);
+
+<span class="syntax-function">multiplyBy2And3</span>(4); <span class="syntax-comment">// 24</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="demo-box rounded-2xl p-6 shadow-lg animate-slide-up" style="animation-delay: 0.1s">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Interactive Demo
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-lg p-4 border border-slate-200">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Step 1: Enter first number
+                                (a)</label>
+                            <input type="number" id="curry-a" value="2"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                        </div>
+
+                        <div class="bg-white rounded-lg p-4 border border-slate-200">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Step 2: Enter second number
+                                (b)</label>
+                            <input type="number" id="curry-b" value="3"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                        </div>
+
+                        <div class="bg-white rounded-lg p-4 border border-slate-200">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Step 3: Enter third number
+                                (c)</label>
+                            <input type="number" id="curry-c" value="4"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                        </div>
+
+                        <button onclick="runCurryingDemo()"
+                            class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all transform active:scale-95">
+                            Calculate Result
+                        </button>
+
+                        <div id="curry-result"
+                            class="hidden mt-4 p-4 bg-slate-900 text-green-400 rounded-lg font-mono text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Throttle Section -->
+    <section id="throttle" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div
+                    class="order-2 lg:order-1 demo-box rounded-2xl p-6 shadow-lg border-purple-100 bg-gradient-to-br from-purple-50 to-white animate-slide-up">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-purple-900">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Live Visualization
+                    </h3>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-700">Throttle Limit: <span
+                                    id="throttle-limit-display">1000</span>ms</span>
+                            <input type="range" id="throttle-limit" min="500" max="3000" value="1000" step="500"
+                                class="w-32 accent-purple-600" oninput="updateThrottleLimit(this.value)">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg border border-slate-200 text-center">
+                                <div class="text-2xl font-bold text-slate-400" id="normal-count">0</div>
+                                <div class="text-xs text-slate-500 uppercase tracking-wide mt-1">Normal Calls</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-purple-200 text-center shadow-sm">
+                                <div class="text-2xl font-bold text-purple-600" id="throttled-count">0</div>
+                                <div class="text-xs text-purple-600 uppercase tracking-wide mt-1">Throttled Calls</div>
+                            </div>
+                        </div>
+
+                        <div class="relative h-32 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                            <div id="activity-bar"
+                                class="absolute bottom-0 left-0 w-full bg-purple-200 transition-all duration-300"
+                                style="height: 0%"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button id="throttle-btn"
+                                    class="px-6 py-2 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-all transform active:scale-95 shadow-lg">
+                                    Click Rapidly!
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="resetThrottle()"
+                                class="flex-1 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Reset</button>
+                            <button onclick="autoClick()"
+                                class="flex-1 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors">Auto
+                                Click</button>
+                        </div>
+
+                        <div id="throttle-log"
+                            class="h-24 overflow-y-auto bg-slate-900 rounded-lg p-3 font-mono text-xs text-green-400 space-y-1">
+                            <div class="text-slate-500 italic">// Click the button to see throttling in action...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2 animate-slide-up">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 text-purple-600 font-bold">02</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Throttle</h2>
+                    </div>
+                    <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                        Limit the rate at which a function can fire. Essential for performance optimization in scroll
+                        handlers,
+                        resize events, and API calls to prevent overwhelming the browser or server.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 card-hover">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-slate-900 mb-1">Performance</h4>
+                            <p class="text-sm text-slate-600">Reduce unnecessary calculations during rapid events</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 card-hover">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-slate-900 mb-1">Rate Limiting</h4>
+                            <p class="text-sm text-slate-600">Protect APIs from excessive client requests</p>
+                        </div>
+                    </div>
+
+                    <div class="code-block p-4 font-mono text-sm">
+                        <pre><code><span class="syntax-keyword">function</span> <span class="syntax-function">throttle</span>(func, limit) {
+  <span class="syntax-keyword">let</span> inThrottle;
+  <span class="syntax-keyword">return</span> <span class="syntax-keyword">function</span>(...args) {
+    <span class="syntax-keyword">if</span> (!inThrottle) {
+      <span class="syntax-function">func</span>.<span class="syntax-function">apply</span>(<span class="syntax-keyword">this</span>, args);
+      inThrottle = <span class="syntax-keyword">true</span>;
+      <span class="syntax-function">setTimeout</span>(() => inThrottle = <span class="syntax-keyword">false</span>, limit);
+    }
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promises Section -->
+    <section id="promises" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="animate-slide-up">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100 text-green-600 font-bold">03</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Promises</h2>
+                    </div>
+                    <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                        Represent the eventual completion (or failure) of an asynchronous operation and its resulting
+                        value.
+                        The foundation of modern asynchronous JavaScript programming.
+                    </p>
+
+                    <div class="space-y-3 mb-8">
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
+                            <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                            <span class="text-sm font-medium text-slate-700">Pending</span>
+                            <span class="text-xs text-slate-500 ml-auto">Initial state</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
+                            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                            <span class="text-sm font-medium text-slate-700">Fulfilled</span>
+                            <span class="text-xs text-slate-500 ml-auto">Operation completed</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
+                            <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                            <span class="text-sm font-medium text-slate-700">Rejected</span>
+                            <span class="text-xs text-slate-500 ml-auto">Operation failed</span>
+                        </div>
+                    </div>
+
+                    <div class="code-block p-4 font-mono text-sm">
+                        <pre><code><span class="syntax-keyword">const</span> fetchData = () => {
+  <span class="syntax-keyword">return</span> <span class="syntax-keyword">new</span> <span class="syntax-function">Promise</span>((resolve, reject) => {
+    <span class="syntax-function">setTimeout</span>(() => {
+      <span class="syntax-keyword">const</span> success = Math.<span class="syntax-function">random</span>() > 0.5;
+      success ? <span class="syntax-function">resolve</span>(<span class="syntax-string">'Data loaded!'</span>) 
+              : <span class="syntax-function">reject</span>(<span class="syntax-string">'Error!'</span>);
+    }, 1000);
+  });
+};</code></pre>
+                    </div>
+                </div>
+
+                <div class="demo-box rounded-2xl p-6 shadow-lg border-green-100 bg-gradient-to-br from-green-50 to-white animate-slide-up"
+                    style="animation-delay: 0.1s">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-green-900">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        Promise Simulator
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="flex gap-2">
+                            <button onclick="createPromise('success')"
+                                class="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all transform active:scale-95 shadow-md">
+                                Create Success
+                            </button>
+                            <button onclick="createPromise('error')"
+                                class="flex-1 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all transform active:scale-95 shadow-md">
+                                Create Error
+                            </button>
+                            <button onclick="createPromise('random')"
+                                class="flex-1 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all transform active:scale-95 shadow-md">
+                                Random
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-lg border border-slate-200 p-4 min-h-[200px]">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active
+                                    Promises</span>
+                                <button onclick="clearPromises()"
+                                    class="text-xs text-slate-400 hover:text-slate-600">Clear</button>
+                            </div>
+                            <div id="promise-container" class="space-y-2">
+                                <div class="text-center text-slate-400 text-sm py-8 italic">Click buttons to create
+                                    promises...</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="bg-yellow-50 rounded p-2 border border-yellow-200">
+                                <span class="block font-bold text-yellow-700" id="pending-count">0</span>
+                                <span class="text-yellow-600">Pending</span>
+                            </div>
+                            <div class="bg-green-50 rounded p-2 border border-green-200">
+                                <span class="block font-bold text-green-700" id="fulfilled-count">0</span>
+                                <span class="text-green-600">Fulfilled</span>
+                            </div>
+                            <div class="bg-red-50 rounded p-2 border border-red-200">
+                                <span class="block font-bold text-red-700" id="rejected-count">0</span>
+                                <span class="text-red-600">Rejected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Combined Example Section -->
+    <section id="playground" class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 animate-fade-in">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Real-World Integration</h2>
+                <p class="text-lg text-slate-600">See how these concepts work together in a practical API request
+                    manager</p>
+            </div>
+
+            <div class="bg-slate-900 rounded-2xl p-6 md:p-8 shadow-2xl animate-slide-up">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-700 pb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <span class="ml-3 text-slate-400 text-sm font-mono">api-manager.js</span>
+                    </div>
+                    <button onclick="runIntegratedDemo()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Run Demo
+                    </button>
+                </div>
+
+                <div class="font-mono text-sm overflow-x-auto">
+                    <pre class="text-slate-300 leading-relaxed"><span class="text-purple-400">const</span> <span class="text-blue-400">createAPIClient</span> = (baseURL) => (authToken) => {
+  <span class="text-slate-500">// Curried configuration</span>
+  <span class="text-purple-400">const</span> headers = {
+    <span class="text-green-400">'Authorization'</span>: `Bearer ${authToken}`,
+    <span class="text-green-400">'Content-Type'</span>: <span class="text-green-400">'application/json'</span>
+  };
+
+  <span class="text-slate-500">// Throttled request function</span>
+  <span class="text-purple-400">const</span> throttledFetch = <span class="text-yellow-400">throttle</span>(<span class="text-purple-400">async</span> (endpoint) => {
+    <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(`${baseURL}${endpoint}`, { headers });
+    <span class="text-purple-400">return</span> response.<span class="text-blue-400">json</span>();
+  }, 1000);
+
+  <span class="text-purple-400">return</span> (endpoint) => <span class="text-purple-400">new</span> <span class="text-blue-400">Promise</span>((resolve) => {
+    <span class="text-blue-400">throttledFetch</span>(endpoint).<span class="text-blue-400">then</span>(resolve);
+  });
+};
+
+<span class="text-slate-500">// Usage</span>
+<span class="text-purple-400">const</span> api = <span class="text-blue-400">createAPIClient</span>(<span class="text-green-400">'https://api.example.com'</span>)(<span class="text-green-400">'token123'</span>);
+</pre>
+                </div>
+
+                <div id="integration-output"
+                    class="mt-6 p-4 bg-slate-800 rounded-lg border border-slate-700 min-h-[100px] text-sm font-mono text-slate-300 hidden">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 border-t border-slate-200 py-12">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div
+                    class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                    JS</div>
+                <span class="font-bold text-slate-900">Advanced JS Patterns</span>
+            </div>
+            <p class="text-slate-500 text-sm">Master modern JavaScript with interactive examples</p>
+            <div class="flex gap-6">
+                <!-- <a href="#" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="sr-only">GitHub</span>
+                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a> -->
+                
+                <a href="https://dhruvil05.github.io/currying-throttle-promises/old-index.html" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    Documentation
+                </a>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // Throttle Promises Implementation
-        async function throttlePromises(promises, limit) {
-            const results = [];
-            const executing = [];
-
-            for (const promise of promises) {
-                const p = Promise.resolve(promise).then(result => {
-                    executing.splice(executing.indexOf(p), 1);
-                    updateStats();
-                    return result;
-                });
-
-                results.push(p);
-                executing.push(p);
-                updateStats();
-
-                if (executing.length >= limit) {
-                    await Promise.race(executing);
-                }
-            }
-
-            return Promise.all(results);
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
         }
 
-        // Mock API request simulator
-        function mockApiRequest(id, delay) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve(`Request ${id} completed after ${delay}ms`);
-                }, delay);
-            });
-        }
+        // Currying Demo
+        function runCurryingDemo() {
+            const a = parseInt(document.getElementById('curry-a').value) || 0;
+            const b = parseInt(document.getElementById('curry-b').value) || 0;
+            const c = parseInt(document.getElementById('curry-c').value) || 0;
 
-        let activeCount = 0;
-        let completedCount = 0;
-        let startTime = 0;
+            const multiply = (x) => (y) => (z) => x * y * z;
+            const step1 = multiply(a);
+            const step2 = step1(b);
+            const result = step2(c);
 
-        function updateStats() {
-            document.getElementById('activeRequests').textContent = activeCount;
-            document.getElementById('completedRequests').textContent = completedCount;
-            document.getElementById('totalTime').textContent = Date.now() - startTime;
-        }
-
-        function logToOutput(message, isThrottle = true) {
-            const outputId = isThrottle ? 'throttleOutput' : 'curryOutput';
-            const output = document.getElementById(outputId);
-            const timestamp = new Date().toLocaleTimeString();
-            output.innerHTML += `[${timestamp}] ${message}\n`;
-            output.scrollTop = output.scrollHeight;
-        }
-
-        async function runThrottleDemo() {
-            const requestCount = parseInt(document.getElementById('requestCount').value);
-            const limit = parseInt(document.getElementById('throttleLimit').value);
-            const delay = parseInt(document.getElementById('delayMs').value);
-
-            activeCount = 0;
-            completedCount = 0;
-            startTime = Date.now();
-
-            logToOutput(`🚀 Starting ${requestCount} throttled requests (limit: ${limit})`);
-
-            const promises = Array.from({ length: requestCount }, (_, i) => {
-                activeCount++;
-                return mockApiRequest(i + 1, delay).then(result => {
-                    completedCount++;
-                    activeCount--;
-                    logToOutput(`✅ ${result}`);
-                    return result;
-                });
-            });
-
-            try {
-                await throttlePromises(promises, limit);
-                logToOutput(`🎉 All throttled requests completed in ${Date.now() - startTime}ms`);
-            } catch (error) {
-                logToOutput(`❌ Error: ${error.message}`);
-            }
-        }
-
-        async function runUnthrottledDemo() {
-            const requestCount = parseInt(document.getElementById('requestCount').value);
-            const delay = parseInt(document.getElementById('delayMs').value);
-
-            activeCount = 0;
-            completedCount = 0;
-            startTime = Date.now();
-
-            logToOutput(`🚀 Starting ${requestCount} UNTHROTTLED requests`);
-
-            const promises = Array.from({ length: requestCount }, (_, i) => {
-                activeCount++;
-                return mockApiRequest(i + 1, delay).then(result => {
-                    completedCount++;
-                    activeCount--;
-                    logToOutput(`✅ ${result}`);
-                    return result;
-                });
-            });
-
-            try {
-                await Promise.all(promises);
-                logToOutput(`🎉 All unthrottled requests completed in ${Date.now() - startTime}ms`);
-            } catch (error) {
-                logToOutput(`❌ Error: ${error.message}`);
-            }
-        }
-
-        function clearThrottleOutput() {
-            document.getElementById('throttleOutput').innerHTML = '';
-            activeCount = 0;
-            completedCount = 0;
-            updateStats();
-        }
-
-        // Currying Implementation
-        function curry(fn) {
-            return function curried(...args) {
-                if (args.length >= fn.length) {
-                    return fn.apply(this, args);
-                } else {
-                    return function (...args2) {
-                        return curried.apply(this, args.concat(args2));
-                    };
-                }
-            };
-        }
-
-        // Example curried functions
-        const curriedAdd = curry((a, b, c) => a + b + c);
-        const curriedMultiply = curry((a, b, c) => a * b * c);
-        const curriedGreeting = curry((greeting, name) => `${greeting}, ${name}!`);
-        const curriedDiscount = curry((discount, price) => price * (1 - discount / 100));
-
-        function demonstrateCurrying() {
-            const a = parseFloat(document.getElementById('curryA').value) || 0;
-            const b = parseFloat(document.getElementById('curryB').value) || 0;
-            const c = parseFloat(document.getElementById('curryC').value) || 0;
-
-            // Show currying chain visually
-            const chainContainer = document.getElementById('curryChain');
-            chainContainer.innerHTML = `
-                <div class="curry-chain">
-                    <div class="curry-step">curriedAdd(${a})</div>
-                    <span class="arrow">→</span>
-                    <div class="curry-step">returns function</div>
-                    <span class="arrow">→</span>
-                    <div class="curry-step">call with (${b})</div>
-                    <span class="arrow">→</span>
-                    <div class="curry-step">returns function</div>
-                    <span class="arrow">→</span>
-                    <div class="curry-step">call with (${c})</div>
-                    <span class="arrow">→</span>
-                    <div class="curry-step">Result: ${a + b + c}</div>
+            const resultDiv = document.getElementById('curry-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = `
+                <div class="space-y-1">
+                    <div><span class="text-slate-500">multiply(${a})(${b})(${c})</span></div>
+                    <div><span class="text-blue-400">Step 1:</span> Returns function expecting (b)(c)</div>
+                    <div><span class="text-blue-400">Step 2:</span> Returns function expecting (c)</div>
+                    <div><span class="text-blue-400">Step 3:</span> Returns <span class="text-yellow-400 font-bold">${result}</span></div>
+                    <div class="mt-2 pt-2 border-t border-slate-700 text-green-400">Result: ${a} × ${b} × ${c} = ${result}</div>
                 </div>
             `;
-
-            logToOutput(`🍛 Currying Demo:`, false);
-            logToOutput(`Step 1: curriedAdd(${a}) - returns a function`, false);
-            logToOutput(`Step 2: curriedAdd(${a})(${b}) - returns a function`, false);
-            logToOutput(`Step 3: curriedAdd(${a})(${b})(${c}) = ${curriedAdd(a)(b)(c)}`, false);
-            logToOutput(``, false);
-
-            // Show partial application
-            const addA = curriedAdd(a);
-            const addAB = addA(b);
-            logToOutput(`💡 Partial Application:`, false);
-            logToOutput(`const addA = curriedAdd(${a}) // Partially applied`, false);
-            logToOutput(`const addAB = addA(${b}) // Further applied`, false);
-            logToOutput(`addAB(${c}) = ${addAB(c)} // Final result`, false);
-            logToOutput(``, false);
         }
 
-        function demonstrateGreeting() {
-            const greeting = document.getElementById('greeting').value || 'Hello';
-            const name = document.getElementById('name').value || 'World';
+        // Throttle Demo
+        let throttleLimit = 1000;
+        let normalCalls = 0;
+        let throttledCalls = 0;
+        let throttleTimer;
+        let lastExecution = 0;
 
-            logToOutput(`👋 Curried Greeting Demo:`, false);
-            logToOutput(`curriedGreeting("${greeting}")("${name}") = "${curriedGreeting(greeting)(name)}"`, false);
-
-            // Show reusable greeting
-            logToOutput(``, false);
-            logToOutput(`💡 Reusable Pattern:`, false);
-            logToOutput(`const sayHello = curriedGreeting("${greeting}")`, false);
-            logToOutput(`sayHello("Alice") = "${curriedGreeting(greeting)("Alice")}"`, false);
-            logToOutput(`sayHello("Bob") = "${curriedGreeting(greeting)("Bob")}"`, false);
-            logToOutput(``, false);
+        function updateThrottleLimit(val) {
+            throttleLimit = parseInt(val);
+            document.getElementById('throttle-limit-display').textContent = val;
         }
 
-        function demonstrateDiscount() {
-            const discount = parseFloat(document.getElementById('discount').value) || 0;
-            const price = parseFloat(document.getElementById('price').value) || 0;
-
-            logToOutput(`💰 Curried Discount Calculator:`, false);
-            logToOutput(`curriedDiscount(${discount})(${price}) = $${curriedDiscount(discount)(price).toFixed(2)}`, false);
-
-            // Show reusable discount function
-            logToOutput(``, false);
-            logToOutput(`💡 Reusable Discount Function:`, false);
-            logToOutput(`const apply${discount}PercentOff = curriedDiscount(${discount})`, false);
-            logToOutput(`apply${discount}PercentOff(50) = $${curriedDiscount(discount)(50).toFixed(2)}`, false);
-            logToOutput(`apply${discount}PercentOff(200) = $${curriedDiscount(discount)(200).toFixed(2)}`, false);
-            logToOutput(``, false);
+        function throttle(func, limit) {
+            let inThrottle;
+            return function (...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
         }
 
-        function clearCurryOutput() {
-            document.getElementById('curryOutput').innerHTML = '';
-            document.getElementById('curryChain').innerHTML = '';
+        const throttledFunction = throttle(() => {
+            throttledCalls++;
+            document.getElementById('throttled-count').textContent = throttledCalls;
+            logThrottle('Throttled call executed!', 'text-purple-400');
+
+            // Visual feedback
+            const bar = document.getElementById('activity-bar');
+            bar.style.height = '100%';
+            setTimeout(() => bar.style.height = '0%', 200);
+        }, throttleLimit);
+
+        const throttleBtn = document.getElementById('throttle-btn');
+        throttleBtn.addEventListener('click', () => {
+            normalCalls++;
+            document.getElementById('normal-count').textContent = normalCalls;
+            logThrottle(`Click detected (total: ${normalCalls})`, 'text-slate-400');
+            throttledFunction();
+        });
+
+        function logThrottle(message, colorClass) {
+            const log = document.getElementById('throttle-log');
+            const entry = document.createElement('div');
+            entry.className = colorClass;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.insertBefore(entry, log.firstChild);
+
+            // Keep only last 20 entries
+            while (log.children.length > 20) {
+                log.removeChild(log.lastChild);
+            }
         }
 
-        // Initialize stats
-        updateStats();
+        function resetThrottle() {
+            normalCalls = 0;
+            throttledCalls = 0;
+            document.getElementById('normal-count').textContent = '0';
+            document.getElementById('throttled-count').textContent = '0';
+            document.getElementById('throttle-log').innerHTML = '<div class="text-slate-500 italic">// Reset complete...</div>';
+        }
+
+        function autoClick() {
+            let count = 0;
+            const interval = setInterval(() => {
+                throttleBtn.click();
+                count++;
+                if (count >= 10) clearInterval(interval);
+            }, 150);
+        }
+
+        // Promise Demo
+        let promiseId = 0;
+        const promises = new Map();
+
+        function createPromise(type) {
+            promiseId++;
+            const id = promiseId;
+            const container = document.getElementById('promise-container');
+
+            // Clear initial message
+            if (container.children.length === 1 && container.children[0].classList.contains('italic')) {
+                container.innerHTML = '';
+            }
+
+            const shouldResolve = type === 'success' ? true : type === 'error' ? false : Math.random() > 0.5;
+            const delay = Math.floor(Math.random() * 2000) + 1000;
+
+            const promiseEl = document.createElement('div');
+            promiseEl.id = `promise-${id}`;
+            promiseEl.className = 'flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 transition-all duration-300';
+            promiseEl.innerHTML = `
+                <div class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+                <span class="text-sm font-mono text-slate-600 flex-1">Promise #${id}</span>
+                <span class="text-xs text-slate-400">${delay}ms</span>
+                <span class="text-xs font-medium text-yellow-600 bg-yellow-50 px-2 py-1 rounded">pending</span>
+            `;
+
+            container.insertBefore(promiseEl, container.firstChild);
+            updatePromiseStats('pending');
+
+            const promise = new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (shouldResolve) {
+                        resolve(`Data from Promise #${id}`);
+                    } else {
+                        reject(`Error in Promise #${id}`);
+                    }
+                }, delay);
+            });
+
+            promise
+                .then(result => {
+                    updatePromiseElement(id, 'fulfilled', result);
+                    updatePromiseStats('fulfilled');
+                })
+                .catch(error => {
+                    updatePromiseElement(id, 'rejected', error);
+                    updatePromiseStats('rejected');
+                });
+        }
+
+        function updatePromiseElement(id, status, message) {
+            const el = document.getElementById(`promise-${id}`);
+            if (!el) return;
+
+            const colors = {
+                fulfilled: { dot: 'bg-green-400', text: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
+                rejected: { dot: 'bg-red-400', text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' }
+            };
+
+            const style = colors[status];
+            el.className = `flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${style.bg} ${style.border}`;
+            el.innerHTML = `
+                <div class="w-2 h-2 rounded-full ${style.dot}"></div>
+                <span class="text-sm font-mono text-slate-700 flex-1 truncate" title="${message}">${message}</span>
+                <span class="text-xs font-medium ${style.text} ${style.bg} px-2 py-1 rounded uppercase">${status}</span>
+            `;
+        }
+
+        function updatePromiseStats(type) {
+            const counts = {
+                pending: parseInt(document.getElementById('pending-count').textContent),
+                fulfilled: parseInt(document.getElementById('fulfilled-count').textContent),
+                rejected: parseInt(document.getElementById('rejected-count').textContent)
+            };
+
+            if (type === 'pending') counts.pending++;
+            else if (type === 'fulfilled') { counts.pending--; counts.fulfilled++; }
+            else if (type === 'rejected') { counts.pending--; counts.rejected++; }
+
+            document.getElementById('pending-count').textContent = counts.pending;
+            document.getElementById('fulfilled-count').textContent = counts.fulfilled;
+            document.getElementById('rejected-count').textContent = counts.rejected;
+        }
+
+        function clearPromises() {
+            document.getElementById('promise-container').innerHTML = '<div class="text-center text-slate-400 text-sm py-8 italic">Click buttons to create promises...</div>';
+            document.getElementById('pending-count').textContent = '0';
+            document.getElementById('fulfilled-count').textContent = '0';
+            document.getElementById('rejected-count').textContent = '0';
+            promiseId = 0;
+        }
+
+        // Integrated Demo
+        async function runIntegratedDemo() {
+            const output = document.getElementById('integration-output');
+            output.classList.remove('hidden');
+            output.innerHTML = '<div class="text-yellow-400">Initializing API Client with Currying...</div>';
+
+            setTimeout(() => {
+                output.innerHTML += '<div class="text-slate-400 mt-1">→ Base URL configured: https://api.example.com</div>';
+                output.innerHTML += '<div class="text-slate-400">→ Auth token applied</div>';
+            }, 600);
+
+            setTimeout(() => {
+                output.innerHTML += '<div class="text-blue-400 mt-2">Setting up Throttle (1000ms)...</div>';
+            }, 1200);
+
+            setTimeout(() => {
+                output.innerHTML += '<div class="text-green-400 mt-2">✓ Client ready! Making requests...</div>';
+                output.innerHTML += '<div class="text-slate-500 mt-1 text-xs">Request 1: /users (executed)</div>';
+                output.innerHTML += '<div class="text-slate-500 text-xs">Request 2: /posts (throttled)</div>';
+                output.innerHTML += '<div class="text-slate-500 text-xs">Request 3: /comments (throttled)</div>';
+            }, 1800);
+
+            setTimeout(() => {
+                output.innerHTML += '<div class="text-purple-400 mt-2">Promise resolved: User data received!</div>';
+            }, 2800);
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-slide-up').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
     </script>
 </body>
 

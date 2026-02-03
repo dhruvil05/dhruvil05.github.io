@@ -1,500 +1,724 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debouncing and Throttling Guide</title>
+    <title>Debouncing vs Throttling | Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        * {
+            font-family: 'Inter', sans-serif;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
         }
-        h2 {
-            color: #34495e;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-            margin-top: 30px;
+
+        /* Custom animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        h3 {
-            color: #e74c3c;
-            margin-top: 25px;
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
         }
-        .section {
-            margin-bottom: 40px;
-            padding: 25px;
-            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
-            border-radius: 12px;
-            border-left: 5px solid #3498db;
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
-        .concept-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #27ae60;
+
+        .animate-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .debounce-card {
-            border-left-color: #e74c3c;
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
         }
-        .throttle-card {
-            border-left-color: #f39c12;
+
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
         }
+
+        /* Interactive visualization styles */
+        .event-dot {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .execution-bar {
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Code block styling */
         .code-block {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            margin: 15px 0;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            font-size: 14px;
-            line-height: 1.5;
+            background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
         }
-        .demo-section {
-            background: linear-gradient(145deg, #e8f4fd, #d1ecf1);
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-            border: 2px solid #3498db;
-        }
-        .interactive-demo {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .demo-box {
-            flex: 1;
-            min-width: 300px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .demo-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            margin: 10px 0;
-        }
-        .demo-input:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-        .counter {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .logs {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            max-height: 200px;
-            overflow-y: auto;
-            margin: 10px 0;
-            font-size: 12px;
-        }
-        button {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            margin: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-        }
-        button.clear {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-        .visual-demo {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .timeline {
-            flex: 1;
-            min-width: 300px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #3498db;
-        }
-        .timeline-bar {
-            height: 40px;
-            background: #ecf0f1;
-            border-radius: 20px;
-            position: relative;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        .timeline-event {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background: #e74c3c;
-            transition: all 0.3s ease;
-        }
-        .timeline-execution {
-            position: absolute;
-            top: 0;
-            height: 100%;
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
             width: 8px;
-            background: #27ae60;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
             border-radius: 4px;
         }
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
-        .comparison-table th {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            padding: 15px;
-            text-align: left;
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .comparison-table td {
-            padding: 15px;
-            border-bottom: 1px solid #ecf0f1;
+
+        /* Interactive playground canvas */
+        #playground-canvas {
+            cursor: crosshair;
         }
-        .comparison-table tr:nth-child(even) {
-            background-color: #f8f9fa;
+
+        .stat-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .use-case {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 4px solid #f39c12;
-        }
-        .performance-tip {
-            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #17a2b8;
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
     </style>
+    <base target="_blank">
 </head>
-<body>
-    <div class="container">
-        <h1>⚡ Debouncing & Throttling in JavaScript</h1>
-        
-        <div class="section">
-            <h2>🎯 What are Debouncing and Throttling?</h2>
-            <p><strong>Both are techniques to limit how often a function is executed, but they work differently:</strong></p>
-            
-            <div class="concept-card debounce-card">
-                <h3>🔴 Debouncing</h3>
-                <p><strong>Delays function execution until after a specified time has passed since the last call.</strong></p>
-                <p>Think of it like an elevator - it waits a few seconds after the last person enters before closing the doors.</p>
-                <ul>
-                    <li>Resets the timer on each new call</li>
-                    <li>Only executes after silence period</li>
-                    <li>Perfect for search inputs, resize events</li>
-                </ul>
-            </div>
-            
-            <div class="concept-card throttle-card">
-                <h3>🟡 Throttling</h3>
-                <p><strong>Limits function execution to once per specified time interval.</strong></p>
-                <p>Think of it like a toll booth - only allows one car through every few seconds, regardless of traffic.</p>
-                <ul>
-                    <li>Executes at regular intervals</li>
-                    <li>Ignores calls during cool-down period</li>
-                    <li>Perfect for scroll events, button clicks</li>
-                </ul>
+
+<body class="bg-white text-slate-900 antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-semibold text-lg tracking-tight">JS Performance</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#concepts"
+                        class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Concepts</a>
+                    <a href="#concepts"
+                        class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Comparison</a>
+                    <a href="#playground"
+                        class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Playground</a>
+                    <a href="#implementation"
+                        class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" target="_self">Implementation</a>
+                </div>
+                <button onclick="document.getElementById('playground').scrollIntoView({behavior: 'smooth'})"
+                    class="bg-slate-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-800 transition-all transform hover:scale-105">
+                    Try Interactive Demo
+                </button>
             </div>
         </div>
+    </nav>
 
-        <div class="section">
-            <h2>🛠️ Implementation</h2>
-            
-            <h3>Debounce Implementation:</h3>
-            <div class="code-block">function debounce(func, delay) {
-    let timeoutId;
-    
-    return function(...args) {
-        // Clear the previous timeout
-        clearTimeout(timeoutId);
-        
-        // Set a new timeout
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="absolute inset-0 -z-10">
+            <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-100 via-white to-white opacity-70">
+            </div>
+            <div
+                class="absolute top-20 left-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float">
+            </div>
+            <div class="absolute top-40 right-10 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
+                style="animation-delay: 1s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-slide-up" style="opacity: 0;">
+                <div
+                    class="inline-flex items-center space-x-2 bg-slate-100 rounded-full px-4 py-1.5 mb-8 border border-slate-200">
+                    <span class="flex h-2 w-2 rounded-full bg-green-500 pulse-ring relative"></span>
+                    <span class="text-xs font-medium text-slate-600 uppercase tracking-wider">Performance
+                        Optimization</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                    <span class="gradient-text">Debouncing</span> vs <br />
+                    <span class="text-slate-400">Throttling</span>
+                </h1>
+                <p class="mt-6 text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                    Master the art of controlling function execution rates. Two powerful techniques to optimize event
+                    handling and create buttery-smooth user experiences.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="document.getElementById('concepts').scrollIntoView({behavior: 'smooth'})"
+                        class="group bg-slate-900 text-white px-8 py-4 rounded-full font-medium hover:bg-slate-800 transition-all flex items-center justify-center space-x-2 shadow-lg shadow-slate-900/20 hover:shadow-slate-900/30">
+                        <span>Explore Concepts</span>
+                        <i data-lucide="arrow-down" class="w-4 h-4 group-hover:translate-y-1 transition-transform"></i>
+                    </button>
+                    <button onclick="toggleCodePreview()"
+                        class="bg-white text-slate-900 border border-slate-300 px-8 py-4 rounded-full font-medium hover:bg-slate-50 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="code" class="w-4 h-4"></i>
+                        <span>View Code</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto animate-slide-up"
+                style="animation-delay: 0.2s; opacity: 0;">
+                <div class="stat-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="text-3xl font-bold text-slate-900 mb-1">10x</div>
+                    <div class="text-sm text-slate-500">Performance Improvement</div>
+                </div>
+                <div class="stat-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="text-3xl font-bold text-slate-900 mb-1">0ms</div>
+                    <div class="text-sm text-slate-500">UI Blocking Prevention</div>
+                </div>
+                <div class="stat-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="text-3xl font-bold text-slate-900 mb-1">∞</div>
+                    <div class="text-sm text-slate-500">Scalability Potential</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Concepts Section -->
+    <section id="concepts" class="py-20 bg-slate-50/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Understanding the Concepts</h2>
+                <p class="text-lg text-slate-600 max-w-2xl mx-auto">Before diving into code, let's visualize how these
+                    techniques control function execution flow.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Debouncing Card -->
+                <div
+                    class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-500">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div
+                            class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 text-blue-600">
+                            <i data-lucide="timer-reset" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Debouncing</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Delays function execution until after a specified wait time has elapsed since the last
+                            event.
+                            Think of it as a "smart delay" that resets the timer with every new event.
+                        </p>
+
+                        <!-- Visual Representation -->
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                            <div class="flex items-center justify-between mb-4 text-sm font-medium text-slate-500">
+                                <span>Event Timeline</span>
+                                <span class="text-blue-600">Wait: 300ms</span>
+                            </div>
+                            <div class="relative h-20 bg-white rounded-lg border border-slate-200 overflow-hidden"
+                                id="debounce-viz">
+                                <div class="absolute inset-0 flex items-center px-4 gap-2">
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"
+                                        style="animation-delay: 0.2s"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"
+                                        style="animation-delay: 0.4s"></div>
+                                    <div class="flex-1"></div>
+                                    <div
+                                        class="event-dot w-4 h-4 rounded-full bg-blue-500 shadow-lg shadow-blue-500/30">
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-1 bg-blue-500 execution-bar" style="width: 0%">
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                                <i data-lucide="info" class="w-3 h-3"></i>
+                                <span>Function executes only after user stops triggering events</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Search
+                                Inputs</span>
+                            <span
+                                class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Auto-save</span>
+                            <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Resize
+                                End</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Throttling Card -->
+                <div
+                    class="group bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-500">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div
+                            class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mb-6 text-purple-600">
+                            <i data-lucide="gauge" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Throttling</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Ensures a function executes at most once per specified time interval, regardless of how many
+                            events fire.
+                            Like a "traffic controller" that maintains a steady execution rate.
+                        </p>
+
+                        <!-- Visual Representation -->
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                            <div class="flex items-center justify-between mb-4 text-sm font-medium text-slate-500">
+                                <span>Event Timeline</span>
+                                <span class="text-purple-600">Limit: 300ms</span>
+                            </div>
+                            <div class="relative h-20 bg-white rounded-lg border border-slate-200 overflow-hidden"
+                                id="throttle-viz">
+                                <div class="absolute inset-0 flex items-center px-4 gap-1">
+                                    <div class="event-dot w-3 h-3 rounded-full bg-purple-500"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-purple-500"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="event-dot w-3 h-3 rounded-full bg-purple-500"></div>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-1 bg-purple-500 execution-bar" style="width: 0%">
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                                <i data-lucide="info" class="w-3 h-3"></i>
+                                <span>Function executes at regular intervals while events continue</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Scroll
+                                Events</span>
+                            <span
+                                class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Infinite
+                                Scroll</span>
+                            <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Mouse
+                                Move</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Playground -->
+    <section id="playground" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Interactive Playground</h2>
+                <p class="text-lg text-slate-600">Move your mouse over the areas below to see the difference in
+                    real-time</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Normal -->
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h3 class="font-semibold text-slate-900">Normal</h3>
+                        <span class="text-xs font-mono bg-slate-200 px-2 py-1 rounded text-slate-600">No Control</span>
+                    </div>
+                    <div class="h-64 relative bg-white cursor-crosshair" id="normal-area">
+                        <canvas id="normal-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 flex justify-between text-xs text-slate-400 font-mono">
+                            <span>Events: <span id="normal-count" class="text-slate-900 font-bold">0</span></span>
+                            <span>Executions: <span id="normal-exec" class="text-red-500 font-bold">0</span></span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 text-xs text-slate-600 border-t border-slate-100">
+                        Every mouse move triggers function execution immediately
+                    </div>
+                </div>
+
+                <!-- Debounce -->
+                <div
+                    class="bg-white rounded-2xl border-2 border-blue-200 overflow-hidden shadow-lg shadow-blue-900/5 relative">
+                    <div
+                        class="absolute top-0 right-0 bg-blue-500 text-white text-xs px-3 py-1 rounded-bl-lg font-medium">
+                        Recommended</div>
+                    <div class="p-4 border-b border-blue-100 bg-blue-50/50 flex justify-between items-center">
+                        <h3 class="font-semibold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="timer-reset" class="w-4 h-4 text-blue-500"></i>
+                            Debounce
+                        </h3>
+                        <span class="text-xs font-mono bg-blue-100 px-2 py-1 rounded text-blue-700">300ms</span>
+                    </div>
+                    <div class="h-64 relative bg-white cursor-crosshair" id="debounce-area">
+                        <canvas id="debounce-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                        <div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-500 opacity-0 transition-opacity"
+                            id="debounce-indicator"></div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 flex justify-between text-xs text-slate-400 font-mono">
+                            <span>Events: <span id="debounce-count" class="text-slate-900 font-bold">0</span></span>
+                            <span>Executions: <span id="debounce-exec" class="text-blue-500 font-bold">0</span></span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-blue-50/30 text-xs text-slate-600 border-t border-blue-100">
+                        Executes only after you stop moving for 300ms
+                    </div>
+                </div>
+
+                <!-- Throttle -->
+                <div class="bg-white rounded-2xl border border-purple-200 overflow-hidden shadow-sm">
+                    <div class="p-4 border-b border-purple-100 bg-purple-50/50 flex justify-between items-center">
+                        <h3 class="font-semibold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="gauge" class="w-4 h-4 text-purple-500"></i>
+                            Throttle
+                        </h3>
+                        <span class="text-xs font-mono bg-purple-100 px-2 py-1 rounded text-purple-700">300ms</span>
+                    </div>
+                    <div class="h-64 relative bg-white cursor-crosshair" id="throttle-area">
+                        <canvas id="throttle-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                        <div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-purple-500 opacity-0 transition-opacity"
+                            id="throttle-indicator"></div>
+                        <div
+                            class="absolute bottom-4 left-4 right-4 flex justify-between text-xs text-slate-400 font-mono">
+                            <span>Events: <span id="throttle-count" class="text-slate-900 font-bold">0</span></span>
+                            <span>Executions: <span id="throttle-exec" class="text-purple-500 font-bold">0</span></span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-purple-50/30 text-xs text-slate-600 border-t border-purple-100">
+                        Executes maximum once every 300ms while moving
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-world Simulation -->
+            <div class="mt-12 bg-slate-900 rounded-3xl p-8 text-white overflow-hidden relative">
+                <div
+                    class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]">
+                </div>
+
+                <div class="relative z-10 grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Search Input Simulation</h3>
+                        <p class="text-slate-400 mb-6">Type in the search box below to see how debouncing prevents
+                            excessive API calls while typing.</p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label
+                                    class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2 block">Search
+                                    Query</label>
+                                <div class="relative">
+                                    <input type="text" id="search-input" placeholder="Type to search..."
+                                        class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors">
+                                    <i data-lucide="search" class="absolute right-4 top-3.5 w-5 h-5 text-slate-500"></i>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                                    <div class="text-2xl font-bold text-red-400" id="search-normal-count">0</div>
+                                    <div class="text-xs text-slate-400">Normal API Calls</div>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                                    <div class="text-2xl font-bold text-green-400" id="search-debounce-count">0</div>
+                                    <div class="text-xs text-slate-400">Debounced Calls</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/30 rounded-2xl p-6 font-mono text-sm border border-white/10">
+                        <div class="flex items-center gap-2 mb-4 text-slate-500 border-b border-white/10 pb-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-2 text-xs">console.log</span>
+                        </div>
+                        <div id="console-output" class="space-y-2 h-48 overflow-y-auto text-xs">
+                            <div class="text-slate-500 italic">// Start typing to see logs...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Section -->
+    <section id="implementation" class="py-20 bg-slate-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Implementation</h2>
+                <p class="text-lg text-slate-600">Clean, production-ready code implementations</p>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Debounce Code -->
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                                <i data-lucide="timer-reset" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-slate-900">Debounce Function</h3>
+                                <p class="text-xs text-slate-500">Leading & Trailing edge support</p>
+                            </div>
+                        </div>
+                        <button onclick="copyCode('debounce-code')"
+                            class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <i data-lucide="copy" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre class="mono text-sm text-slate-700 leading-relaxed" id="debounce-code"><code>function debounce(func, wait, immediate = false) {
+  let timeout;
+  
+  return function executedFunction(...args) {
+    const later = () => {
+      timeout = null;
+      if (!immediate) func.apply(this, args);
     };
+    
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    
+    if (callNow) func.apply(this, args);
+  };
 }
 
-// Usage Example
-const debouncedSearch = debounce((query) => {
-    console.log('Searching for:', query);
-    // API call would go here
+// Usage
+const handleSearch = debounce((query) => {
+  console.log('Searching for:', query);
+  // API call here
 }, 300);
 
-// This will only execute once, 300ms after the last call
-debouncedSearch('hello');
-debouncedSearch('hello w');
-debouncedSearch('hello world'); // Only this executes after 300ms</div>
+input.addEventListener('input', (e) => handleSearch(e.target.value));</code></pre>
+                    </div>
+                </div>
 
-            <h3>Throttle Implementation:</h3>
-            <div class="code-block">function throttle(func, limit) {
-    let inThrottle;
+                <!-- Throttle Code -->
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
+                                <i data-lucide="gauge" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-slate-900">Throttle Function</h3>
+                                <p class="text-xs text-slate-500">With trailing execution option</p>
+                            </div>
+                        </div>
+                        <button onclick="copyCode('throttle-code')"
+                            class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <i data-lucide="copy" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre class="mono text-sm text-slate-700 leading-relaxed" id="throttle-code"><code>function throttle(func, limit, trailing = true) {
+  let inThrottle;
+  let lastFunc;
+  let lastRan;
+  
+  return function executedFunction(...args) {
+    const context = this;
     
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            
-            setTimeout(() => {
-                inThrottle = false;
-            }, limit);
+    if (!inThrottle) {
+      func.apply(context, args);
+      lastRan = Date.now();
+      inThrottle = true;
+      
+      setTimeout(() => {
+        inThrottle = false;
+        if (trailing && lastFunc) {
+          lastFunc.apply(context, args);
+          lastFunc = null;
         }
-    };
+      }, limit);
+    } else if (trailing) {
+      lastFunc = () => func.apply(context, args);
+    }
+  };
 }
 
-// Usage Example
-const throttledScroll = throttle(() => {
-    console.log('Scroll event handled');
-    // Update scroll position, animate elements, etc.
+// Usage
+const handleScroll = throttle(() => {
+  console.log('Scroll position:', window.scrollY);
 }, 100);
 
-// This will execute at most once every 100ms
-window.addEventListener('scroll', throttledScroll);</div>
-        </div>
-
-        <div class="demo-section">
-            <h2>🎮 Interactive Demo - Search Input</h2>
-            <p>Type in the inputs below to see the difference between normal, debounced, and throttled function calls:</p>
-            
-            <div class="interactive-demo">
-                <div class="demo-box">
-                    <h4>🔵 Normal (No Optimization)</h4>
-                    <input type="text" class="demo-input" id="normalInput" placeholder="Type here...">
-                    <div class="counter" id="normalCounter">Calls: 0</div>
-                    <div class="logs" id="normalLogs">Logs will appear here...</div>
-                </div>
-                
-                <div class="demo-box">
-                    <h4>🔴 Debounced (300ms delay)</h4>
-                    <input type="text" class="demo-input" id="debouncedInput" placeholder="Type here...">
-                    <div class="counter" id="debouncedCounter">Calls: 0</div>
-                    <div class="logs" id="debouncedLogs">Logs will appear here...</div>
-                </div>
-                
-                <div class="demo-box">
-                    <h4>🟡 Throttled (300ms interval)</h4>
-                    <input type="text" class="demo-input" id="throttledInput" placeholder="Type here...">
-                    <div class="counter" id="throttledCounter">Calls: 0</div>
-                    <div class="logs" id="throttledLogs">Logs will appear here...</div>
+window.addEventListener('scroll', handleScroll);</code></pre>
+                    </div>
                 </div>
             </div>
-            
-            <button onclick="clearAllLogs()" class="clear">Clear All Logs</button>
-        </div>
 
-        <div class="demo-section">
-            <h2>🎯 Visual Demo - Button Clicks</h2>
-            <p>Click the buttons rapidly to see how debouncing and throttling limit function execution:</p>
-            
-            <div class="visual-demo">
-                <div class="timeline">
-                    <h4>🔵 Normal Button</h4>
-                    <button onclick="normalButtonClick()" id="normalBtn">Click Me Rapidly!</button>
-                    <div class="counter" id="normalBtnCounter">Clicks: 0</div>
-                    <div class="timeline-bar" id="normalTimeline"></div>
+            <!-- Quick Reference Table -->
+            <div class="mt-12 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="p-6 border-b border-slate-100">
+                    <h3 class="text-lg font-semibold text-slate-900">When to Use What</h3>
                 </div>
-                
-                <div class="timeline">
-                    <h4>🔴 Debounced Button (500ms)</h4>
-                    <button onclick="debouncedButtonClick()" id="debouncedBtn">Click Me Rapidly!</button>
-                    <div class="counter" id="debouncedBtnCounter">Executions: 0</div>
-                    <div class="timeline-bar" id="debouncedTimeline"></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-600">
+                            <tr>
+                                <th class="px-6 py-4 font-medium">Scenario</th>
+                                <th class="px-6 py-4 font-medium">Technique</th>
+                                <th class="px-6 py-4 font-medium">Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Search Input</td>
+                                <td class="px-6 py-4"><span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Debounce</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">Wait for user to finish typing</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Window Resize</td>
+                                <td class="px-6 py-4"><span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Debounce</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">Recalculate layout after resize ends</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Infinite Scroll</td>
+                                <td class="px-6 py-4"><span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Throttle</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">Check scroll position at intervals</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Button Clicks</td>
+                                <td class="px-6 py-4"><span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Debounce</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">Prevent double submission</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">Mouse Move</td>
+                                <td class="px-6 py-4"><span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Throttle</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">Update coordinates smoothly</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                
-                <div class="timeline">
-                    <h4>🟡 Throttled Button (500ms)</h4>
-                    <button onclick="throttledButtonClick()" id="throttledBtn">Click Me Rapidly!</button>
-                    <div class="counter" id="throttledBtnCounter">Executions: 0</div>
-                    <div class="timeline-bar" id="throttledTimeline"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12 border-t border-slate-800">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                    <i data-lucide="zap" class="w-5 h-5 text-slate-900"></i>
                 </div>
+                <span class="font-semibold text-lg">JS Performance</span>
             </div>
-            
-            <button onclick="resetButtonDemo()" class="clear">Reset Demo</button>
-        </div>
-
-        <div class="section">
-            <h2>📊 Comparison Table</h2>
-            <table class="comparison-table">
-                <tr>
-                    <th>Aspect</th>
-                    <th>Debouncing</th>
-                    <th>Throttling</th>
-                </tr>
-                <tr>
-                    <td><strong>Execution Pattern</strong></td>
-                    <td>Waits for silence, then executes once</td>
-                    <td>Executes at regular intervals</td>
-                </tr>
-                <tr>
-                    <td><strong>Timer Reset</strong></td>
-                    <td>Yes, resets on each call</td>
-                    <td>No, fixed intervals</td>
-                </tr>
-                <tr>
-                    <td><strong>Use Case</strong></td>
-                    <td>Search input, resize events</td>
-                    <td>Scroll events, button spam protection</td>
-                </tr>
-                <tr>
-                    <td><strong>Performance Impact</strong></td>
-                    <td>Minimal calls, but may delay response</td>
-                    <td>Predictable call frequency</td>
-                </tr>
-                <tr>
-                    <td><strong>User Experience</strong></td>
-                    <td>Smooth, reduces unnecessary work</td>
-                    <td>Responsive, prevents overwhelming</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="section">
-            <h2>🚀 Real-World Use Cases</h2>
-            
-            <div class="use-case">
-                <h4>🔴 Debouncing Use Cases:</h4>
-                <ul>
-                    <li><strong>Search as you type:</strong> Wait for user to stop typing before searching</li>
-                    <li><strong>Form validation:</strong> Validate after user finishes entering data</li>
-                    <li><strong>Auto-save:</strong> Save document after user stops editing</li>
-                    <li><strong>Window resize:</strong> Recalculate layout after resize ends</li>
-                    <li><strong>API calls:</strong> Prevent multiple calls while user is still inputting</li>
-                </ul>
+            <div class="text-slate-400 text-sm">
+                Interactive guide to Debouncing and Throttling
             </div>
-            
-            <div class="use-case">
-                <h4>🟡 Throttling Use Cases:</h4>
-                <ul>
-                    <li><strong>Scroll events:</strong> Update navbar/progress bar during scrolling</li>
-                    <li><strong>Mouse movement:</strong> Track cursor position for animations</li>
-                    <li><strong>Button clicks:</strong> Prevent double-clicking/spam clicking</li>
-                    <li><strong>Game controls:</strong> Limit shooting rate in games</li>
-                    <li><strong>Analytics:</strong> Send tracking data at regular intervals</li>
-                </ul>
+            <div class="flex space-x-6">
+                <!-- <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="github" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="twitter" class="w-5 h-5"></i>
+                </a> -->
+
+                <a href="https://dhruvil05.github.io/deboucing-throttling/old-index.html" target="_blank" class="hover:text-white transition-colors">Documentation</a>
+                <a href="https://developer.mozilla.org/en-US/docs/Glossary/Debounce" target="_blank" class="hover:text-white transition-colors">MDN Reference</a>
             </div>
         </div>
+    </footer>
 
-        <div class="section">
-            <h2>⚡ Performance Benefits</h2>
-            
-            <div class="performance-tip">
-                <h4>💡 Performance Impact:</h4>
-                <ul>
-                    <li><strong>Reduced API calls:</strong> Can reduce server load by 90%+</li>
-                    <li><strong>Better user experience:</strong> Prevents UI freezing from excessive events</li>
-                    <li><strong>Battery savings:</strong> Fewer computations on mobile devices</li>
-                    <li><strong>Network optimization:</strong> Reduces bandwidth usage</li>
-                </ul>
-            </div>
-
-            <h3>Advanced Implementation with Leading/Trailing Options:</h3>
-            <div class="code-block">// Advanced debounce with immediate execution option
-function advancedDebounce(func, delay, immediate = false) {
-    let timeoutId;
-    
-    return function(...args) {
-        const callNow = immediate && !timeoutId;
-        
-        clearTimeout(timeoutId);
-        
-        timeoutId = setTimeout(() => {
-            timeoutId = null;
-            if (!immediate) func.apply(this, args);
-        }, delay);
-        
-        if (callNow) func.apply(this, args);
-    };
-}
-
-// Advanced throttle with leading/trailing options
-function advancedThrottle(func, limit, options = {}) {
-    let inThrottle;
-    let lastFunc;
-    let lastRan;
-    
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            lastRan = Date.now();
-            inThrottle = true;
-        } else {
-            clearTimeout(lastFunc);
-            lastFunc = setTimeout(() => {
-                if ((Date.now() - lastRan) >= limit) {
-                    func.apply(this, args);
-                    lastRan = Date.now();
-                }
-            }, limit - (Date.now() - lastRan));
-        }
-    };
-}</div>
-        </div>
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+        <span id="toast-message">Copied to clipboard!</span>
     </div>
 
     <script>
-        // Utility functions
-        function debounce(func, delay) {
-            let timeoutId;
-            return function(...args) {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => func.apply(this, args), delay);
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Utility Functions
+        function debounce(func, wait, immediate = false) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    timeout = null;
+                    if (!immediate) func.apply(this, args);
+                };
+                const callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(this, args);
             };
         }
 
         function throttle(func, limit) {
             let inThrottle;
-            return function(...args) {
+            return function executedFunction(...args) {
                 if (!inThrottle) {
                     func.apply(this, args);
                     inThrottle = true;
@@ -503,134 +727,270 @@ function advancedThrottle(func, limit, options = {}) {
             };
         }
 
-        // Search demo counters
-        let normalCount = 0;
-        let debouncedCount = 0;
-        let throttledCount = 0;
+        // Interactive Playground Logic
+        const playgrounds = {
+            normal: { count: 0, exec: 0, canvas: null, ctx: null, dots: [] },
+            debounce: { count: 0, exec: 0, canvas: null, ctx: null, dots: [] },
+            throttle: { count: 0, exec: 0, canvas: null, ctx: null, dots: [] }
+        };
 
-        // Search demo functions
-        function normalSearch(value) {
-            normalCount++;
-            document.getElementById('normalCounter').textContent = `Calls: ${normalCount}`;
-            addLog('normalLogs', `Search: "${value}"`);
+        function initCanvas(type) {
+            const canvas = document.getElementById(`${type}-canvas`);
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            playgrounds[type].canvas = canvas;
+            playgrounds[type].ctx = ctx;
         }
 
-        function debouncedSearch(value) {
-            debouncedCount++;
-            document.getElementById('debouncedCounter').textContent = `Calls: ${debouncedCount}`;
-            addLog('debouncedLogs', `Search: "${value}"`);
+        function drawDot(type, x, y, color) {
+            const { ctx, dots } = playgrounds[type];
+            dots.push({ x, y, color, alpha: 1, radius: 4 });
+
+            // Keep only last 50 dots for performance
+            if (dots.length > 50) dots.shift();
         }
 
-        function throttledSearch(value) {
-            throttledCount++;
-            document.getElementById('throttledCounter').textContent = `Calls: ${throttledCount}`;
-            addLog('throttledLogs', `Search: "${value}"`);
+        function animateCanvas(type) {
+            const { canvas, ctx, dots } = playgrounds[type];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            dots.forEach((dot, index) => {
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+                ctx.fillStyle = dot.color.replace('1)', `${dot.alpha})`);
+                ctx.fill();
+
+                // Fade out
+                dot.alpha -= 0.02;
+                dot.radius += 0.1;
+            });
+
+            // Remove faded dots
+            playgrounds[type].dots = dots.filter(d => d.alpha > 0);
+
+            requestAnimationFrame(() => animateCanvas(type));
         }
 
-        // Create debounced and throttled versions
-        const debouncedSearchHandler = debounce(debouncedSearch, 300);
-        const throttledSearchHandler = throttle(throttledSearch, 300);
+        // Setup Normal Playground
+        initCanvas('normal');
+        animateCanvas('normal');
 
-        // Add event listeners
-        document.getElementById('normalInput').addEventListener('input', (e) => {
-            normalSearch(e.target.value);
+        const normalArea = document.getElementById('normal-area');
+        normalArea.addEventListener('mousemove', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            playgrounds.normal.count++;
+            document.getElementById('normal-count').textContent = playgrounds.normal.count;
+
+            // Execute immediately
+            playgrounds.normal.exec++;
+            document.getElementById('normal-exec').textContent = playgrounds.normal.exec;
+            drawDot('normal', x, y, 'rgba(239, 68, 68, 1)'); // Red
         });
 
-        document.getElementById('debouncedInput').addEventListener('input', (e) => {
-            debouncedSearchHandler(e.target.value);
+        // Setup Debounce Playground
+        initCanvas('debounce');
+        animateCanvas('debounce');
+
+        const debounceArea = document.getElementById('debounce-area');
+        const debounceIndicator = document.getElementById('debounce-indicator');
+
+        const debouncedMouseMove = debounce((x, y) => {
+            playgrounds.debounce.exec++;
+            document.getElementById('debounce-exec').textContent = playgrounds.debounce.exec;
+            drawDot('debounce', x, y, 'rgba(59, 130, 246, 1)'); // Blue
+            debounceIndicator.style.opacity = '0';
+        }, 300);
+
+        debounceArea.addEventListener('mousemove', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            playgrounds.debounce.count++;
+            document.getElementById('debounce-count').textContent = playgrounds.debounce.count;
+
+            debounceIndicator.style.opacity = '1';
+            debouncedMouseMove(x, y);
         });
 
-        document.getElementById('throttledInput').addEventListener('input', (e) => {
-            throttledSearchHandler(e.target.value);
+        // Setup Throttle Playground
+        initCanvas('throttle');
+        animateCanvas('throttle');
+
+        const throttleArea = document.getElementById('throttle-area');
+        const throttleIndicator = document.getElementById('throttle-indicator');
+
+        const throttledMouseMove = throttle((x, y) => {
+            playgrounds.throttle.exec++;
+            document.getElementById('throttle-exec').textContent = playgrounds.throttle.exec;
+            drawDot('throttle', x, y, 'rgba(168, 85, 247, 1)'); // Purple
+            throttleIndicator.style.opacity = '1';
+            setTimeout(() => throttleIndicator.style.opacity = '0', 100);
+        }, 300);
+
+        throttleArea.addEventListener('mousemove', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            playgrounds.throttle.count++;
+            document.getElementById('throttle-count').textContent = playgrounds.throttle.count;
+
+            throttledMouseMove(x, y);
         });
 
-        // Button demo variables
-        let normalBtnCount = 0;
-        let debouncedBtnCount = 0;
-        let throttledBtnCount = 0;
+        // Search Simulation
+        const searchInput = document.getElementById('search-input');
+        const consoleOutput = document.getElementById('console-output');
+        let normalSearchCount = 0;
+        let debounceSearchCount = 0;
 
-        // Button demo functions
-        function normalButtonClick() {
-            normalBtnCount++;
-            document.getElementById('normalBtnCounter').textContent = `Clicks: ${normalBtnCount}`;
-            addTimelineEvent('normalTimeline', '#e74c3c');
+        function logToConsole(message, type = 'info') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            div.className = type === 'success' ? 'text-green-400' : 'text-slate-300';
+            div.innerHTML = `<span class="text-slate-600">[${time}]</span> ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+
+            // Keep only last 20 logs
+            while (consoleOutput.children.length > 20) {
+                consoleOutput.removeChild(consoleOutput.firstChild);
+            }
         }
 
-        function debouncedButtonAction() {
-            debouncedBtnCount++;
-            document.getElementById('debouncedBtnCounter').textContent = `Executions: ${debouncedBtnCount}`;
-            addTimelineEvent('debouncedTimeline', '#27ae60', true);
+        const debouncedSearch = debounce((value) => {
+            debounceSearchCount++;
+            document.getElementById('search-debounce-count').textContent = debounceSearchCount;
+            logToConsole(`<span class="text-blue-400">DEBOUNCE:</span> API call with query "${value}"`, 'success');
+        }, 500);
+
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Normal behavior simulation
+            normalSearchCount++;
+            document.getElementById('search-normal-count').textContent = normalSearchCount;
+            logToConsole(`<span class="text-red-400">NORMAL:</span> API call with query "${value}"`);
+
+            // Debounced behavior
+            debouncedSearch(value);
+        });
+
+        // Copy Code Functionality
+        function copyCode(elementId) {
+            const code = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Code copied to clipboard!');
+            });
         }
 
-        function throttledButtonAction() {
-            throttledBtnCount++;
-            document.getElementById('throttledBtnCounter').textContent = `Executions: ${throttledBtnCount}`;
-            addTimelineEvent('throttledTimeline', '#27ae60', true);
-        }
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
 
-        // Create debounced and throttled button handlers
-        const debouncedButtonClick = debounce(debouncedButtonAction, 500);
-        const throttledButtonClick = throttle(throttledButtonAction, 500);
-
-        // Utility functions
-        function addLog(logId, message) {
-            const logElement = document.getElementById(logId);
-            const timestamp = new Date().toLocaleTimeString();
-            logElement.textContent += `[${timestamp}] ${message}\n`;
-            logElement.scrollTop = logElement.scrollHeight;
-        }
-
-        function addTimelineEvent(timelineId, color, isExecution = false) {
-            const timeline = document.getElementById(timelineId);
-            const event = document.createElement('div');
-            event.className = isExecution ? 'timeline-execution' : 'timeline-event';
-            event.style.background = color;
-            event.style.left = '0px';
-            
-            timeline.appendChild(event);
-            
-            // Animate the event moving across the timeline
             setTimeout(() => {
-                event.style.left = '100%';
-            }, 10);
-            
-            // Remove the event after animation
-            setTimeout(() => {
-                if (event.parentNode) {
-                    event.parentNode.removeChild(event);
-                }
+                toast.classList.add('translate-y-20', 'opacity-0');
             }, 2000);
         }
 
-        function clearAllLogs() {
-            ['normalLogs', 'debouncedLogs', 'throttledLogs'].forEach(id => {
-                document.getElementById(id).textContent = 'Logs cleared...\n';
+        // Navbar scroll effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > 100) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    entry.target.style.opacity = '1';
+                }
             });
-            
-            normalCount = 0;
-            debouncedCount = 0;
-            throttledCount = 0;
-            
-            document.getElementById('normalCounter').textContent = 'Calls: 0';
-            document.getElementById('debouncedCounter').textContent = 'Calls: 0';
-            document.getElementById('throttledCounter').textContent = 'Calls: 0';
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-slide-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+
+        // Visualization animations
+        function animateVisualizations() {
+            // Debounce visualization
+            const debounceBar = document.querySelector('#debounce-viz .execution-bar');
+            const debounceDots = document.querySelectorAll('#debounce-viz .event-dot');
+
+            setInterval(() => {
+                debounceBar.style.width = '0%';
+                debounceDots.forEach((dot, i) => {
+                    setTimeout(() => {
+                        dot.classList.remove('bg-slate-300');
+                        dot.classList.add('bg-blue-400');
+                        debounceBar.style.width = `${((i + 1) / debounceDots.length) * 100}%`;
+                    }, i * 200);
+                });
+
+                setTimeout(() => {
+                    debounceDots.forEach(dot => {
+                        dot.classList.remove('bg-blue-400');
+                        dot.classList.add('bg-slate-300');
+                    });
+                    debounceBar.style.width = '100%';
+                    setTimeout(() => {
+                        debounceBar.style.width = '0%';
+                    }, 500);
+                }, debounceDots.length * 200 + 300);
+            }, 3000);
+
+            // Throttle visualization
+            const throttleBar = document.querySelector('#throttle-viz .execution-bar');
+            const throttleDots = document.querySelectorAll('#throttle-viz .event-dot');
+
+            setInterval(() => {
+                throttleDots.forEach((dot, i) => {
+                    setTimeout(() => {
+                        if (dot.classList.contains('bg-purple-500')) {
+                            dot.classList.add('ring-2', 'ring-purple-300');
+                            setTimeout(() => dot.classList.remove('ring-2', 'ring-purple-300'), 300);
+                        }
+                    }, i * 150);
+                });
+            }, 2000);
         }
 
-        function resetButtonDemo() {
-            normalBtnCount = 0;
-            debouncedBtnCount = 0;
-            throttledBtnCount = 0;
-            
-            document.getElementById('normalBtnCounter').textContent = 'Clicks: 0';
-            document.getElementById('debouncedBtnCounter').textContent = 'Executions: 0';
-            document.getElementById('throttledBtnCounter').textContent = 'Executions: 0';
-            
-            // Clear timelines
-            ['normalTimeline', 'debouncedTimeline', 'throttledTimeline'].forEach(id => {
-                const timeline = document.getElementById(id);
-                timeline.innerHTML = '';
-            });
+        animateVisualizations();
+
+        // Toggle Code Preview (for hero button)
+        function toggleCodePreview() {
+            document.getElementById('implementation').scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
+
 </html>

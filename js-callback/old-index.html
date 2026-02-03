@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Callbacks Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .topic {
+            background: #f0f4ff;
+            border-left: 4px solid #4338ca;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .topic:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(67, 56, 202, 0.2);
+        }
+
+        .topic-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4338ca;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+
+        .topic-content {
+            color: #4a5568;
+            line-height: 1.8;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .topic-content.active {
+            max-height: 3000px;
+            margin-top: 15px;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-comment {
+            color: #94a3b8;
+        }
+
+        .code-string {
+            color: #86efac;
+        }
+
+        .code-keyword {
+            color: #c084fc;
+        }
+
+        .code-function {
+            color: #60a5fa;
+        }
+
+        .interactive-demo {
+            background: white;
+            border: 2px solid #4338ca;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .demo-title {
+            font-weight: bold;
+            color: #4338ca;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 56, 202, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .output-box {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+            color: #2d3748;
+        }
+
+        .output-line {
+            padding: 5px 0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .key-point {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 JavaScript Callbacks</h1>
+            <p>Complete Interactive Guide with Live Examples</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">What is a Callback?</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>📖 Definition & Basic Concept</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>A <span class="highlight">callback</span> is a function that is passed as an argument to
+                            another function and is executed after some operation has been completed. It's called a
+                            "callback" because it gets "called back" at a later time.</p>
+
+                        <div class="key-point">
+                            <strong>💡 Key Insight:</strong> Callbacks are the foundation of asynchronous programming in
+                            JavaScript!
+                        </div>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Basic callback example</span>
+                            <span class="code-keyword">function</span> <span class="code-function">greet</span>(name,
+                            callback) {
+                            console.log(<span class="code-string">'Hello '</span> + name);
+                            callback(); <span class="code-comment">// Execute the callback function</span>
+                            }
+
+                            <span class="code-keyword">function</span> <span class="code-function">sayGoodbye</span>() {
+                            console.log(<span class="code-string">'Goodbye!'</span>);
+                            }
+
+                            greet(<span class="code-string">'John'</span>, sayGoodbye);
+                            <span class="code-comment">// Output: Hello John
+                                // Output: Goodbye!</span>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-title">🎮 Try It Yourself:</div>
+                            <button class="btn" onclick="demoBasicCallback()">Run Basic Callback</button>
+                            <div class="output-box" id="output-basic"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>🎯 Why Do We Need Callbacks?</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>JavaScript is <span class="highlight">asynchronous</span> and <span
+                                class="highlight">non-blocking</span>, meaning it doesn't wait for long operations to
+                            complete before moving to the next line of code.</p>
+
+                        <div class="key-point">
+                            <strong>📌 Use Cases:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Handling API responses</li>
+                                <li>Reading/writing files</li>
+                                <li>Database operations</li>
+                                <li>Event handling</li>
+                                <li>Timer functions</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Without callbacks - code doesn't wait</span>
+                            console.log(<span class="code-string">'Start'</span>);
+
+                            setTimeout(() => {
+                            console.log(<span class="code-string">'This runs after 2 seconds'</span>);
+                            }, 2000);
+
+                            console.log(<span class="code-string">'End'</span>);
+
+                            <span class="code-comment">// Output:
+                                // Start
+                                // End
+                                // This runs after 2 seconds (after delay)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Types of Callbacks</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>⚡ Synchronous Callbacks</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Synchronous callbacks are executed immediately within the function they're passed to.</p>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Array methods use synchronous callbacks</span>
+                            <span class="code-keyword">const</span> numbers = [1, 2, 3, 4, 5];
+
+                            numbers.forEach((num) => {
+                            console.log(num * 2);
+                            });
+                            <span class="code-comment">// Output: 2, 4, 6, 8, 10 (immediately)</span>
+
+                            <span class="code-keyword">const</span> doubled = numbers.map((num) => num * 2);
+                            console.log(doubled); <span class="code-comment">// [2, 4, 6, 8, 10]</span>
+
+                            <span class="code-keyword">const</span> evens = numbers.filter((num) => num % 2 === 0);
+                            console.log(evens); <span class="code-comment">// [2, 4]</span>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-title">🎮 Try Synchronous Callbacks:</div>
+                            <button class="btn" onclick="demoSyncCallback()">Run Array Methods</button>
+                            <div class="output-box" id="output-sync"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>⏱️ Asynchronous Callbacks</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Asynchronous callbacks are executed later, after an asynchronous operation completes.</p>
+
+                        <div class="code-block">
+                            <span class="code-comment">// setTimeout - executes callback after delay</span>
+                            console.log(<span class="code-string">'Start'</span>);
+
+                            setTimeout(() => {
+                            console.log(<span class="code-string">'Callback executed after 2 seconds'</span>);
+                            }, 2000);
+
+                            console.log(<span class="code-string">'End'</span>);
+
+                            <span class="code-comment">// Simulating API call</span>
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">fetchUserData</span>(userId, callback) {
+                            setTimeout(() => {
+                            <span class="code-keyword">const</span> user = { id: userId, name: <span
+                                class="code-string">'John Doe'</span> };
+                            callback(user);
+                            }, 1000);
+                            }
+
+                            fetchUserData(123, (user) => {
+                            console.log(<span class="code-string">'User:'</span>, user);
+                            });
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-title">🎮 Try Asynchronous Callbacks:</div>
+                            <button class="btn" onclick="demoAsyncCallback()">Run Async Example</button>
+                            <button class="btn" onclick="demoFetchUser()">Fetch User Data</button>
+                            <div class="output-box" id="output-async"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Real-World Examples</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>🎪 Event Listeners</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Event listeners use callbacks to handle user interactions.</p>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Button click event</span>
+                            button.addEventListener(<span class="code-string">'click'</span>, <span
+                                class="code-keyword">function</span>() {
+                            console.log(<span class="code-string">'Button clicked!'</span>);
+                            });
+
+                            <span class="code-comment">// Using arrow function</span>
+                            button.addEventListener(<span class="code-string">'click'</span>, () => {
+                            console.log(<span class="code-string">'Button clicked with arrow function!'</span>);
+                            });
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-title">🎮 Try Event Callback:</div>
+                            <button class="btn" onclick="demoEventCallback(this)">Click Me!</button>
+                            <div class="output-box" id="output-event"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>📝 Error-First Callbacks (Node.js Convention)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Node.js follows a convention where the first parameter of a callback is always an error
+                            object.</p>
+
+                        <div class="code-block">
+                            <span class="code-comment">// File reading example (Node.js)</span>
+                            fs.readFile(<span class="code-string">'file.txt'</span>, <span
+                                class="code-string">'utf8'</span>, (error, data) => {
+                            <span class="code-keyword">if</span> (error) {
+                            console.error(<span class="code-string">'Error reading file:'</span>, error);
+                            <span class="code-keyword">return</span>;
+                            }
+                            console.log(<span class="code-string">'File contents:'</span>, data);
+                            });
+
+                            <span class="code-comment">// Custom error-first callback</span>
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">divideNumbers</span>(a, b, callback) {
+                            <span class="code-keyword">if</span> (b === 0) {
+                            callback(<span class="code-keyword">new</span> Error(<span class="code-string">'Cannot
+                                divide by zero'</span>), <span class="code-keyword">null</span>);
+                            } <span class="code-keyword">else</span> {
+                            callback(<span class="code-keyword">null</span>, a / b);
+                            }
+                            }
+
+                            divideNumbers(10, 2, (error, result) => {
+                            <span class="code-keyword">if</span> (error) {
+                            console.error(<span class="code-string">'Error:'</span>, error.message);
+                            <span class="code-keyword">return</span>;
+                            }
+                            console.log(<span class="code-string">'Result:'</span>, result);
+                            });
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-title">🎮 Try Error-First Callback:</div>
+                            <button class="btn" onclick="demoDivide(10, 2)">Divide 10 / 2</button>
+                            <button class="btn" onclick="demoDivide(10, 0)">Divide 10 / 0 (Error)</button>
+                            <div class="output-box" id="output-error"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>🔗 Chaining Callbacks</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>Multiple callbacks can be chained to perform sequential operations.</p>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Sequential operations with callbacks</span>
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">step1</span>(callback) {
+                            setTimeout(() => {
+                            console.log(<span class="code-string">'Step 1 complete'</span>);
+                            callback();
+                            }, 1000);
+                            }
+
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">step2</span>(callback) {
+                            setTimeout(() => {
+                            console.log(<span class="code-string">'Step 2 complete'</span>);
+                            callback();
+                            }, 1000);
+                            }
+
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">step3</span>(callback) {
+                            setTimeout(() => {
+                            console.log(<span class="code-string">'Step 3 complete'</span>);
+                            callback();
+                            }, 1000);
+                            }
+
+                            <span class="code-comment">// Executing in sequence</span>
+                            step1(() => {
+                            step2(() => {
+                            step3(() => {
+                            console.log(<span class="code-string">'All steps complete!'</span>);
+                            });
+                            });
+                            });
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-title">🎮 Try Chained Callbacks:</div>
+                            <button class="btn" onclick="demoChainedCallbacks()">Run Sequential Steps</button>
+                            <div class="output-box" id="output-chain"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Common Problems & Solutions</h2>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>⚠️ Callback Hell (Pyramid of Doom)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <p>When you have multiple nested callbacks, code becomes hard to read and maintain.</p>
+
+                        <div class="warning-box">
+                            <strong>❌ Problem:</strong> Deeply nested callbacks create unreadable code
+                        </div>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Callback Hell Example</span>
+                            getData((data1) => {
+                            processData(data1, (data2) => {
+                            saveData(data2, (data3) => {
+                            sendEmail(data3, (result) => {
+                            updateUI(result, (finalResult) => {
+                            console.log(<span class="code-string">'Done!'</span>);
+                            });
+                            });
+                            });
+                            });
+                            });
+                        </div>
+
+                        <div class="success-box">
+                            <strong>✅ Solutions:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li><strong>Use Promises:</strong> Modern way to handle async operations</li>
+                                <li><strong>Use Async/Await:</strong> Even cleaner syntax built on promises</li>
+                                <li><strong>Named Functions:</strong> Instead of anonymous functions</li>
+                                <li><strong>Modularize Code:</strong> Break into smaller functions</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Solution: Named functions</span>
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">handleData1</span>(data1) {
+                            processData(data1, handleData2);
+                            }
+
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">handleData2</span>(data2) {
+                            saveData(data2, handleData3);
+                            }
+
+                            <span class="code-keyword">function</span> <span
+                                class="code-function">handleData3</span>(data3) {
+                            sendEmail(data3, handleResult);
+                            }
+
+                            getData(handleData1);
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic" onclick="toggleTopic(this)">
+                    <div class="topic-header">
+                        <span>💡 Best Practices</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="topic-content">
+                        <div class="key-point">
+                            <strong>✅ Do's:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Always handle errors in callbacks</li>
+                                <li>Keep callbacks short and focused</li>
+                                <li>Use named functions for better readability</li>
+                                <li>Follow error-first convention in Node.js</li>
+                                <li>Consider using Promises or Async/Await for complex async flows</li>
+                            </ul>
+                        </div>
+
+                        <div class="warning-box">
+                            <strong>❌ Don'ts:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li>Don't nest callbacks too deeply</li>
+                                <li>Don't forget to handle errors</li>
+                                <li>Don't use callbacks when Promises are more appropriate</li>
+                                <li>Don't create memory leaks by not cleaning up event listeners</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-block">
+                            <span class="code-comment">// Good: Clean callback with error handling</span>
+                            <span class="code-keyword">function</span> <span class="code-function">fetchData</span>(id,
+                            callback) {
+                            <span class="code-keyword">if</span> (!id) {
+                            <span class="code-keyword">return</span> callback(<span class="code-keyword">new</span>
+                            Error(<span class="code-string">'ID is required'</span>), <span
+                                class="code-keyword">null</span>);
+                            }
+
+                            <span class="code-comment">// Simulate async operation</span>
+                            setTimeout(() => {
+                            <span class="code-keyword">const</span> data = { id: id, name: <span
+                                class="code-string">'Item'</span> };
+                            callback(<span class="code-keyword">null</span>, data);
+                            }, 1000);
+                            }
+
+                            <span class="code-comment">// Usage with proper error handling</span>
+                            fetchData(123, (error, data) => {
+                            <span class="code-keyword">if</span> (error) {
+                            console.error(<span class="code-string">'Error:'</span>, error.message);
+                            <span class="code-keyword">return</span>;
+                            }
+                            console.log(<span class="code-string">'Data:'</span>, data);
+                            });
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Key Takeaways</h2>
+
+                <div class="key-point">
+                    <strong>📚 Summary:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>✅ Callbacks are functions passed as arguments to other functions</li>
+                        <li>✅ Executed later after some operation completes</li>
+                        <li>✅ Can be synchronous (array methods) or asynchronous (setTimeout, API calls)</li>
+                        <li>✅ Error-first convention is standard in Node.js</li>
+                        <li>✅ Avoid callback hell by using Promises or Async/Await</li>
+                        <li>✅ Always handle errors properly in callbacks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTopic(element) {
+            const content = element.querySelector('.topic-content');
+            const icon = element.querySelector('.toggle-icon');
+
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        function clearOutput(id) {
+            document.getElementById(id).innerHTML = '';
+        }
+
+        function addOutput(id, text) {
+            const output = document.getElementById(id);
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            line.textContent = text;
+            output.appendChild(line);
+        }
+
+        function demoBasicCallback() {
+            clearOutput('output-basic');
+
+            function greet(name, callback) {
+                addOutput('output-basic', `Hello ${name}`);
+                callback();
+            }
+
+            function sayGoodbye() {
+                addOutput('output-basic', 'Goodbye!');
+            }
+
+            greet('John', sayGoodbye);
+        }
+
+        function demoSyncCallback() {
+            clearOutput('output-sync');
+            const numbers = [1, 2, 3, 4, 5];
+
+            addOutput('output-sync', 'Original array: [1, 2, 3, 4, 5]');
+            addOutput('output-sync', '---');
+
+            const doubled = numbers.map(num => num * 2);
+            addOutput('output-sync', `map(num * 2): [${doubled.join(', ')}]`);
+
+            const evens = numbers.filter(num => num % 2 === 0);
+            addOutput('output-sync', `filter(even numbers): [${evens.join(', ')}]`);
+
+            let sum = 0;
+            numbers.forEach(num => sum += num);
+            addOutput('output-sync', `forEach(sum): ${sum}`);
+        }
+
+        function demoAsyncCallback() {
+            clearOutput('output-async');
+            addOutput('output-async', 'Start');
+
+            setTimeout(() => {
+                addOutput('output-async', 'Callback executed after 2 seconds');
+            }, 2000);
+
+            addOutput('output-async', 'End');
+            addOutput('output-async', '(Wait 2 seconds...)');
+        }
+
+        function demoFetchUser() {
+            clearOutput('output-async');
+            addOutput('output-async', 'Fetching user data...');
+
+            function fetchUserData(userId, callback) {
+                setTimeout(() => {
+                    const user = { id: userId, name: 'John Doe', email: 'john@example.com' };
+                    callback(user);
+                }, 1500);
+            }
+
+            fetchUserData(123, (user) => {
+                addOutput('output-async', `User ID: ${user.id}`);
+                addOutput('output-async', `Name: ${user.name}`);
+                addOutput('output-async', `Email: ${user.email}`);
+            });
+        }
+
+        function demoEventCallback(button) {
+            clearOutput('output-event');
+            addOutput('output-event', `Button clicked at ${new Date().toLocaleTimeString()}`);
+            addOutput('output-event', 'Event callback executed successfully!');
+        }
+
+        function demoDivide(a, b) {
+            clearOutput('output-error');
+
+            function divideNumbers(a, b, callback) {
+                if (b === 0) {
+                    callback(new Error('Cannot divide by zero'), null);
+                } else {
+                    callback(null, a / b);
+                }
+            }
+
+            divideNumbers(a, b, (error, result) => {
+                if (error) {
+                    addOutput('output-error', `❌ Error: ${error.message}`);
+                    return;
+                }
+                addOutput('output-error', `✅ Result: ${a} / ${b} = ${result}`);
+            });
+        }
+
+        function demoChainedCallbacks() {
+            clearOutput('output-chain');
+
+            function step1(callback) {
+                setTimeout(() => {
+                    addOutput('output-chain', '✓ Step 1 complete');
+                    callback();
+                }, 1000);
+            }
+
+            function step2(callback) {
+                setTimeout(() => {
+                    addOutput('output-chain', '✓ Step 2 complete');
+                    callback();
+                }, 1000);
+            }
+
+            function step3(callback) {
+                setTimeout(() => {
+                    addOutput('output-chain', '✓ Step 3 complete');
+                    callback();
+                }, 1000);
+            }
+
+            addOutput('output-chain', 'Starting sequential operations...');
+
+            step1(() => {
+                step2(() => {
+                    step3(() => {
+                        addOutput('output-chain', '🎉 All steps complete!');
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

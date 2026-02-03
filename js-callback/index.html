@@ -4,782 +4,1001 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript Callbacks Guide</title>
+    <title>JavaScript Callbacks - Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        code,
+        pre {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .gradient-text {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .header {
-            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            color: #2d3748;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .topic {
-            background: #f0f4ff;
-            border-left: 4px solid #4338ca;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .topic:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(67, 56, 202, 0.2);
-        }
-
-        .topic-header {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #4338ca;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .toggle-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-icon.active {
-            transform: rotate(180deg);
-        }
-
-        .topic-content {
-            color: #4a5568;
-            line-height: 1.8;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-        }
-
-        .topic-content.active {
-            max-height: 3000px;
-            margin-top: 15px;
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
         }
 
         .code-block {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
         }
 
-        .code-comment {
-            color: #94a3b8;
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
 
-        .code-string {
-            color: #86efac;
+        .playground-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
         }
 
-        .code-keyword {
-            color: #c084fc;
-        }
-
-        .code-function {
-            color: #60a5fa;
-        }
-
-        .interactive-demo {
-            background: white;
-            border: 2px solid #4338ca;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .demo-title {
-            font-weight: bold;
-            color: #4338ca;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(67, 56, 202, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .output-box {
-            background: #f8fafc;
-            border: 2px dashed #cbd5e0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            min-height: 60px;
-            font-family: 'Courier New', monospace;
-            color: #2d3748;
-        }
-
-        .output-line {
-            padding: 5px 0;
-            animation: fadeIn 0.3s ease;
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
+
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
         }
 
-        .highlight {
-            background: #fef3c7;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
+        .stagger-1 {
+            animation-delay: 0.1s;
         }
 
-        .key-point {
-            background: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
+        .stagger-2 {
+            animation-delay: 0.2s;
         }
 
-        .warning-box {
-            background: #fee2e2;
-            border-left: 4px solid #ef4444;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
+        .stagger-3 {
+            animation-delay: 0.3s;
         }
 
-        .success-box {
-            background: #d1fae5;
-            border-left: 4px solid #10b981;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
+        .stagger-4 {
+            animation-delay: 0.4s;
         }
 
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c7c7c7;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+        .interactive-btn {
+            transition: all 0.2s ease;
+        }
+
+        .interactive-btn:active {
+            transform: scale(0.95);
+        }
+
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid #667eea;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0
             }
 
-            .section-title {
-                font-size: 1.5rem;
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink-caret {
+
+            from,
+            to {
+                border-color: transparent
             }
 
-            .content {
-                padding: 20px;
+            50% {
+                border-color: #667eea
             }
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🔄 JavaScript Callbacks</h1>
-            <p>Complete Interactive Guide with Live Examples</p>
+<body class="bg-white text-gray-800 antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 z-50 transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 hero-gradient rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        JS</div>
+                    <span class="font-semibold text-gray-900 text-lg">Callbacks</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#definition"
+                        class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium" target="_self">Definition</a>
+                    <a href="#types"
+                        class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium" target="_self">Types</a>
+                    <a href="#examples"
+                        class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium" target="_self">Examples</a>
+                    <a href="#problems"
+                        class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium" target="_self">Best
+                        Practices</a>
+                </div>
+                <button onclick="scrollToTop()"
+                    class="interactive-btn p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
+    </nav>
 
-        <div class="content">
-            <div class="section">
-                <h2 class="section-title">What is a Callback?</h2>
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center fade-in">
+            <div
+                class="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-sm font-medium mb-6 border border-indigo-100">
+                <span class="w-2 h-2 bg-indigo-600 rounded-full mr-2 animate-pulse"></span>
+                JavaScript Fundamentals
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
+                Understanding <span class="gradient-text">Callbacks</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Master the foundation of asynchronous programming in JavaScript.
+                Learn how callbacks work, when to use them, and how to avoid common pitfalls.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#definition"
+                    class="interactive-btn hero-gradient text-white px-8 py-4 rounded-full font-medium shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all" target="_self">
+                    Start Learning
+                </a>
+                <a href="#playground"
+                    class="interactive-btn bg-gray-100 text-gray-700 px-8 py-4 rounded-full font-medium hover:bg-gray-200 transition-all" target="_self">
+                    Try Interactive Demo
+                </a>
+            </div>
+        </div>
+    </section>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>📖 Definition & Basic Concept</span>
-                        <span class="toggle-icon">▼</span>
+    <!-- Definition Section -->
+    <section id="definition" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="fade-in stagger-1">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">What is a Callback?</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        A callback is a function passed as an argument to another function, executed after an operation
+                        completes.
+                        It's called a "callback" because it gets "called back" at a later time.
+                    </p>
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg mb-6">
+                        <div class="flex items-start">
+                            <svg class="w-6 h-6 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <h3 class="font-semibold text-indigo-900 mb-1">Key Insight</h3>
+                                <p class="text-indigo-800">Callbacks are the foundation of asynchronous programming in
+                                    JavaScript, enabling non-blocking operations.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="topic-content">
-                        <p>A <span class="highlight">callback</span> is a function that is passed as an argument to
-                            another function and is executed after some operation has been completed. It's called a
-                            "callback" because it gets "called back" at a later time.</p>
-
-                        <div class="key-point">
-                            <strong>💡 Key Insight:</strong> Callbacks are the foundation of asynchronous programming in
-                            JavaScript!
-                        </div>
-
-                        <div class="code-block">
-                            <span class="code-comment">// Basic callback example</span>
-                            <span class="code-keyword">function</span> <span class="code-function">greet</span>(name,
-                            callback) {
-                            console.log(<span class="code-string">'Hello '</span> + name);
-                            callback(); <span class="code-comment">// Execute the callback function</span>
-                            }
-
-                            <span class="code-keyword">function</span> <span class="code-function">sayGoodbye</span>() {
-                            console.log(<span class="code-string">'Goodbye!'</span>);
-                            }
-
-                            greet(<span class="code-string">'John'</span>, sayGoodbye);
-                            <span class="code-comment">// Output: Hello John
-                                // Output: Goodbye!</span>
-                        </div>
-
-                        <div class="interactive-demo">
-                            <div class="demo-title">🎮 Try It Yourself:</div>
-                            <button class="btn" onclick="demoBasicCallback()">Run Basic Callback</button>
-                            <div class="output-box" id="output-basic"></div>
-                        </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span
+                            class="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-gray-200">Asynchronous</span>
+                        <span
+                            class="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-gray-200">Non-blocking</span>
+                        <span
+                            class="px-3 py-1 bg-white rounded-full text-sm text-gray-600 border border-gray-200">Higher-order
+                            Functions</span>
                     </div>
                 </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>🎯 Why Do We Need Callbacks?</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>JavaScript is <span class="highlight">asynchronous</span> and <span
-                                class="highlight">non-blocking</span>, meaning it doesn't wait for long operations to
-                            complete before moving to the next line of code.</p>
-
-                        <div class="key-point">
-                            <strong>📌 Use Cases:</strong>
-                            <ul style="margin-top: 10px; margin-left: 20px;">
-                                <li>Handling API responses</li>
-                                <li>Reading/writing files</li>
-                                <li>Database operations</li>
-                                <li>Event handling</li>
-                                <li>Timer functions</li>
-                            </ul>
+                <div class="fade-in stagger-2">
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover">
+                        <div class="bg-gray-900 px-4 py-3 flex items-center space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-2 text-gray-400 text-sm">example.js</span>
                         </div>
+                        <div class="p-6 bg-gray-900">
+                            <pre class="language-javascript text-sm"><code>function greet(name, callback) {
+  console.log('Hello ' + name);
+  callback();
+}
 
-                        <div class="code-block">
-                            <span class="code-comment">// Without callbacks - code doesn't wait</span>
-                            console.log(<span class="code-string">'Start'</span>);
+function sayGoodbye() {
+  console.log('Goodbye!');
+}
 
-                            setTimeout(() => {
-                            console.log(<span class="code-string">'This runs after 2 seconds'</span>);
-                            }, 2000);
-
-                            console.log(<span class="code-string">'End'</span>);
-
-                            <span class="code-comment">// Output:
-                                // Start
-                                // End
-                                // This runs after 2 seconds (after delay)</span>
+// Execute
+greet('John', sayGoodbye);</code></pre>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t border-gray-100">
+                            <button onclick="runBasicExample()"
+                                class="interactive-btn w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Run Code
+                            </button>
+                            <div id="basic-output"
+                                class="mt-3 p-3 bg-gray-900 rounded text-green-400 text-sm font-mono hidden"></div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="section">
-                <h2 class="section-title">Types of Callbacks</h2>
+    <!-- Async Nature -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">JavaScript is Asynchronous</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">JavaScript doesn't wait for long operations to complete
+                    before moving to the next line of code.</p>
+            </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>⚡ Synchronous Callbacks</span>
-                        <span class="toggle-icon">▼</span>
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="fade-in stagger-1 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm card-hover">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01">
+                            </path>
+                        </svg>
                     </div>
-                    <div class="topic-content">
-                        <p>Synchronous callbacks are executed immediately within the function they're passed to.</p>
-
-                        <div class="code-block">
-                            <span class="code-comment">// Array methods use synchronous callbacks</span>
-                            <span class="code-keyword">const</span> numbers = [1, 2, 3, 4, 5];
-
-                            numbers.forEach((num) => {
-                            console.log(num * 2);
-                            });
-                            <span class="code-comment">// Output: 2, 4, 6, 8, 10 (immediately)</span>
-
-                            <span class="code-keyword">const</span> doubled = numbers.map((num) => num * 2);
-                            console.log(doubled); <span class="code-comment">// [2, 4, 6, 8, 10]</span>
-
-                            <span class="code-keyword">const</span> evens = numbers.filter((num) => num % 2 === 0);
-                            console.log(evens); <span class="code-comment">// [2, 4]</span>
-                        </div>
-
-                        <div class="interactive-demo">
-                            <div class="demo-title">🎮 Try Synchronous Callbacks:</div>
-                            <button class="btn" onclick="demoSyncCallback()">Run Array Methods</button>
-                            <div class="output-box" id="output-sync"></div>
-                        </div>
-                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">API Responses</h3>
+                    <p class="text-gray-600 text-sm">Handle data fetching without freezing the UI</p>
                 </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>⏱️ Asynchronous Callbacks</span>
-                        <span class="toggle-icon">▼</span>
+                <div class="fade-in stagger-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm card-hover">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
                     </div>
-                    <div class="topic-content">
-                        <p>Asynchronous callbacks are executed later, after an asynchronous operation completes.</p>
+                    <h3 class="font-semibold text-gray-900 mb-2">File Operations</h3>
+                    <p class="text-gray-600 text-sm">Read/write files efficiently in Node.js</p>
+                </div>
+                <div class="fade-in stagger-3 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm card-hover">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Timers & Events</h3>
+                    <p class="text-gray-600 text-sm">Schedule code execution and handle user interactions</p>
+                </div>
+            </div>
 
-                        <div class="code-block">
-                            <span class="code-comment">// setTimeout - executes callback after delay</span>
-                            console.log(<span class="code-string">'Start'</span>);
+            <div class="fade-in stagger-4 max-w-3xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-900">Async Execution Flow</h3>
+                        <button onclick="runAsyncDemo()"
+                            class="interactive-btn text-indigo-600 hover:text-indigo-700 font-medium text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                </path>
+                            </svg>
+                            Run Demo
+                        </button>
+                    </div>
+                    <div class="p-6 bg-gray-900">
+                        <pre class="language-javascript text-sm mb-4"><code>console.log('Start');
 
-                            setTimeout(() => {
-                            console.log(<span class="code-string">'Callback executed after 2 seconds'</span>);
-                            }, 2000);
+setTimeout(() => {
+  console.log('This runs after 2 seconds');
+}, 2000);
 
-                            console.log(<span class="code-string">'End'</span>);
-
-                            <span class="code-comment">// Simulating API call</span>
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">fetchUserData</span>(userId, callback) {
-                            setTimeout(() => {
-                            <span class="code-keyword">const</span> user = { id: userId, name: <span
-                                class="code-string">'John Doe'</span> };
-                            callback(user);
-                            }, 1000);
-                            }
-
-                            fetchUserData(123, (user) => {
-                            console.log(<span class="code-string">'User:'</span>, user);
-                            });
-                        </div>
-
-                        <div class="interactive-demo">
-                            <div class="demo-title">🎮 Try Asynchronous Callbacks:</div>
-                            <button class="btn" onclick="demoAsyncCallback()">Run Async Example</button>
-                            <button class="btn" onclick="demoFetchUser()">Fetch User Data</button>
-                            <div class="output-box" id="output-async"></div>
+console.log('End');</code></pre>
+                        <div id="async-flow-output" class="space-y-2 font-mono text-sm">
+                            <div class="text-gray-500 italic">Click "Run Demo" to see execution order...</div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="section">
-                <h2 class="section-title">Real-World Examples</h2>
+    <!-- Types of Callbacks -->
+    <section id="types" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Types of Callbacks</h2>
+                <p class="text-gray-600">Understanding the difference between synchronous and asynchronous execution</p>
+            </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>🎪 Event Listeners</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Event listeners use callbacks to handle user interactions.</p>
-
-                        <div class="code-block">
-                            <span class="code-comment">// Button click event</span>
-                            button.addEventListener(<span class="code-string">'click'</span>, <span
-                                class="code-keyword">function</span>() {
-                            console.log(<span class="code-string">'Button clicked!'</span>);
-                            });
-
-                            <span class="code-comment">// Using arrow function</span>
-                            button.addEventListener(<span class="code-string">'click'</span>, () => {
-                            console.log(<span class="code-string">'Button clicked with arrow function!'</span>);
-                            });
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Synchronous -->
+                <div class="fade-in stagger-1 bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Synchronous</h3>
+                            <span
+                                class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Immediate</span>
                         </div>
+                        <p class="text-gray-600 text-sm mb-4">Executed immediately within the function they're passed
+                            to. Common in array methods.</p>
+                    </div>
+                    <div class="p-6 bg-gray-900">
+                        <pre class="language-javascript text-sm"><code>const numbers = [1, 2, 3, 4, 5];
 
-                        <div class="interactive-demo">
-                            <div class="demo-title">🎮 Try Event Callback:</div>
-                            <button class="btn" onclick="demoEventCallback(this)">Click Me!</button>
-                            <div class="output-box" id="output-event"></div>
+// forEach
+numbers.forEach((num) => {
+  console.log(num * 2);
+});
+
+// map
+const doubled = numbers.map((num) => num * 2);
+
+// filter
+const evens = numbers.filter((num) => num % 2 === 0);</code></pre>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <button onclick="runSyncExample()"
+                            class="interactive-btn w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                </path>
+                            </svg>
+                            Try Synchronous
+                        </button>
+                        <div id="sync-output"
+                            class="mt-4 p-3 bg-white rounded border border-gray-200 text-sm font-mono hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Asynchronous -->
+                <div class="fade-in stagger-2 bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Asynchronous</h3>
+                            <span
+                                class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">Deferred</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">Executed later, after an asynchronous operation completes.
+                            Used for timers, APIs, and I/O.</p>
+                    </div>
+                    <div class="p-6 bg-gray-900">
+                        <pre class="language-javascript text-sm"><code>console.log('Start');
+
+setTimeout(() => {
+  console.log('Callback after 2s');
+}, 2000);
+
+console.log('End');
+
+// Simulating API call
+function fetchUserData(userId, callback) {
+  setTimeout(() => {
+    const user = { id: userId, name: 'John' };
+    callback(user);
+  }, 1000);
+}</code></pre>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <button onclick="runAsyncExample()"
+                            class="interactive-btn w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                </path>
+                            </svg>
+                            Try Asynchronous
+                        </button>
+                        <div id="async-output"
+                            class="mt-4 p-3 bg-white rounded border border-gray-200 text-sm font-mono hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Real World Examples -->
+    <section id="examples" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Real-World Examples</h2>
+                <p class="text-gray-600">Practical implementations you'll encounter in production code</p>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Event Listeners -->
+                <div class="fade-in stagger-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="grid md:grid-cols-2 gap-0">
+                        <div class="p-8">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">Event Listeners</h3>
+                            </div>
+                            <p class="text-gray-600 mb-6">Handle user interactions by passing callback functions to
+                                event listeners.</p>
+
+                            <div class="space-y-3">
+                                <div id="demo-button-container"
+                                    class="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center">
+                                    <button id="demo-btn"
+                                        class="interactive-btn bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                                        Click Me!
+                                    </button>
+                                </div>
+                                <div id="event-output"
+                                    class="p-3 bg-gray-900 rounded text-green-400 text-sm font-mono h-20 overflow-y-auto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-900 p-8 flex flex-col justify-center">
+                            <pre class="language-javascript text-sm"><code>// Traditional function
+button.addEventListener('click', function() {
+  console.log('Button clicked!');
+});
+
+// Arrow function (modern)
+button.addEventListener('click', () => {
+  console.log('Clicked with arrow!');
+});</code></pre>
                         </div>
                     </div>
                 </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>📝 Error-First Callbacks (Node.js Convention)</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Node.js follows a convention where the first parameter of a callback is always an error
-                            object.</p>
+                <!-- Error-First Callback -->
+                <div class="fade-in stagger-2 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="grid md:grid-cols-2 gap-0">
+                        <div class="p-8">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">Error-First Convention</h3>
+                            </div>
+                            <p class="text-gray-600 mb-6">Node.js standard: first parameter is always an error object
+                                (if any), second is the data.</p>
 
-                        <div class="code-block">
-                            <span class="code-comment">// File reading example (Node.js)</span>
-                            fs.readFile(<span class="code-string">'file.txt'</span>, <span
-                                class="code-string">'utf8'</span>, (error, data) => {
-                            <span class="code-keyword">if</span> (error) {
-                            console.error(<span class="code-string">'Error reading file:'</span>, error);
-                            <span class="code-keyword">return</span>;
-                            }
-                            console.log(<span class="code-string">'File contents:'</span>, data);
-                            });
-
-                            <span class="code-comment">// Custom error-first callback</span>
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">divideNumbers</span>(a, b, callback) {
-                            <span class="code-keyword">if</span> (b === 0) {
-                            callback(<span class="code-keyword">new</span> Error(<span class="code-string">'Cannot
-                                divide by zero'</span>), <span class="code-keyword">null</span>);
-                            } <span class="code-keyword">else</span> {
-                            callback(<span class="code-keyword">null</span>, a / b);
-                            }
-                            }
-
-                            divideNumbers(10, 2, (error, result) => {
-                            <span class="code-keyword">if</span> (error) {
-                            console.error(<span class="code-string">'Error:'</span>, error.message);
-                            <span class="code-keyword">return</span>;
-                            }
-                            console.log(<span class="code-string">'Result:'</span>, result);
-                            });
+                            <div class="space-y-3">
+                                <div class="flex gap-2">
+                                    <button onclick="runErrorExample(true)"
+                                        class="interactive-btn flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700">
+                                        Success Case
+                                    </button>
+                                    <button onclick="runErrorExample(false)"
+                                        class="interactive-btn flex-1 bg-red-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-700">
+                                        Error Case
+                                    </button>
+                                </div>
+                                <div id="error-output"
+                                    class="p-3 bg-gray-900 rounded text-sm font-mono h-24 overflow-y-auto"></div>
+                            </div>
                         </div>
+                        <div class="bg-gray-900 p-8 flex flex-col justify-center">
+                            <pre class="language-javascript text-sm"><code>function divideNumbers(a, b, callback) {
+  if (b === 0) {
+    callback(new Error('Cannot divide by zero'), null);
+  } else {
+    callback(null, a / b);
+  }
+}
 
-                        <div class="interactive-demo">
-                            <div class="demo-title">🎮 Try Error-First Callback:</div>
-                            <button class="btn" onclick="demoDivide(10, 2)">Divide 10 / 2</button>
-                            <button class="btn" onclick="demoDivide(10, 0)">Divide 10 / 0 (Error)</button>
-                            <div class="output-box" id="output-error"></div>
+divideNumbers(10, 2, (err, result) => {
+  if (err) {
+    console.error('Error:', err.message);
+    return;
+  }
+  console.log('Result:', result);
+});</code></pre>
                         </div>
                     </div>
                 </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>🔗 Chaining Callbacks</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Multiple callbacks can be chained to perform sequential operations.</p>
+                <!-- Callback Chaining -->
+                <div class="fade-in stagger-3 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="p-8">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900">Callback Chaining</h3>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded font-medium">Callback
+                                Hell</span>
+                        </div>
+                        <p class="text-gray-600 mb-6">Sequential operations using nested callbacks. This pattern can
+                            lead to deeply nested code.</p>
 
-                        <div class="code-block">
-                            <span class="code-comment">// Sequential operations with callbacks</span>
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">step1</span>(callback) {
-                            setTimeout(() => {
-                            console.log(<span class="code-string">'Step 1 complete'</span>);
-                            callback();
-                            }, 1000);
-                            }
-
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">step2</span>(callback) {
-                            setTimeout(() => {
-                            console.log(<span class="code-string">'Step 2 complete'</span>);
-                            callback();
-                            }, 1000);
-                            }
-
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">step3</span>(callback) {
-                            setTimeout(() => {
-                            console.log(<span class="code-string">'Step 3 complete'</span>);
-                            callback();
-                            }, 1000);
-                            }
-
-                            <span class="code-comment">// Executing in sequence</span>
-                            step1(() => {
-                            step2(() => {
-                            step3(() => {
-                            console.log(<span class="code-string">'All steps complete!'</span>);
-                            });
-                            });
-                            });
+                        <div class="bg-gray-50 p-4 rounded-xl mb-4">
+                            <button onclick="runChainExample()" id="chain-btn"
+                                class="interactive-btn w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                    </path>
+                                </svg>
+                                Run Chained Operations
+                            </button>
+                            <div id="chain-steps" class="mt-4 space-y-2 hidden">
+                                <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-50"
+                                    id="step-1">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
+                                        1</div>
+                                    <span class="text-gray-700">Step 1: Fetching data...</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-50"
+                                    id="step-2">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
+                                        2</div>
+                                    <span class="text-gray-700">Step 2: Processing...</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-50"
+                                    id="step-3">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
+                                        3</div>
+                                    <span class="text-gray-700">Step 3: Saving...</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="interactive-demo">
-                            <div class="demo-title">🎮 Try Chained Callbacks:</div>
-                            <button class="btn" onclick="demoChainedCallbacks()">Run Sequential Steps</button>
-                            <div class="output-box" id="output-chain"></div>
+                        <div class="bg-gray-900 rounded-xl overflow-hidden">
+                            <pre class="language-javascript text-sm p-4"><code>step1(() => {
+  step2(() => {
+    step3(() => {
+      console.log('All steps complete!');
+    });
+  });
+});</code></pre>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="section">
-                <h2 class="section-title">Common Problems & Solutions</h2>
+    <!-- Problems & Solutions -->
+    <section id="problems" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Common Problems & Solutions</h2>
+                <p class="text-gray-600">Best practices to write clean, maintainable callback-based code</p>
+            </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>⚠️ Callback Hell (Pyramid of Doom)</span>
-                        <span class="toggle-icon">▼</span>
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <!-- The Problem -->
+                <div class="fade-in stagger-1 bg-red-50 rounded-2xl p-8 border border-red-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-red-900">Callback Hell</h3>
                     </div>
-                    <div class="topic-content">
-                        <p>When you have multiple nested callbacks, code becomes hard to read and maintain.</p>
-
-                        <div class="warning-box">
-                            <strong>❌ Problem:</strong> Deeply nested callbacks create unreadable code
-                        </div>
-
-                        <div class="code-block">
-                            <span class="code-comment">// Callback Hell Example</span>
-                            getData((data1) => {
-                            processData(data1, (data2) => {
-                            saveData(data2, (data3) => {
-                            sendEmail(data3, (result) => {
-                            updateUI(result, (finalResult) => {
-                            console.log(<span class="code-string">'Done!'</span>);
-                            });
-                            });
-                            });
-                            });
-                            });
-                        </div>
-
-                        <div class="success-box">
-                            <strong>✅ Solutions:</strong>
-                            <ul style="margin-top: 10px; margin-left: 20px;">
-                                <li><strong>Use Promises:</strong> Modern way to handle async operations</li>
-                                <li><strong>Use Async/Await:</strong> Even cleaner syntax built on promises</li>
-                                <li><strong>Named Functions:</strong> Instead of anonymous functions</li>
-                                <li><strong>Modularize Code:</strong> Break into smaller functions</li>
-                            </ul>
-                        </div>
-
-                        <div class="code-block">
-                            <span class="code-comment">// Solution: Named functions</span>
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">handleData1</span>(data1) {
-                            processData(data1, handleData2);
-                            }
-
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">handleData2</span>(data2) {
-                            saveData(data2, handleData3);
-                            }
-
-                            <span class="code-keyword">function</span> <span
-                                class="code-function">handleData3</span>(data3) {
-                            sendEmail(data3, handleResult);
-                            }
-
-                            getData(handleData1);
-                        </div>
+                    <p class="text-red-800 mb-4 text-sm">Deeply nested callbacks create unreadable, hard-to-maintain
+                        code.</p>
+                    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                        <pre class="language-javascript text-xs text-gray-300"><code>getData((data1) => {
+  processData(data1, (data2) => {
+    saveData(data2, (data3) => {
+      sendEmail(data3, (result) => {
+        // Too deep!
+      });
+    });
+  });
+});</code></pre>
                     </div>
                 </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>💡 Best Practices</span>
-                        <span class="toggle-icon">▼</span>
+                <!-- The Solution -->
+                <div class="fade-in stagger-2 bg-green-50 rounded-2xl p-8 border border-green-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-green-900">Named Functions</h3>
                     </div>
-                    <div class="topic-content">
-                        <div class="key-point">
-                            <strong>✅ Do's:</strong>
-                            <ul style="margin-top: 10px; margin-left: 20px;">
-                                <li>Always handle errors in callbacks</li>
-                                <li>Keep callbacks short and focused</li>
-                                <li>Use named functions for better readability</li>
-                                <li>Follow error-first convention in Node.js</li>
-                                <li>Consider using Promises or Async/Await for complex async flows</li>
-                            </ul>
-                        </div>
-
-                        <div class="warning-box">
-                            <strong>❌ Don'ts:</strong>
-                            <ul style="margin-top: 10px; margin-left: 20px;">
-                                <li>Don't nest callbacks too deeply</li>
-                                <li>Don't forget to handle errors</li>
-                                <li>Don't use callbacks when Promises are more appropriate</li>
-                                <li>Don't create memory leaks by not cleaning up event listeners</li>
-                            </ul>
-                        </div>
-
-                        <div class="code-block">
-                            <span class="code-comment">// Good: Clean callback with error handling</span>
-                            <span class="code-keyword">function</span> <span class="code-function">fetchData</span>(id,
-                            callback) {
-                            <span class="code-keyword">if</span> (!id) {
-                            <span class="code-keyword">return</span> callback(<span class="code-keyword">new</span>
-                            Error(<span class="code-string">'ID is required'</span>), <span
-                                class="code-keyword">null</span>);
-                            }
-
-                            <span class="code-comment">// Simulate async operation</span>
-                            setTimeout(() => {
-                            <span class="code-keyword">const</span> data = { id: id, name: <span
-                                class="code-string">'Item'</span> };
-                            callback(<span class="code-keyword">null</span>, data);
-                            }, 1000);
-                            }
-
-                            <span class="code-comment">// Usage with proper error handling</span>
-                            fetchData(123, (error, data) => {
-                            <span class="code-keyword">if</span> (error) {
-                            console.error(<span class="code-string">'Error:'</span>, error.message);
-                            <span class="code-keyword">return</span>;
-                            }
-                            console.log(<span class="code-string">'Data:'</span>, data);
-                            });
-                        </div>
+                    <p class="text-green-800 mb-4 text-sm">Break into smaller, named functions for better readability.
+                    </p>
+                    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                        <pre class="language-javascript text-xs text-gray-300"><code>function handleData1(data1) {
+  processData(data1, handleData2);
+}
+function handleData2(data2) {
+  saveData(data2, handleData3);
+}
+getData(handleData1);</code></pre>
                     </div>
                 </div>
             </div>
 
-            <div class="section">
-                <h2 class="section-title">Key Takeaways</h2>
+            <!-- Modern Alternatives -->
+            <div class="fade-in stagger-3 bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Modern Alternatives</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center p-6 rounded-xl bg-indigo-50 border border-indigo-100 card-hover">
+                        <div
+                            class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
+                            P</div>
+                        <h4 class="font-bold text-gray-900 mb-2">Promises</h4>
+                        <p class="text-sm text-gray-600">Chain async operations with .then() and .catch()</p>
+                    </div>
+                    <div class="text-center p-6 rounded-xl bg-purple-50 border border-purple-100 card-hover">
+                        <div
+                            class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
+                            A</div>
+                        <h4 class="font-bold text-gray-900 mb-2">Async/Await</h4>
+                        <p class="text-sm text-gray-600">Syntactic sugar over Promises for cleaner code</p>
+                    </div>
+                    <div class="text-center p-6 rounded-xl bg-blue-50 border border-blue-100 card-hover">
+                        <div
+                            class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
+                            M</div>
+                        <h4 class="font-bold text-gray-900 mb-2">Modularize</h4>
+                        <p class="text-sm text-gray-600">Break code into smaller, reusable functions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="key-point">
-                    <strong>📚 Summary:</strong>
-                    <ul style="margin-top: 10px; margin-left: 20px;">
-                        <li>✅ Callbacks are functions passed as arguments to other functions</li>
-                        <li>✅ Executed later after some operation completes</li>
-                        <li>✅ Can be synchronous (array methods) or asynchronous (setTimeout, API calls)</li>
-                        <li>✅ Error-first convention is standard in Node.js</li>
-                        <li>✅ Avoid callback hell by using Promises or Async/Await</li>
-                        <li>✅ Always handle errors properly in callbacks</li>
+    <!-- Do's and Don'ts -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="fade-in stagger-1">
+                    <h3 class="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Do's
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
+                            <span class="text-green-600 mt-0.5">✓</span>
+                            <span class="text-gray-700">Always handle errors in callbacks</span>
+                        </li>
+                        <li class="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
+                            <span class="text-green-600 mt-0.5">✓</span>
+                            <span class="text-gray-700">Keep callbacks short and focused</span>
+                        </li>
+                        <li class="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
+                            <span class="text-green-600 mt-0.5">✓</span>
+                            <span class="text-gray-700">Use named functions for better readability</span>
+                        </li>
+                        <li class="flex items-start gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
+                            <span class="text-green-600 mt-0.5">✓</span>
+                            <span class="text-gray-700">Follow error-first convention in Node.js</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="fade-in stagger-2">
+                    <h3 class="text-2xl font-bold text-red-600 mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Don'ts
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
+                            <span class="text-red-600 mt-0.5">✗</span>
+                            <span class="text-gray-700">Don't nest callbacks too deeply (callback hell)</span>
+                        </li>
+                        <li class="flex items-start gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
+                            <span class="text-red-600 mt-0.5">✗</span>
+                            <span class="text-gray-700">Don't forget to handle errors</span>
+                        </li>
+                        <li class="flex items-start gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
+                            <span class="text-red-600 mt-0.5">✗</span>
+                            <span class="text-gray-700">Don't use callbacks when Promises are cleaner</span>
+                        </li>
+                        <li class="flex items-start gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
+                            <span class="text-red-600 mt-0.5">✗</span>
+                            <span class="text-gray-700">Don't create memory leaks with event listeners</span>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Key Takeaways -->
+    <section class="py-20 hero-gradient text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-8">Key Takeaways</h2>
+            <div class="grid md:grid-cols-2 gap-6 text-left">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            1</div>
+                        <p class="text-white/90">Callbacks are functions passed as arguments to other functions</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            2</div>
+                        <p class="text-white/90">Executed later after some operation completes</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            3</div>
+                        <p class="text-white/90">Can be synchronous (array methods) or asynchronous (timers, APIs)</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            4</div>
+                        <p class="text-white/90">Error-first convention is standard in Node.js environment</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                <p class="text-lg font-medium">💡 <span class="font-bold">Pro Tip:</span> For complex async flows,
+                    consider using Promises or Async/Await to avoid callback hell and write more maintainable code.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="mb-4">Built with modern web technologies</p>
+            <div class="flex justify-center gap-4 text-sm">
+                <a href="https://dhruvil05.github.io/js-callback/old-index.html">
+                <span class="px-3 py-1 bg-gray-800 rounded-full">Documentation</span></a>
+                <!-- <span class="px-3 py-1 bg-gray-800 rounded-full">Tailwind CSS</span>
+                <span class="px-3 py-1 bg-gray-800 rounded-full">Vanilla JS</span>
+                <span class="px-3 py-1 bg-gray-800 rounded-full">Prism.js</span> -->
+            </div>
+        </div>
+    </footer>
 
     <script>
-        function toggleTopic(element) {
-            const content = element.querySelector('.topic-content');
-            const icon = element.querySelector('.toggle-icon');
-
-            content.classList.toggle('active');
-            icon.classList.toggle('active');
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function clearOutput(id) {
-            document.getElementById(id).innerHTML = '';
-        }
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
 
-        function addOutput(id, text) {
-            const output = document.getElementById(id);
-            const line = document.createElement('div');
-            line.className = 'output-line';
-            line.textContent = text;
-            output.appendChild(line);
-        }
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        function demoBasicCallback() {
-            clearOutput('output-basic');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Basic Example
+        function runBasicExample() {
+            const output = document.getElementById('basic-output');
+            output.classList.remove('hidden');
+            output.innerHTML = '';
 
             function greet(name, callback) {
-                addOutput('output-basic', `Hello ${name}`);
+                output.innerHTML += `<div>> Hello ${name}</div>`;
                 callback();
             }
 
             function sayGoodbye() {
-                addOutput('output-basic', 'Goodbye!');
+                output.innerHTML += `<div>> Goodbye!</div>`;
             }
 
             greet('John', sayGoodbye);
         }
 
-        function demoSyncCallback() {
-            clearOutput('output-sync');
-            const numbers = [1, 2, 3, 4, 5];
+        // Async Flow Demo
+        function runAsyncDemo() {
+            const output = document.getElementById('async-flow-output');
+            output.innerHTML = '';
 
-            addOutput('output-sync', 'Original array: [1, 2, 3, 4, 5]');
-            addOutput('output-sync', '---');
-
-            const doubled = numbers.map(num => num * 2);
-            addOutput('output-sync', `map(num * 2): [${doubled.join(', ')}]`);
-
-            const evens = numbers.filter(num => num % 2 === 0);
-            addOutput('output-sync', `filter(even numbers): [${evens.join(', ')}]`);
-
-            let sum = 0;
-            numbers.forEach(num => sum += num);
-            addOutput('output-sync', `forEach(sum): ${sum}`);
-        }
-
-        function demoAsyncCallback() {
-            clearOutput('output-async');
-            addOutput('output-async', 'Start');
+            output.innerHTML += `<div class="text-blue-400">> Start</div>`;
 
             setTimeout(() => {
-                addOutput('output-async', 'Callback executed after 2 seconds');
+                output.innerHTML += `<div class="text-yellow-400">> This runs after 2 seconds</div>`;
             }, 2000);
 
-            addOutput('output-async', 'End');
-            addOutput('output-async', '(Wait 2 seconds...)');
+            output.innerHTML += `<div class="text-blue-400">> End</div>`;
+            output.innerHTML += `<div class="text-gray-500 italic mt-2">// Notice: End appears before the timeout!</div>`;
         }
 
-        function demoFetchUser() {
-            clearOutput('output-async');
-            addOutput('output-async', 'Fetching user data...');
+        // Sync Example
+        function runSyncExample() {
+            const output = document.getElementById('sync-output');
+            output.classList.remove('hidden');
 
-            function fetchUserData(userId, callback) {
-                setTimeout(() => {
-                    const user = { id: userId, name: 'John Doe', email: 'john@example.com' };
-                    callback(user);
-                }, 1500);
-            }
+            const numbers = [1, 2, 3, 4, 5];
+            let result = '';
 
-            fetchUserData(123, (user) => {
-                addOutput('output-async', `User ID: ${user.id}`);
-                addOutput('output-async', `Name: ${user.name}`);
-                addOutput('output-async', `Email: ${user.email}`);
+            result += '<div class="text-gray-500 mb-2">// forEach (immediate execution):</div>';
+            numbers.forEach((num) => {
+                result += `<div class="text-blue-600">> ${num} × 2 = ${num * 2}</div>`;
             });
+
+            result += '<div class="text-gray-500 mt-3 mb-2">// map (returns new array):</div>';
+            const doubled = numbers.map((num) => num * 2);
+            result += `<div class="text-green-600">> [${doubled.join(', ')}]</div>`;
+
+            result += '<div class="text-gray-500 mt-3 mb-2">// filter (returns filtered array):</div>';
+            const evens = numbers.filter((num) => num % 2 === 0);
+            result += `<div class="text-purple-600">> [${evens.join(', ')}]</div>`;
+
+            output.innerHTML = result;
         }
 
-        function demoEventCallback(button) {
-            clearOutput('output-event');
-            addOutput('output-event', `Button clicked at ${new Date().toLocaleTimeString()}`);
-            addOutput('output-event', 'Event callback executed successfully!');
+        // Async Example
+        function runAsyncExample() {
+            const output = document.getElementById('async-output');
+            output.classList.remove('hidden');
+            output.innerHTML = '<div class="text-blue-400">> Start</div>';
+
+            setTimeout(() => {
+                output.innerHTML += '<div class="text-yellow-400">> Callback executed after 2 seconds</div>';
+            }, 2000);
+
+            output.innerHTML += '<div class="text-blue-400">> End</div>';
+
+            // Simulate API call
+            setTimeout(() => {
+                output.innerHTML += '<div class="text-gray-500 mt-2">// Simulating API call...</div>';
+                function fetchUserData(userId, callback) {
+                    setTimeout(() => {
+                        const user = { id: userId, name: 'John Doe' };
+                        callback(user);
+                    }, 1000);
+                }
+
+                fetchUserData(123, (user) => {
+                    output.innerHTML += `<div class="text-green-400">> User: { id: ${user.id}, name: "${user.name}" }</div>`;
+                });
+            }, 2500);
         }
 
-        function demoDivide(a, b) {
-            clearOutput('output-error');
+        // Event Listener Demo
+        const demoBtn = document.getElementById('demo-btn');
+        const eventOutput = document.getElementById('event-output');
+        let clickCount = 0;
+
+        demoBtn.addEventListener('click', function () {
+            clickCount++;
+            const timestamp = new Date().toLocaleTimeString();
+            eventOutput.innerHTML += `<div>> Button clicked! (${clickCount}x) at ${timestamp}</div>`;
+            eventOutput.scrollTop = eventOutput.scrollHeight;
+
+            // Visual feedback
+            demoBtn.classList.add('scale-95');
+            setTimeout(() => demoBtn.classList.remove('scale-95'), 100);
+        });
+
+        // Error Example
+        function runErrorExample(shouldSucceed) {
+            const output = document.getElementById('error-output');
+            output.innerHTML = '';
 
             function divideNumbers(a, b, callback) {
                 if (b === 0) {
@@ -789,49 +1008,94 @@
                 }
             }
 
-            divideNumbers(a, b, (error, result) => {
-                if (error) {
-                    addOutput('output-error', `❌ Error: ${error.message}`);
-                    return;
-                }
-                addOutput('output-error', `✅ Result: ${a} / ${b} = ${result}`);
-            });
+            if (shouldSucceed) {
+                divideNumbers(10, 2, (error, result) => {
+                    if (error) {
+                        output.innerHTML += `<div class="text-red-400">> Error: ${error.message}</div>`;
+                        return;
+                    }
+                    output.innerHTML += `<div class="text-green-400">> Success! Result: ${result}</div>`;
+                });
+            } else {
+                divideNumbers(10, 0, (error, result) => {
+                    if (error) {
+                        output.innerHTML += `<div class="text-red-400">> Error: ${error.message}</div>`;
+                        return;
+                    }
+                    output.innerHTML += `<div class="text-green-400">> Success! Result: ${result}</div>`;
+                });
+            }
         }
 
-        function demoChainedCallbacks() {
-            clearOutput('output-chain');
+        // Chain Example
+        function runChainExample() {
+            const btn = document.getElementById('chain-btn');
+            const stepsContainer = document.getElementById('chain-steps');
+            const step1 = document.getElementById('step-1');
+            const step2 = document.getElementById('step-2');
+            const step3 = document.getElementById('step-3');
 
-            function step1(callback) {
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Running...';
+
+            stepsContainer.classList.remove('hidden');
+
+            function step1fn(callback) {
                 setTimeout(() => {
-                    addOutput('output-chain', '✓ Step 1 complete');
+                    step1.classList.remove('opacity-50');
+                    step1.querySelector('div').classList.add('bg-green-500', 'text-white');
+                    step1.querySelector('span').textContent = 'Step 1: Data fetched successfully';
                     callback();
                 }, 1000);
             }
 
-            function step2(callback) {
+            function step2fn(callback) {
                 setTimeout(() => {
-                    addOutput('output-chain', '✓ Step 2 complete');
+                    step2.classList.remove('opacity-50');
+                    step2.querySelector('div').classList.add('bg-green-500', 'text-white');
+                    step2.querySelector('span').textContent = 'Step 2: Processing complete';
                     callback();
                 }, 1000);
             }
 
-            function step3(callback) {
+            function step3fn(callback) {
                 setTimeout(() => {
-                    addOutput('output-chain', '✓ Step 3 complete');
+                    step3.classList.remove('opacity-50');
+                    step3.querySelector('div').classList.add('bg-green-500', 'text-white');
+                    step3.querySelector('span').textContent = 'Step 3: Saved to database';
                     callback();
                 }, 1000);
             }
 
-            addOutput('output-chain', 'Starting sequential operations...');
-
-            step1(() => {
-                step2(() => {
-                    step3(() => {
-                        addOutput('output-chain', '🎉 All steps complete!');
+            step1fn(() => {
+                step2fn(() => {
+                    step3fn(() => {
+                        setTimeout(() => {
+                            btn.innerHTML = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Steps Complete!';
+                            btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                            btn.classList.add('bg-green-600');
+                            setTimeout(() => {
+                                btn.disabled = false;
+                                btn.innerHTML = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg> Run Chained Operations';
+                                btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                                btn.classList.remove('bg-green-600');
+                                stepsContainer.classList.add('hidden');
+                                [step1, step2, step3].forEach(step => {
+                                    step.classList.add('opacity-50');
+                                    step.querySelector('div').classList.remove('bg-green-500', 'text-white');
+                                });
+                                step1.querySelector('span').textContent = 'Step 1: Fetching data...';
+                                step2.querySelector('span').textContent = 'Step 2: Processing...';
+                                step3.querySelector('span').textContent = 'Step 3: Saving...';
+                            }, 2000);
+                        }, 500);
                     });
                 });
             });
         }
+
+        // Initialize Prism
+        Prism.highlightAll();
     </script>
 </body>
 
