@@ -1,398 +1,1063 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Node.js Basics Guide</title>
+    <title>Node.js Field Guide // Core Concepts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        mono: ['IBM Plex Mono', 'monospace'],
+                    },
+                    colors: {
+                        'neon-green': '#00ff41',
+                        'neon-purple': '#bc13fe',
+                        'neon-cyan': '#00f3ff',
+                        'dark-bg': '#0a0a0a',
+                        'panel': '#111111',
+                        'panel-hover': '#1a1a1a',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #00ff41, 0 0 10px #00ff41' },
+                            '100%': { boxShadow: '0 0 20px #00ff41, 0 0 30px #00ff41' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #0a0a0a;
+            background-image:
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+        .glass-panel {
+            background: rgba(17, 17, 17, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .header {
-            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+        .code-window {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .syntax-keyword {
+            color: #ff00ff;
         }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .syntax-string {
+            color: #00ff41;
         }
 
-        .content {
-            padding: 40px;
+        .syntax-function {
+            color: #00f3ff;
         }
 
-        .section {
-            margin-bottom: 40px;
+        .syntax-comment {
+            color: #666;
+            font-style: italic;
         }
 
-        .section-title {
-            font-size: 2rem;
-            color: #2d3748;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+        .syntax-number {
+            color: #ffaa00;
         }
 
-        .topic {
-            background: #f7fafc;
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
+        .glitch-text {
+            position: relative;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 #00ff41;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(31px, 9999px, 94px, 0);
+            }
+
+            20% {
+                clip: rect(78px, 9999px, 20px, 0);
+            }
+
+            40% {
+                clip: rect(12px, 9999px, 6px, 0);
+            }
+
+            60% {
+                clip: rect(89px, 9999px, 54px, 0);
+            }
+
+            80% {
+                clip: rect(23px, 9999px, 76px, 0);
+            }
+
+            100% {
+                clip: rect(67px, 9999px, 32px, 0);
+            }
+        }
+
+        @keyframes glitch-anim2 {
+            0% {
+                clip: rect(65px, 9999px, 99px, 0);
+            }
+
+            20% {
+                clip: rect(12px, 9999px, 43px, 0);
+            }
+
+            40% {
+                clip: rect(87px, 9999px, 12px, 0);
+            }
+
+            60% {
+                clip: rect(23px, 9999px, 67px, 0);
+            }
+
+            80% {
+                clip: rect(45px, 9999px, 34px, 0);
+            }
+
+            100% {
+                clip: rect(12px, 9999px, 89px, 0);
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    transparent 50%,
+                    rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.3;
+        }
+
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            border-color: #00ff41;
+        }
+
+        .tab-active {
+            background: #00ff41;
+            color: #000;
+        }
+
+        .corner-brackets {
+            position: relative;
+        }
+
+        .corner-brackets::before,
+        .corner-brackets::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ff41;
             transition: all 0.3s ease;
-            cursor: pointer;
         }
 
-        .topic:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        .corner-brackets::before {
+            top: -2px;
+            left: -2px;
+            border-right: 0;
+            border-bottom: 0;
         }
 
-        .topic-header {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #4c51bf;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .corner-brackets::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: 0;
+            border-top: 0;
         }
 
-        .toggle-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-icon.active {
-            transform: rotate(180deg);
-        }
-
-        .topic-content {
-            color: #4a5568;
-            line-height: 1.8;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-        }
-
-        .topic-content.active {
-            max-height: 1000px;
-            margin-top: 15px;
-        }
-
-        .topic-content p {
-            margin-bottom: 10px;
-        }
-
-        .method-list {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .method {
-            font-family: 'Courier New', monospace;
-            background: #edf2f7;
-            padding: 5px 10px;
-            margin: 5px 0;
-            border-radius: 4px;
-            display: inline-block;
-            font-size: 0.9rem;
-            color: #2d3748;
-        }
-
-        .badge {
-            background: #667eea;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
-            }
-
-            .topic-header {
-                font-size: 1.1rem;
-            }
-
-            .content {
-                padding: 20px;
-            }
+        .corner-brackets:hover::before,
+        .corner-brackets:hover::after {
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📚 Understanding Node.js Basics</h1>
-            <p>Complete guide to JavaScript fundamentals and core Node.js concepts</p>
+<body class="text-gray-300 font-sans antialiased overflow-x-hidden">
+
+    <!-- CRT Scanline Effect -->
+    <div class="scanline"></div>
+
+    <!-- Floating Navigation -->
+    <nav class="fixed top-6 left-1/2 transform -translate-x-1/2 z-40 w-[95%] max-w-6xl">
+        <div class="glass-panel rounded-full px-6 py-3 flex items-center justify-between border border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-neon-green animate-pulse"></div>
+                <span class="font-mono text-sm text-white tracking-widest">NODE_FIELD_GUIDE_v2.0</span>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-sm font-mono">
+                <a href="#syntax" class="hover:text-neon-green transition-colors" target="_self">[SYNTAX]</a>
+                <a href="#architecture" class="hover:text-neon-green transition-colors" target="_self">[ARCH]</a>
+                <a href="#async" class="hover:text-neon-green transition-colors" target="_self">[ASYNC]</a>
+                <a href="#system" class="hover:text-neon-green transition-colors" target="_self">[SYSTEM]</a>
+            </div>
+            <button onclick="toggleTheme()" class="md:hidden text-neon-green font-mono text-sm">[MENU]</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="min-h-screen flex items-center justify-center relative pt-20">
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-neon-green/5 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-purple/5 rounded-full blur-3xl animate-float"
+                style="animation-delay: 2s;"></div>
         </div>
 
-        <div class="content">
-            <div class="section">
-                <h2 class="section-title">JavaScript Fundamentals (ES6+ Features)</h2>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>let/const, arrow functions, template literals</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Modern variable declarations where <span class="method">let</span> allows reassignment and
-                            <span class="method">const</span> creates immutable bindings.</p>
-                        <p>Arrow functions <span class="method">() => {}</span> provide concise syntax and lexical this
-                            binding.</p>
-                        <p>Template literals use backticks for string interpolation: <span class="method">`Hello
-                                ${name}`</span></p>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Destructuring, Rest/Spread Operators</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Destructuring extracts values from objects and arrays efficiently.</p>
-                        <div class="method-list">
-                            <div class="method">const {name, age} = user</div>
-                            <div class="method">const [first, second] = array</div>
-                        </div>
-                        <p>Spread operator expands arrays/objects: <span class="method">[...arr1, ...arr2]</span></p>
-                        <p>Rest operator collects remaining elements: <span class="method">function sum(...numbers)
-                                {}</span></p>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Promises and Async/Await</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Promises handle asynchronous operations with chainable methods.</p>
-                        <div class="method-list">
-                            <div class="method">.then()</div>
-                            <div class="method">.catch()</div>
-                            <div class="method">.finally()</div>
-                            <div class="method">Promise.all()</div>
-                            <div class="method">Promise.race()</div>
-                            <div class="method">Promise.resolve()</div>
-                            <div class="method">Promise.reject()</div>
-                        </div>
-                        <p>Async/await provides synchronous-looking async code: <span class="method">await
-                                fetch(url)</span></p>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Modules: CommonJS (require) vs ES Modules (import)</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p><strong>CommonJS:</strong></p>
-                        <div class="method-list">
-                            <div class="method">const module = require('module')</div>
-                            <div class="method">module.exports = {}</div>
-                        </div>
-                        <p><strong>ES Modules:</strong></p>
-                        <div class="method-list">
-                            <div class="method">import { func } from 'module'</div>
-                            <div class="method">export default</div>
-                            <div class="method">export const</div>
-                        </div>
-                        <p>ES modules are static and support tree-shaking for optimization.</p>
-                    </div>
-                </div>
+        <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
+            <div class="inline-block mb-6 px-4 py-2 border border-neon-green/30 rounded-full bg-neon-green/5">
+                <span class="font-mono text-xs text-neon-green tracking-widest">RUNTIME_ENVIRONMENT::ACTIVE</span>
             </div>
 
-            <div class="section">
-                <h2 class="section-title">Core Node.js Concepts</h2>
+            <h1 class="text-6xl md:text-8xl font-bold text-white mb-6 glitch-text" data-text="NODE.js">
+                NODE.js
+            </h1>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Event Loop & Async Programming</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Node.js runs on a single-threaded event loop that handles async operations efficiently.</p>
-                        <p><strong>Phases:</strong> timers, pending callbacks, poll, check, close callbacks</p>
-                        <div class="method-list">
-                            <div class="method">process.nextTick()</div>
-                            <div class="method">setImmediate()</div>
-                            <div class="method">setTimeout()</div>
-                        </div>
-                    </div>
+            <p class="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+                JavaScript unshackled from the browser.
+                <span class="text-neon-green">Event-driven.</span>
+                <span class="text-neon-cyan">Non-blocking.</span>
+                <span class="text-neon-purple">Server-side.</span>
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center font-mono text-sm">
+                <a href="#syntax"
+                    class="group relative px-8 py-4 bg-neon-green text-black font-bold rounded hover:bg-white transition-all duration-300 hover:scale-105" target="_self">
+                    INITIALIZE_LEARNING
+                    <span
+                        class="absolute inset-0 border-2 border-neon-green rounded opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"></span>
+                </a>
+                <a href="https://nodejs.org" target="_blank"
+                    class="px-8 py-4 border border-gray-600 text-gray-400 rounded hover:border-neon-green hover:text-neon-green transition-all duration-300">
+                    DOWNLOAD_RUNTIME →
+                </a>
+            </div>
+
+            <!-- Terminal Window Decoration -->
+            <div
+                class="mt-16 mx-auto max-w-2xl code-window rounded-lg overflow-hidden text-left font-mono text-sm opacity-80 hover:opacity-100 transition-opacity">
+                <div class="bg-gray-800 px-4 py-2 flex items-center gap-2 border-b border-gray-700">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="ml-2 text-xs text-gray-500">terminal — node</span>
                 </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Callbacks, Promises, and Async/Await</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p><strong>Callbacks:</strong> Traditional pattern for async operations</p>
-                        <div class="method-list">
-                            <div class="method">fs.readFile(path, (err, data) => {})</div>
-                        </div>
-                        <p><strong>Promises:</strong> Modern async handling with chainable <span
-                                class="method">.then()</span></p>
-                        <p><strong>Async/await:</strong> Syntactic sugar over promises for cleaner, more readable code
-                        </p>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Streams and Buffers</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Streams process data in chunks (Readable, Writable, Duplex, Transform).</p>
-                        <div class="method-list">
-                            <div class="method">.pipe()</div>
-                            <div class="method">.on('data')</div>
-                            <div class="method">.on('end')</div>
-                            <div class="method">.read()</div>
-                            <div class="method">.write()</div>
-                        </div>
-                        <p>Buffers handle binary data efficiently:</p>
-                        <div class="method-list">
-                            <div class="method">Buffer.from()</div>
-                            <div class="method">Buffer.alloc()</div>
-                            <div class="method">.toString()</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>File System (fs module)</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p><strong>Read files:</strong></p>
-                        <div class="method-list">
-                            <div class="method">fs.readFile()</div>
-                            <div class="method">fs.readFileSync()</div>
-                            <div class="method">fs.createReadStream()</div>
-                        </div>
-                        <p><strong>Write files:</strong></p>
-                        <div class="method-list">
-                            <div class="method">fs.writeFile()</div>
-                            <div class="method">fs.writeFileSync()</div>
-                            <div class="method">fs.createWriteStream()</div>
-                        </div>
-                        <p><strong>Directory operations:</strong></p>
-                        <div class="method-list">
-                            <div class="method">fs.readdir()</div>
-                            <div class="method">fs.mkdir()</div>
-                            <div class="method">fs.rmdir()</div>
-                        </div>
-                        <p><strong>File info:</strong></p>
-                        <div class="method-list">
-                            <div class="method">fs.stat()</div>
-                            <div class="method">fs.exists()</div>
-                            <div class="method">fs.unlink()</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Process Management</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p><strong>Access process info:</strong></p>
-                        <div class="method-list">
-                            <div class="method">process.argv</div>
-                            <div class="method">process.env</div>
-                            <div class="method">process.cwd()</div>
-                        </div>
-                        <p><strong>Control execution:</strong></p>
-                        <div class="method-list">
-                            <div class="method">process.exit()</div>
-                            <div class="method">process.kill()</div>
-                        </div>
-                        <p><strong>Event handling:</strong></p>
-                        <div class="method-list">
-                            <div class="method">process.on('uncaughtException')</div>
-                            <div class="method">process.on('exit')</div>
-                        </div>
-                        <p><strong>Child processes:</strong></p>
-                        <div class="method-list">
-                            <div class="method">child_process.exec()</div>
-                            <div class="method">.spawn()</div>
-                            <div class="method">.fork()</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Environment Variables</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Access via <span class="method">process.env.VARIABLE_NAME</span></p>
-                        <p>Set using .env files with packages like <span class="method">dotenv</span></p>
-                        <p>Used for configuration such as database URLs, API keys, and port numbers.</p>
-                        <p>Check environment: <span class="method">process.env.NODE_ENV</span> to determine
-                            development/production mode.</p>
-                    </div>
+                <div class="p-4 space-y-2 text-xs md:text-sm">
+                    <div class="text-gray-500">$ node --version</div>
+                    <div class="text-neon-green">v20.11.0</div>
+                    <div class="text-gray-500">$ node -e "console.log('Hello, Node.js')"</div>
+                    <div class="text-white">Hello, Node.js</div>
+                    <div class="text-gray-500 animate-pulse">_</div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3">
+                </path>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-6 py-20 space-y-32">
+
+        <!-- ES6+ Syntax Section -->
+        <section id="syntax" class="scroll-mt-28">
+            <div class="flex items-end gap-4 mb-12 border-b border-gray-800 pb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">01 // SYNTAX</h2>
+                <span class="text-neon-green font-mono text-sm mb-2">MODERN_JS_PROTOCOLS</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Variable Declarations -->
+                <div class="glass-panel p-6 rounded-lg corner-brackets hover-glow transition-all group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Variable Scope</h3>
+                        <span class="font-mono text-xs text-neon-purple">ES6</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Block-scoped declarations. No more hoisting chaos.</p>
+                    <div class="code-window rounded p-4 font-mono text-xs">
+                        <div><span class="syntax-keyword">let</span> mutable = <span
+                                class="syntax-string">'changeable'</span>;</div>
+                        <div><span class="syntax-keyword">const</span> immutable = <span
+                                class="syntax-string">'locked'</span>;</div>
+                        <div class="syntax-comment mt-2">// const objects can still mutate</div>
+                    </div>
+                </div>
+
+                <!-- Arrow Functions -->
+                <div class="glass-panel p-6 rounded-lg corner-brackets hover-glow transition-all group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Arrow Functions</h3>
+                        <span class="font-mono text-xs text-neon-cyan">FAT_ARROW</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Lexical this binding. Concise syntax for callbacks.</p>
+                    <div class="code-window rounded p-4 font-mono text-xs">
+                        <div><span class="syntax-comment">// Implicit return</span></div>
+                        <div><span class="syntax-keyword">const</span> <span class="syntax-function">add</span> = (a, b)
+                            => a + b;</div>
+                        <div class="mt-1"><span class="syntax-comment">// Block body</span></div>
+                        <div><span class="syntax-keyword">const</span> <span class="syntax-function">greet</span> = name
+                            => {</div>
+                        <div class="pl-4"><span class="syntax-keyword">return</span> <span class="syntax-string">`Hi
+                                ${name}`</span>;</div>
+                        <div>}</div>
+                    </div>
+                </div>
+
+                <!-- Destructuring -->
+                <div class="glass-panel p-6 rounded-lg corner-brackets hover-glow transition-all group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Destructuring</h3>
+                        <span class="font-mono text-xs text-neon-green">UNPACK</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Extract values into distinct variables.</p>
+                    <div class="code-window rounded p-4 font-mono text-xs">
+                        <div><span class="syntax-keyword">const</span> { id, name } = user;</div>
+                        <div><span class="syntax-keyword">const</span> [first, ...rest] = array;</div>
+                        <div class="mt-1"><span class="syntax-comment">// Nested unpacking</span></div>
+                        <div><span class="syntax-keyword">const</span> { data: { items } } = response;</div>
+                    </div>
+                </div>
+
+                <!-- Template Literals -->
+                <div class="glass-panel p-6 rounded-lg corner-brackets hover-glow transition-all group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Template Literals</h3>
+                        <span class="font-mono text-xs text-yellow-500">BACKTICK</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">String interpolation and multi-line support.</p>
+                    <div class="code-window rounded p-4 font-mono text-xs">
+                        <div><span class="syntax-keyword">const</span> msg = <span class="syntax-string">`Hello
+                                ${user}</span></div>
+                        <div class="pl-4 syntax-string">Today: ${new Date()}`</div>
+                        <div class="mt-1"><span class="syntax-comment">// Tagged templates</span></div>
+                        <div><span class="syntax-function">sql</span><span class="syntax-string">`SELECT * FROM
+                                ${table}`</span></div>
+                    </div>
+                </div>
+
+                <!-- Spread/Rest -->
+                <div class="glass-panel p-6 rounded-lg corner-brackets hover-glow transition-all group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Spread & Rest</h3>
+                        <span class="font-mono text-xs text-neon-purple">...</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Expand arrays or collect parameters.</p>
+                    <div class="code-window rounded p-4 font-mono text-xs">
+                        <div><span class="syntax-comment">// Spread</span></div>
+                        <div><span class="syntax-keyword">const</span> merged = [...a, ...b];</div>
+                        <div><span class="syntax-keyword">const</span> clone = { ...original };</div>
+                        <div class="mt-1"><span class="syntax-comment">// Rest params</span></div>
+                        <div><span class="syntax-keyword">const</span> <span class="syntax-function">sum</span> =
+                            (...nums) => nums.reduce(...)</div>
+                    </div>
+                </div>
+
+                <!-- Promises -->
+                <div class="glass-panel p-6 rounded-lg corner-brackets hover-glow transition-all group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white">Promises</h3>
+                        <span class="font-mono text-xs text-neon-cyan">ASYNC</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Escape callback hell with chainable futures.</p>
+                    <div class="code-window rounded p-4 font-mono text-xs">
+                        <div><span class="syntax-function">fetch</span>(url)</div>
+                        <div class="pl-2">.then(res => res.json())</div>
+                        <div class="pl-2">.then(data => process(data))</div>
+                        <div class="pl-2">.catch(err => handle(err));</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Module Systems -->
+        <section id="architecture" class="scroll-mt-28">
+            <div class="flex items-end gap-4 mb-12 border-b border-gray-800 pb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">02 // ARCHITECTURE</h2>
+                <span class="text-neon-cyan font-mono text-sm mb-2">MODULE_SYSTEMS</span>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- CommonJS -->
+                <div class="relative group">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-gray-700 to-gray-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000">
+                    </div>
+                    <div class="relative glass-panel p-8 rounded-lg border border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-gray-400">CommonJS</h3>
+                            <span class="px-3 py-1 bg-gray-800 text-gray-400 rounded-full text-xs font-mono">CJS</span>
+                        </div>
+                        <p class="text-gray-500 mb-6">The original Node module system. Dynamic, synchronous,
+                            runtime-based.</p>
+
+                        <div class="space-y-4 font-mono text-sm">
+                            <div class="code-window rounded p-4">
+                                <div class="text-gray-500 mb-2">// Import</div>
+                                <div><span class="syntax-keyword">const</span> fs = <span
+                                        class="syntax-function">require</span>(<span class="syntax-string">'fs'</span>);
+                                </div>
+                                <div><span class="syntax-keyword">const</span> { util } = <span
+                                        class="syntax-function">require</span>(<span
+                                        class="syntax-string">'./utils'</span>);</div>
+                            </div>
+                            <div class="code-window rounded p-4">
+                                <div class="text-gray-500 mb-2">// Export</div>
+                                <div>module.exports = { foo, bar };</div>
+                                <div>exports.single = value;</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex gap-2">
+                            <span class="px-2 py-1 bg-red-900/30 text-red-400 rounded text-xs">Sync</span>
+                            <span class="px-2 py-1 bg-red-900/30 text-red-400 rounded text-xs">Dynamic</span>
+                            <span class="px-2 py-1 bg-yellow-900/30 text-yellow-400 rounded text-xs">Legacy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ES Modules -->
+                <div class="relative group">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-neon-green/50 to-neon-cyan/50 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000">
+                    </div>
+                    <div class="relative glass-panel p-8 rounded-lg border border-neon-green/30">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-white">ES Modules</h3>
+                            <span class="px-3 py-1 bg-neon-green/20 text-neon-green rounded-full text-xs font-mono">ESM
+                                ⭐</span>
+                        </div>
+                        <p class="text-gray-400 mb-6">The modern standard. Static analysis, tree-shaking, top-level
+                            await.</p>
+
+                        <div class="space-y-4 font-mono text-sm">
+                            <div class="code-window rounded p-4 border-neon-green/20">
+                                <div class="text-gray-500 mb-2">// Import</div>
+                                <div><span class="syntax-keyword">import</span> fs <span
+                                        class="syntax-keyword">from</span> <span class="syntax-string">'fs'</span>;
+                                </div>
+                                <div><span class="syntax-keyword">import</span> { helper } <span
+                                        class="syntax-keyword">from</span> <span
+                                        class="syntax-string">'./utils.js'</span>;</div>
+                                <div><span class="syntax-keyword">import</span> * <span class="syntax-keyword">as</span>
+                                    utils <span class="syntax-keyword">from</span> <span
+                                        class="syntax-string">'./utils'</span>;</div>
+                            </div>
+                            <div class="code-window rounded p-4 border-neon-green/20">
+                                <div class="text-gray-500 mb-2">// Export</div>
+                                <div><span class="syntax-keyword">export</span> <span
+                                        class="syntax-keyword">default</span> main;</div>
+                                <div><span class="syntax-keyword">export</span> <span
+                                        class="syntax-keyword">const</span> helper = () => {};</div>
+                                <div><span class="syntax-keyword">export</span> { foo, bar };</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex gap-2">
+                            <span class="px-2 py-1 bg-neon-green/20 text-neon-green rounded text-xs">Static</span>
+                            <span class="px-2 py-1 bg-neon-green/20 text-neon-green rounded text-xs">Tree-shake</span>
+                            <span class="px-2 py-1 bg-neon-green/20 text-neon-green rounded text-xs">Modern</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Loop Visualization -->
+        <section id="event-loop" class="scroll-mt-28">
+            <div class="flex items-end gap-4 mb-12 border-b border-gray-800 pb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">03 // EVENT_LOOP</h2>
+                <span class="text-neon-purple font-mono text-sm mb-2">CONCURRENCY_MODEL</span>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 border border-neon-purple/20">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Visual Diagram -->
+                    <div class="lg:col-span-1 space-y-4">
+                        <div
+                            class="text-center p-6 bg-black/40 rounded-lg border border-gray-800 relative overflow-hidden group">
+                            <div
+                                class="absolute inset-0 bg-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div class="text-4xl mb-2">🔄</div>
+                            <div class="font-mono text-neon-purple font-bold">Event Loop</div>
+                            <div class="text-xs text-gray-500 mt-1">Single Thread</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3 bg-yellow-900/20 border border-yellow-700/30 rounded text-center">
+                                <div class="font-mono text-xs text-yellow-500">Timers</div>
+                            </div>
+                            <div class="p-3 bg-orange-900/20 border border-orange-700/30 rounded text-center">
+                                <div class="font-mono text-xs text-orange-500">I/O</div>
+                            </div>
+                            <div class="p-3 bg-blue-900/20 border border-blue-700/30 rounded text-center">
+                                <div class="font-mono text-xs text-blue-500">Idle</div>
+                            </div>
+                            <div class="p-3 bg-purple-900/20 border border-purple-700/30 rounded text-center">
+                                <div class="font-mono text-xs text-purple-500">Check</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-black/40 rounded border border-gray-800">
+                            <div class="font-mono text-xs text-gray-500 mb-2">Priority Queue:</div>
+                            <div class="space-y-1 font-mono text-xs">
+                                <div class="text-red-400">1. nextTickQueue</div>
+                                <div class="text-neon-purple">2. microTaskQueue</div>
+                                <div class="text-gray-400">3. timerQueue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Examples -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="code-window rounded-lg p-6 font-mono text-sm">
+                            <div class="flex items-center gap-2 mb-4 text-gray-500 border-b border-gray-800 pb-2">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                <span>event_loop_demo.js</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div><span class="syntax-function">setTimeout</span>(() => <span
+                                        class="syntax-function">console</span>.log(<span class="syntax-string">'1:
+                                        Timer'</span>), <span class="syntax-number">0</span>);</div>
+                                <div><span class="syntax-function">setImmediate</span>(() => <span
+                                        class="syntax-function">console</span>.log(<span class="syntax-string">'2:
+                                        Immediate'</span>));</div>
+                                <div>process.<span class="syntax-function">nextTick</span>(() => <span
+                                        class="syntax-function">console</span>.log(<span class="syntax-string">'3:
+                                        nextTick'</span>));</div>
+                                <div><span class="syntax-function">Promise</span>.resolve().then(() => <span
+                                        class="syntax-function">console</span>.log(<span class="syntax-string">'4:
+                                        Promise'</span>));</div>
+                                <div><span class="syntax-function">console</span>.log(<span class="syntax-string">'5:
+                                        Sync'</span>);</div>
+                                <div class="mt-4 pt-4 border-t border-gray-800 text-gray-500">// Output Order: 5 → 3 → 4
+                                    → 1 → 2</div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div
+                                class="p-4 bg-black/40 rounded border border-gray-800 hover:border-neon-purple/50 transition-colors">
+                                <div class="font-mono text-xs text-neon-purple mb-2">process.nextTick()</div>
+                                <div class="text-xs text-gray-500">Executes after current operation, before event loop
+                                    continues</div>
+                            </div>
+                            <div
+                                class="p-4 bg-black/40 rounded border border-gray-800 hover:border-neon-purple/50 transition-colors">
+                                <div class="font-mono text-xs text-neon-cyan mb-2">setImmediate()</div>
+                                <div class="text-xs text-gray-500">Executes in check phase after I/O callbacks</div>
+                            </div>
+                            <div
+                                class="p-4 bg-black/40 rounded border border-gray-800 hover:border-neon-purple/50 transition-colors">
+                                <div class="font-mono text-xs text-yellow-500 mb-2">setTimeout()</div>
+                                <div class="text-xs text-gray-500">Minimum delay, executes in timers phase</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Async Patterns -->
+        <section id="async" class="scroll-mt-28">
+            <div class="flex items-end gap-4 mb-12 border-b border-gray-800 pb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">04 // ASYNC_PATTERNS</h2>
+                <span class="text-yellow-500 font-mono text-sm mb-2">CONTROL_FLOW</span>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Tabs -->
+                <div class="flex gap-2 overflow-x-auto pb-2 font-mono text-sm">
+                    <button onclick="showTab('callbacks')"
+                        class="tab-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-400 hover:text-white transition-all border border-gray-700"
+                        data-tab="callbacks">CALLBACKS</button>
+                    <button onclick="showTab('promises')"
+                        class="tab-btn px-6 py-3 rounded-lg bg-gray-800 text-gray-400 hover:text-white transition-all border border-gray-700"
+                        data-tab="promises">PROMISES</button>
+                    <button onclick="showTab('asyncawait')"
+                        class="tab-btn px-6 py-3 rounded-lg bg-neon-green text-black font-bold border border-neon-green"
+                        data-tab="asyncawait">ASYNC/AWAIT ⭐</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="glass-panel rounded-xl p-8 border border-gray-800 min-h-[400px]">
+                    <!-- Callbacks -->
+                    <div id="callbacks" class="tab-content hidden">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span
+                                class="px-3 py-1 bg-red-900/30 text-red-400 rounded text-xs font-mono">ERROR_FIRST</span>
+                            <h3 class="text-2xl font-bold text-white">Callback Pattern</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="code-window rounded-lg p-6 font-mono text-sm">
+                                <div class="text-gray-500 mb-2">// The Pyramid of Doom</div>
+                                <div><span class="syntax-function">getData</span>(id, (err, data) => {</div>
+                                <div class="pl-4"><span class="syntax-keyword">if</span> (err) <span
+                                        class="syntax-keyword">return</span> handle(err);</div>
+                                <div class="pl-4"><span class="syntax-function">process</span>(data, (err, result) => {
+                                </div>
+                                <div class="pl-8"><span class="syntax-keyword">if</span> (err) <span
+                                        class="syntax-keyword">return</span> handle(err);</div>
+                                <div class="pl-8"><span class="syntax-function">save</span>(result, (err) => {</div>
+                                <div class="pl-12"><span class="syntax-keyword">if</span> (err) <span
+                                        class="syntax-keyword">return</span> handle(err);</div>
+                                <div class="pl-12"><span class="syntax-function">console</span>.log(<span
+                                        class="syntax-string">'Done'</span>);</div>
+                                <div class="pl-8">});</div>
+                                <div class="pl-4">});</div>
+                                <div>});</div>
+                            </div>
+                            <div class="space-y-4 text-gray-400">
+                                <p>The original Node.js pattern. Every callback receives error as first argument.</p>
+                                <div class="p-4 bg-red-900/10 border border-red-900/30 rounded-lg">
+                                    <div class="text-red-400 font-mono text-sm mb-2">⚠️ Callback Hell</div>
+                                    <div class="text-sm">Deeply nested callbacks reduce readability and error handling
+                                        becomes fragmented.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Promises -->
+                    <div id="promises" class="tab-content hidden">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span
+                                class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded text-xs font-mono">CHAINABLE</span>
+                            <h3 class="text-2xl font-bold text-white">Promise Chain</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="code-window rounded-lg p-6 font-mono text-sm">
+                                <div><span class="syntax-function">fetchUser</span>(id)</div>
+                                <div class="pl-2">.then(user => <span
+                                        class="syntax-function">fetchOrders</span>(user.id))</div>
+                                <div class="pl-2">.then(orders => <span
+                                        class="syntax-function">processOrders</span>(orders))</div>
+                                <div class="pl-2">.then(result => {</div>
+                                <div class="pl-4"><span class="syntax-function">console</span>.log(result);</div>
+                                <div class="pl-4"><span class="syntax-keyword">return</span> result;</div>
+                                <div class="pl-2">})</div>
+                                <div class="pl-2">.catch(err => <span class="syntax-function">handleError</span>(err))
+                                </div>
+                                <div class="pl-2">.finally(() => <span class="syntax-function">cleanup</span>());</div>
+                                <div class="mt-4 text-gray-500">// Parallel execution</div>
+                                <div><span class="syntax-keyword">const</span> [users, posts] = <span
+                                        class="syntax-keyword">await</span> <span
+                                        class="syntax-function">Promise.all</span>([</div>
+                                <div class="pl-4"><span class="syntax-function">fetchUsers</span>(),</div>
+                                <div class="pl-4"><span class="syntax-function">fetchPosts</span>()</div>
+                                <div>]);</div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-blue-900/10 border border-blue-900/30 rounded-lg">
+                                    <div class="text-blue-400 font-mono text-sm mb-2">Promise.all()</div>
+                                    <div class="text-sm text-gray-400">Wait for all promises. Fails fast on first
+                                        rejection.</div>
+                                </div>
+                                <div class="p-4 bg-blue-900/10 border border-blue-900/30 rounded-lg">
+                                    <div class="text-blue-400 font-mono text-sm mb-2">Promise.race()</div>
+                                    <div class="text-sm text-gray-400">Returns first settled promise (fulfilled or
+                                        rejected).</div>
+                                </div>
+                                <div class="p-4 bg-blue-900/10 border border-blue-900/30 rounded-lg">
+                                    <div class="text-blue-400 font-mono text-sm mb-2">Promise.allSettled()</div>
+                                    <div class="text-sm text-gray-400">Wait for all, never rejects. Returns status
+                                        array.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Async/Await -->
+                    <div id="asyncawait" class="tab-content">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span
+                                class="px-3 py-1 bg-neon-green/20 text-neon-green rounded text-xs font-mono">SYNCHRONOUS_SYNTAX</span>
+                            <h3 class="text-2xl font-bold text-white">Async / Await</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="code-window rounded-lg p-6 font-mono text-sm border-neon-green/20">
+                                <div><span class="syntax-keyword">async function</span> <span
+                                        class="syntax-function">getUserData</span>(userId) {</div>
+                                <div class="pl-4"><span class="syntax-keyword">try</span> {</div>
+                                <div class="pl-8"><span class="syntax-keyword">const</span> user = <span
+                                        class="syntax-keyword">await</span> <span
+                                        class="syntax-function">fetchUser</span>(userId);</div>
+                                <div class="pl-8"><span class="syntax-keyword">const</span> orders = <span
+                                        class="syntax-keyword">await</span> <span
+                                        class="syntax-function">fetchOrders</span>(user.id);</div>
+                                <div class="pl-8"><span class="syntax-keyword">const</span> processed = <span
+                                        class="syntax-keyword">await</span> <span
+                                        class="syntax-function">process</span>(orders);</div>
+                                <div class="pl-8"><span class="syntax-keyword">return</span> processed;</div>
+                                <div class="pl-4">} <span class="syntax-keyword">catch</span> (err) {</div>
+                                <div class="pl-8"><span class="syntax-function">console</span>.error(<span
+                                        class="syntax-string">'Failed:'</span>, err);</div>
+                                <div class="pl-8"><span class="syntax-keyword">throw</span> <span
+                                        class="syntax-keyword">new</span> <span
+                                        class="syntax-function">Error</span>(<span class="syntax-string">'User fetch
+                                        failed'</span>);</div>
+                                <div class="pl-4">}</div>
+                                <div>}</div>
+                                <div class="mt-4 text-gray-500">// Top-level await (ES2022)</div>
+                                <div><span class="syntax-keyword">const</span> data = <span
+                                        class="syntax-keyword">await</span> <span
+                                        class="syntax-function">fetchData</span>();</div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg">
+                                    <div class="text-neon-green font-mono text-sm mb-2">✓ Error Handling</div>
+                                    <div class="text-sm text-gray-400">Standard try/catch blocks instead of .catch()
+                                        chains. Stack traces are cleaner.</div>
+                                </div>
+                                <div class="p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg">
+                                    <div class="text-neon-green font-mono text-sm mb-2">✓ Debugging</div>
+                                    <div class="text-sm text-gray-400">Set breakpoints inside async functions. Step
+                                        through like synchronous code.</div>
+                                </div>
+                                <div class="p-4 bg-neon-green/10 border border-neon-green/30 rounded-lg">
+                                    <div class="text-neon-green font-mono text-sm mb-2">✓ Conditionals</div>
+                                    <div class="text-sm text-gray-400">Easy to use if statements and loops with async
+                                        operations.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Streams & Buffers -->
+        <section id="streams" class="scroll-mt-28">
+            <div class="flex items-end gap-4 mb-12 border-b border-gray-800 pb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">05 // DATA_STREAMS</h2>
+                <span class="text-orange-500 font-mono text-sm mb-2">MEMORY_EFFICIENT</span>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 glass-panel rounded-xl p-8 border border-gray-800">
+                    <h3 class="text-2xl font-bold text-white mb-6">Stream Processing</h3>
+                    <div class="code-window rounded-lg p-6 font-mono text-sm mb-6">
+                        <div class="text-gray-500 mb-2">// Pipeline pattern</div>
+                        <div>fs.<span class="syntax-function">createReadStream</span>(<span
+                                class="syntax-string">'input.txt'</span>)</div>
+                        <div class="pl-2">.pipe(zlib.<span class="syntax-function">createGzip</span>())</div>
+                        <div class="pl-2">.pipe(fs.<span class="syntax-function">createWriteStream</span>(<span
+                                class="syntax-string">'output.txt.gz'</span>))</div>
+                        <div class="pl-2">.on(<span class="syntax-string">'finish'</span>, () => <span
+                                class="syntax-function">console</span>.log(<span
+                                class="syntax-string">'Compressed'</span>));</div>
+                    </div>
+
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div
+                            class="p-4 bg-black/40 rounded border border-gray-800 text-center group hover:border-orange-500/50 transition-colors">
+                            <div class="text-2xl mb-2">📖</div>
+                            <div class="font-mono text-xs text-orange-400">Readable</div>
+                            <div class="text-xs text-gray-500 mt-1">Source streams</div>
+                        </div>
+                        <div
+                            class="p-4 bg-black/40 rounded border border-gray-800 text-center group hover:border-orange-500/50 transition-colors">
+                            <div class="text-2xl mb-2">✍️</div>
+                            <div class="font-mono text-xs text-orange-400">Writable</div>
+                            <div class="text-xs text-gray-500 mt-1">Destination streams</div>
+                        </div>
+                        <div
+                            class="p-4 bg-black/40 rounded border border-gray-800 text-center group hover:border-orange-500/50 transition-colors">
+                            <div class="text-2xl mb-2">🔄</div>
+                            <div class="font-mono text-xs text-orange-400">Duplex</div>
+                            <div class="text-xs text-gray-500 mt-1">Both read & write</div>
+                        </div>
+                        <div
+                            class="p-4 bg-black/40 rounded border border-gray-800 text-center group hover:border-orange-500/50 transition-colors">
+                            <div class="text-2xl mb-2">⚡</div>
+                            <div class="font-mono text-xs text-orange-400">Transform</div>
+                            <div class="text-xs text-gray-500 mt-1">Modify in transit</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-8 border border-gray-800 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-4">Buffers</h3>
+                        <p class="text-gray-400 text-sm mb-6">Fixed-size binary data chunks. Essential for TCP streams
+                            and file operations.</p>
+
+                        <div class="space-y-3 font-mono text-xs">
+                            <div class="p-3 bg-black/40 rounded border border-gray-800">
+                                <span class="text-orange-400">Buffer.</span><span
+                                    class="syntax-function">from</span>(<span class="syntax-string">'hello'</span>)
+                            </div>
+                            <div class="p-3 bg-black/40 rounded border border-gray-800">
+                                <span class="text-orange-400">Buffer.</span><span
+                                    class="syntax-function">alloc</span>(<span class="syntax-number">1024</span>)
+                            </div>
+                            <div class="p-3 bg-black/40 rounded border border-gray-800">
+                                buf.<span class="syntax-function">toString</span>(<span
+                                    class="syntax-string">'utf8'</span>)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-orange-900/10 border border-orange-900/30 rounded-lg">
+                        <div class="text-orange-400 font-mono text-xs mb-2">Memory Tip</div>
+                        <div class="text-xs text-gray-400">Streams process data in chunks vs loading entire files into
+                            memory.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- File System & Process -->
+        <section id="system" class="scroll-mt-28">
+            <div class="flex items-end gap-4 mb-12 border-b border-gray-800 pb-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-white">06 // SYSTEM_OPS</h2>
+                <span class="text-neon-cyan font-mono text-sm mb-2">OS_INTERFACE</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- File System -->
+                <div class="glass-panel rounded-xl p-8 border border-gray-800">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span
+                            class="w-8 h-8 rounded bg-neon-cyan/20 text-neon-cyan flex items-center justify-center text-sm">fs</span>
+                        File System
+                    </h3>
+
+                    <div class="space-y-4 font-mono text-sm">
+                        <div
+                            class="flex items-center justify-between p-3 bg-black/40 rounded border border-gray-800 hover:border-neon-cyan/50 transition-colors cursor-default group">
+                            <span class="text-gray-300">fs.readFile()</span>
+                            <span class="text-xs text-gray-500 group-hover:text-neon-cyan">Async read</span>
+                        </div>
+                        <div
+                            class="flex items-center justify-between p-3 bg-black/40 rounded border border-gray-800 hover:border-neon-cyan/50 transition-colors cursor-default group">
+                            <span class="text-gray-300">fs.writeFile()</span>
+                            <span class="text-xs text-gray-500 group-hover:text-neon-cyan">Async write</span>
+                        </div>
+                        <div
+                            class="flex items-center justify-between p-3 bg-black/40 rounded border border-gray-800 hover:border-neon-cyan/50 transition-colors cursor-default group">
+                            <span class="text-gray-300">fs.mkdir()</span>
+                            <span class="text-xs text-gray-500 group-hover:text-neon-cyan">Create dir</span>
+                        </div>
+                        <div
+                            class="flex items-center justify-between p-3 bg-black/40 rounded border border-gray-800 hover:border-neon-cyan/50 transition-colors cursor-default group">
+                            <span class="text-gray-300">fs.stat()</span>
+                            <span class="text-xs text-gray-500 group-hover:text-neon-cyan">File info</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-lg">
+                        <div class="font-mono text-xs text-neon-cyan mb-2">Promise API</div>
+                        <div class="text-xs text-gray-400">Use fs.promises for async/await compatibility</div>
+                    </div>
+                </div>
+
+                <!-- Process & Env -->
+                <div class="glass-panel rounded-xl p-8 border border-gray-800">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span
+                            class="w-8 h-8 rounded bg-neon-purple/20 text-neon-purple flex items-center justify-center text-sm">proc</span>
+                        Process & ENV
+                    </h3>
+
+                    <div class="space-y-6">
+                        <div>
+                            <div class="font-mono text-xs text-gray-500 mb-2">process.argv</div>
+                            <div class="code-window rounded p-3 font-mono text-xs">
+                                <span class="syntax-comment">// Command line arguments</span><br>
+                                node script.js --port 3000<br>
+                                <span class="text-neon-purple">process.argv[2]</span> <span class="text-gray-500">//
+                                    --port</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="font-mono text-xs text-gray-500 mb-2">process.env</div>
+                            <div class="code-window rounded p-3 font-mono text-xs">
+                                <span class="syntax-keyword">const</span> dbUrl = process.env.DATABASE_URL;<br>
+                                <span class="syntax-keyword">const</span> isDev = process.env.NODE_ENV === <span
+                                    class="syntax-string">'development'</span>;
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="font-mono text-xs text-gray-500 mb-2">Child Processes</div>
+                            <div class="code-window rounded p-3 font-mono text-xs">
+                                <span class="syntax-keyword">const</span> { exec, spawn } = <span
+                                    class="syntax-function">require</span>(<span
+                                    class="syntax-string">'child_process'</span>);<br>
+                                exec(<span class="syntax-string">'ls -la'</span>, (err, stdout) => {...});
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-red-900/10 border border-red-900/30 rounded">
+                            <div class="text-xs text-red-400 font-mono">⚠️ Security</div>
+                            <div class="text-xs text-gray-400 mt-1">Never commit .env files. Use dotenv package for
+                                local dev only.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-32 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <div class="font-mono text-neon-green text-sm mb-1">SYSTEM_STATUS: OPERATIONAL</div>
+                <div class="text-gray-600 text-sm">Node.js Field Guide // Built for the terminal generation</div>
+            </div>
+            <div class="flex gap-6 font-mono text-sm">
+                <a href="https://nodejs.org/api" target="_blank"
+                    class="text-gray-400 hover:text-neon-green transition-colors">[DOCS]</a>
+                <a href="https://github.com/nodejs/node" target="_blank"
+                    class="text-gray-400 hover:text-neon-green transition-colors">[SOURCE]</a>
+                <a href="#" onclick="window.scrollTo(0,0)"
+                    class="text-gray-400 hover:text-neon-green transition-colors" target="_self">[TOP]</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        function toggleTopic(element) {
-            const content = element.querySelector('.topic-content');
-            const icon = element.querySelector('.toggle-icon');
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
 
-            content.classList.toggle('active');
-            icon.classList.toggle('active');
+            // Show selected
+            document.getElementById(tabName).classList.remove('hidden');
+
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.remove('bg-gray-800', 'text-gray-400', 'border-gray-700');
+                    btn.classList.add('bg-neon-green', 'text-black', 'font-bold', 'border-neon-green');
+                } else {
+                    btn.classList.add('bg-gray-800', 'text-gray-400', 'border-gray-700');
+                    btn.classList.remove('bg-neon-green', 'text-black', 'font-bold', 'border-neon-green');
+                }
+            });
         }
+
+        // Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(50px)';
+            section.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(section);
+        });
+
+        // Glitch effect randomization
+        setInterval(() => {
+            const glitch = document.querySelector('.glitch-text');
+            if (Math.random() > 0.95) {
+                glitch.style.animation = 'none';
+                setTimeout(() => {
+                    glitch.style.animation = '';
+                }, 100);
+            }
+        }, 3000);
+
+        // Copy code functionality
+        document.querySelectorAll('.code-window').forEach(block => {
+            const btn = document.createElement('button');
+            btn.className = 'absolute top-2 right-2 px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100';
+            btn.textContent = 'COPY';
+            btn.style.position = 'absolute';
+            btn.style.top = '0.5rem';
+            btn.style.right = '0.5rem';
+
+            block.style.position = 'relative';
+            block.appendChild(btn);
+
+            btn.addEventListener('click', () => {
+                const code = block.querySelector('div:not(:first-child)')?.innerText || block.innerText;
+                navigator.clipboard.writeText(code.replace('COPY', ''));
+                btn.textContent = 'COPIED!';
+                btn.classList.add('text-neon-green');
+                setTimeout(() => {
+                    btn.textContent = 'COPY';
+                    btn.classList.remove('text-neon-green');
+                }, 2000);
+            });
+        });
     </script>
 </body>
 

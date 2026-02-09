@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Basics Guide | Modern Development Reference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        node: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'slide-in': 'slideIn 0.4s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideIn: {
+                            '0%': { opacity: '0', transform: 'translateX(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Code block styling */
+        .code-block {
+            background: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .code-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .code-header {
+            background: #1e293b;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .code-content {
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+
+        /* Syntax highlighting colors */
+        .keyword {
+            color: #c678dd;
+        }
+
+        .string {
+            color: #98c379;
+        }
+
+        .function {
+            color: #61afef;
+        }
+
+        .comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .number {
+            color: #d19a66;
+        }
+
+        .operator {
+            color: #56b6c2;
+        }
+
+        .variable {
+            color: #e06c75;
+        }
+
+        /* Card hover effects */
+        .concept-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .concept-card:hover {
+            border-color: #22c55e;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.1);
+            transform: translateY(-4px);
+        }
+
+        /* Navigation link hover */
+        .nav-link {
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #22c55e;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Section reveal animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #16a34a 0%, #0d9488 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Floating shapes background */
+        .floating-shape {
+            position: absolute;
+            opacity: 0.03;
+            pointer-events: none;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+        }
+
+        /* Mobile Bottom Sheet Menu */
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-menu-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 51;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .mobile-menu-sheet.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu-handle {
+            width: 40px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+
+        /* Copy button feedback */
+        .copied {
+            background-color: #22c55e !important;
+            color: white !important;
+        }
+
+        /* Mobile-specific improvements */
+        @media (max-width: 768px) {
+            .code-content {
+                font-size: 0.75rem;
+                padding: 16px;
+            }
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body class="antialiased">
+
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="floating-shape w-64 h-64 rounded-full bg-node-500 top-20 left-10" style="animation-delay: 0s;">
+        </div>
+        <div class="floating-shape w-48 h-48 rounded-full bg-blue-500 top-1/3 right-20" style="animation-delay: 5s;">
+        </div>
+        <div class="floating-shape w-32 h-32 rounded-full bg-purple-500 bottom-40 left-1/3"
+            style="animation-delay: 10s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 z-40 transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 bg-node-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        N</div>
+                    <span class="font-bold text-xl tracking-tight">Node Basics</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#javascript" class="nav-link text-gray-600 hover:text-node-600 font-medium">JavaScript</a>
+                    <a href="#core-concepts" class="nav-link text-gray-600 hover:text-node-600 font-medium">Core
+                        Concepts</a>
+                    <a href="#async" class="nav-link text-gray-600 hover:text-node-600 font-medium">Async</a>
+                    <a href="#modules" class="nav-link text-gray-600 hover:text-node-600 font-medium">Modules</a>
+                    <a href="#filesystem" class="nav-link text-gray-600 hover:text-node-600 font-medium">File System</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                    onclick="toggleMobileMenu()" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Bottom Sheet Menu -->
+    <div class="mobile-menu-overlay md:hidden" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+
+    <div class="mobile-menu-sheet md:hidden" id="mobileMenuSheet">
+        <div class="mobile-menu-handle"></div>
+
+        <div class="px-6 pb-8 pt-2">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-2">
+                    <div
+                        class="w-8 h-8 bg-node-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        N</div>
+                    <span class="font-bold text-lg">Menu</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    aria-label="Close menu">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="space-y-1">
+                <a href="#javascript" onclick="toggleMobileMenu()"
+                    class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-gray-900">JavaScript</span>
+                        <span class="block text-sm text-gray-500">ES6+ Features</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+
+                <a href="#core-concepts" onclick="toggleMobileMenu()"
+                    class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-node-100 text-node-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-gray-900">Core Concepts</span>
+                        <span class="block text-sm text-gray-500">Event Loop & Streams</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+
+                <a href="#async" onclick="toggleMobileMenu()"
+                    class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-gray-900">Async Patterns</span>
+                        <span class="block text-sm text-gray-500">Promises & Async/Await</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+
+                <a href="#modules" onclick="toggleMobileMenu()"
+                    class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-gray-900">Modules</span>
+                        <span class="block text-sm text-gray-500">CommonJS & ES Modules</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+
+                <a href="#filesystem" onclick="toggleMobileMenu()"
+                    class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-gray-900">File System</span>
+                        <span class="block text-sm text-gray-500">fs Module & Streams</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+
+                <a href="#process" onclick="toggleMobileMenu()"
+                    class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 9l3 3-3 3m5 0h3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="block font-semibold text-gray-900">Process</span>
+                        <span class="block text-sm text-gray-500">Environment & Control</span>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </nav>
+
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <span>Node.js Reference</span>
+                    <span class="text-node-600 font-medium">v1.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto reveal active">
+                <div
+                    class="inline-flex items-center px-4 py-2 rounded-full bg-node-50 text-node-700 text-sm font-medium mb-6 border border-node-100">
+                    <span class="w-2 h-2 rounded-full bg-node-500 mr-2 animate-pulse"></span>
+                    Modern Node.js Guide
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                    Master <span class="gradient-text">Node.js</span><br>
+                    Fundamentals
+                </h1>
+                <p class="text-xl text-gray-600 mb-10 leading-relaxed">
+                    A comprehensive, interactive reference to JavaScript ES6+ features and Node.js core concepts.
+                    From async patterns to file system operations.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#javascript"
+                        class="px-8 py-4 bg-node-600 text-white rounded-full font-medium hover:bg-node-700 transition-all hover:shadow-lg hover:shadow-node-500/30 transform hover:-translate-y-0.5">
+                        Start Learning
+                    </a>
+                    <a href="#core-concepts"
+                        class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-full font-medium hover:border-node-500 hover:text-node-600 transition-all">
+                        Explore Concepts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- JavaScript Fundamentals Section -->
+    <section id="javascript" class="py-20 bg-gray-50/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-12">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">JavaScript Fundamentals</h2>
+                        <p class="text-gray-600 mt-1">Modern ES6+ features essential for Node.js development</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Variable Declarations -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">Variable Declarations</h3>
+                            <span
+                                class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">ES6</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                            Use <code class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">let</code>
+                            for reassignable values and
+                            <code class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">const</code> for
+                            immutable bindings.
+                            Avoid <code
+                                class="bg-gray-100 px-2 py-1 rounded text-gray-500 font-mono text-xs line-through">var</code>.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">variables.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Mutable variable</span>
+<span class="keyword">let</span> <span class="variable">count</span> <span class="operator">=</span> <span class="number">0</span>;
+<span class="variable">count</span> <span class="operator">=</span> <span class="number">1</span>; <span class="comment">// ✓ Valid</span>
+
+<span class="comment">// Immutable binding</span>
+<span class="keyword">const</span> <span class="variable">API_URL</span> <span class="operator">=</span> <span class="string">'https://api.example.com'</span>;
+<span class="comment">// API_URL = 'new'; // ✗ TypeError</span>
+
+<span class="comment">// const objects can be modified</span>
+<span class="keyword">const</span> <span class="variable">user</span> <span class="operator">=</span> { <span class="variable">name</span>: <span class="string">'John'</span> };
+<span class="variable">user</span>.<span class="variable">name</span> <span class="operator">=</span> <span class="string">'Jane'</span>; <span class="comment">// ✓ Valid</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Arrow Functions -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">Arrow Functions</h3>
+                            <span
+                                class="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Syntax</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                            Concise syntax with lexical <code
+                                class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">this</code>
+                            binding.
+                            Perfect for callbacks and array methods. No own <code
+                                class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">this</code>,
+                            <code
+                                class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">arguments</code>,
+                            or <code class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">super</code>.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">arrows.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Traditional function</span>
+<span class="keyword">const</span> <span class="function">add</span> <span class="operator">=</span> <span class="keyword">function</span>(<span class="variable">a</span>, <span class="variable">b</span>) {
+  <span class="keyword">return</span> <span class="variable">a</span> <span class="operator">+</span> <span class="variable">b</span>;
+};
+
+<span class="comment">// Arrow function</span>
+<span class="keyword">const</span> <span class="function">add</span> <span class="operator">=</span> (<span class="variable">a</span>, <span class="variable">b</span>) <span class="operator">=></span> <span class="variable">a</span> <span class="operator">+</span> <span class="variable">b</span>;
+
+<span class="comment">// With implicit return</span>
+<span class="keyword">const</span> <span class="variable">numbers</span> <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">const</span> <span class="variable">doubled</span> <span class="operator">=</span> <span class="variable">numbers</span>.<span class="function">map</span>(<span class="variable">n</span> <span class="operator">=></span> <span class="variable">n</span> <span class="operator">*</span> <span class="number">2</span>);</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template Literals -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">Template Literals</h3>
+                            <span
+                                class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Strings</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                            Backtick strings enabling interpolation and multiline text. Supports embedded expressions
+                            with <code class="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-xs">${}</code>
+                            syntax.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">templates.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">const</span> <span class="variable">name</span> <span class="operator">=</span> <span class="string">'Node.js'</span>;
+<span class="keyword">const</span> <span class="variable">version</span> <span class="operator">=</span> <span class="number">18</span>;
+
+<span class="comment">// String interpolation</span>
+<span class="keyword">const</span> <span class="variable">message</span> <span class="operator">=</span> <span class="string">`Welcome to ${name} v${version}`</span>;
+
+<span class="comment">// Multiline strings</span>
+<span class="keyword">const</span> <span class="variable">html</span> <span class="operator">=</span> <span class="string">`
+  &lt;div class="container"&gt;
+    &lt;h1&gt;${name}&lt;/h1&gt;
+  &lt;/div&gt;
+`</span>;
+
+<span class="comment">// Tagged templates</span>
+<span class="keyword">const</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="function">SQL</span><span class="string">`SELECT * FROM users WHERE id = ${userId}`</span>;</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destructuring -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">Destructuring</h3>
+                            <span
+                                class="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Patterns</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                            Extract values from objects and arrays into distinct variables. Supports nesting,
+                            renaming, and default values for cleaner code.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">destructure.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Object destructuring</span>
+<span class="keyword">const</span> { <span class="variable">name</span>, <span class="variable">age</span>: <span class="variable">years</span>, <span class="variable">role</span> <span class="operator">=</span> <span class="string">'user'</span> } <span class="operator">=</span> <span class="variable">user</span>;
+
+<span class="comment">// Array destructuring</span>
+<span class="keyword">const</span> [<span class="variable">first</span>, <span class="variable">second</span>, ...<span class="variable">rest</span>] <span class="operator">=</span> <span class="variable">array</span>;
+
+<span class="comment">// Nested destructuring</span>
+<span class="keyword">const</span> { <span class="variable">user</span>: { <span class="variable">email</span> } } <span class="operator">=</span> <span class="variable">data</span>;
+
+<span class="comment">// Function parameters</span>
+<span class="keyword">function</span> <span class="function">Component</span>({ <span class="variable">title</span>, <span class="variable">content</span> }) {
+  <span class="keyword">return</span> <span class="string">`&lt;h1&gt;${title}&lt;/h1&gt;`</span>;
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spread & Rest -->
+                    <div class="concept-card bg-white rounded-2xl p-8 lg:col-span-2">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">Spread & Rest Operators</h3>
+                            <span
+                                class="px-3 py-1 bg-pink-100 text-pink-700 text-xs font-medium rounded-full">Operators</span>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                                    <strong class="text-gray-900">Spread (<code
+                                            class="text-pink-600 font-mono">...</code>):</strong> Expands iterables into
+                                    individual elements.
+                                    Use for copying arrays/objects or passing arguments.
+                                </p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="text-xs text-gray-400 font-mono">spread.js</span>
+                                        <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><span class="comment">// Array concatenation</span>
+<span class="keyword">const</span> <span class="variable">combined</span> <span class="operator">=</span> [...<span class="variable">arr1</span>, ...<span class="variable">arr2</span>];
+
+<span class="comment">// Object merging</span>
+<span class="keyword">const</span> <span class="variable">defaults</span> <span class="operator">=</span> { ...<span class="variable">config</span>, <span class="variable">port</span>: <span class="number">3000</span> };
+
+<span class="comment">// Function arguments</span>
+<span class="keyword">const</span> <span class="variable">nums</span> <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="variable">Math</span>.<span class="function">max</span>(...<span class="variable">nums</span>); <span class="comment">// 3</span></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                                    <strong class="text-gray-900">Rest (<code
+                                            class="text-pink-600 font-mono">...</code>):</strong> Collects remaining
+                                    elements into an array.
+                                    Perfect for variadic functions.
+                                </p>
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="text-xs text-gray-400 font-mono">rest.js</span>
+                                        <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                            onclick="copyCode(this)">Copy</button>
+                                    </div>
+                                    <div class="code-content">
+                                        <pre><span class="comment">// Function parameters</span>
+<span class="keyword">function</span> <span class="function">sum</span>(...<span class="variable">numbers</span>) {
+  <span class="keyword">return</span> <span class="variable">numbers</span>.<span class="function">reduce</span>((<span class="variable">a</span>, <span class="variable">b</span>) <span class="operator">=></span> <span class="variable">a</span> <span class="operator">+</span> <span class="variable">b</span>, <span class="number">0</span>);
+}
+
+<span class="comment">// Destructuring</span>
+<span class="keyword">const</span> [<span class="variable">head</span>, ...<span class="variable">tail</span>] <span class="operator">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+<span class="comment">// head = 1, tail = [2,3,4]</span></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Async Patterns Section -->
+    <section id="async" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-12">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Asynchronous Patterns</h2>
+                        <p class="text-gray-600 mt-1">Handling async operations from callbacks to async/await</p>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Promises -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Promises</h3>
+                        <p class="text-gray-600 mb-6 max-w-3xl">
+                            Objects representing eventual completion or failure of asynchronous operations.
+                            Chainable methods for handling success (<code
+                                class="bg-gray-100 px-2 py-1 rounded font-mono text-xs">.then()</code>)
+                            and errors (<code class="bg-gray-100 px-2 py-1 rounded font-mono text-xs">.catch()</code>).
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">promises.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">const</span> <span class="variable">fetchData</span> <span class="operator">=</span> () <span class="operator">=></span> {
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="function">Promise</span>((<span class="variable">resolve</span>, <span class="variable">reject</span>) <span class="operator">=></span> {
+    <span class="function">setTimeout</span>(() <span class="operator">=></span> {
+      <span class="variable">success</span> ? <span class="function">resolve</span>(<span class="variable">data</span>) : <span class="function">reject</span>(<span class="variable">error</span>);
+    }, <span class="number">1000</span>);
+  });
+};
+
+<span class="comment">// Chaining</span>
+<span class="function">fetchData</span>()
+  .<span class="function">then</span>(<span class="variable">data</span> <span class="operator">=></span> <span class="function">processData</span>(<span class="variable">data</span>))
+  .<span class="function">then</span>(<span class="variable">result</span> <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="variable">result</span>))
+  .<span class="function">catch</span>(<span class="variable">err</span> <span class="operator">=></span> <span class="variable">console</span>.<span class="function">error</span>(<span class="variable">err</span>))
+  .<span class="function">finally</span>(() <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'Done'</span>));
+
+<span class="comment">// Promise combinators</span>
+<span class="keyword">const</span> <span class="variable">results</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="variable">Promise</span>.<span class="function">all</span>([<span class="function">promise1</span>(), <span class="function">promise2</span>()]);
+<span class="keyword">const</span> <span class="variable">winner</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="variable">Promise</span>.<span class="function">race</span>([<span class="function">p1</span>(), <span class="function">p2</span>()]);</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Async/Await -->
+                    <div class="concept-card bg-white rounded-2xl p-8 border-node-200 border-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">Async/Await</h3>
+                            <span
+                                class="px-3 py-1 bg-node-100 text-node-700 text-xs font-bold rounded-full">Recommended</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 max-w-3xl">
+                            Syntactic sugar over Promises for writing asynchronous code that looks synchronous.
+                            Makes error handling with <code
+                                class="bg-gray-100 px-2 py-1 rounded font-mono text-xs">try/catch</code> more intuitive.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">async-await.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">async function</span> <span class="function">getUserData</span>(<span class="variable">userId</span>) {
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> <span class="variable">response</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">`/api/users/${userId}`</span>);
+    
+    <span class="keyword">if</span> (!<span class="variable">response</span>.<span class="variable">ok</span>) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="function">Error</span>(<span class="string">'User not found'</span>);
+    }
+    
+    <span class="keyword">const</span> <span class="variable">data</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="variable">response</span>.<span class="function">json</span>();
+    <span class="keyword">return</span> <span class="variable">data</span>;
+    
+  } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+    <span class="variable">console</span>.<span class="function">error</span>(<span class="string">'Fetch failed:'</span>, <span class="variable">error</span>);
+    <span class="keyword">throw</span> <span class="variable">error</span>;
+  }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Node.js Concepts -->
+    <section id="core-concepts" class="py-20 bg-gray-50/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-12">
+                    <div class="w-12 h-12 rounded-xl bg-node-100 text-node-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Core Node.js Concepts</h2>
+                        <p class="text-gray-600 mt-1">Event loop, streams, and buffers explained</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Event Loop -->
+                    <div class="concept-card bg-white rounded-2xl p-8 lg:col-span-2">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">The Event Loop</h3>
+                        <p class="text-gray-600 mb-6">
+                            Node.js runs on a single-threaded event loop that enables non-blocking I/O operations.
+                            Understanding the phases is crucial for performance optimization.
+                        </p>
+
+                        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-yellow-400">
+                                <h4 class="font-semibold text-gray-900 mb-1">Timers</h4>
+                                <p class="text-sm text-gray-600"><code class="font-mono text-xs">setTimeout</code>,
+                                    <code class="font-mono text-xs">setInterval</code></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-400">
+                                <h4 class="font-semibold text-gray-900 mb-1">Pending Callbacks</h4>
+                                <p class="text-sm text-gray-600">I/O callbacks deferred to next loop</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-green-400">
+                                <h4 class="font-semibold text-gray-900 mb-1">Poll</h4>
+                                <p class="text-sm text-gray-600">Retrieve new I/O events; execute callbacks</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-purple-400">
+                                <h4 class="font-semibold text-gray-900 mb-1">Check</h4>
+                                <p class="text-sm text-gray-600"><code class="font-mono text-xs">setImmediate</code>
+                                    callbacks</p>
+                            </div>
+                        </div>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">event-loop.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Execution order demonstration</span>
+<span class="variable">console</span>.<span class="function">log</span>(<span class="string">'1. Start'</span>);
+
+<span class="function">setTimeout</span>(() <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'2. Timeout'</span>), <span class="number">0</span>);
+<span class="function">setImmediate</span>(() <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'3. Immediate'</span>));
+<span class="variable">process</span>.<span class="function">nextTick</span>(() <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'4. Next Tick'</span>));
+
+<span class="variable">console</span>.<span class="function">log</span>(<span class="string">'5. End'</span>);
+
+<span class="comment">// Output: 1 → 5 → 4 → 2 → 3</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Methods -->
+                    <div class="space-y-4">
+                        <div class="concept-card bg-white rounded-2xl p-6">
+                            <h4 class="font-semibold text-gray-900 mb-3">process.nextTick()</h4>
+                            <p class="text-sm text-gray-600 mb-3">Executes before next event loop phase. Highest
+                                priority.</p>
+                            <code
+                                class="block bg-gray-100 p-3 rounded-lg font-mono text-xs">process.nextTick(callback)</code>
+                        </div>
+
+                        <div class="concept-card bg-white rounded-2xl p-6">
+                            <h4 class="font-semibold text-gray-900 mb-3">setImmediate()</h4>
+                            <p class="text-sm text-gray-600 mb-3">Executes after I/O events in check phase.</p>
+                            <code
+                                class="block bg-gray-100 p-3 rounded-lg font-mono text-xs">setImmediate(callback)</code>
+                        </div>
+
+                        <div class="concept-card bg-white rounded-2xl p-6 bg-node-50 border-node-200">
+                            <h4 class="font-semibold text-node-900 mb-2">Best Practice</h4>
+                            <p class="text-sm text-node-800">
+                                Use <code class="font-mono">setImmediate</code> over <code
+                                    class="font-mono">process.nextTick</code> for I/O-bound operations to prevent
+                                starvation.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Streams -->
+                    <div class="concept-card bg-white rounded-2xl p-8 lg:col-span-2">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Streams</h3>
+                        <p class="text-gray-600 mb-6">
+                            Abstract interfaces for handling streaming data in chunks. Memory-efficient for large files
+                            or network operations. Types: Readable, Writable, Duplex, Transform.
+                        </p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">streams.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">const</span> <span class="variable">fs</span> <span class="operator">=</span> <span class="function">require</span>(<span class="string">'fs'</span>);
+
+<span class="comment">// Reading with streams</span>
+<span class="keyword">const</span> <span class="variable">readStream</span> <span class="operator">=</span> <span class="variable">fs</span>.<span class="function">createReadStream</span>(<span class="string">'large-file.txt'</span>, { <span class="variable">encoding</span>: <span class="string">'utf8'</span> });
+
+<span class="variable">readStream</span>.<span class="function">on</span>(<span class="string">'data'</span>, (<span class="variable">chunk</span>) <span class="operator">=></span> {
+  <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'Received chunk:'</span>, <span class="variable">chunk</span>.<span class="variable">length</span>);
+});
+
+<span class="variable">readStream</span>.<span class="function">on</span>(<span class="string">'end'</span>, () <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'Finished reading'</span>));
+
+<span class="comment">// Piping streams</span>
+<span class="variable">fs</span>.<span class="function">createReadStream</span>(<span class="string">'input.txt'</span>)
+  .<span class="function">pipe</span>(<span class="variable">fs</span>.<span class="function">createWriteStream</span>(<span class="string">'output.txt'</span>));</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buffers -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Buffers</h3>
+                        <p class="text-gray-600 mb-6">
+                            Fixed-size chunks of memory for handling binary data directly. Essential for file operations
+                            and network protocols.
+                        </p>
+
+                        <div class="space-y-3">
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <code class="font-mono text-sm text-gray-800">Buffer.from(string)</code>
+                                <p class="text-xs text-gray-600 mt-1">Create buffer from string</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <code class="font-mono text-sm text-gray-800">Buffer.alloc(size)</code>
+                                <p class="text-xs text-gray-600 mt-1">Allocate zero-filled buffer</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <code class="font-mono text-sm text-gray-800">buffer.toString()</code>
+                                <p class="text-xs text-gray-600 mt-1">Convert to string</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section id="modules" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-12">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Module Systems</h2>
+                        <p class="text-gray-600 mt-1">CommonJS vs ES Modules</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- CommonJS -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">CommonJS</h3>
+                            <span
+                                class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">Legacy</span>
+                        </div>
+                        <p class="text-gray-600 mb-6">
+                            Synchronous module system used in Node.js since inception.
+                            Loaded at runtime with dynamic <code
+                                class="bg-gray-100 px-1 rounded font-mono">require()</code>.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">commonjs/</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Importing</span>
+<span class="keyword">const</span> <span class="variable">fs</span> <span class="operator">=</span> <span class="function">require</span>(<span class="string">'fs'</span>);
+<span class="keyword">const</span> { <span class="variable">helper</span> } <span class="operator">=</span> <span class="function">require</span>(<span class="string">'./utils'</span>);
+
+<span class="comment">// Exporting</span>
+<span class="variable">module</span>.<span class="variable">exports</span> <span class="operator">=</span> <span class="variable">myFunction</span>;
+<span class="comment">// or</span>
+<span class="variable">exports</span>.<span class="variable">helper</span> <span class="operator">=</span> <span class="variable">helper</span>;</pre>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <p class="text-sm text-yellow-800">
+                                <strong>Note:</strong> Still default in Node.js. Use <code class="font-mono">.cjs</code>
+                                extension or configure in package.json.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ES Modules -->
+                    <div class="concept-card bg-white rounded-2xl p-8 border-2 border-node-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900">ES Modules</h3>
+                            <span
+                                class="px-3 py-1 bg-node-100 text-node-700 text-xs font-bold rounded-full">Modern</span>
+                        </div>
+                        <p class="text-gray-600 mb-6">
+                            Standard JavaScript module system with static analysis and tree-shaking support.
+                            Use <code class="bg-gray-100 px-1 rounded font-mono">"type": "module"</code> in
+                            package.json.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">esm/</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Importing</span>
+<span class="keyword">import</span> <span class="variable">fs</span> <span class="keyword">from</span> <span class="string">'fs'</span>;
+<span class="keyword">import</span> { <span class="variable">helper</span> } <span class="keyword">from</span> <span class="string">'./utils.js'</span>;
+<span class="keyword">import</span> * <span class="keyword">as</span> <span class="variable">utils</span> <span class="keyword">from</span> <span class="string">'./utils.js'</span>;
+
+<span class="comment">// Exporting</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="function">helper</span> <span class="operator">=</span> () <span class="operator">=></span> {};
+<span class="keyword">export</span> <span class="keyword">default</span> <span class="variable">mainFunction</span>;</pre>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 bg-node-50 rounded-lg border border-node-200">
+                            <p class="text-sm text-node-800">
+                                <strong>Advantages:</strong> Static analysis, tree-shaking, top-level await, better
+                                browser compatibility.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- File System Section -->
+    <section id="filesystem" class="py-20 bg-gray-50/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-12">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">File System (fs)</h2>
+                        <p class="text-gray-600 mt-1">Reading, writing, and managing files</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- Read Operations -->
+                    <div class="concept-card bg-white rounded-2xl p-6">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Read Files</h3>
+                        <ul class="space-y-2 text-sm text-gray-600 mb-4">
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.readFile()</code>
+                                Async</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.readFileSync()</code>
+                                Sync</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.createReadStream()</code>
+                                Stream</li>
+                        </ul>
+                        <div class="code-block">
+                            <div class="code-content text-xs">
+                                <pre><span class="keyword">const</span> <span class="variable">data</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="variable">fs</span>.<span class="function">readFile</span>(<span class="string">'file.txt'</span>, 
+  <span class="string">'utf8'</span>
+);</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Write Operations -->
+                    <div class="concept-card bg-white rounded-2xl p-6">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Write Files</h3>
+                        <ul class="space-y-2 text-sm text-gray-600 mb-4">
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.writeFile()</code>
+                                Async</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.writeFileSync()</code>
+                                Sync</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.appendFile()</code>
+                                Append</li>
+                        </ul>
+                        <div class="code-block">
+                            <div class="code-content text-xs">
+                                <pre><span class="keyword">await</span> <span class="variable">fs</span>.<span class="function">writeFile</span>(<span class="string">'file.txt'</span>, 
+  <span class="string">'Hello World'</span>
+);</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Directory Operations -->
+                    <div class="concept-card bg-white rounded-2xl p-6">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Directories</h3>
+                        <ul class="space-y-2 text-sm text-gray-600 mb-4">
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.readdir()</code>
+                                List</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.mkdir()</code>
+                                Create</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.rmdir()</code>
+                                Remove</li>
+                        </ul>
+                        <div class="code-block">
+                            <div class="code-content text-xs">
+                                <pre><span class="keyword">const</span> <span class="variable">files</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="variable">fs</span>.<span class="function">readdir</span>(<span class="string">'./'</span>);</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Info -->
+                    <div class="concept-card bg-white rounded-2xl p-6">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">File Information</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.stat()</code>
+                                Metadata</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.access()</code>
+                                Permissions</li>
+                            <li class="flex items-center"><code
+                                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2">fs.unlink()</code>
+                                Delete</li>
+                        </ul>
+                    </div>
+
+                    <!-- Promises API -->
+                    <div class="concept-card bg-white rounded-2xl p-6 lg:col-span-2 border-2 border-node-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">fs/promises API (Recommended)</h3>
+                            <span
+                                class="px-2 py-1 bg-node-100 text-node-700 text-xs font-bold rounded">Async/Await</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Modern promise-based API eliminating callback hell. Import from <code
+                                class="bg-gray-100 px-2 py-1 rounded font-mono text-sm">fs/promises</code>
+                            for cleaner async code.
+                        </p>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">fs-promises.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">import</span> { <span class="variable">readFile</span>, <span class="variable">writeFile</span>, <span class="variable">mkdir</span> } <span class="keyword">from</span> <span class="string">'fs/promises'</span>;
+
+<span class="keyword">async function</span> <span class="function">setupProject</span>() {
+  <span class="keyword">try</span> {
+    <span class="keyword">await</span> <span class="function">mkdir</span>(<span class="string">'./logs'</span>, { <span class="variable">recursive</span>: <span class="keyword">true</span> });
+    <span class="keyword">await</span> <span class="function">writeFile</span>(<span class="string">'./logs/app.log'</span>, <span class="string">'Session started'</span>);
+    
+    <span class="keyword">const</span> <span class="variable">data</span> <span class="operator">=</span> <span class="keyword">await</span> <span class="function">readFile</span>(<span class="string">'./config.json'</span>, <span class="string">'utf8'</span>);
+    <span class="keyword">return</span> <span class="variable">JSON</span>.<span class="function">parse</span>(<span class="variable">data</span>);
+    
+  } <span class="keyword">catch</span> (<span class="variable">err</span>) {
+    <span class="variable">console</span>.<span class="function">error</span>(<span class="string">'Setup failed:'</span>, <span class="variable">err</span>);
+  }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process & Environment Section -->
+    <section id="process" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-12">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 9l3 3-3 3m5 0h3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Process & Environment</h2>
+                        <p class="text-gray-600 mt-1">Runtime control and configuration</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Process Info -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Process Information</h3>
+
+                        <div class="space-y-4">
+                            <div
+                                class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <code
+                                    class="font-mono text-sm text-pink-600 bg-white px-3 py-1 rounded shadow-sm">process.argv</code>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Command Line Arguments</p>
+                                    <p class="text-xs text-gray-600">Array containing command-line arguments</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <code
+                                    class="font-mono text-sm text-pink-600 bg-white px-3 py-1 rounded shadow-sm">process.env</code>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Environment Variables</p>
+                                    <p class="text-xs text-gray-600">Object containing user environment</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <code
+                                    class="font-mono text-sm text-pink-600 bg-white px-3 py-1 rounded shadow-sm">process.cwd()</code>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Current Working Directory</p>
+                                    <p class="text-xs text-gray-600">Returns the current working directory</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="code-block mt-6">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">process-info.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// CLI arguments</span>
+<span class="keyword">const</span> [,, ...<span class="variable">args</span>] <span class="operator">=</span> <span class="variable">process</span>.<span class="variable">argv</span>;
+<span class="variable">console</span>.<span class="function">log</span>(<span class="string">'Arguments:'</span>, <span class="variable">args</span>);
+
+<span class="comment">// Current directory</span>
+<span class="variable">console</span>.<span class="function">log</span>(<span class="string">'CWD:'</span>, <span class="variable">process</span>.<span class="function">cwd</span>());
+
+<span class="comment">// Node version</span>
+<span class="variable">console</span>.<span class="function">log</span>(<span class="string">'Version:'</span>, <span class="variable">process</span>.<span class="variable">version</span>);</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Environment Variables -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Environment Variables</h3>
+
+                        <p class="text-gray-600 mb-6">
+                            Access via <code
+                                class="bg-gray-100 px-2 py-1 rounded font-mono text-sm">process.env.VARIABLE_NAME</code>.
+                            Use <code class="bg-gray-100 px-2 py-1 rounded font-mono text-sm">dotenv</code> package for
+                            local development.
+                        </p>
+
+                        <div class="code-block mb-6">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">.env</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="variable">NODE_ENV</span>=<span class="string">development</span>
+<span class="variable">PORT</span>=<span class="number">3000</span>
+<span class="variable">DB_URL</span>=<span class="string">mongodb://localhost:27017/app</span>
+<span class="variable">API_KEY</span>=<span class="string">secret_key_here</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">config.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">import</span> <span class="string">'dotenv/config'</span>;
+
+<span class="keyword">const</span> <span class="variable">config</span> <span class="operator">=</span> {
+  <span class="variable">port</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">PORT</span> || <span class="number">3000</span>,
+  <span class="variable">env</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">NODE_ENV</span> || <span class="string">'development'</span>,
+  <span class="variable">dbUrl</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">DB_URL</span>,
+  <span class="variable">isDev</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">NODE_ENV</span> <span class="operator">===</span> <span class="string">'development'</span>
+};
+
+<span class="keyword">export default</span> <span class="variable">config</span>;</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process Control -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Process Control</h3>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="p-4 bg-red-50 rounded-lg border border-red-100">
+                                <code class="font-mono text-sm text-red-700">process.exit()</code>
+                                <p class="text-xs text-gray-600 mt-1">Terminate process with code</p>
+                            </div>
+                            <div class="p-4 bg-orange-50 rounded-lg border border-orange-100">
+                                <code class="font-mono text-sm text-orange-700">process.kill()</code>
+                                <p class="text-xs text-gray-600 mt-1">Send signal to process</p>
+                            </div>
+                        </div>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">process-control.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="comment">// Graceful shutdown</span>
+<span class="variable">process</span>.<span class="function">on</span>(<span class="string">'SIGTERM'</span>, () <span class="operator">=></span> {
+  <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'SIGTERM received, closing...'</span>);
+  <span class="variable">server</span>.<span class="function">close</span>(() <span class="operator">=></span> {
+    <span class="variable">process</span>.<span class="function">exit</span>(<span class="number">0</span>);
+  });
+});
+
+<span class="comment">// Uncaught exceptions</span>
+<span class="variable">process</span>.<span class="function">on</span>(<span class="string">'uncaughtException'</span>, (<span class="variable">err</span>) <span class="operator">=></span> {
+  <span class="variable">console</span>.<span class="function">error</span>(<span class="string">'Uncaught:'</span>, <span class="variable">err</span>);
+  <span class="variable">process</span>.<span class="function">exit</span>(<span class="number">1</span>);
+});</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Child Processes -->
+                    <div class="concept-card bg-white rounded-2xl p-8">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Child Processes</h3>
+                        <p class="text-gray-600 mb-6">
+                            Spawn subprocesses for CPU-intensive tasks or shell commands.
+                        </p>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <code class="font-mono text-sm">exec()</code>
+                                <span class="text-xs text-gray-500">Buffer output, shell commands</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <code class="font-mono text-sm">spawn()</code>
+                                <span class="text-xs text-gray-500">Streaming, large data</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <code class="font-mono text-sm">fork()</code>
+                                <span class="text-xs text-gray-500">New Node.js instance</span>
+                            </div>
+                        </div>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="text-xs text-gray-400 font-mono">child-process.js</span>
+                                <button class="text-xs text-gray-400 hover:text-white transition-colors"
+                                    onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <div class="code-content">
+                                <pre><span class="keyword">import</span> { <span class="variable">exec</span>, <span class="variable">spawn</span> } <span class="keyword">from</span> <span class="string">'child_process'</span>;
+
+<span class="comment">// Execute shell command</span>
+<span class="function">exec</span>(<span class="string">'ls -la'</span>, (<span class="variable">err</span>, <span class="variable">stdout</span>) <span class="operator">=></span> {
+  <span class="variable">console</span>.<span class="function">log</span>(<span class="variable">stdout</span>);
+});
+
+<span class="comment">// Spawn with streams</span>
+<span class="keyword">const</span> <span class="variable">child</span> <span class="operator">=</span> <span class="function">spawn</span>(<span class="string">'node'</span>, [<span class="string">'script.js'</span>]);
+<span class="variable">child</span>.<span class="variable">stdout</span>.<span class="function">on</span>(<span class="string">'data'</span>, (<span class="variable">data</span>) <span class="operator">=></span> <span class="variable">console</span>.<span class="function">log</span>(<span class="variable">data</span>));</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-node-500 rounded-lg flex items-center justify-center text-white font-bold">N
+                    </div>
+                    <span class="font-bold text-xl">Node Basics</span>
+                </div>
+                <div class="flex space-x-6 text-sm text-gray-400">
+                    <a href="https://dhruvil05.github.io/node-basic/old-index.html" class="hover:text-white transition-colors">Documentation</a>
+                    <!-- <a href="#" class="hover:text-white transition-colors">GitHub</a>
+                    <a href="#" class="hover:text-white transition-colors">Node.js Official</a> -->
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
+                <p>Modern reference guide for Node.js developers.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" onclick="scrollToTop()"
+        class="fixed bottom-8 right-8 bg-node-600 text-white p-3 rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-node-700 hover:shadow-xl transform hover:-translate-y-1 z-40">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </button>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const sheet = document.getElementById('mobileMenuSheet');
+
+            overlay.classList.toggle('active');
+            sheet.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (sheet.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('pre');
+            const text = codeBlock.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerText;
+                button.innerText = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Scroll reveal animation
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+        // Back to top button visibility
+        const backToTopBtn = document.getElementById('backToTop');
+        const navbar = document.getElementById('navbar');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+            }
+
+            // Navbar shadow on scroll
+            if (window.pageYOffset > 10) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80; // Account for fixed header
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add hover effect to code blocks for syntax highlighting emphasis
+        document.querySelectorAll('.code-block').forEach(block => {
+            block.addEventListener('mouseenter', () => {
+                block.style.transform = 'translateY(-2px)';
+            });
+            block.addEventListener('mouseleave', () => {
+                block.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Close mobile menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const sheet = document.getElementById('mobileMenuSheet');
+                if (sheet.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

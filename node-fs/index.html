@@ -1,1193 +1,853 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Node.js File System Guide</title>
+    <title>The File System Companion — A Node.js Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Crimson Pro', 'Georgia', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        'paper': '#faf9f6',
+                        'paper-dark': '#f5f3f0',
+                        'ink': '#2c2c2c',
+                        'ink-light': '#5c5c5c',
+                        'accent': '#d97706',
+                        'accent-light': '#fbbf24',
+                        'sage': '#84a98c',
+                        'clay': '#c17767',
+                        'ocean': '#457b9d',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'lifted': '0 20px 40px -15px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #faf9f6;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+        .prose-serif {
+            font-family: 'Crimson Pro', Georgia, serif;
+            line-height: 1.7;
         }
 
-        header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            overflow-x: auto;
-            flex-wrap: wrap;
-        }
-
-        .nav-tab {
-            padding: 15px 25px;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            font-size: 1em;
-            font-weight: 500;
-            color: #495057;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .nav-tab:hover {
-            background: #e9ecef;
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: #11998e;
-            border-bottom: 3px solid #11998e;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h2 {
-            color: #1e3c72;
-            margin-bottom: 20px;
-            font-size: 2em;
-            border-bottom: 3px solid #11998e;
-            padding-bottom: 10px;
-        }
-
-        h3 {
-            color: #2a5298;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        h4 {
-            color: #34495e;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        p {
-            line-height: 1.8;
-            color: #555;
-            margin-bottom: 15px;
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 5rem;
+            line-height: 0.8;
+            margin-right: 0.1em;
+            margin-top: 0.1em;
+            font-weight: 600;
+            color: #d97706;
         }
 
         .code-block {
-            background: #282c34;
-            color: #abb2bf;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-            position: relative;
+            background: #f5f3f0;
+            border-left: 3px solid #d97706;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .code-block .keyword {
-            color: #c678dd;
-        }
-
-        .code-block .string {
-            color: #98c379;
-        }
-
-        .code-block .function {
-            color: #61afef;
-        }
-
-        .code-block .comment {
-            color: #5c6370;
-            font-style: italic;
-        }
-
-        .code-block .number {
-            color: #d19a66;
-        }
-
-        .highlight-box {
-            background: #e8f8f5;
-            border-left: 4px solid #11998e;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .highlight-box strong {
-            color: #11998e;
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .warning-box strong {
-            color: #856404;
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .info-box {
-            background: #d1ecf1;
-            border-left: 4px solid #17a2b8;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .info-box strong {
-            color: #0c5460;
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        ul {
-            margin-left: 30px;
-            margin-bottom: 20px;
-        }
-
-        li {
-            line-height: 1.8;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-card h4 {
-            margin: 0 0 10px 0;
-            font-size: 1.2em;
-            color: white;
-        }
-
-        .feature-card p {
-            margin: 0;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .comparison-table th,
-        .comparison-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .comparison-table th {
-            background: #11998e;
-            color: white;
-            font-weight: 600;
-        }
-
-        .comparison-table tr:hover {
-            background: #f8f9fa;
+        .sidebar-nav {
+            position: sticky;
+            top: 2rem;
         }
 
         .method-card {
-            background: #f8f9fa;
-            border-left: 4px solid #2a5298;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 5px;
+            transition: all 0.3s ease;
         }
 
-        .method-card h4 {
-            margin-top: 0;
-            color: #2a5298;
+        .method-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
         }
 
-        .error-codes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+        .chapter-number {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.05em;
         }
 
-        .error-code {
-            background: #fff5f5;
-            border: 1px solid #fc8181;
-            padding: 15px;
-            border-radius: 5px;
+        .highlight-mark {
+            background: linear-gradient(120deg, #fbbf24 0%, #fbbf24 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.3em;
+            background-position: 0 88%;
+            transition: background-size 0.3s ease;
         }
 
-        .error-code strong {
-            color: #c53030;
-            display: block;
-            margin-bottom: 5px;
+        .highlight-mark:hover {
+            background-size: 100% 100%;
         }
 
-        .error-code p {
-            color: #742a2a;
-            margin: 0;
-            font-size: 0.9em;
+        .comparison-table th {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
         }
 
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
+        .comparison-table td {
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-            .content {
-                padding: 20px;
-            }
+        .tip-box {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+        }
 
-            .nav-tab {
-                padding: 12px 15px;
-                font-size: 0.9em;
-            }
+        .warning-box {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+        }
+
+        /* Smooth reveal animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <header>
-            <h1>📁 Node.js File System</h1>
-            <p>Complete Guide to File and Directory Operations</p>
-        </header>
+<body class="text-ink antialiased">
 
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('intro')">Introduction</button>
-            <button class="nav-tab" onclick="showTab('reading')">Reading</button>
-            <button class="nav-tab" onclick="showTab('writing')">Writing</button>
-            <button class="nav-tab" onclick="showTab('directories')">Directories</button>
-            <button class="nav-tab" onclick="showTab('streams')">Streams</button>
-            <button class="nav-tab" onclick="showTab('advanced')">Advanced</button>
-            <button class="nav-tab" onclick="showTab('errors')">Error Handling</button>
-            <button class="nav-tab" onclick="showTab('tips')">Best Practices</button>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-paper/90 backdrop-blur-md border-b border-stone-200 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-accent text-white rounded-lg flex items-center justify-center font-serif text-xl font-bold">
+                    fs</div>
+                <div>
+                    <div class="font-serif text-lg font-semibold text-ink">The File System Companion</div>
+                    <div class="text-xs text-ink-light font-sans tracking-wider">NODE.JS GUIDE</div>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-8 font-sans text-sm">
+                <a href="#reading" class="text-ink-light hover:text-accent transition-colors">Reading</a>
+                <a href="#writing" class="text-ink-light hover:text-accent transition-colors">Writing</a>
+                <a href="#directories" class="text-ink-light hover:text-accent transition-colors">Directories</a>
+                <a href="#streams" class="text-ink-light hover:text-accent transition-colors">Streams</a>
+                <a href="#advanced" class="text-ink-light hover:text-accent transition-colors">Advanced</a>
+            </div>
         </div>
+    </nav>
 
-        <div class="content">
-            <div id="intro" class="tab-content active">
-                <h2>Introduction to Node.js File System</h2>
-                <p>The file system (fs) module in Node.js provides an API for interacting with the file system in a way
-                    modeled on standard POSIX functions. It allows you to read, write, update, delete, and manipulate
-                    files and directories on your computer.</p>
+    <!-- Hero Section -->
+    <header class="pt-32 pb-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div
+                class="inline-block mb-6 px-4 py-2 bg-stone-200 rounded-full text-xs font-sans font-medium text-ink-light tracking-widest uppercase">
+                Essential Reference
+            </div>
+            <h1 class="font-serif text-5xl md:text-7xl font-bold text-ink mb-6 leading-tight">
+                Mastering the<br>
+                <span class="italic text-accent">Node.js File System</span>
+            </h1>
+            <p class="text-xl text-ink-light max-w-2xl mx-auto leading-relaxed font-serif">
+                A comprehensive guide to reading, writing, and manipulating files with elegance and precision. From
+                basic operations to advanced streaming techniques.
+            </p>
 
-                <h3>Getting Started</h3>
-                <p>To use the file system module, you need to require it:</p>
-                <div class="code-block">
-                    <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                        class="string">'fs'</span>); <span class="comment">// Callback-based</span>
-                    <span class="keyword">const</span> fsPromises = <span class="function">require</span>(<span
-                        class="string">'fs'</span>).promises; <span class="comment">// Promise-based</span>
-                    <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                        class="string">'fs/promises'</span>); <span class="comment">// Promise-based (Node.js
-                        14+)</span>
+            <div class="mt-12 flex flex-wrap justify-center gap-4 text-sm font-sans">
+                <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-soft">
+                    <span class="w-2 h-2 rounded-full bg-sage"></span>
+                    <span class="text-ink-light">Async/Await</span>
                 </div>
-
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>📖 Reading Files</h4>
-                        <p>Read file contents synchronously or asynchronously</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>✍️ Writing Files</h4>
-                        <p>Create, write, and append to files</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>📂 Directory Operations</h4>
-                        <p>Create, read, and delete directories</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>🌊 Streams</h4>
-                        <p>Handle large files efficiently</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>👀 File Watching</h4>
-                        <p>Monitor files for changes</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>ℹ️ File Info</h4>
-                        <p>Get metadata and statistics</p>
-                    </div>
+                <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-soft">
+                    <span class="w-2 h-2 rounded-full bg-ocean"></span>
+                    <span class="text-ink-light">Streams</span>
                 </div>
-
-                <div class="highlight-box">
-                    <strong>Three Ways to Use fs Module:</strong>
-                    <ul>
-                        <li><strong>Synchronous:</strong> Blocks execution until operation completes</li>
-                        <li><strong>Callbacks:</strong> Non-blocking with callback functions</li>
-                        <li><strong>Promises:</strong> Non-blocking with async/await syntax</li>
-                    </ul>
+                <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-soft">
+                    <span class="w-2 h-2 rounded-full bg-clay"></span>
+                    <span class="text-ink-light">Error Handling</span>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <div id="reading" class="tab-content">
-                <h2>Reading Files</h2>
-
-                <div class="method-card">
-                    <h4>Synchronous Reading (Blocking)</h4>
-                    <p>Blocks execution until the file is read completely.</p>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs'</span>);
-
-                        <span class="keyword">try</span> {
-                        <span class="keyword">const</span> data = fs.<span class="function">readFileSync</span>(<span
-                            class="string">'example.txt'</span>, <span class="string">'utf8'</span>);
-                        console.<span class="function">log</span>(data);
-                        } <span class="keyword">catch</span> (error) {
-                        console.<span class="function">error</span>(<span class="string">'Error reading file:'</span>,
-                        error);
-                        }
+    <!-- Three Approaches Overview -->
+    <section class="py-16 px-6 bg-white border-y border-stone-200">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="font-serif text-3xl font-bold text-center mb-12">Three Ways to Work with Files</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="method-card bg-paper p-8 rounded-2xl border border-stone-200">
+                    <div class="w-12 h-12 bg-stone-200 rounded-xl flex items-center justify-center mb-4 text-2xl">⏸️
                     </div>
+                    <h3 class="font-serif text-xl font-bold mb-2">Synchronous</h3>
+                    <p class="text-ink-light text-sm mb-4 font-serif">Blocks execution until complete. Simple but halts
+                        everything.</p>
+                    <code
+                        class="text-xs font-mono bg-white px-2 py-1 rounded border border-stone-200">readFileSync()</code>
                 </div>
-
-                <div class="method-card">
-                    <h4>Asynchronous with Callbacks</h4>
-                    <p>Non-blocking operation with callback function.</p>
-                    <div class="code-block">
-                        fs.<span class="function">readFile</span>(<span class="string">'example.txt'</span>, <span
-                            class="string">'utf8'</span>, (error, data) => {
-                        <span class="keyword">if</span> (error) {
-                        console.<span class="function">error</span>(<span class="string">'Error reading file:'</span>,
-                        error);
-                        <span class="keyword">return</span>;
-                        }
-                        console.<span class="function">log</span>(data);
-                        });
+                <div class="method-card bg-paper p-8 rounded-2xl border border-stone-200">
+                    <div class="w-12 h-12 bg-stone-200 rounded-xl flex items-center justify-center mb-4 text-2xl">📞
                     </div>
+                    <h3 class="font-serif text-xl font-bold mb-2">Callbacks</h3>
+                    <p class="text-ink-light text-sm mb-4 font-serif">Non-blocking with traditional Node.js callback
+                        pattern.</p>
+                    <code
+                        class="text-xs font-mono bg-white px-2 py-1 rounded border border-stone-200">readFile(cb)</code>
                 </div>
-
-                <div class="method-card">
-                    <h4>Asynchronous with Promises (Recommended)</h4>
-                    <p>Clean async/await syntax for better readability.</p>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs/promises'</span>);
-
-                        <span class="keyword">async function</span> <span class="function">readFileExample</span>() {
-                        <span class="keyword">try</span> {
-                        <span class="keyword">const</span> data = <span class="keyword">await</span> fs.<span
-                            class="function">readFile</span>(<span class="string">'example.txt'</span>, <span
-                            class="string">'utf8'</span>);
-                        console.<span class="function">log</span>(data);
-                        } <span class="keyword">catch</span> (error) {
-                        console.<span class="function">error</span>(<span class="string">'Error reading file:'</span>,
-                        error);
-                        }
-                        }
+                <div
+                    class="method-card bg-paper p-8 rounded-2xl border border-accent/30 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-accent text-white text-xs px-3 py-1 rounded-bl-lg font-sans">
+                        Recommended</div>
+                    <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4 text-2xl">✨
                     </div>
-                </div>
-
-                <h3>Other Reading Operations</h3>
-
-                <div class="method-card">
-                    <h4>Check File Existence</h4>
-                    <div class="code-block">
-                        <span class="keyword">async function</span> <span class="function">checkExists</span>() {
-                        <span class="keyword">try</span> {
-                        <span class="keyword">await</span> fs.<span class="function">access</span>(<span
-                            class="string">'example.txt'</span>);
-                        console.<span class="function">log</span>(<span class="string">'File exists'</span>);
-                        } <span class="keyword">catch</span> {
-                        console.<span class="function">log</span>(<span class="string">'File does not exist'</span>);
-                        }
-                        }
-                    </div>
-                </div>
-
-                <div class="method-card">
-                    <h4>Get File Information</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> stats = <span class="keyword">await</span> fs.<span
-                            class="function">stat</span>(<span class="string">'example.txt'</span>);
-
-                        console.<span class="function">log</span>(stats.<span class="function">isFile</span>()); <span
-                            class="comment">// true if it's a file</span>
-                        console.<span class="function">log</span>(stats.<span class="function">isDirectory</span>());
-                        <span class="comment">// true if it's a directory</span>
-                        console.<span class="function">log</span>(stats.size); <span class="comment">// file size in
-                            bytes</span>
-                        console.<span class="function">log</span>(stats.mtime); <span class="comment">// last modified
-                            time</span>
-                        console.<span class="function">log</span>(stats.birthtime); <span class="comment">// creation
-                            time</span>
-                    </div>
-                </div>
-
-                <div class="info-box">
-                    <strong>Reading JSON Files</strong>
-                    <div class="code-block">
-                        <span class="keyword">async function</span> <span class="function">readJSON</span>(filename) {
-                        <span class="keyword">const</span> data = <span class="keyword">await</span> fs.<span
-                            class="function">readFile</span>(filename, <span class="string">'utf8'</span>);
-                        <span class="keyword">return</span> JSON.<span class="function">parse</span>(data);
-                        }
-
-                        <span class="keyword">const</span> config = <span class="keyword">await</span> <span
-                            class="function">readJSON</span>(<span class="string">'config.json'</span>);
-                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-2 text-accent">Promises</h3>
+                    <p class="text-ink-light text-sm mb-4 font-serif">Clean async/await syntax. Modern and readable.</p>
+                    <code
+                        class="text-xs font-mono bg-white px-2 py-1 rounded border border-accent/30 text-accent">fs/promises</code>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div id="writing" class="tab-content">
-                <h2>Writing Files</h2>
+    <!-- Main Content Layout -->
+    <div class="max-w-7xl mx-auto px-6 py-20">
+        <div class="grid lg:grid-cols-12 gap-12">
 
-                <div class="method-card">
-                    <h4>Write File (Overwrites existing content)</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs/promises'</span>);
+            <!-- Sidebar Navigation -->
+            <aside class="hidden lg:block lg:col-span-3">
+                <div class="sidebar-nav space-y-8">
+                    <div>
+                        <h4 class="font-sans text-xs font-bold text-ink-light uppercase tracking-wider mb-4">Contents
+                        </h4>
+                        <nav class="space-y-2 font-serif">
+                            <a href="#reading"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Reading
+                                Files</a>
+                            <a href="#writing"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Writing
+                                & Modifying</a>
+                            <a href="#directories"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Directory
+                                Operations</a>
+                            <a href="#streams"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Working
+                                with Streams</a>
+                            <a href="#watching"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">File
+                                Watching</a>
+                            <a href="#advanced"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Advanced
+                                Techniques</a>
+                            <a href="#errors"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Error
+                                Handling</a>
+                            <a href="#best-practices"
+                                class="block py-2 px-3 rounded-lg hover:bg-stone-100 transition-colors text-ink-light hover:text-ink">Best
+                                Practices</a>
+                        </nav>
+                    </div>
 
-                        <span class="keyword">async function</span> <span class="function">writeFileExample</span>() {
-                        <span class="keyword">try</span> {
-                        <span class="keyword">await</span> fs.<span class="function">writeFile</span>(<span
-                            class="string">'output.txt'</span>, <span class="string">'Hello World!'</span>, <span
-                            class="string">'utf8'</span>);
-                        console.<span class="function">log</span>(<span class="string">'File written
-                            successfully'</span>);
-                        } <span class="keyword">catch</span> (error) {
-                        console.<span class="function">error</span>(<span class="string">'Error writing file:'</span>,
-                        error);
-                        }
-                        }
+                    <div class="p-6 bg-accent/5 rounded-xl border border-accent/20">
+                        <div class="font-sans text-xs font-bold text-accent uppercase tracking-wider mb-2">Quick Tip
+                        </div>
+                        <p class="text-sm text-ink-light font-serif">Always use <code
+                                class="font-mono text-xs bg-white px-1 rounded">try/catch</code> with async operations
+                            and close file handles in <code
+                                class="font-mono text-xs bg-white px-1 rounded">finally</code> blocks.</p>
                     </div>
                 </div>
+            </aside>
 
-                <div class="method-card">
-                    <h4>Append to File (Adds to existing content)</h4>
-                    <div class="code-block">
-                        <span class="keyword">await</span> fs.<span class="function">appendFile</span>(<span
-                            class="string">'log.txt'</span>, <span class="string">'New log entry\n'</span>, <span
-                            class="string">'utf8'</span>);
+            <!-- Main Content -->
+            <main class="lg:col-span-9 space-y-24">
+
+                <!-- Reading Section -->
+                <section id="reading" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">01</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Reading Files</h2>
                     </div>
-                </div>
 
-                <div class="method-card">
-                    <h4>Copy File</h4>
-                    <div class="code-block">
-                        <span class="keyword">await</span> fs.<span class="function">copyFile</span>(<span
-                            class="string">'source.txt'</span>, <span class="string">'destination.txt'</span>);
-                        console.<span class="function">log</span>(<span class="string">'File copied'</span>);
+                    <div class="prose-serif text-lg text-ink-light space-y-6 mb-12 drop-cap">
+                        The file system module provides multiple approaches to reading data, each suited to different
+                        scenarios. Whether you need to load a small configuration file or process a massive dataset,
+                        choosing the right method ensures both performance and reliability.
                     </div>
-                </div>
 
-                <div class="method-card">
-                    <h4>Rename/Move File</h4>
-                    <div class="code-block">
-                        <span class="keyword">await</span> fs.<span class="function">rename</span>(<span
-                            class="string">'old-name.txt'</span>, <span class="string">'new-name.txt'</span>);
-                        <span class="comment">// Can also move files to different directories</span>
-                        <span class="keyword">await</span> fs.<span class="function">rename</span>(<span
-                            class="string">'file.txt'</span>, <span class="string">'./subfolder/file.txt'</span>);
+                    <div class="space-y-8">
+                        <!-- Sync Method -->
+                        <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span
+                                    class="px-3 py-1 bg-stone-200 text-stone-700 rounded-full text-xs font-sans font-medium">Synchronous</span>
+                                <h3 class="font-serif text-2xl font-bold">Blocking Read</h3>
+                            </div>
+                            <p class="text-ink-light mb-6 font-serif">Useful for configuration files during application
+                                startup when you need data before proceeding.</p>
+                            <div class="code-block rounded-lg p-6 overflow-x-auto">
+                                <pre class="font-mono text-sm text-ink"><code>const fs = require('fs');
+
+try {
+    const data = fs.readFileSync('config.txt', 'utf8');
+    console.log(data);
+} catch (error) {
+    console.error('Failed to read:', error.message);
+}</code></pre>
+                            </div>
+                            <div class="mt-4 flex items-start gap-3 warning-box rounded-lg p-4">
+                                <span class="text-clay text-xl">⚠️</span>
+                                <p class="text-sm text-ink-light font-serif">Avoid in web servers or during request
+                                    handling. Blocks the entire event loop until complete.</p>
+                            </div>
+                        </div>
+
+                        <!-- Async/Await Method -->
+                        <div
+                            class="bg-white rounded-2xl p-8 shadow-soft border border-accent/20 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-accent"></div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span
+                                    class="px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-sans font-medium">Recommended</span>
+                                <h3 class="font-serif text-2xl font-bold">Asynchronous with Promises</h3>
+                            </div>
+                            <p class="text-ink-light mb-6 font-serif">The modern approach. Non-blocking with clean error
+                                handling using async/await syntax.</p>
+                            <div class="code-block rounded-lg p-6 overflow-x-auto border-accent/30">
+                                <pre class="font-mono text-sm text-ink"><code>const fs = require('fs').promises;
+
+async function readDocument(path) {
+    try {
+        const data = await fs.readFile(path, 'utf8');
+        return data;
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.error('File not found');
+        } else {
+            console.error('Read failed:', error);
+        }
+        throw error;
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <!-- JSON Reading -->
+                        <div class="bg-sage/10 rounded-2xl p-8 border border-sage/30">
+                            <h4 class="font-serif text-xl font-bold text-sage mb-4 flex items-center gap-2">
+                                <span>🎯</span> Pattern: Reading JSON Files
+                            </h4>
+                            <div class="code-block rounded-lg p-6 bg-white border-sage/30">
+                                <pre class="font-mono text-sm text-ink"><code>async function readJSON(filename) {
+    const data = await fs.readFile(filename, 'utf8');
+    return JSON.parse(data);
+}
+
+// Usage
+const config = await readJSON('config.json');</code></pre>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="method-card">
-                    <h4>Delete File</h4>
-                    <div class="code-block">
-                        <span class="keyword">await</span> fs.<span class="function">unlink</span>(<span
-                            class="string">'file-to-delete.txt'</span>);
-                        console.<span class="function">log</span>(<span class="string">'File deleted'</span>);
+                <!-- Writing Section -->
+                <section id="writing" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">02</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Writing & Modifying</h2>
                     </div>
-                </div>
 
-                <div class="info-box">
-                    <strong>Writing JSON Files</strong>
-                    <div class="code-block">
-                        <span class="keyword">async function</span> <span class="function">writeJSON</span>(filename,
-                        data) {
-                        <span class="keyword">const</span> jsonString = JSON.<span
-                            class="function">stringify</span>(data, <span class="keyword">null</span>, <span
-                            class="number">2</span>);
-                        <span class="keyword">await</span> fs.<span class="function">writeFile</span>(filename,
-                        jsonString, <span class="string">'utf8'</span>);
-                        }
-
-                        <span class="keyword">await</span> <span class="function">writeJSON</span>(<span
-                            class="string">'data.json'</span>, { name: <span class="string">'John'</span>, age: <span
-                            class="number">30</span> });
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="method-card bg-white p-6 rounded-xl shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-lg font-bold mb-2">writeFile()</h3>
+                            <p class="text-sm text-ink-light mb-4 font-serif">Creates new file or replaces existing
+                                content entirely.</p>
+                            <code
+                                class="text-xs font-mono bg-paper px-2 py-1 rounded">await fs.writeFile('file.txt', 'content')</code>
+                        </div>
+                        <div class="method-card bg-white p-6 rounded-xl shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-lg font-bold mb-2">appendFile()</h3>
+                            <p class="text-sm text-ink-light mb-4 font-serif">Adds content to end of file. Creates file
+                                if doesn't exist.</p>
+                            <code
+                                class="text-xs font-mono bg-paper px-2 py-1 rounded">await fs.appendFile('log.txt', 'entry')</code>
+                        </div>
+                        <div class="method-card bg-white p-6 rounded-xl shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-lg font-bold mb-2">copyFile()</h3>
+                            <p class="text-sm text-ink-light mb-4 font-serif">Copies file from source to destination.
+                            </p>
+                            <code
+                                class="text-xs font-mono bg-paper px-2 py-1 rounded">await fs.copyFile('src.txt', 'dest.txt')</code>
+                        </div>
+                        <div class="method-card bg-white p-6 rounded-xl shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-lg font-bold mb-2">rename()</h3>
+                            <p class="text-sm text-ink-light mb-4 font-serif">Moves or renames files and directories.
+                            </p>
+                            <code
+                                class="text-xs font-mono bg-paper px-2 py-1 rounded">await fs.rename('old.txt', 'new.txt')</code>
+                        </div>
                     </div>
-                </div>
 
-                <div class="info-box">
-                    <strong>Simple Logger Example</strong>
-                    <div class="code-block">
-                        <span class="keyword">async function</span> <span class="function">log</span>(message) {
-                        <span class="keyword">const</span> timestamp = <span class="keyword">new</span> <span
-                            class="function">Date</span>().<span class="function">toISOString</span>();
-                        <span class="keyword">const</span> logEntry = <span class="string">`[${timestamp}]
-                            ${message}\n`</span>;
-                        <span class="keyword">await</span> fs.<span class="function">appendFile</span>(<span
-                            class="string">'app.log'</span>, logEntry, <span class="string">'utf8'</span>);
-                        }
+                    <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                        <h3 class="font-serif text-2xl font-bold mb-6">Practical Example: Logger</h3>
+                        <div class="code-block rounded-lg p-6">
+                            <pre class="font-mono text-sm text-ink"><code>async function log(message) {
+    const timestamp = new Date().toISOString();
+    const entry = `[${timestamp}] ${message}\n`;
+    await fs.appendFile('app.log', entry, 'utf8');
+}
 
-                        <span class="keyword">await</span> <span class="function">log</span>(<span
-                            class="string">'Application started'</span>);
+// Usage
+await log('Application started');
+await log('User logged in');</code></pre>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </section>
 
-            <div id="directories" class="tab-content">
-                <h2>Directory Operations</h2>
-
-                <div class="method-card">
-                    <h4>Create Directory</h4>
-                    <div class="code-block">
-                        <span class="comment">// Create single directory</span>
-                        <span class="keyword">await</span> fs.<span class="function">mkdir</span>(<span
-                            class="string">'new-folder'</span>);
-
-                        <span class="comment">// Create nested directories</span>
-                        <span class="keyword">await</span> fs.<span class="function">mkdir</span>(<span
-                            class="string">'path/to/nested/folder'</span>, { recursive: <span
-                            class="keyword">true</span> });
+                <!-- Directories Section -->
+                <section id="directories" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">03</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Directory Operations</h2>
                     </div>
-                </div>
 
-                <div class="method-card">
-                    <h4>Read Directory Contents</h4>
-                    <div class="code-block">
-                        <span class="comment">// Get array of filenames</span>
-                        <span class="keyword">const</span> files = <span class="keyword">await</span> fs.<span
-                            class="function">readdir</span>(<span class="string">'./my-folder'</span>);
-                        console.<span class="function">log</span>(files); <span class="comment">// ['file1.txt',
-                            'file2.txt', 'subfolder']</span>
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-xl font-bold mb-4">Creating Nested Structures</h3>
+                            <div class="code-block rounded-lg p-6 mb-4">
+                                <pre class="font-mono text-sm text-ink"><code>// Create single directory
+await fs.mkdir('new-folder');
 
-                        <span class="comment">// Get detailed information</span>
-                        <span class="keyword">const</span> filesWithTypes = <span class="keyword">await</span> fs.<span
-                            class="function">readdir</span>(<span class="string">'./my-folder'</span>, { withFileTypes:
-                        <span class="keyword">true</span> });
-                        filesWithTypes.<span class="function">forEach</span>(file => {
-                        console.<span class="function">log</span>(file.name, file.<span
-                            class="function">isDirectory</span>() ? <span class="string">'DIR'</span> : <span
-                            class="string">'FILE'</span>);
-                        });
+// Create nested directories (recursive)
+await fs.mkdir('path/to/nested/folder', { recursive: true });</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-xl font-bold mb-4">Reading Directory Contents</h3>
+                            <div class="code-block rounded-lg p-6 mb-4">
+                                <pre class="font-mono text-sm text-ink"><code>// Simple list
+const files = await fs.readdir('./my-folder');
+console.log(files); // ['file1.txt', 'file2.js']
+
+// With file type information
+const entries = await fs.readdir('./my-folder', { withFileTypes: true });
+entries.forEach(entry => {
+    console.log(entry.name, entry.isDirectory() ? '📁' : '📄');
+});</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="tip-box rounded-2xl p-6">
+                            <h4 class="font-serif text-lg font-bold text-ink mb-2">Recursive Listing Pattern</h4>
+                            <div class="code-block rounded-lg p-4 bg-white border-accent/20 mt-4">
+                                <pre class="font-mono text-sm text-ink"><code>async function listFilesRecursively(dir, files = []) {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            await listFilesRecursively(fullPath, files);
+        } else {
+            files.push(fullPath);
+        }
+    }
+    return files;
+}</code></pre>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="method-card">
-                    <h4>Remove Directory</h4>
-                    <div class="code-block">
-                        <span class="comment">// Remove empty directory</span>
-                        <span class="keyword">await</span> fs.<span class="function">rmdir</span>(<span
-                            class="string">'empty-folder'</span>);
-
-                        <span class="comment">// Remove directory and all contents (Node.js 14.14+)</span>
-                        <span class="keyword">await</span> fs.<span class="function">rm</span>(<span
-                            class="string">'folder-with-files'</span>, { recursive: <span class="keyword">true</span>,
-                        force: <span class="keyword">true</span> });
+                <!-- Streams Section -->
+                <section id="streams" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">04</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Working with Streams</h2>
                     </div>
-                </div>
 
-                <div class="info-box">
-                    <strong>Recursive Directory Listing</strong>
-                    <div class="code-block">
-                        <span class="keyword">async function</span> <span
-                            class="function">listFilesRecursively</span>(dir, fileList = []) {
-                        <span class="keyword">const</span> files = <span class="keyword">await</span> fs.<span
-                            class="function">readdir</span>(dir, { withFileTypes: <span class="keyword">true</span> });
-
-                        <span class="keyword">for</span> (<span class="keyword">const</span> file <span
-                            class="keyword">of</span> files) {
-                        <span class="keyword">const</span> filePath = path.<span class="function">join</span>(dir,
-                        file.name);
-
-                        <span class="keyword">if</span> (file.<span class="function">isDirectory</span>()) {
-                        <span class="keyword">await</span> <span class="function">listFilesRecursively</span>(filePath,
-                        fileList);
-                        } <span class="keyword">else</span> {
-                        fileList.<span class="function">push</span>(filePath);
-                        }
-                        }
-
-                        <span class="keyword">return</span> fileList;
-                        }
+                    <div class="prose-serif text-lg text-ink-light mb-8">
+                        For large files, streams are essential. They process data in chunks, keeping memory usage
+                        constant regardless of file size.
                     </div>
-                </div>
 
-                <h3>Working with Paths</h3>
-                <p>Often used with the path module:</p>
-                <div class="code-block">
-                    <span class="keyword">const</span> path = <span class="function">require</span>(<span
-                        class="string">'path'</span>);
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-ocean/10 rounded-2xl p-8 border border-ocean/30">
+                            <h3 class="font-serif text-xl font-bold text-ocean mb-4">Readable Streams</h3>
+                            <div class="code-block rounded-lg p-4 bg-white border-ocean/20">
+                                <pre class="font-mono text-sm text-ink"><code>const readStream = fs.createReadStream('large-file.txt');
 
-                    <span class="comment">// Join paths correctly for any OS</span>
-                    <span class="keyword">const</span> filePath = path.<span class="function">join</span>(__dirname,
-                    <span class="string">'data'</span>, <span class="string">'file.txt'</span>);
+readStream.on('data', chunk => {
+    console.log('Chunk:', chunk.length);
+});
 
-                    <span class="comment">// Get file extension</span>
-                    <span class="keyword">const</span> ext = path.<span class="function">extname</span>(<span
-                        class="string">'document.pdf'</span>); <span class="comment">// '.pdf'</span>
+readStream.on('end', () => {
+    console.log('Complete');
+});</code></pre>
+                            </div>
+                        </div>
 
-                    <span class="comment">// Get filename without extension</span>
-                    <span class="keyword">const</span> name = path.<span class="function">basename</span>(<span
-                        class="string">'document.pdf'</span>, <span class="string">'.pdf'</span>); <span
-                        class="comment">// 'document'</span>
+                        <div class="bg-clay/10 rounded-2xl p-8 border border-clay/30">
+                            <h3 class="font-serif text-xl font-bold text-clay mb-4">Piping Streams</h3>
+                            <div class="code-block rounded-lg p-4 bg-white border-clay/20">
+                                <pre class="font-mono text-sm text-ink"><code>const read = fs.createReadStream('source.txt');
+const write = fs.createWriteStream('dest.txt');
 
-                    <span class="comment">// Get directory name</span>
-                    <span class="keyword">const</span> dir = path.<span class="function">dirname</span>(<span
-                        class="string">'/path/to/file.txt'</span>); <span class="comment">// '/path/to'</span>
+read.pipe(write);
 
-                    <span class="comment">// Resolve absolute path</span>
-                    <span class="keyword">const</span> absolute = path.<span class="function">resolve</span>(<span
-                        class="string">'file.txt'</span>);
-                </div>
-            </div>
-
-            <div id="streams" class="tab-content">
-                <h2>Working with Streams</h2>
-                <p>Streams are useful for handling large files efficiently without loading the entire file into memory.
-                </p>
-
-                <div class="method-card">
-                    <h4>Reading Streams</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs'</span>);
-
-                        <span class="keyword">const</span> readStream = fs.<span
-                            class="function">createReadStream</span>(<span class="string">'large-file.txt'</span>, <span
-                            class="string">'utf8'</span>);
-
-                        readStream.<span class="function">on</span>(<span class="string">'data'</span>, (chunk) => {
-                        console.<span class="function">log</span>(<span class="string">'Received chunk:'</span>, chunk);
-                        });
-
-                        readStream.<span class="function">on</span>(<span class="string">'end'</span>, () => {
-                        console.<span class="function">log</span>(<span class="string">'Finished reading file'</span>);
-                        });
-
-                        readStream.<span class="function">on</span>(<span class="string">'error'</span>, (error) => {
-                        console.<span class="function">error</span>(<span class="string">'Error:'</span>, error);
-                        });
+write.on('finish', () => {
+    console.log('Copied!');
+});</code></pre>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="method-card">
-                    <h4>Writing Streams</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> writeStream = fs.<span
-                            class="function">createWriteStream</span>(<span class="string">'output.txt'</span>);
-
-                        writeStream.<span class="function">write</span>(<span class="string">'First line\n'</span>);
-                        writeStream.<span class="function">write</span>(<span class="string">'Second line\n'</span>);
-                        writeStream.<span class="function">end</span>(<span class="string">'Final line\n'</span>);
-
-                        writeStream.<span class="function">on</span>(<span class="string">'finish'</span>, () => {
-                        console.<span class="function">log</span>(<span class="string">'Finished writing'</span>);
-                        });
+                    <div class="success-box rounded-2xl p-6">
+                        <h4 class="font-serif text-lg font-bold text-ink mb-2">When to Use Streams</h4>
+                        <ul class="space-y-2 text-ink-light font-serif mt-4">
+                            <li class="flex items-start gap-2"><span class="text-sage">✓</span> Files larger than 100MB
+                            </li>
+                            <li class="flex items-start gap-2"><span class="text-sage">✓</span> Processing data on the
+                                fly</li>
+                            <li class="flex items-start gap-2"><span class="text-sage">✓</span> Network responses</li>
+                            <li class="flex items-start gap-2"><span class="text-sage">✓</span> Real-time data
+                                processing</li>
+                        </ul>
                     </div>
-                </div>
+                </section>
 
-                <div class="method-card">
-                    <h4>Piping Streams (Copy files efficiently)</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> readStream = fs.<span
-                            class="function">createReadStream</span>(<span class="string">'source.txt'</span>);
-                        <span class="keyword">const</span> writeStream = fs.<span
-                            class="function">createWriteStream</span>(<span class="string">'destination.txt'</span>);
-
-                        readStream.<span class="function">pipe</span>(writeStream);
-
-                        writeStream.<span class="function">on</span>(<span class="string">'finish'</span>, () => {
-                        console.<span class="function">log</span>(<span class="string">'File copied
-                            successfully'</span>);
-                        });
+                <!-- Watching Section -->
+                <section id="watching" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">05</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">File Watching</h2>
                     </div>
-                </div>
 
-                <div class="highlight-box">
-                    <strong>Why Use Streams?</strong>
-                    <ul>
-                        <li>Handle large files without loading them entirely into memory</li>
-                        <li>Process data as it arrives, chunk by chunk</li>
-                        <li>More efficient for reading/writing large amounts of data</li>
-                        <li>Can pipe data from one stream to another</li>
-                    </ul>
-                </div>
+                    <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                        <div class="code-block rounded-lg p-6">
+                            <pre class="font-mono text-sm text-ink"><code>// Watch a single file
+fs.watch('config.txt', (eventType, filename) => {
+    console.log(`${filename} changed: ${eventType}`);
+});
 
-                <h3>File Watching</h3>
-                <p>Monitor files and directories for changes:</p>
+// Watch directory recursively
+fs.watch('./src', { recursive: true }, (eventType, filename) => {
+    console.log(`${filename} was ${eventType}`);
+});
 
-                <div class="method-card">
-                    <h4>Watch a File</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs'</span>);
-
-                        <span class="comment">// Watch a single file</span>
-                        fs.<span class="function">watch</span>(<span class="string">'example.txt'</span>, (eventType,
-                        filename) => {
-                        console.<span class="function">log</span>(<span class="string">`Event: ${eventType} on
-                            ${filename}`</span>);
-                        });
-
-                        <span class="comment">// Watch a directory</span>
-                        fs.<span class="function">watch</span>(<span class="string">'./my-folder'</span>, { recursive:
-                        <span class="keyword">true</span> }, (eventType, filename) => {
-                        console.<span class="function">log</span>(<span class="string">`${filename} was
-                            ${eventType}`</span>);
-                        });
+// Detailed change info
+fs.watchFile('important.txt', (current, previous) => {
+    console.log(`Modified: ${current.mtime}`);
+});</code></pre>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="method-card">
-                    <h4>Watch File with Details</h4>
-                    <div class="code-block">
-                        fs.<span class="function">watchFile</span>(<span class="string">'example.txt'</span>, (current,
-                        previous) => {
-                        console.<span class="function">log</span>(<span class="string">`File modified at:
-                            ${current.mtime}`</span>);
-                        console.<span class="function">log</span>(<span class="string">`Previous modified:
-                            ${previous.mtime}`</span>);
-                        });
+                <!-- Advanced Section -->
+                <section id="advanced" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">06</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Advanced Operations</h2>
                     </div>
-                </div>
-            </div>
 
-            <div id="advanced" class="tab-content">
-                <h2>Advanced File Operations</h2>
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-xl font-bold mb-4">File Descriptors</h3>
+                            <p class="text-ink-light mb-4 font-serif">Low-level control for precise read/write
+                                operations.</p>
+                            <div class="code-block rounded-lg p-6">
+                                <pre class="font-mono text-sm text-ink"><code>const handle = await fs.open('data.txt', 'r');
 
-                <div class="method-card">
-                    <h4>Reading Files in Chunks</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs/promises'</span>);
+try {
+    const buffer = Buffer.alloc(100);
+    const result = await handle.read(buffer, 0, 100, 0);
+    console.log(buffer.toString('utf8', 0, result.bytesRead));
+} finally {
+    await handle.close(); // Always close!
+}</code></pre>
+                            </div>
+                        </div>
 
-                        <span class="keyword">async function</span> <span class="function">readInChunks</span>(filename,
-                        chunkSize = <span class="number">1024</span>) {
-                        <span class="keyword">const</span> fileHandle = <span class="keyword">await</span> fs.<span
-                            class="function">open</span>(filename, <span class="string">'r'</span>);
-                        <span class="keyword">const</span> buffer = Buffer.<span
-                            class="function">alloc</span>(chunkSize);
+                        <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100">
+                            <h3 class="font-serif text-xl font-bold mb-4">File Permissions</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="code-block rounded-lg p-4">
+                                    <pre class="font-mono text-sm text-ink"><code>// Make executable
+await fs.chmod('script.sh', 0o755);
 
-                        <span class="keyword">try</span> {
-                        <span class="keyword">let</span> bytesRead;
-                        <span class="keyword">do</span> {
-                        <span class="keyword">const</span> result = <span class="keyword">await</span> fileHandle.<span
-                            class="function">read</span>(buffer, <span class="number">0</span>, chunkSize);
-                        bytesRead = result.bytesRead;
-
-                        <span class="keyword">if</span> (bytesRead > <span class="number">0</span>) {
-                        console.<span class="function">log</span>(buffer.<span class="function">toString</span>(<span
-                            class="string">'utf8'</span>, <span class="number">0</span>, bytesRead));
-                        }
-                        } <span class="keyword">while</span> (bytesRead > <span class="number">0</span>);
-                        } <span class="keyword">finally</span> {
-                        <span class="keyword">await</span> fileHandle.<span class="function">close</span>();
-                        }
-                        }
+// Private file
+await fs.chmod('secret.txt', 0o600);</code></pre>
+                                </div>
+                                <div class="space-y-2 text-sm font-serif text-ink-light">
+                                    <div class="flex justify-between border-b border-stone-200 py-2">
+                                        <span>0o755</span>
+                                        <span>rwxr-xr-x</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-stone-200 py-2">
+                                        <span>0o644</span>
+                                        <span>rw-r--r--</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-stone-200 py-2">
+                                        <span>0o600</span>
+                                        <span>rw-------</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="method-card">
-                    <h4>Working with File Descriptors</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fileHandle = <span class="keyword">await</span> fs.<span
-                            class="function">open</span>(<span class="string">'example.txt'</span>, <span
-                            class="string">'r'</span>);
-
-                        <span class="keyword">try</span> {
-                        <span class="keyword">const</span> stats = <span class="keyword">await</span> fileHandle.<span
-                            class="function">stat</span>();
-                        console.<span class="function">log</span>(<span class="string">'File size:'</span>, stats.size);
-
-                        <span class="keyword">const</span> buffer = Buffer.<span class="function">alloc</span>(<span
-                            class="number">100</span>);
-                        <span class="keyword">await</span> fileHandle.<span class="function">read</span>(buffer, <span
-                            class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>);
-                        console.<span class="function">log</span>(buffer.<span class="function">toString</span>());
-                        } <span class="keyword">finally</span> {
-                        <span class="keyword">await</span> fileHandle.<span class="function">close</span>();
-                        }
+                <!-- Error Handling -->
+                <section id="errors" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">07</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Error Handling</h2>
                     </div>
-                </div>
 
-                <div class="method-card">
-                    <h4>Truncating Files</h4>
-                    <div class="code-block">
-                        <span class="comment">// Truncate to specific size</span>
-                        <span class="keyword">await</span> fs.<span class="function">truncate</span>(<span
-                            class="string">'file.txt'</span>, <span class="number">100</span>); <span class="comment">//
-                            Keep only first 100 bytes</span>
-
-                        <span class="comment">// Empty a file</span>
-                        <span class="keyword">await</span> fs.<span class="function">truncate</span>(<span
-                            class="string">'file.txt'</span>, <span class="number">0</span>);
+                    <div class="bg-white rounded-2xl p-8 shadow-soft border border-stone-100 mb-8">
+                        <h3 class="font-serif text-xl font-bold mb-6">Common Error Codes</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-paper rounded-lg border border-stone-200">
+                                <code class="font-mono text-sm text-clay font-bold">ENOENT</code>
+                                <p class="text-sm text-ink-light mt-1 font-serif">File or directory does not exist</p>
+                            </div>
+                            <div class="p-4 bg-paper rounded-lg border border-stone-200">
+                                <code class="font-mono text-sm text-clay font-bold">EACCES</code>
+                                <p class="text-sm text-ink-light mt-1 font-serif">Permission denied</p>
+                            </div>
+                            <div class="p-4 bg-paper rounded-lg border border-stone-200">
+                                <code class="font-mono text-sm text-clay font-bold">EISDIR</code>
+                                <p class="text-sm text-ink-light mt-1 font-serif">Expected file, found directory</p>
+                            </div>
+                            <div class="p-4 bg-paper rounded-lg border border-stone-200">
+                                <code class="font-mono text-sm text-clay font-bold">EEXIST</code>
+                                <p class="text-sm text-ink-light mt-1 font-serif">File already exists</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="method-card">
-                    <h4>Changing File Permissions</h4>
-                    <div class="code-block">
-                        <span class="comment">// Make file readable and writable by owner only</span>
-                        <span class="keyword">await</span> fs.<span class="function">chmod</span>(<span
-                            class="string">'file.txt'</span>, <span class="number">0o600</span>);
-
-                        <span class="comment">// Make file executable</span>
-                        <span class="keyword">await</span> fs.<span class="function">chmod</span>(<span
-                            class="string">'script.sh'</span>, <span class="number">0o755</span>);
+                    <div class="warning-box rounded-2xl p-6">
+                        <h4 class="font-serif text-lg font-bold text-ink mb-4">Robust Error Handling Pattern</h4>
+                        <div class="code-block rounded-lg p-4 bg-white border-clay/30">
+                            <pre class="font-mono text-sm text-ink"><code>async function safeOperation(filepath) {
+    try {
+        return await fs.readFile(filepath, 'utf8');
+    } catch (error) {
+        switch (error.code) {
+            case 'ENOENT':
+                throw new Error(`File not found: ${filepath}`);
+            case 'EACCES':
+                throw new Error(`Permission denied: ${filepath}`);
+            case 'EISDIR':
+                throw new Error(`Expected file, got directory: ${filepath}`);
+            default:
+                throw new Error(`Unexpected error: ${error.message}`);
+        }
+    }
+}</code></pre>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="info-box">
-                    <strong>Permission Codes Explained:</strong>
-                    <ul>
-                        <li><strong>0o600:</strong> Owner can read and write</li>
-                        <li><strong>0o644:</strong> Owner can read/write, others can read</li>
-                        <li><strong>0o755:</strong> Owner can read/write/execute, others can read/execute</li>
-                        <li><strong>0o777:</strong> Everyone can read/write/execute (not recommended)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div id="errors" class="tab-content">
-                <h2>Error Handling</h2>
-
-                <div class="method-card">
-                    <h4>Proper Error Handling Pattern</h4>
-                    <div class="code-block">
-                        <span class="keyword">const</span> fs = <span class="function">require</span>(<span
-                            class="string">'fs/promises'</span>);
-
-                        <span class="keyword">async function</span> <span class="function">safeFileOperation</span>() {
-                        <span class="keyword">try</span> {
-                        <span class="keyword">const</span> data = <span class="keyword">await</span> fs.<span
-                            class="function">readFile</span>(<span class="string">'file.txt'</span>, <span
-                            class="string">'utf8'</span>);
-                        <span class="keyword">return</span> data;
-                        } <span class="keyword">catch</span> (error) {
-                        <span class="keyword">if</span> (error.code === <span class="string">'ENOENT'</span>) {
-                        console.<span class="function">error</span>(<span class="string">'File not found'</span>);
-                        } <span class="keyword">else if</span> (error.code === <span class="string">'EACCES'</span>) {
-                        console.<span class="function">error</span>(<span class="string">'Permission denied'</span>);
-                        } <span class="keyword">else if</span> (error.code === <span class="string">'EISDIR'</span>) {
-                        console.<span class="function">error</span>(<span class="string">'Expected file but found
-                            directory'</span>);
-                        } <span class="keyword">else</span> {
-                        console.<span class="function">error</span>(<span class="string">'Unexpected error:'</span>,
-                        error);
-                        }
-                        <span class="keyword">throw</span> error;
-                        }
-                        }
+                <!-- Best Practices -->
+                <section id="best-practices" class="reveal scroll-mt-24">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="chapter-number font-serif text-6xl text-accent/20 font-bold">08</span>
+                        <h2 class="font-serif text-4xl font-bold text-ink">Best Practices</h2>
                     </div>
-                </div>
 
-                <h3>Common Error Codes</h3>
-                <div class="error-codes">
-                    <div class="error-code">
-                        <strong>ENOENT</strong>
-                        <p>File or directory doesn't exist</p>
+                    <div class="bg-white rounded-2xl shadow-soft border border-stone-100 overflow-hidden">
+                        <table class="w-full comparison-table text-sm">
+                            <thead class="bg-paper">
+                                <tr>
+                                    <th class="text-left p-4 text-ink-light">Scenario</th>
+                                    <th class="text-left p-4 text-ink-light">Approach</th>
+                                    <th class="text-left p-4 text-ink-light">Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody class="font-serif">
+                                <tr>
+                                    <td class="p-4">Application startup config</td>
+                                    <td class="p-4"><span
+                                            class="font-mono text-xs bg-stone-200 px-2 py-1 rounded">readFileSync</span>
+                                    </td>
+                                    <td class="p-4 text-ink-light">Need config before accepting requests</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4">Web server requests</td>
+                                    <td class="p-4"><span
+                                            class="font-mono text-xs bg-accent/10 text-accent px-2 py-1 rounded">fs/promises</span>
+                                    </td>
+                                    <td class="p-4 text-ink-light">Don't block concurrent requests</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4">Files > 100MB</td>
+                                    <td class="p-4"><span
+                                            class="font-mono text-xs bg-ocean/10 text-ocean px-2 py-1 rounded">createReadStream</span>
+                                    </td>
+                                    <td class="p-4 text-ink-light">Constant memory usage</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4">One-time scripts</td>
+                                    <td class="p-4"><span class="font-mono text-xs bg-stone-200 px-2 py-1 rounded">Sync
+                                            methods</span></td>
+                                    <td class="p-4 text-ink-light">Simplicity over performance</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="error-code">
-                        <strong>EACCES</strong>
-                        <p>Permission denied</p>
+
+                    <div class="mt-8 grid md:grid-cols-2 gap-6">
+                        <div class="info-box rounded-xl p-6">
+                            <h4 class="font-serif text-lg font-bold text-ink mb-2">Always Close Handles</h4>
+                            <p class="text-sm text-ink-light font-serif">Use try/finally blocks to ensure file
+                                descriptors are closed, preventing memory leaks.</p>
+                        </div>
+                        <div class="success-box rounded-xl p-6">
+                            <h4 class="font-serif text-lg font-bold text-ink mb-2">Validate Paths</h4>
+                            <p class="text-sm text-ink-light font-serif">Never use user input directly in file paths.
+                                Use <code class="font-mono text-xs bg-white px-1 rounded">path.join()</code> and
+                                validation.</p>
+                        </div>
                     </div>
-                    <div class="error-code">
-                        <strong>EISDIR</strong>
-                        <p>Expected a file but got a directory</p>
+                </section>
+
+                <!-- Quick Reference -->
+                <section class="reveal bg-ink text-paper rounded-3xl p-12 mt-24">
+                    <h2 class="font-serif text-3xl font-bold mb-8 text-center">Quick Reference</h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 font-mono text-sm">
+                        <div class="bg-white/10 rounded-lg p-4">
+                            <div class="text-accent mb-2">fs.readFile()</div>
+                            <div class="text-paper/70 text-xs">Read entire file</div>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4">
+                            <div class="text-accent mb-2">fs.writeFile()</div>
+                            <div class="text-paper/70 text-xs">Write/overwrite file</div>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4">
+                            <div class="text-accent mb-2">fs.appendFile()</div>
+                            <div class="text-paper/70 text-xs">Add to existing file</div>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4">
+                            <div class="text-accent mb-2">fs.mkdir()</div>
+                            <div class="text-paper/70 text-xs">Create directory</div>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4">
+                            <div class="text-accent mb-2">fs.readdir()</div>
+                            <div class="text-paper/70 text-xs">List directory contents</div>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-4">
+                            <div class="text-accent mb-2">fs.stat()</div>
+                            <div class="text-paper/70 text-xs">Get file metadata</div>
+                        </div>
                     </div>
-                    <div class="error-code">
-                        <strong>ENOTDIR</strong>
-                        <p>Expected a directory but got a file</p>
-                    </div>
-                    <div class="error-code">
-                        <strong>EEXIST</strong>
-                        <p>File or directory already exists</p>
-                    </div>
-                    <div class="error-code">
-                        <strong>EMFILE</strong>
-                        <p>Too many open files</p>
-                    </div>
-                </div>
+                </section>
 
-                <div class="warning-box">
-                    <strong>Important Error Handling Tips:</strong>
-                    <ul>
-                        <li>Always use try-catch blocks with async operations</li>
-                        <li>Check error codes to provide specific error messages</li>
-                        <li>Close file handles in finally blocks to prevent leaks</li>
-                        <li>Validate file paths before performing operations</li>
-                        <li>Handle both synchronous and asynchronous errors appropriately</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div id="tips" class="tab-content">
-                <h2>Best Practices & Performance Tips</h2>
-
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>🌊 Use Streams for Large Files</h4>
-                        <p>Don't load entire files into memory. Use streams for efficient processing.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>⚡ Prefer Async Operations</h4>
-                        <p>Avoid blocking the event loop with synchronous methods.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>🎯 Use fs/promises</h4>
-                        <p>Cleaner async/await syntax compared to callbacks.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>📦 Batch Operations</h4>
-                        <p>Group multiple operations instead of individual calls.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>🔒 Close File Handles</h4>
-                        <p>Always close file handles to prevent memory leaks.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>💾 Use Buffers for Binary</h4>
-                        <p>Use Buffer for binary data instead of strings.</p>
-                    </div>
-                </div>
-
-                <h3>Sync vs Async - When to Use What</h3>
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Scenario</th>
-                            <th>Recommended Approach</th>
-                            <th>Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Application startup/initialization</td>
-                            <td>Synchronous (Sync)</td>
-                            <td>App needs config before starting</td>
-                        </tr>
-                        <tr>
-                            <td>Reading config files at startup</td>
-                            <td>Synchronous (Sync)</td>
-                            <td>Sequential execution required</td>
-                        </tr>
-                        <tr>
-                            <td>One-time scripts</td>
-                            <td>Synchronous (Sync)</td>
-                            <td>Scripts run once and exit</td>
-                        </tr>
-                        <tr>
-                            <td>Web servers and APIs</td>
-                            <td>Asynchronous (Async)</td>
-                            <td>Handle concurrent requests</td>
-                        </tr>
-                        <tr>
-                            <td>Multiple operations</td>
-                            <td>Asynchronous (Async)</td>
-                            <td>Don't block event loop</td>
-                        </tr>
-                        <tr>
-                            <td>Long-running applications</td>
-                            <td>Asynchronous (Async)</td>
-                            <td>Performance and scalability</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>Performance Optimization Tips</h3>
-                <div class="highlight-box">
-                    <strong>1. Buffer Size Matters</strong>
-                    <p>Choose appropriate buffer sizes for streams. Too small = many operations, too large = memory
-                        waste.</p>
-                    <div class="code-block">
-                        <span class="comment">// Good for most cases</span>
-                        <span class="keyword">const</span> stream = fs.<span
-                            class="function">createReadStream</span>(<span class="string">'file.txt'</span>, {
-                        highWaterMark: <span class="number">64</span> * <span class="number">1024</span> <span
-                            class="comment">// 64KB chunks</span>
-                        });
-                    </div>
-                </div>
-
-                <div class="highlight-box">
-                    <strong>2. Cache File Stats</strong>
-                    <p>If you need to check file stats multiple times, cache the results.</p>
-                    <div class="code-block">
-                        <span class="keyword">const</span> stats = <span class="keyword">await</span> fs.<span
-                            class="function">stat</span>(<span class="string">'file.txt'</span>);
-                        <span class="comment">// Use stats multiple times without re-reading</span>
-                        <span class="keyword">if</span> (stats.<span class="function">isFile</span>() && stats.size >
-                        <span class="number">1000000</span>) {
-                        <span class="comment">// Process large file</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="highlight-box">
-                    <strong>3. Use Appropriate Methods</strong>
-                    <p>Choose the right method for your use case:</p>
-                    <ul>
-                        <li><strong>Small files:</strong> readFile/writeFile</li>
-                        <li><strong>Large files:</strong> createReadStream/createWriteStream</li>
-                        <li><strong>Specific portions:</strong> open() with read()</li>
-                    </ul>
-                </div>
-
-                <div class="warning-box">
-                    <strong>Common Mistakes to Avoid:</strong>
-                    <ul>
-                        <li>Using sync methods in web servers/APIs</li>
-                        <li>Not closing file handles after opening them</li>
-                        <li>Reading entire large files into memory</li>
-                        <li>Not handling errors properly</li>
-                        <li>Hardcoding file paths instead of using path.join()</li>
-                        <li>Not validating file paths from user input</li>
-                        <li>Forgetting to set encoding when reading text files</li>
-                    </ul>
-                </div>
-
-                <div class="info-box">
-                    <strong>Quick Reference: Most Common Operations</strong>
-                    <div class="code-block">
-                        <span class="comment">// Read file</span>
-                        <span class="keyword">const</span> data = <span class="keyword">await</span> fs.<span
-                            class="function">readFile</span>(<span class="string">'file.txt'</span>, <span
-                            class="string">'utf8'</span>);
-
-                        <span class="comment">// Write file</span>
-                        <span class="keyword">await</span> fs.<span class="function">writeFile</span>(<span
-                            class="string">'file.txt'</span>, <span class="string">'content'</span>);
-
-                        <span class="comment">// Append to file</span>
-                        <span class="keyword">await</span> fs.<span class="function">appendFile</span>(<span
-                            class="string">'file.txt'</span>, <span class="string">'more content'</span>);
-
-                        <span class="comment">// Check if exists</span>
-                        <span class="keyword">await</span> fs.<span class="function">access</span>(<span
-                            class="string">'file.txt'</span>);
-
-                        <span class="comment">// Delete file</span>
-                        <span class="keyword">await</span> fs.<span class="function">unlink</span>(<span
-                            class="string">'file.txt'</span>);
-
-                        <span class="comment">// Copy file</span>
-                        <span class="keyword">await</span> fs.<span class="function">copyFile</span>(<span
-                            class="string">'src.txt'</span>, <span class="string">'dest.txt'</span>);
-
-                        <span class="comment">// Create directory</span>
-                        <span class="keyword">await</span> fs.<span class="function">mkdir</span>(<span
-                            class="string">'dir'</span>, { recursive: <span class="keyword">true</span> });
-
-                        <span class="comment">// Read directory</span>
-                        <span class="keyword">const</span> files = <span class="keyword">await</span> fs.<span
-                            class="function">readdir</span>(<span class="string">'dir'</span>);
-
-                        <span class="comment">// Get file info</span>
-                        <span class="keyword">const</span> stats = <span class="keyword">await</span> fs.<span
-                            class="function">stat</span>(<span class="string">'file.txt'</span>);
-                    </div>
-                </div>
-
-                <div class="highlight-box">
-                    <strong>Key Takeaway</strong>
-                    <p>The file system module is essential for any Node.js application that needs to interact with files
-                        and directories. Understanding these operations allows you to build powerful applications that
-                        can process, store, and manipulate data on the file system efficiently and safely.</p>
-                </div>
-            </div>
+            </main>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 py-12 px-6 mt-24">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <div class="font-serif text-xl font-bold text-ink">The File System Companion</div>
+                <div class="text-sm text-ink-light font-serif mt-1">A comprehensive Node.js reference</div>
+            </div>
+            <div class="flex gap-6 text-sm font-sans text-ink-light">
+                <a href="https://nodejs.org/api/fs.html" target="_blank"
+                    class="hover:text-accent transition-colors">Official API Docs →</a>
+                <a href="#" onclick="window.scrollTo(0,0)" class="hover:text-accent transition-colors">Back to Top ↑</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        function showTab(tabId) {
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => {
-                content.classList.remove('active');
-            });
+        // Reveal animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
             });
+        }, observerOptions);
 
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-        }
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Copy code functionality
+        document.querySelectorAll('.code-block').forEach(block => {
+            const button = document.createElement('button');
+            button.className = 'absolute top-4 right-4 px-3 py-1 bg-white text-ink-light text-xs rounded border border-stone-200 hover:border-accent hover:text-accent transition-all opacity-0 group-hover:opacity-100';
+            button.textContent = 'Copy';
+
+            block.style.position = 'relative';
+            block.classList.add('group');
+            block.appendChild(button);
+
+            button.addEventListener('click', () => {
+                const code = block.querySelector('code').innerText;
+                navigator.clipboard.writeText(code);
+                button.textContent = 'Copied!';
+                button.classList.add('text-accent', 'border-accent');
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('text-accent', 'border-accent');
+                }, 2000);
+            });
+        });
     </script>
 </body>
 

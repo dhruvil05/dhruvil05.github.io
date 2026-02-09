@@ -1,629 +1,1067 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Node.js Process Management</title>
+    <title>Node.js Process Management | Complete Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        node: {
+                            green: '#339933',
+                            dark: '#1a1a1a',
+                            darker: '#0d0d0d',
+                            gray: '#2d2d2d',
+                            light: '#e0e0e0'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background-color: #0d0d0d;
+            color: #e0e0e0;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        .glass-panel {
+            background: rgba(45, 45, 45, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-window {
+            background: #1e1e1e;
+            border-radius: 0.5rem;
             overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
         }
 
-        header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .nav-tabs {
+        .code-header {
+            background: #2d2d2d;
+            padding: 0.75rem 1rem;
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            overflow-x: auto;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #3d3d3d;
         }
 
-        .nav-tab {
-            padding: 15px 25px;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            font-size: 1em;
-            font-weight: 500;
-            color: #495057;
-            transition: all 0.3s;
-            white-space: nowrap;
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
 
-        .nav-tab:hover {
-            background: #e9ecef;
+        .gradient-text {
+            background: linear-gradient(135deg, #339933 0%, #68d968 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .nav-tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
+        .hover-card {
+            transition: all 0.3s ease;
         }
 
-        .content {
-            padding: 40px;
+        .hover-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(51, 153, 51, 0.15);
+            border-color: rgba(51, 153, 51, 0.3);
         }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
+        .nav-link {
+            position: relative;
         }
 
-        .tab-content.active {
-            display: block;
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #339933;
+            transition: width 0.3s;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 2em;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        h3 {
-            color: #34495e;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        p {
-            line-height: 1.8;
-            color: #555;
-            margin-bottom: 15px;
-        }
-
-        .code-block {
-            background: #282c34;
-            color: #abb2bf;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-
-        .code-block .keyword {
-            color: #c678dd;
-        }
-
-        .code-block .string {
-            color: #98c379;
-        }
-
-        .code-block .function {
-            color: #61afef;
-        }
-
-        .code-block .comment {
-            color: #5c6370;
-            font-style: italic;
-        }
-
-        .highlight-box {
-            background: #e8f4fd;
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-
-        .highlight-box strong {
-            color: #667eea;
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        ul {
-            margin-left: 30px;
-            margin-bottom: 20px;
-        }
-
-        li {
-            line-height: 1.8;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-card h4 {
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        .best-practice {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .comparison-table {
+        .nav-link:hover::after {
             width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
         }
 
-        .comparison-table th,
-        .comparison-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
+        .active-nav::after {
+            width: 100%;
         }
 
-        .comparison-table th {
-            background: #667eea;
-            color: white;
-            font-weight: 600;
-        }
-
-        .comparison-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .nav-tab {
-                padding: 12px 15px;
-                font-size: 0.9em;
-            }
+        .process-grid {
+            background-image: radial-gradient(circle at 1px 1px, rgba(51, 153, 51, 0.15) 1px, transparent 0);
+            background-size: 40px 40px;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <header>
-            <h1>📦 Node.js Process Management</h1>
-            <p>Complete Guide to Managing Processes in Node.js Applications</p>
-        </header>
+<body class="font-sans antialiased selection:bg-node-green selection:text-white">
 
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
-            <button class="nav-tab" onclick="showTab('core')">Core Concepts</button>
-            <button class="nav-tab" onclick="showTab('modules')">Modules</button>
-            <button class="nav-tab" onclick="showTab('tools')">Tools</button>
-            <button class="nav-tab" onclick="showTab('patterns')">Patterns</button>
-            <button class="nav-tab" onclick="showTab('best')">Best Practices</button>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-node-green rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Process<span
+                            class="text-node-green">Manager</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#overview"
+                        class="nav-link text-sm font-medium text-gray-300 hover:text-white transition">Overview</a>
+                    <a href="#concepts"
+                        class="nav-link text-sm font-medium text-gray-300 hover:text-white transition">Core Concepts</a>
+                    <a href="#modules"
+                        class="nav-link text-sm font-medium text-gray-300 hover:text-white transition">Modules</a>
+                    <a href="#tools"
+                        class="nav-link text-sm font-medium text-gray-300 hover:text-white transition">Tools</a>
+                    <a href="#patterns"
+                        class="nav-link text-sm font-medium text-gray-300 hover:text-white transition">Patterns</a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
-        <div class="content">
-            <div id="overview" class="tab-content active">
-                <h2>Node.js Process Management Overview</h2>
-                <p>Node.js process management refers to how Node.js applications handle and control processes, enabling
-                    you to create, monitor, and manage multiple processes for better performance, scalability, and
-                    reliability.</p>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-gray-800">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#overview"
+                    class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded">Overview</a>
+                <a href="#concepts"
+                    class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded">Core
+                    Concepts</a>
+                <a href="#modules"
+                    class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded">Modules</a>
+                <a href="#tools"
+                    class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded">Tools</a>
+                <a href="#patterns"
+                    class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded">Patterns</a>
+            </div>
+        </div>
+    </nav>
 
-                <div class="highlight-box">
-                    <strong>The Node.js Process Model</strong>
-                    <p>Node.js runs JavaScript in a single thread with an event-driven, non-blocking I/O model. While
-                        this is efficient for I/O-bound tasks, CPU-intensive operations can block the entire
-                        application. Process management helps overcome this limitation.</p>
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden process-grid">
+        <div class="absolute inset-0 bg-gradient-to-b from-node-green/5 to-transparent pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-4xl mx-auto">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-node-green/10 border border-node-green/20 text-node-green text-sm font-medium mb-8 animate-float">
+                    <span class="w-2 h-2 rounded-full bg-node-green animate-pulse"></span>
+                    Node.js Process Management
                 </div>
 
-                <h3>Why Process Management Matters</h3>
-                <ul>
-                    <li>Utilize multiple CPU cores for better performance</li>
-                    <li>Isolate processes to prevent crashes from affecting the entire system</li>
-                    <li>Handle CPU-intensive tasks without blocking the main thread</li>
-                    <li>Achieve zero-downtime deployments</li>
-                    <li>Automatic restart on failures</li>
-                    <li>Load balancing across multiple instances</li>
-                </ul>
-            </div>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Master <span class="gradient-text">Process Management</span><br>
+                    in Node.js
+                </h1>
 
-            <div id="core" class="tab-content">
-                <h2>Core Process Management Concepts</h2>
-
-                <h3>1. The `process` Object</h3>
-                <p>Node.js provides a global process object that gives information and control over the current process:
+                <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Learn how to create, monitor, and manage multiple processes for better performance,
+                    scalability, and reliability in your Node.js applications.
                 </p>
-                <div class="code-block">
-                    <span class="comment">// Get process information</span>
-                    console.<span class="function">log</span>(process.pid); <span class="comment">// Process ID</span>
-                    console.<span class="function">log</span>(process.version); <span class="comment">// Node.js
-                        version</span>
-                    console.<span class="function">log</span>(process.platform); <span class="comment">// Operating
-                        system</span>
-                    console.<span class="function">log</span>(process.<span class="function">uptime</span>()); <span
-                        class="comment">// How long process has been running</span>
-                    console.<span class="function">log</span>(process.<span class="function">memoryUsage</span>());
-                    <span class="comment">// Memory consumption</span>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#concepts"
+                        class="px-8 py-4 bg-node-green hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2">
+                        Start Learning
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                    </a>
+                    <a href="#tools"
+                        class="px-8 py-4 glass-panel hover:bg-gray-800 text-white font-semibold rounded-lg transition-all border border-gray-700">
+                        View Tools
+                    </a>
                 </div>
+            </div>
 
-                <h3>2. Child Processes Module</h3>
-                <p>The child_process module allows you to spawn new processes and execute system commands:</p>
+            <!-- Stats -->
+            <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">4</div>
+                    <div class="text-sm text-gray-500">Core Modules</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">3</div>
+                    <div class="text-sm text-gray-500">Process Types</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">∞</div>
+                    <div class="text-sm text-gray-500">Scalability</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-white mb-1">0ms</div>
+                    <div class="text-sm text-gray-500">Downtime</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="highlight-box">
-                    <strong>spawn() - Launches a new process</strong>
-                    <div class="code-block">
-                        <span class="keyword">const</span> { spawn } = <span class="function">require</span>(<span
-                            class="string">'child_process'</span>);
-                        <span class="keyword">const</span> ls = <span class="function">spawn</span>(<span
-                            class="string">'ls'</span>, [<span class="string">'-lh'</span>, <span
-                            class="string">'/usr'</span>]);
+    <!-- Overview Section -->
+    <section id="overview" class="py-20 bg-node-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6">The Node.js Process Model</h2>
+                    <p class="text-gray-400 text-lg mb-6 leading-relaxed">
+                        Node.js runs JavaScript in a single thread with an event-driven, non-blocking I/O model.
+                        While this is efficient for I/O-bound tasks, CPU-intensive operations can block the entire
+                        application.
+                        Process management helps overcome this limitation.
+                    </p>
 
-                        ls.stdout.<span class="function">on</span>(<span class="string">'data'</span>, (data) => {
-                        console.<span class="function">log</span>(<span class="string">`Output: ${data}`</span>);
-                        });
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-6 h-6 rounded-full bg-node-green/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Utilize multiple CPU cores</h4>
+                                <p class="text-gray-500 text-sm">Maximize performance across all available processors
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-6 h-6 rounded-full bg-node-green/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Process Isolation</h4>
+                                <p class="text-gray-500 text-sm">Prevent crashes from affecting the entire system</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-6 h-6 rounded-full bg-node-green/20 flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-white">Zero-downtime deployments</h4>
+                                <p class="text-gray-500 text-sm">Update without interrupting service</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="highlight-box">
-                    <strong>exec() - Executes a command in a shell</strong>
-                    <div class="code-block">
-                        <span class="keyword">const</span> { exec } = <span class="function">require</span>(<span
-                            class="string">'child_process'</span>);
-                        <span class="function">exec</span>(<span class="string">'ls -lh'</span>, (error, stdout, stderr)
-                        => {
-                        <span class="keyword">if</span> (error) console.<span class="function">error</span>(error);
-                        console.<span class="function">log</span>(stdout);
-                        });
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-dot bg-red-500"></div>
+                        <div class="code-dot bg-yellow-500"></div>
+                        <div class="code-dot bg-green-500"></div>
+                        <span class="ml-2 text-xs text-gray-400 font-mono">process-model.js</span>
+                    </div>
+                    <pre class="p-4 overflow-x-auto text-sm"><code class="language-javascript">// Single Thread vs Multi-Process Architecture
+
+// Traditional Node.js (Single Thread)
+console.log('Main thread running');
+heavyComputation(); // Blocks everything!
+console.log('Waiting...');
+
+// Multi-Process Architecture
+const cluster = require('cluster');
+if (cluster.isMaster) {
+    // Fork workers for each CPU core
+    const numCPUs = require('os').cpus().length;
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+} else {
+    // Each worker runs independently
+    console.log(`Worker ${process.pid} started`);
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Concepts -->
+    <section id="concepts" class="py-20 bg-node-darker relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Core Process Management Concepts</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Understanding the building blocks of process management in
+                    Node.js</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Process Object -->
+                <div class="glass-panel rounded-xl p-6 hover-card border border-gray-800">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">The `process` Object</h3>
+                    <p class="text-gray-400 mb-4 text-sm">Global object providing information and control over the
+                        current process.</p>
+
+                    <div class="code-window mb-4">
+                        <div class="code-header py-2">
+                            <span class="text-xs text-gray-400 font-mono">process-info.js</span>
+                        </div>
+                        <pre class="p-3 text-xs overflow-x-auto"><code class="language-javascript">console.log(process.pid);        // Process ID
+console.log(process.version);    // Node version
+console.log(process.platform);   // Operating system
+console.log(process.uptime());   // Uptime in seconds
+console.log(process.memoryUsage()); // Memory stats</code></pre>
                     </div>
                 </div>
 
-                <div class="highlight-box">
-                    <strong>fork() - Creates a new Node.js process</strong>
-                    <div class="code-block">
-                        <span class="keyword">const</span> { fork } = <span class="function">require</span>(<span
-                            class="string">'child_process'</span>);
-                        <span class="keyword">const</span> child = <span class="function">fork</span>(<span
-                            class="string">'child.js'</span>);
+                <!-- Child Processes -->
+                <div class="glass-panel rounded-xl p-6 hover-card border border-gray-800">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">Child Processes Module</h3>
+                    <p class="text-gray-400 mb-4 text-sm">Spawn new processes and execute system commands.</p>
 
-                        child.<span class="function">send</span>({ msg: <span class="string">'Hello from parent'</span>
-                        });
-                        child.<span class="function">on</span>(<span class="string">'message'</span>, (msg) => {
-                        console.<span class="function">log</span>(<span class="string">'Message from child:'</span>,
-                        msg);
-                        });
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                            <code class="text-node-green text-sm font-mono">spawn()</code>
+                            <span class="text-gray-400 text-sm">Launches new process with streams</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                            <code class="text-node-green text-sm font-mono">exec()</code>
+                            <span class="text-gray-400 text-sm">Executes command in shell</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                            <code class="text-node-green text-sm font-mono">fork()</code>
+                            <span class="text-gray-400 text-sm">Creates new Node.js process</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div id="modules" class="tab-content">
-                <h2>Process Management Modules</h2>
-
-                <h3>Cluster Module</h3>
-                <p>The cluster module enables you to create multiple worker processes that share the same server port:
-                </p>
-                <div class="code-block">
-                    <span class="keyword">const</span> cluster = <span class="function">require</span>(<span
-                        class="string">'cluster'</span>);
-                    <span class="keyword">const</span> http = <span class="function">require</span>(<span
-                        class="string">'http'</span>);
-                    <span class="keyword">const</span> numCPUs = <span class="function">require</span>(<span
-                        class="string">'os'</span>).<span class="function">cpus</span>().length;
-
-                    <span class="keyword">if</span> (cluster.isMaster) {
-                    <span class="comment">// Fork workers</span>
-                    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span
-                        class="string">0</span>; i < numCPUs; i++) { cluster.<span class="function">fork</span>();
-                        }
-
-                        cluster.<span class="function">on</span>(<span class="string">'exit'</span>, (worker, code,
-                        signal) => {
-                        console.<span class="function">log</span>(<span class="string">`Worker ${worker.process.pid}
-                            died`</span>);
-                        cluster.<span class="function">fork</span>(); <span class="comment">// Restart worker</span>
-                        });
-                        } <span class="keyword">else</span> {
-                        <span class="comment">// Workers share TCP connection</span>
-                        http.<span class="function">createServer</span>((req, res) => {
-                        res.<span class="function">writeHead</span>(<span class="string">200</span>);
-                        res.<span class="function">end</span>(<span class="string">'Hello World\n'</span>);
-                        }).<span class="function">listen</span>(<span class="string">8000</span>);
-                        }
+            <!-- Code Examples Tabs -->
+            <div class="mt-12 glass-panel rounded-xl border border-gray-800 overflow-hidden">
+                <div class="flex border-b border-gray-800 overflow-x-auto">
+                    <button onclick="switchTab('spawn')" id="tab-spawn"
+                        class="tab-btn px-6 py-4 text-sm font-medium text-node-green border-b-2 border-node-green bg-gray-800/30 whitespace-nowrap">spawn()</button>
+                    <button onclick="switchTab('exec')" id="tab-exec"
+                        class="tab-btn px-6 py-4 text-sm font-medium text-gray-400 hover:text-white whitespace-nowrap">exec()</button>
+                    <button onclick="switchTab('fork')" id="tab-fork"
+                        class="tab-btn px-6 py-4 text-sm font-medium text-gray-400 hover:text-white whitespace-nowrap">fork()</button>
                 </div>
 
-                <h3>Worker Threads</h3>
-                <p>For CPU-intensive tasks, worker threads provide true parallel execution:</p>
-                <div class="code-block">
-                    <span class="keyword">const</span> { Worker } = <span class="function">require</span>(<span
-                        class="string">'worker_threads'</span>);
+                <div id="content-spawn" class="tab-content p-6">
+                    <pre class="overflow-x-auto text-sm"><code class="language-javascript">const { spawn } = require('child_process');
+const ls = spawn('ls', ['-lh', '/usr']);
 
-                    <span class="keyword">const</span> worker = <span class="keyword">new</span> <span
-                        class="function">Worker</span>(<span class="string">'./worker.js'</span>, {
-                    workerData: { value: <span class="string">5</span> }
-                    });
+ls.stdout.on('data', (data) => {
+    console.log(`Output: ${data}`);
+});
 
-                    worker.<span class="function">on</span>(<span class="string">'message'</span>, (result) => {
-                    console.<span class="function">log</span>(<span class="string">'Result:'</span>, result);
-                    });
+ls.stderr.on('data', (data) => {
+    console.error(`Error: ${data}`);
+});
+
+ls.on('close', (code) => {
+    console.log(`Process exited with code ${code}`);
+});</code></pre>
                 </div>
 
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>🔄 Cluster</h4>
-                        <p>Multiple processes sharing server ports for web applications</p>
+                <div id="content-exec" class="tab-content p-6 hidden">
+                    <pre class="overflow-x-auto text-sm"><code class="language-javascript">const { exec } = require('child_process');
+
+exec('ls -lh', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`Execution error: ${error}`);
+        return;
+    }
+    if (stderr) {
+        console.error(`Stderr: ${stderr}`);
+        return;
+    }
+    console.log(`Stdout: ${stdout}`);
+});</code></pre>
+                </div>
+
+                <div id="content-fork" class="tab-content p-6 hidden">
+                    <pre class="overflow-x-auto text-sm"><code class="language-javascript">const { fork } = require('child_process');
+const child = fork('child.js');
+
+// Send message to child
+child.send({ msg: 'Hello from parent' });
+
+// Receive messages from child
+child.on('message', (msg) => {
+    console.log('Message from child:', msg);
+});
+
+// Handle child exit
+child.on('close', (code) => {
+    console.log(`Child process exited with code ${code}`);
+});</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Management Modules -->
+    <section id="modules" class="py-20 bg-node-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Process Management Modules</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Choose the right module for your specific use case</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Cluster -->
+                <div class="glass-panel rounded-xl p-6 hover-card border border-gray-800 group cursor-pointer"
+                    onclick="toggleDetails('cluster-details')">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🔄</div>
+                    <h3 class="text-lg font-bold mb-2 text-white">Cluster</h3>
+                    <p class="text-gray-400 text-sm mb-4">Multiple processes sharing server ports for web applications
+                    </p>
+                    <div class="flex items-center text-node-green text-sm font-medium">
+                        Learn more
+                        <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </div>
-                    <div class="feature-card">
-                        <h4>👶 Child Process</h4>
-                        <p>Spawn external commands and Node.js scripts</p>
+
+                    <div id="cluster-details" class="hidden mt-4 pt-4 border-t border-gray-700">
+                        <div class="code-window">
+                            <pre class="p-3 text-xs overflow-x-auto"><code class="language-javascript">const cluster = require('cluster');
+const http = require('http');
+const numCPUs = require('os').cpus().length;
+
+if (cluster.isMaster) {
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+    cluster.on('exit', (worker) => {
+        console.log(`Worker ${worker.process.pid} died`);
+        cluster.fork(); // Replace dead worker
+    });
+} else {
+    http.createServer((req, res) => {
+        res.writeHead(200);
+        res.end('Hello World\n');
+    }).listen(8000);
+}</code></pre>
+                        </div>
                     </div>
-                    <div class="feature-card">
-                        <h4>⚡ Worker Threads</h4>
-                        <p>CPU-intensive tasks with parallel execution</p>
+                </div>
+
+                <!-- Child Process -->
+                <div class="glass-panel rounded-xl p-6 hover-card border border-gray-800 group cursor-pointer"
+                    onclick="toggleDetails('child-details')">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">👶</div>
+                    <h3 class="text-lg font-bold mb-2 text-white">Child Process</h3>
+                    <p class="text-gray-400 text-sm mb-4">Spawn external commands and Node.js scripts</p>
+                    <div class="flex items-center text-node-green text-sm font-medium">
+                        Learn more
+                        <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </div>
-                    <div class="feature-card">
-                        <h4>📊 Process Object</h4>
-                        <p>Monitor and control the current process</p>
+
+                    <div id="child-details" class="hidden mt-4 pt-4 border-t border-gray-700">
+                        <p class="text-gray-400 text-xs mb-2">Best for running system commands or isolating untrusted
+                            code.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">spawn()</span>
+                            <span class="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">exec()</span>
+                            <span class="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">fork()</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Worker Threads -->
+                <div class="glass-panel rounded-xl p-6 hover-card border border-gray-800 group cursor-pointer"
+                    onclick="toggleDetails('worker-details')">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚡</div>
+                    <h3 class="text-lg font-bold mb-2 text-white">Worker Threads</h3>
+                    <p class="text-gray-400 text-sm mb-4">CPU-intensive tasks with parallel execution</p>
+                    <div class="flex items-center text-node-green text-sm font-medium">
+                        Learn more
+                        <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+
+                    <div id="worker-details" class="hidden mt-4 pt-4 border-t border-gray-700">
+                        <div class="code-window">
+                            <pre class="p-3 text-xs overflow-x-auto"><code class="language-javascript">const { Worker } = require('worker_threads');
+
+const worker = new Worker('./worker.js', {
+    workerData: { value: 5 } // Data to pass
+});
+
+worker.on('message', (result) => {
+    console.log('Result:', result);
+});
+
+worker.on('error', (error) => {
+    console.error(error);
+});</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Object -->
+                <div class="glass-panel rounded-xl p-6 hover-card border border-gray-800 group cursor-pointer"
+                    onclick="toggleDetails('process-details')">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                    <h3 class="text-lg font-bold mb-2 text-white">Process Object</h3>
+                    <p class="text-gray-400 text-sm mb-4">Monitor and control the current process</p>
+                    <div class="flex items-center text-node-green text-sm font-medium">
+                        Learn more
+                        <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+
+                    <div id="process-details" class="hidden mt-4 pt-4 border-t border-gray-700">
+                        <ul class="text-xs text-gray-400 space-y-2">
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-node-green rounded-full"></span>process.env - Environment
+                                variables</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-node-green rounded-full"></span>process.argv - Command line
+                                args</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-node-green rounded-full"></span>process.exit() - Exit process
+                            </li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-node-green rounded-full"></span>process.on() - Event handlers
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section id="tools" class="py-20 bg-node-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Process Management Tools</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Production-ready tools for managing Node.js processes</p>
+            </div>
+
+            <!-- PM2 Highlight -->
+            <div class="glass-panel rounded-2xl p-8 mb-8 border border-node-green/30 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-node-green/10 rounded-full blur-3xl -mr-32 -mt-32">
+                </div>
+
+                <div class="relative z-10 grid lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-node-green/20 text-node-green text-xs font-bold mb-4">
+                            RECOMMENDED
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 text-white">PM2 (Process Manager 2)</h3>
+                        <p class="text-gray-400 mb-6">The most popular production process manager for Node.js with
+                            built-in load balancing, monitoring, and automatic restarts.</p>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <svg class="w-5 h-5 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Automatic restarts on crashes
+                            </div>
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <svg class="w-5 h-5 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Load balancing across instances
+                            </div>
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <svg class="w-5 h-5 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Zero-downtime reloads
+                            </div>
+                            <div class="flex items-center gap-3 text-sm text-gray-300">
+                                <svg class="w-5 h-5 text-node-green" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Built-in monitoring & logs
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="text-xs text-gray-400 font-mono">terminal</span>
+                        </div>
+                        <pre class="p-4 text-sm overflow-x-auto"><code class="language-bash"># Install PM2 globally
+npm install -g pm2
+
+# Start application with max instances
+pm2 start app.js -i max
+
+# Common commands
+pm2 list          # List all processes
+pm2 restart app   # Restart application
+pm2 stop app      # Stop application
+pm2 logs          # View logs
+pm2 monit         # Monitor resources</code></pre>
                     </div>
                 </div>
             </div>
 
-            <div id="tools" class="tab-content">
-                <h2>Process Management Tools</h2>
-
-                <h3>PM2 (Process Manager 2)</h3>
-                <p>The most popular production process manager for Node.js:</p>
-                <div class="code-block">
-                    pm2 start app.js -i max <span class="comment"># Start with max CPU cores</span>
-                    pm2 list <span class="comment"># List all processes</span>
-                    pm2 restart app <span class="comment"># Restart application</span>
-                    pm2 stop app <span class="comment"># Stop application</span>
-                    pm2 logs <span class="comment"># View logs</span>
-                    pm2 monit <span class="comment"># Monitor CPU/Memory</span>
+            <!-- Other Tools Grid -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-panel rounded-xl p-6 border border-gray-800">
+                    <h4 class="text-xl font-bold mb-3 text-white flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        Forever
+                    </h4>
+                    <p class="text-gray-400 text-sm mb-4">Simple alternative to PM2 for basic process management needs.
+                    </p>
+                    <div class="code-window">
+                        <pre class="p-3 text-xs overflow-x-auto"><code class="language-bash">forever start app.js
+forever list
+forever stop app.js</code></pre>
+                    </div>
                 </div>
 
-                <div class="highlight-box">
-                    <strong>PM2 Features:</strong>
-                    <ul>
-                        <li>Automatic restarts on crashes</li>
-                        <li>Load balancing across multiple instances</li>
-                        <li>Log management</li>
-                        <li>Zero-downtime reloads</li>
-                        <li>Startup scripts for server reboots</li>
-                    </ul>
+                <div class="glass-panel rounded-xl p-6 border border-gray-800">
+                    <h4 class="text-xl font-bold mb-3 text-white flex items-center gap-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        Nodemon
+                    </h4>
+                    <p class="text-gray-400 text-sm mb-4">Development tool that auto-restarts on file changes.</p>
+                    <div class="code-window">
+                        <pre class="p-3 text-xs overflow-x-auto"><code class="language-bash">npm install -g nodemon
+nodemon app.js</code></pre>
+                    </div>
                 </div>
+            </div>
 
-                <h3>Forever</h3>
-                <p>Simpler alternative to PM2:</p>
-                <div class="code-block">
-                    forever start app.js
-                    forever list
-                    forever stop app.js
-                </div>
-
-                <h3>nodemon (Development)</h3>
-                <p>Auto-restarts app when files change during development:</p>
-                <div class="code-block">
-                    nodemon app.js
-                </div>
-
-                <h3>When to Use What</h3>
-                <table class="comparison-table">
+            <!-- Comparison Table -->
+            <div class="mt-12 overflow-x-auto">
+                <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr>
-                            <th>Scenario</th>
-                            <th>Recommended Tool</th>
-                            <th>Reason</th>
+                        <tr class="border-b border-gray-800">
+                            <th class="py-4 px-4 text-gray-400 font-medium">Scenario</th>
+                            <th class="py-4 px-4 text-gray-400 font-medium">Recommended Tool</th>
+                            <th class="py-4 px-4 text-gray-400 font-medium">Reason</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Simple applications, low traffic</td>
-                            <td>Single Process</td>
-                            <td>No need for complexity</td>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition">
+                            <td class="py-4 px-4 text-white">Simple applications, low traffic</td>
+                            <td class="py-4 px-4"><span class="px-2 py-1 bg-gray-800 rounded text-node-green">Single
+                                    Process</span></td>
+                            <td class="py-4 px-4 text-gray-400">No need for complexity</td>
                         </tr>
-                        <tr>
-                            <td>Web servers with multiple CPUs</td>
-                            <td>Cluster Mode</td>
-                            <td>Maximize CPU utilization</td>
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition">
+                            <td class="py-4 px-4 text-white">Web servers with multiple CPUs</td>
+                            <td class="py-4 px-4"><span class="px-2 py-1 bg-gray-800 rounded text-node-green">Cluster
+                                    Mode</span></td>
+                            <td class="py-4 px-4 text-gray-400">Maximize CPU utilization</td>
                         </tr>
-                        <tr>
-                            <td>Running external commands</td>
-                            <td>Child Processes</td>
-                            <td>Execute system scripts</td>
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition">
+                            <td class="py-4 px-4 text-white">Running external commands</td>
+                            <td class="py-4 px-4"><span class="px-2 py-1 bg-gray-800 rounded text-node-green">Child
+                                    Processes</span></td>
+                            <td class="py-4 px-4 text-gray-400">Execute system scripts</td>
                         </tr>
-                        <tr>
-                            <td>CPU-intensive computations</td>
-                            <td>Worker Threads</td>
-                            <td>Parallel JavaScript execution</td>
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition">
+                            <td class="py-4 px-4 text-white">CPU-intensive computations</td>
+                            <td class="py-4 px-4"><span class="px-2 py-1 bg-gray-800 rounded text-node-green">Worker
+                                    Threads</span></td>
+                            <td class="py-4 px-4 text-gray-400">Parallel JavaScript execution</td>
                         </tr>
-                        <tr>
-                            <td>Production deployment</td>
-                            <td>PM2/Forever</td>
-                            <td>Reliability and monitoring</td>
+                        <tr class="hover:bg-gray-800/30 transition">
+                            <td class="py-4 px-4 text-white">Production deployment</td>
+                            <td class="py-4 px-4"><span
+                                    class="px-2 py-1 bg-node-green/20 text-node-green rounded">PM2/Forever</span></td>
+                            <td class="py-4 px-4 text-gray-400">Reliability and monitoring</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+    </section>
 
-            <div id="patterns" class="tab-content">
-                <h2>Key Process Management Patterns</h2>
-
-                <h3>1. Graceful Shutdown</h3>
-                <p>Properly close connections and cleanup resources:</p>
-                <div class="code-block">
-                    process.<span class="function">on</span>(<span class="string">'SIGTERM'</span>, () => {
-                    console.<span class="function">log</span>(<span class="string">'SIGTERM received, closing
-                        server...'</span>);
-                    server.<span class="function">close</span>(() => {
-                    console.<span class="function">log</span>(<span class="string">'Server closed'</span>);
-                    process.<span class="function">exit</span>(<span class="string">0</span>);
-                    });
-                    });
-                </div>
-
-                <h3>2. Error Handling</h3>
-                <p>Catch uncaught exceptions and unhandled rejections:</p>
-                <div class="code-block">
-                    process.<span class="function">on</span>(<span class="string">'uncaughtException'</span>, (error) =>
-                    {
-                    console.<span class="function">error</span>(<span class="string">'Uncaught Exception:'</span>,
-                    error);
-                    process.<span class="function">exit</span>(<span class="string">1</span>);
-                    });
-
-                    process.<span class="function">on</span>(<span class="string">'unhandledRejection'</span>, (reason,
-                    promise) => {
-                    console.<span class="function">error</span>(<span class="string">'Unhandled Rejection at:'</span>,
-                    promise, <span class="string">'reason:'</span>, reason);
-                    });
-                </div>
-
-                <h3>3. Inter-Process Communication (IPC)</h3>
-                <p>Enable processes to communicate with each other:</p>
-                <div class="code-block">
-                    <span class="comment">// Parent process</span>
-                    <span class="keyword">const</span> child = <span class="function">fork</span>(<span
-                        class="string">'child.js'</span>);
-                    child.<span class="function">send</span>({ cmd: <span class="string">'start'</span>, data: [<span
-                        class="string">1</span>,<span class="string">2</span>,<span class="string">3</span>] });
-
-                    <span class="comment">// Child process (child.js)</span>
-                    process.<span class="function">on</span>(<span class="string">'message'</span>, (msg) => {
-                    console.<span class="function">log</span>(<span class="string">'Received:'</span>, msg);
-                    process.<span class="function">send</span>({ result: <span class="string">'processed'</span> });
-                    });
-                </div>
+    <!-- Patterns Section -->
+    <section id="patterns" class="py-20 bg-node-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Key Process Management Patterns</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Essential patterns for robust production applications</p>
             </div>
 
-            <div id="best" class="tab-content">
-                <h2>Best Practices</h2>
-
-                <div class="best-practice">
-                    <strong>1. Use cluster for web servers</strong>
-                    <p>Maximize CPU utilization by running multiple worker processes.</p>
+            <div class="space-y-8">
+                <!-- Pattern 1 -->
+                <div
+                    class="glass-panel rounded-xl p-6 md:p-8 border border-gray-800 hover:border-node-green/50 transition">
+                    <div class="flex items-start gap-6">
+                        <div
+                            class="hidden md:flex w-12 h-12 rounded-full bg-node-green/20 items-center justify-center flex-shrink-0 text-node-green font-bold text-xl">
+                            1</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-3 text-white">Graceful Shutdown</h3>
+                            <p class="text-gray-400 mb-4">Properly close connections and cleanup resources before
+                                exiting to prevent data loss.</p>
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs text-gray-400 font-mono">graceful-shutdown.js</span>
+                                </div>
+                                <pre class="p-4 text-sm overflow-x-auto"><code class="language-javascript">process.on('SIGTERM', () => {
+    console.log('SIGTERM received, closing server...');
+    server.close(() => {
+        console.log('Server closed');
+        // Close database connections
+        mongoose.connection.close(false, () => {
+            console.log('Database connections closed');
+            process.exit(0);
+        });
+    });
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="best-practice">
-                    <strong>2. Implement health checks</strong>
-                    <p>Monitor process status and automatically restart unhealthy processes.</p>
+                <!-- Pattern 2 -->
+                <div
+                    class="glass-panel rounded-xl p-6 md:p-8 border border-gray-800 hover:border-node-green/50 transition">
+                    <div class="flex items-start gap-6">
+                        <div
+                            class="hidden md:flex w-12 h-12 rounded-full bg-node-green/20 items-center justify-center flex-shrink-0 text-node-green font-bold text-xl">
+                            2</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-3 text-white">Error Handling</h3>
+                            <p class="text-gray-400 mb-4">Catch uncaught exceptions and unhandled rejections to prevent
+                                crashes.</p>
+                            <div class="code-window">
+                                <div class="code-header">
+                                    <span class="text-xs text-gray-400 font-mono">error-handling.js</span>
+                                </div>
+                                <pre class="p-4 text-sm overflow-x-auto"><code class="language-javascript">process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // Log to monitoring service
+    logger.fatal(error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Application specific logging
+    logger.error('Unhandled Rejection', { reason, promise });
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="best-practice">
-                    <strong>3. Set up automatic restarts</strong>
-                    <p>Use PM2 or Forever to restart crashed processes automatically.</p>
-                </div>
+                <!-- Pattern 3 -->
+                <div
+                    class="glass-panel rounded-xl p-6 md:p-8 border border-gray-800 hover:border-node-green/50 transition">
+                    <div class="flex items-start gap-6">
+                        <div
+                            class="hidden md:flex w-12 h-12 rounded-full bg-node-green/20 items-center justify-center flex-shrink-0 text-node-green font-bold text-xl">
+                            3</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-3 text-white">Inter-Process Communication (IPC)</h3>
+                            <p class="text-gray-400 mb-4">Enable processes to communicate with each other using
+                                messages.</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="code-window">
+                                    <div class="code-header py-2">
+                                        <span class="text-xs text-gray-400 font-mono">parent.js</span>
+                                    </div>
+                                    <pre class="p-3 text-xs overflow-x-auto"><code class="language-javascript">const child = fork('child.js');
+child.send({ cmd: 'start', data: [1,2,3] });
 
-                <div class="best-practice">
-                    <strong>4. Log process events</strong>
-                    <p>Keep detailed logs for debugging and monitoring purposes.</p>
-                </div>
-
-                <div class="best-practice">
-                    <strong>5. Handle signals properly</strong>
-                    <p>Implement graceful shutdown for SIGTERM and SIGINT signals.</p>
-                </div>
-
-                <div class="best-practice">
-                    <strong>6. Limit memory usage</strong>
-                    <p>Prevent memory leaks from crashing the system by setting limits.</p>
-                </div>
-
-                <div class="best-practice">
-                    <strong>7. Use environment variables</strong>
-                    <p>Configure processes using environment variables for flexibility.</p>
-                </div>
-
-                <div class="highlight-box">
-                    <strong>Key Takeaway</strong>
-                    <p>Process management is crucial for building robust, scalable Node.js applications that can handle
-                        production workloads efficiently and recover from failures automatically. Choose the right tool
-                        and pattern based on your specific needs.</p>
+child.on('message', (msg) => {
+    console.log('Received:', msg);
+});</code></pre>
+                                </div>
+                                <div class="code-window">
+                                    <div class="code-header py-2">
+                                        <span class="text-xs text-gray-400 font-mono">child.js</span>
+                                    </div>
+                                    <pre class="p-3 text-xs overflow-x-auto"><code class="language-javascript">process.on('message', (msg) => {
+    console.log('Received:', msg);
+    process.send({ result: 'processed' });
+});</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Best Practices -->
+    <section class="py-20 bg-node-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Best Practices</h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div
+                    class="glass-panel rounded-lg p-6 border border-gray-800 hover:border-node-green/30 transition group">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-node-green/10 flex items-center justify-center mb-4 group-hover:bg-node-green/20 transition">
+                        <span class="text-node-green font-bold">01</span>
+                    </div>
+                    <h4 class="font-bold text-white mb-2">Use cluster for web servers</h4>
+                    <p class="text-gray-400 text-sm">Maximize CPU utilization by running multiple worker processes
+                        behind a load balancer.</p>
+                </div>
+
+                <div
+                    class="glass-panel rounded-lg p-6 border border-gray-800 hover:border-node-green/30 transition group">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-node-green/10 flex items-center justify-center mb-4 group-hover:bg-node-green/20 transition">
+                        <span class="text-node-green font-bold">02</span>
+                    </div>
+                    <h4 class="font-bold text-white mb-2">Implement health checks</h4>
+                    <p class="text-gray-400 text-sm">Monitor process status and automatically restart unhealthy
+                        processes before they fail.</p>
+                </div>
+
+                <div
+                    class="glass-panel rounded-lg p-6 border border-gray-800 hover:border-node-green/30 transition group">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-node-green/10 flex items-center justify-center mb-4 group-hover:bg-node-green/20 transition">
+                        <span class="text-node-green font-bold">03</span>
+                    </div>
+                    <h4 class="font-bold text-white mb-2">Set up automatic restarts</h4>
+                    <p class="text-gray-400 text-sm">Use PM2 or Forever to restart crashed processes automatically and
+                        maintain uptime.</p>
+                </div>
+
+                <div
+                    class="glass-panel rounded-lg p-6 border border-gray-800 hover:border-node-green/30 transition group">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-node-green/10 flex items-center justify-center mb-4 group-hover:bg-node-green/20 transition">
+                        <span class="text-node-green font-bold">04</span>
+                    </div>
+                    <h4 class="font-bold text-white mb-2">Log process events</h4>
+                    <p class="text-gray-400 text-sm">Keep detailed logs for debugging, monitoring, and auditing process
+                        behavior.</p>
+                </div>
+
+                <div
+                    class="glass-panel rounded-lg p-6 border border-gray-800 hover:border-node-green/30 transition group">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-node-green/10 flex items-center justify-center mb-4 group-hover:bg-node-green/20 transition">
+                        <span class="text-node-green font-bold">05</span>
+                    </div>
+                    <h4 class="font-bold text-white mb-2">Handle signals properly</h4>
+                    <p class="text-gray-400 text-sm">Implement graceful shutdown for SIGTERM and SIGINT signals in
+                        containerized environments.</p>
+                </div>
+
+                <div
+                    class="glass-panel rounded-lg p-6 border border-gray-800 hover:border-node-green/30 transition group">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-node-green/10 flex items-center justify-center mb-4 group-hover:bg-node-green/20 transition">
+                        <span class="text-node-green font-bold">06</span>
+                    </div>
+                    <h4 class="font-bold text-white mb-2">Limit memory usage</h4>
+                    <p class="text-gray-400 text-sm">Prevent memory leaks from crashing the system by setting
+                        --max-old-space-size limits.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Takeaway -->
+    <section class="py-20 bg-node-dark relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-node-green/10 to-transparent"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-node-green/20 mb-6">
+                <svg class="w-8 h-8 text-node-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Key Takeaway</h2>
+            <p class="text-xl text-gray-300 leading-relaxed">
+                Process management is crucial for building <span class="text-node-green font-semibold">robust, scalable
+                    Node.js applications</span>
+                that can handle production workloads efficiently and recover from failures automatically.
+                Choose the right tool and pattern based on your specific needs.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-node-darker border-t border-gray-800 py-12">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-node-green rounded flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <span class="font-semibold text-gray-300">Node.js Process Management</span>
+            </div>
+            <div class="text-gray-500 text-sm">
+                Complete Guide & Reference
+            </div>
+        </div>
+    </footer>
 
     <script>
-        function showTab(tabId) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => {
-                content.classList.remove('active');
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Show selected content
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+
+            // Reset all tabs
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('text-node-green', 'border-b-2', 'border-node-green', 'bg-gray-800/30');
+                el.classList.add('text-gray-400');
             });
 
-            // Remove active class from all tabs
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            // Show selected tab content
-            document.getElementById(tabId).classList.add('active');
-
-            // Add active class to clicked tab
-            event.target.classList.add('active');
+            // Highlight active tab
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            activeTab.classList.remove('text-gray-400');
+            activeTab.classList.add('text-node-green', 'border-b-2', 'border-node-green', 'bg-gray-800/30');
         }
+
+        // Toggle details
+        function toggleDetails(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('hidden');
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Highlight active section on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active-nav', 'text-node-green');
+                link.classList.add('text-gray-300');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active-nav', 'text-node-green');
+                    link.classList.remove('text-gray-300');
+                }
+            });
+        });
+
+        // Re-run Prism highlighting after dynamic content changes
+        Prism.highlightAll();
     </script>
 </body>
 
