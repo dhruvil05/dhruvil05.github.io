@@ -1,516 +1,1356 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>npm & Package.json Guide</title>
+    <title>Node.js & npm Mastery Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#22c55e',
+                        secondary: '#3b82f6',
+                        accent: '#a855f7',
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        surface: '#1e293b',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 15s ease infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                            '100%': { backgroundPosition: '0% 50%' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #1e293b);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-block {
+            position: relative;
             overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #22c55e, #3b82f6, #a855f7);
+            animation: shimmer 2s infinite;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            color: #2d3748;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #f5576c;
-        }
-
-        .topic {
-            background: #fff5f5;
-            border-left: 4px solid #f5576c;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
+        .hover-card {
             transition: all 0.3s ease;
-            cursor: pointer;
         }
 
-        .topic:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.2);
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -15px rgba(34, 197, 94, 0.3);
         }
 
-        .topic-header {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #c53030;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .nav-link {
+            position: relative;
         }
 
-        .toggle-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #22c55e;
+            transition: width 0.3s;
         }
 
-        .toggle-icon.active {
-            transform: rotate(180deg);
+        .nav-link:hover::after {
+            width: 100%;
         }
 
-        .topic-content {
-            color: #4a5568;
-            line-height: 1.8;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #3b82f6);
+            z-index: 50;
+            transition: width 0.1s;
         }
 
-        .topic-content.active {
-            max-height: 2000px;
-            margin-top: 15px;
+        .command-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease-out forwards;
         }
 
-        .topic-content p {
-            margin-bottom: 10px;
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .method-list {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .method {
-            font-family: 'Courier New', monospace;
-            background: #fed7d7;
-            padding: 8px 12px;
-            margin: 5px 0;
-            border-radius: 4px;
-            display: inline-block;
-            font-size: 0.95rem;
-            color: #742a2a;
-            font-weight: 600;
-        }
-
-        .command-description {
-            margin: 5px 0 15px 0;
-            color: #2d3748;
-            font-style: italic;
-        }
-
-        .npm-icon {
-            display: inline-block;
-            background: #cc3534;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        .example-box {
-            background: #f7fafc;
-            border: 2px dashed #cbd5e0;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .example-title {
-            font-weight: bold;
-            color: #2d3748;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
-            }
-
-            .topic-header {
-                font-size: 1.1rem;
-            }
-
-            .content {
-                padding: 20px;
-            }
+        .tooltip.show {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📦 Working with npm & Package.json</h1>
-            <p>Complete guide to Node Package Manager and package configuration</p>
+<body class="text-gray-300 font-sans antialiased overflow-x-hidden">
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 glass border-b border-gray-800 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center transform rotate-3 hover:rotate-6 transition-transform">
+                        <i class="fab fa-node-js text-white text-2xl"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white tracking-tight">Node<span
+                            class="text-green-500">NPM</span> Guide</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#commands"
+                            class="nav-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Commands</a>
+                        <a href="#package-json"
+                            class="nav-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Package.json</a>
+                        <a href="#dependencies"
+                            class="nav-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Dependencies</a>
+                        <a href="#scripts"
+                            class="nav-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Scripts</a>
+                        <a href="#semver"
+                            class="nav-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Versioning</a>
+                    </div>
+                </div>
+                <button class="md:hidden text-gray-300 hover:text-white" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden glass border-t border-gray-800" id="mobileMenu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#commands"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Commands</a>
+                <a href="#package-json"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Package.json</a>
+                <a href="#dependencies"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Dependencies</a>
+                <a href="#scripts"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Scripts</a>
+                <a href="#semver"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Versioning</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div
+                class="absolute top-20 left-10 w-72 h-72 bg-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float">
+            </div>
+            <div class="absolute top-40 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"
+                style="animation-delay: 2s;"></div>
+            <div class="absolute -bottom-8 left-1/2 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"
+                style="animation-delay: 4s;"></div>
         </div>
 
-        <div class="content">
-            <div class="section">
-                <h2 class="section-title">Common Commands</h2>
+        <div class="relative z-10 max-w-5xl mx-auto text-center">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium mb-6 animate-fade-in">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Complete Reference Guide
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight animate-slide-up">
+                Master <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">Node.js</span> &
+                npm
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-10 animate-slide-up"
+                style="animation-delay: 0.1s;">
+                Your comprehensive guide to package management, dependency handling, and project configuration. From
+                beginner basics to advanced workflows.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s;">
+                <a href="#commands"
+                    class="px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-terminal"></i>
+                    Start Learning
+                </a>
+                <a href="#package-json"
+                    class="px-8 py-4 glass text-white rounded-full font-semibold hover:bg-gray-800 transition-all border border-gray-700 flex items-center gap-2">
+                    <i class="fas fa-book"></i>
+                    View Reference
+                </a>
+            </div>
+        </div>
+    </section>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span><span class="npm-icon">npm</span>Initialize Project</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p><strong>Command:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm init -y</div>
-                            <p class="command-description">Initialize a new package.json file with default values</p>
+    <!-- Quick Stats -->
+    <section class="py-12 border-y border-gray-800 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="command-card" style="animation-delay: 0.1s;">
+                    <div class="text-3xl font-bold text-white mb-1">20+</div>
+                    <div class="text-sm text-gray-400">Essential Commands</div>
+                </div>
+                <div class="command-card" style="animation-delay: 0.2s;">
+                    <div class="text-3xl font-bold text-white mb-1">100%</div>
+                    <div class="text-sm text-gray-400">Interactive Code</div>
+                </div>
+                <div class="command-card" style="animation-delay: 0.3s;">
+                    <div class="text-3xl font-bold text-white mb-1">5</div>
+                    <div class="text-sm text-gray-400">Core Sections</div>
+                </div>
+                <div class="command-card" style="animation-delay: 0.4s;">
+                    <div class="text-3xl font-bold text-white mb-1">∞</div>
+                    <div class="text-sm text-gray-400">Possibilities</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Common Commands Section -->
+    <section id="commands" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Essential Commands</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Master the most important npm commands for initializing
+                    projects, installing packages, and managing dependencies.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Init Command -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                <i class="fas fa-file-code text-blue-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Initialize Project</h3>
+                                <p class="text-sm text-gray-400">Create package.json</p>
+                            </div>
                         </div>
-                        <p>This command creates a package.json file in your project directory. The <span
-                                class="method">-y</span> flag accepts all default options automatically.</p>
-                        <div class="example-box">
-                            <div class="example-title">What it does:</div>
-                            <p>✓ Creates package.json with project metadata</p>
-                            <p>✓ Sets up basic project structure</p>
-                            <p>✓ Prepares project for dependency management</p>
+                        <span
+                            class="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">Essential</span>
+                    </div>
+                    <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm mb-3 relative group">
+                        <code class="text-green-400">npm init -y</code>
+                        <button onclick="copyCode(this)"
+                            class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Copy to clipboard">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span
+                            class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i> Creates
+                            package.json with defaults</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i> Sets up
+                            project metadata</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i> Prepares
+                            for dependency management</li>
+                    </ul>
+                </div>
+
+                <!-- Install Package -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                                <i class="fas fa-download text-purple-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Install Package</h3>
+                                <p class="text-sm text-gray-400">Add dependencies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm mb-3 relative group">
+                        <code class="text-purple-400">npm install express</code>
+                        <button onclick="copyCode(this)"
+                            class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span
+                            class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-3">Installs package and adds to <code
+                            class="text-gray-300 bg-gray-800 px-1 rounded">dependencies</code></p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">express</span>
+                        <span class="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">mongoose</span>
+                        <span class="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">axios</span>
+                    </div>
+                </div>
+
+                <!-- Install All -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                <i class="fas fa-box-open text-green-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Install All Dependencies</h3>
+                                <p class="text-sm text-gray-400">From package.json</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm mb-3 relative group">
+                        <code class="text-green-400">npm install</code>
+                        <span class="text-gray-500"> or </span>
+                        <code class="text-green-400">npm i</code>
+                        <button onclick="copyCode(this)"
+                            class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span
+                            class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Reads package.json and installs all listed dependencies in
+                        node_modules</p>
+                </div>
+
+                <!-- Dev Dependencies -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                                <i class="fas fa-tools text-yellow-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Dev Dependencies</h3>
+                                <p class="text-sm text-gray-400">Development only</p>
+                            </div>
+                        </div>
+                        <span
+                            class="px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium border border-yellow-500/20">Dev
+                            Only</span>
+                    </div>
+                    <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm mb-3 relative group">
+                        <code class="text-yellow-400">npm install -D nodemon</code>
+                        <button onclick="copyCode(this)"
+                            class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span
+                            class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-2">Installs packages only needed during development (testing,
+                        linting, etc.)</p>
+                    <div class="text-xs text-gray-500">Short flag: <code class="text-gray-400">-D</code> or <code
+                            class="text-gray-400">--save-dev</code></div>
+                </div>
+
+                <!-- Global Install -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
+                                <i class="fas fa-globe text-red-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Global Install</h3>
+                                <p class="text-sm text-gray-400">System-wide access</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm mb-3 relative group">
+                        <code class="text-red-400">npm install -g nodemon</code>
+                        <button onclick="copyCode(this)"
+                            class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span
+                            class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Installs package globally on your system, accessible from any
+                        directory</p>
+                </div>
+
+                <!-- Uninstall -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gray-600/20 flex items-center justify-center">
+                                <i class="fas fa-trash text-gray-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Remove Package</h3>
+                                <p class="text-sm text-gray-400">Clean up dependencies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm mb-3 relative group">
+                        <code class="text-gray-400">npm uninstall express</code>
+                        <button onclick="copyCode(this)"
+                            class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span
+                            class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="px-2 py-1 bg-gray-800 rounded text-gray-400">npm remove</span>
+                        <span class="px-2 py-1 bg-gray-800 rounded text-gray-400">npm rm</span>
+                        <span class="px-2 py-1 bg-gray-800 rounded text-gray-400">npm un</span>
+                    </div>
+                </div>
+
+                <!-- Update -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+                                <i class="fas fa-sync-alt text-cyan-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Update Packages</h3>
+                                <p class="text-sm text-gray-400">Keep dependencies fresh</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-cyan-400">npm update</code>
+                            <span class="text-gray-500 ml-2">// Update all</span>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-cyan-400">npm update express</code>
+                            <span class="text-gray-500 ml-2">// Update specific</span>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span><span class="npm-icon">npm</span>Install Packages</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p><strong>Install a specific package:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm install express</div>
-                            <p class="command-description">Installs the express package and adds it to dependencies</p>
-                        </div>
-
-                        <p><strong>Install all dependencies:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm install</div>
-                            <p class="command-description">Installs all packages listed in package.json</p>
-                        </div>
-
-                        <p><strong>Install as dev dependency:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm install --save-dev jest</div>
-                            <div class="method">npm install -D nodemon</div>
-                            <p class="command-description">Installs packages only needed during development</p>
-                        </div>
-
-                        <p><strong>Install globally:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm install -g nodemon</div>
-                            <p class="command-description">Installs package globally on your system</p>
-                        </div>
-
-                        <div class="example-box">
-                            <div class="example-title">Common packages to install:</div>
-                            <p><span class="method">express</span> - Web framework</p>
-                            <p><span class="method">mongoose</span> - MongoDB ODM</p>
-                            <p><span class="method">axios</span> - HTTP client</p>
-                            <p><span class="method">dotenv</span> - Environment variables</p>
+                <!-- List & Audit -->
+                <div class="glass rounded-2xl p-6 hover-card group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                                <i class="fas fa-list text-pink-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">List & Audit</h3>
+                                <p class="text-sm text-gray-400">Inspect & secure</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span><span class="npm-icon">npm</span>Uninstall Packages</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <div class="method-list">
-                            <div class="method">npm uninstall express</div>
-                            <p class="command-description">Removes the express package from your project</p>
+                    <div class="space-y-2">
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-pink-400">npm list --depth=0</code>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
                         </div>
-                        <p>This command removes the package from node_modules folder and removes the entry from
-                            package.json dependencies.</p>
-
-                        <p><strong>Alternative commands:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm remove express</div>
-                            <div class="method">npm rm express</div>
-                            <div class="method">npm un express</div>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-pink-400">npm audit</code>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
                         </div>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span><span class="npm-icon">npm</span>Update Dependencies</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <div class="method-list">
-                            <div class="method">npm update</div>
-                            <p class="command-description">Updates all dependencies to their latest compatible versions
-                            </p>
-                        </div>
-
-                        <p><strong>Update specific package:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm update express</div>
-                            <p class="command-description">Updates only the express package</p>
-                        </div>
-
-                        <p><strong>Check for outdated packages:</strong></p>
-                        <div class="method-list">
-                            <div class="method">npm outdated</div>
-                            <p class="command-description">Lists packages that have newer versions available</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span><span class="npm-icon">npm</span>Other Useful Commands</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <div class="method-list">
-                            <div class="method">npm list</div>
-                            <p class="command-description">Lists all installed packages in a tree structure</p>
-
-                            <div class="method">npm list --depth=0</div>
-                            <p class="command-description">Lists only top-level packages</p>
-
-                            <div class="method">npm search express</div>
-                            <p class="command-description">Searches for packages in npm registry</p>
-
-                            <div class="method">npm view express</div>
-                            <p class="command-description">Shows package information</p>
-
-                            <div class="method">npm audit</div>
-                            <p class="command-description">Checks for security vulnerabilities</p>
-
-                            <div class="method">npm audit fix</div>
-                            <p class="command-description">Automatically fixes security issues</p>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-pink-400">npm audit fix</code>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="section">
-                <h2 class="section-title">Understanding package.json</h2>
+            <!-- Additional Commands Grid -->
+            <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass rounded-xl p-4 text-center hover-card">
+                    <code class="text-blue-400 font-mono text-sm">npm outdated</code>
+                    <p class="text-xs text-gray-400 mt-2">Check for updates</p>
+                </div>
+                <div class="glass rounded-xl p-4 text-center hover-card">
+                    <code class="text-blue-400 font-mono text-sm">npm search pkg</code>
+                    <p class="text-xs text-gray-400 mt-2">Search registry</p>
+                </div>
+                <div class="glass rounded-xl p-4 text-center hover-card">
+                    <code class="text-blue-400 font-mono text-sm">npm view pkg</code>
+                    <p class="text-xs text-gray-400 mt-2">Package info</p>
+                </div>
+                <div class="glass rounded-xl p-4 text-center hover-card">
+                    <code class="text-blue-400 font-mono text-sm">npm ls</code>
+                    <p class="text-xs text-gray-400 mt-2">List all packages</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>dependencies vs devDependencies</span>
-                        <span class="toggle-icon">▼</span>
+    <!-- Package.json Section -->
+    <section id="package-json" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Understanding package.json</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">The heart of your Node.js project. Learn every field and its
+                    purpose.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Interactive Package.json Viewer -->
+                <div class="glass rounded-2xl p-6 overflow-hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white flex items-center gap-2">
+                            <i class="fab fa-npm text-red-500"></i>
+                            package.json Structure
+                        </h3>
+                        <span class="text-xs text-gray-500 font-mono">package.json</span>
                     </div>
-                    <div class="topic-content">
-                        <p><strong><span class="method">dependencies</span></strong></p>
-                        <p>Packages required for the application to run in production. These are essential for your app
-                            to function.</p>
-
-                        <div class="example-box">
-                            <div class="example-title">Examples of dependencies:</div>
-                            <p><span class="method">express</span> - Web server framework</p>
-                            <p><span class="method">mongoose</span> - Database ORM</p>
-                            <p><span class="method">axios</span> - HTTP requests</p>
-                            <p><span class="method">dotenv</span> - Environment variables</p>
-                            <p><span class="method">bcrypt</span> - Password hashing</p>
-                        </div>
-
-                        <p style="margin-top: 20px;"><strong><span class="method">devDependencies</span></strong></p>
-                        <p>Packages only needed during development and testing. Not required in production.</p>
-
-                        <div class="example-box">
-                            <div class="example-title">Examples of devDependencies:</div>
-                            <p><span class="method">nodemon</span> - Auto-restart server</p>
-                            <p><span class="method">jest</span> - Testing framework</p>
-                            <p><span class="method">eslint</span> - Code linting</p>
-                            <p><span class="method">prettier</span> - Code formatting</p>
-                            <p><span class="method">webpack</span> - Module bundler</p>
-                        </div>
+                    <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                        <pre class="text-gray-300 leading-relaxed"><span class="text-purple-400">{</span>
+  <span class="text-blue-400">"name"</span><span class="text-gray-500">:</span> <span class="text-green-400">"my-awesome-app"</span><span class="text-gray-500">,</span>
+  <span class="text-blue-400">"version"</span><span class="text-gray-500">:</span> <span class="text-green-400">"1.0.0"</span><span class="text-gray-500">,</span>
+  <span class="text-blue-400">"description"</span><span class="text-gray-500">:</span> <span class="text-green-400">"A fantastic Node.js application"</span><span class="text-gray-500">,</span>
+  <span class="text-blue-400">"main"</span><span class="text-gray-500">:</span> <span class="text-green-400">"index.js"</span><span class="text-gray-500">,</span>
+  <span class="text-blue-400">"scripts"</span><span class="text-gray-500">: {</span>
+    <span class="text-blue-400">"start"</span><span class="text-gray-500">:</span> <span class="text-green-400">"node index.js"</span><span class="text-gray-500">,</span>
+    <span class="text-blue-400">"dev"</span><span class="text-gray-500">:</span> <span class="text-green-400">"nodemon index.js"</span><span class="text-gray-500">,</span>
+    <span class="text-blue-400">"test"</span><span class="text-gray-500">:</span> <span class="text-green-400">"jest"</span>
+  <span class="text-gray-500">},</span>
+  <span class="text-blue-400">"dependencies"</span><span class="text-gray-500">: {</span>
+    <span class="text-blue-400">"express"</span><span class="text-gray-500">:</span> <span class="text-green-400">"^4.18.2"</span>
+  <span class="text-gray-500">},</span>
+  <span class="text-blue-400">"devDependencies"</span><span class="text-gray-500">: {</span>
+    <span class="text-blue-400">"nodemon"</span><span class="text-gray-500">:</span> <span class="text-green-400">"^2.0.20"</span>
+  <span class="text-gray-500">},</span>
+  <span class="text-blue-400">"keywords"</span><span class="text-gray-500">: [</span><span class="text-green-400">"nodejs"</span><span class="text-gray-500">,</span> <span class="text-green-400">"api"</span><span class="text-gray-500">],</span>
+  <span class="text-blue-400">"author"</span><span class="text-gray-500">:</span> <span class="text-green-400">"Your Name"</span><span class="text-gray-500">,</span>
+  <span class="text-blue-400">"license"</span><span class="text-gray-500">:</span> <span class="text-green-400">"MIT"</span><span class="text-gray-500">,</span>
+  <span class="text-blue-400">"engines"</span><span class="text-gray-500">: {</span>
+    <span class="text-blue-400">"node"</span><span class="text-gray-500">:</span> <span class="text-green-400">">=14.0.0"</span>
+  <span class="text-gray-500">}</span>
+<span class="text-purple-400">}</span></pre>
                     </div>
+                    <button onclick="copyCode(this)"
+                        class="mt-4 w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-copy"></i> Copy Full Configuration
+                    </button>
+                    <span class="tooltip block text-center mt-2 text-green-400 text-sm">Copied to clipboard!</span>
                 </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Scripts for running commands</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <p>Scripts allow you to define custom commands in package.json to streamline your workflow.</p>
-
-                        <div class="example-box">
-                            <div class="example-title">Common script examples:</div>
-
-                            <div class="method">start</div>
-                            <p class="command-description">Run with: npm start</p>
-                            <p>Example: <span class="method">"start": "node app.js"</span></p>
-                            <p style="margin-bottom: 15px;">Starts your application in production mode</p>
-
-                            <div class="method">test</div>
-                            <p class="command-description">Run with: npm test</p>
-                            <p>Example: <span class="method">"test": "jest"</span></p>
-                            <p style="margin-bottom: 15px;">Executes your test suite</p>
-
-                            <div class="method">lint</div>
-                            <p class="command-description">Run with: npm run lint</p>
-                            <p>Example: <span class="method">"lint": "eslint ."</span></p>
-                            <p style="margin-bottom: 15px;">Checks code quality and style</p>
-
-                            <div class="method">dev</div>
-                            <p class="command-description">Run with: npm run dev</p>
-                            <p>Example: <span class="method">"dev": "nodemon app.js"</span></p>
-                            <p style="margin-bottom: 15px;">Starts with auto-reload for development</p>
+                <!-- Field Explanations -->
+                <div class="space-y-4">
+                    <div class="glass rounded-xl p-4 hover-card cursor-pointer" onclick="toggleDetail(this)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-mono text-xs font-bold">01</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">name</h4>
+                                    <p class="text-xs text-gray-400">Project identifier</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
                         </div>
-
-                        <p style="margin-top: 20px;"><strong>Note:</strong> <span class="method">start</span> and <span
-                                class="method">test</span> are special scripts that don't need "run" keyword. All other
-                            scripts require <span class="method">npm run script-name</span></p>
-                    </div>
-                </div>
-
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Important package.json Fields</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="topic-content">
-                        <div class="method-list">
-                            <div class="method">"name"</div>
-                            <p class="command-description">The package name (required, lowercase, no spaces)</p>
-
-                            <div class="method">"version"</div>
-                            <p class="command-description">Package version following semantic versioning (e.g., 1.0.0)
-                            </p>
-
-                            <div class="method">"description"</div>
-                            <p class="command-description">Brief description of your project</p>
-
-                            <div class="method">"main"</div>
-                            <p class="command-description">Entry point file (e.g., "index.js" or "app.js")</p>
-
-                            <div class="method">"scripts"</div>
-                            <p class="command-description">Custom commands for your project</p>
-
-                            <div class="method">"keywords"</div>
-                            <p class="command-description">Array of keywords for npm search</p>
-
-                            <div class="method">"author"</div>
-                            <p class="command-description">Package author's name</p>
-
-                            <div class="method">"license"</div>
-                            <p class="command-description">License type (e.g., "MIT", "ISC")</p>
-
-                            <div class="method">"repository"</div>
-                            <p class="command-description">GitHub repository URL</p>
-
-                            <div class="method">"engines"</div>
-                            <p class="command-description">Specifies Node.js and npm versions required</p>
-                        </div>
-
-                        <div class="example-box" style="margin-top: 20px;">
-                            <div class="example-title">Example package.json structure:</div>
-                            <pre
-                                style="background: #2d3748; color: #68d391; padding: 15px; border-radius: 5px; overflow-x: auto;">
-{
-  "name": "my-app",
-  "version": "1.0.0",
-  "description": "My awesome Node.js app",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "jest"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.20"
-  }
-}</pre>
+                        <div class="hidden mt-3 pl-11 text-sm text-gray-400 border-l-2 border-blue-500/30 ml-4">
+                            Must be lowercase, no spaces. Used in npm registry and as directory name. Required field.
                         </div>
                     </div>
-                </div>
 
-                <div class="topic" onclick="toggleTopic(this)">
-                    <div class="topic-header">
-                        <span>Version Numbers Explained</span>
-                        <span class="toggle-icon">▼</span>
+                    <div class="glass rounded-xl p-4 hover-card cursor-pointer" onclick="toggleDetail(this)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 font-mono text-xs font-bold">02</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">version</h4>
+                                    <p class="text-xs text-gray-400">Semantic versioning</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                        </div>
+                        <div class="hidden mt-3 pl-11 text-sm text-gray-400 border-l-2 border-green-500/30 ml-4">
+                            Follows semver (MAJOR.MINOR.PATCH). Required field. Example: 1.0.0
+                        </div>
                     </div>
-                    <div class="topic-content">
-                        <p>npm uses semantic versioning (semver) in the format: <span
-                                class="method">MAJOR.MINOR.PATCH</span></p>
 
-                        <div class="example-box">
-                            <div class="example-title">Version symbols:</div>
+                    <div class="glass rounded-xl p-4 hover-card cursor-pointer" onclick="toggleDetail(this)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 font-mono text-xs font-bold">03</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">main</h4>
+                                    <p class="text-xs text-gray-400">Entry point</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                        </div>
+                        <div class="hidden mt-3 pl-11 text-sm text-gray-400 border-l-2 border-purple-500/30 ml-4">
+                            The primary entry point to your program. Default is index.js. When someone imports your
+                            package, this file loads first.
+                        </div>
+                    </div>
 
-                            <p><span class="method">^4.18.2</span> (Caret)</p>
-                            <p class="command-description">Allows updates that don't change the leftmost non-zero digit
-                                (e.g., 4.18.2 → 4.19.0 ✓, but not 5.0.0 ✗)</p>
+                    <div class="glass rounded-xl p-4 hover-card cursor-pointer" onclick="toggleDetail(this)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400 font-mono text-xs font-bold">04</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">scripts</h4>
+                                    <p class="text-xs text-gray-400">Automation commands</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                        </div>
+                        <div class="hidden mt-3 pl-11 text-sm text-gray-400 border-l-2 border-yellow-500/30 ml-4">
+                            Custom commands to run with npm run [script]. Common: start, test, build, dev.
+                        </div>
+                    </div>
 
-                            <p><span class="method">~4.18.2</span> (Tilde)</p>
-                            <p class="command-description">Allows only patch updates (e.g., 4.18.2 → 4.18.5 ✓, but not
-                                4.19.0 ✗)</p>
+                    <div class="glass rounded-xl p-4 hover-card cursor-pointer" onclick="toggleDetail(this)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 font-mono text-xs font-bold">05</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">engines</h4>
+                                    <p class="text-xs text-gray-400">Environment requirements</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                        </div>
+                        <div class="hidden mt-3 pl-11 text-sm text-gray-400 border-l-2 border-red-500/30 ml-4">
+                            Specifies Node.js and npm version requirements. Ensures compatibility across environments.
+                        </div>
+                    </div>
 
-                            <p><span class="method">4.18.2</span> (Exact)</p>
-                            <p class="command-description">Installs exactly this version only</p>
-
-                            <p><span class="method">*</span> or <span class="method">latest</span></p>
-                            <p class="command-description">Installs the latest version available</p>
+                    <div class="glass rounded-xl p-4 hover-card cursor-pointer" onclick="toggleDetail(this)">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-mono text-xs font-bold">06</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">keywords & repository</h4>
+                                    <p class="text-xs text-gray-400">Discovery & source</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                        </div>
+                        <div class="hidden mt-3 pl-11 text-sm text-gray-400 border-l-2 border-cyan-500/30 ml-4">
+                            Keywords help others find your package. Repository links to source code (usually GitHub).
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Dependencies Section -->
+    <section id="dependencies" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Dependencies vs DevDependencies</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Understanding the difference is crucial for production
+                    optimization.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Production Dependencies -->
+                <div class="glass rounded-2xl p-8 border border-green-500/20 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-all">
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center">
+                                <i class="fas fa-box text-green-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">dependencies</h3>
+                                <p class="text-green-400 text-sm">Production Required</p>
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 mb-6">Packages essential for your application to run in production.
+                            These are installed when you deploy your app.</p>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-server text-blue-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">express</div>
+                                    <div class="text-xs text-gray-400">Web server framework</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-database text-green-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">mongoose</div>
+                                    <div class="text-xs text-gray-400">MongoDB ODM</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-exchange-alt text-purple-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">axios</div>
+                                    <div class="text-xs text-gray-400">HTTP client</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-lock text-yellow-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">bcrypt</div>
+                                    <div class="text-xs text-gray-400">Password hashing</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-key text-cyan-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">dotenv</div>
+                                    <div class="text-xs text-gray-400">Environment variables</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm relative">
+                            <code class="text-green-400">npm install express</code>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dev Dependencies -->
+                <div class="glass rounded-2xl p-8 border border-yellow-500/20 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl group-hover:bg-yellow-500/20 transition-all">
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-14 h-14 rounded-2xl bg-yellow-500/20 flex items-center justify-center">
+                                <i class="fas fa-tools text-yellow-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">devDependencies</h3>
+                                <p class="text-yellow-400 text-sm">Development Only</p>
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 mb-6">Packages only needed during development and testing. Not installed
+                            in production (when NODE_ENV=production).</p>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-sync text-green-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">nodemon</div>
+                                    <div class="text-xs text-gray-400">Auto-restart server</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-vial text-red-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">jest</div>
+                                    <div class="text-xs text-gray-400">Testing framework</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-code text-blue-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">eslint</div>
+                                    <div class="text-xs text-gray-400">Code linting</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-magic text-pink-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">prettier</div>
+                                    <div class="text-xs text-gray-400">Code formatting</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <i class="fas fa-cube text-orange-400"></i>
+                                <div>
+                                    <div class="text-white font-medium">webpack</div>
+                                    <div class="text-xs text-gray-400">Module bundler</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="code-block bg-gray-950 rounded-lg p-4 font-mono text-sm relative">
+                            <code class="text-yellow-400">npm install -D nodemon</code>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-12 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Tip -->
+            <div class="mt-8 glass rounded-2xl p-6 border border-blue-500/20 bg-blue-500/5">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-lightbulb text-blue-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-semibold mb-2">Production Optimization Tip</h4>
+                        <p class="text-gray-300 text-sm mb-3">When deploying to production, use <code
+                                class="text-blue-400 bg-blue-900/30 px-1 rounded">npm ci --only=production</code> to
+                            install only production dependencies, significantly reducing node_modules size and
+                            deployment time.</p>
+                        <div
+                            class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm inline-block relative group">
+                            <code class="text-blue-400">npm ci --only=production</code>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-2 p-1 rounded bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy text-xs"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-8 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts Section -->
+    <section id="scripts" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">NPM Scripts</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Automate your workflow with custom commands. Special scripts
+                    vs custom scripts explained.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <!-- Start Script -->
+                <div class="glass rounded-2xl p-6 hover-card relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-green-500/20 rounded-full blur-2xl group-hover:bg-green-500/30 transition-all">
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4">
+                            <i class="fas fa-play text-green-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">start</h3>
+                        <p class="text-gray-400 text-sm mb-4">Launch production application</p>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm mb-3">
+                            <code class="text-green-400">"start": "node app.js"</code>
+                        </div>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-gray-300">npm start</code>
+                            <span class="absolute right-2 top-2 text-xs text-green-500">No "run" needed</span>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-8 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-16 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Script -->
+                <div class="glass rounded-2xl p-6 hover-card relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl group-hover:bg-purple-500/30 transition-all">
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                            <i class="fas fa-vial text-purple-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">test</h3>
+                        <p class="text-gray-400 text-sm mb-4">Execute test suite</p>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm mb-3">
+                            <code class="text-purple-400">"test": "jest"</code>
+                        </div>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-gray-300">npm test</code>
+                            <span class="absolute right-2 top-2 text-xs text-purple-500">No "run" needed</span>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-8 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-16 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dev Script -->
+                <div class="glass rounded-2xl p-6 hover-card relative overflow-hidden group">
+                    <div
+                        class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/30 transition-all">
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
+                            <i class="fas fa-code text-blue-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">dev</h3>
+                        <p class="text-gray-400 text-sm mb-4">Development with auto-reload</p>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm mb-3">
+                            <code class="text-blue-400">"dev": "nodemon app.js"</code>
+                        </div>
+                        <div class="code-block bg-gray-950 rounded-lg p-3 font-mono text-sm relative group">
+                            <code class="text-gray-300">npm run dev</code>
+                            <span class="absolute right-2 top-2 text-xs text-yellow-500">Requires "run"</span>
+                            <button onclick="copyCode(this)"
+                                class="absolute right-2 top-8 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span
+                                class="tooltip absolute right-2 top-16 px-2 py-1 bg-green-500 text-white text-xs rounded">Copied!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Script Rules -->
+            <div class="glass rounded-2xl p-8 border border-gray-700">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-terminal text-gray-400"></i>
+                    Script Execution Rules
+                </h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-green-400 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            Special Scripts (No "run" needed)
+                        </h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-green-400">npm start</code>
+                                <span class="text-sm">Runs start script</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-purple-400">npm test</code>
+                                <span class="text-sm">Runs test script</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-red-400">npm stop</code>
+                                <span class="text-sm">Runs stop script (if defined)</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-yellow-400">npm restart</code>
+                                <span class="text-sm">Runs restart script</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-yellow-400 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Custom Scripts (Requires "run")
+                        </h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-blue-400">npm run dev</code>
+                                <span class="text-sm">Runs dev script</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-cyan-400">npm run lint</code>
+                                <span class="text-sm">Runs lint script</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <code class="bg-gray-800 px-2 py-1 rounded text-pink-400">npm run build</code>
+                                <span class="text-sm">Runs build script</span>
+                            </li>
+                            <li class="text-sm text-gray-500 mt-2 italic">All custom scripts require "run" keyword</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Semantic Versioning Section -->
+    <section id="semver" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Semantic Versioning</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Understanding version numbers and symbols in package.json</p>
+            </div>
+
+            <div class="glass rounded-2xl p-8 mb-8 border border-gray-700">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-white mb-2">Version Format: MAJOR.MINOR.PATCH</h3>
+                    <p class="text-gray-400">Example: <span class="text-green-400 font-mono">4.18.2</span></p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center p-6 rounded-xl bg-red-500/10 border border-red-500/20">
+                        <div class="text-4xl font-bold text-red-400 mb-2">MAJOR</div>
+                        <div class="text-white font-semibold mb-2">Breaking Changes</div>
+                        <p class="text-sm text-gray-400">Incompatible API changes. Requires code updates.</p>
+                        <div class="mt-4 text-xs text-red-400 font-mono">X.0.0</div>
+                    </div>
+                    <div class="text-center p-6 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                        <div class="text-4xl font-bold text-yellow-400 mb-2">MINOR</div>
+                        <div class="text-white font-semibold mb-2">New Features</div>
+                        <p class="text-sm text-gray-400">Backward-compatible functionality additions.</p>
+                        <div class="mt-4 text-xs text-yellow-400 font-mono">0.X.0</div>
+                    </div>
+                    <div class="text-center p-6 rounded-xl bg-green-500/10 border border-green-500/20">
+                        <div class="text-4xl font-bold text-green-400 mb-2">PATCH</div>
+                        <div class="text-white font-semibold mb-2">Bug Fixes</div>
+                        <p class="text-sm text-gray-400">Backward-compatible bug fixes. Safe to update.</p>
+                        <div class="mt-4 text-xs text-green-400 font-mono">0.0.X</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Version Symbols -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass rounded-2xl p-6 hover-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-2xl font-bold text-blue-400">
+                            ^</div>
+                        <div>
+                            <h4 class="text-xl font-bold text-white">Caret (^)</h4>
+                            <p class="text-blue-400 text-sm">Compatible with version</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">Allows updates that do not change the leftmost non-zero digit. Allows
+                        minor and patch updates.</p>
+                    <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm">
+                        <div class="text-gray-400 mb-2">"express": "^4.18.2"</div>
+                        <div class="space-y-1 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-green-400">4.19.0</span>
+                                <span class="text-gray-500">✓ (Minor update)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-green-400">4.18.5</span>
+                                <span class="text-gray-500">✓ (Patch update)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-times text-red-500"></i>
+                                <span class="text-red-400">5.0.0</span>
+                                <span class="text-gray-500">✗ (Major change)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-6 hover-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-2xl font-bold text-purple-400">
+                            ~</div>
+                        <div>
+                            <h4 class="text-xl font-bold text-white">Tilde (~)</h4>
+                            <p class="text-purple-400 text-sm">Approximately equivalent</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">Allows only patch updates. Use when you want to minimize changes and
+                        only accept bug fixes.</p>
+                    <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm">
+                        <div class="text-gray-400 mb-2">"express": "~4.18.2"</div>
+                        <div class="space-y-1 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-green-400">4.18.5</span>
+                                <span class="text-gray-500">✓ (Patch update)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-times text-red-500"></i>
+                                <span class="text-red-400">4.19.0</span>
+                                <span class="text-gray-500">✗ (Minor change)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-times text-red-500"></i>
+                                <span class="text-red-400">5.0.0</span>
+                                <span class="text-gray-500">✗ (Major change)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-6 hover-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-xl font-bold text-red-400">
+                            1.2.3</div>
+                        <div>
+                            <h4 class="text-xl font-bold text-white">Exact</h4>
+                            <p class="text-red-400 text-sm">Specific version only</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">Installs exactly this version. No updates allowed. Use for maximum
+                        stability.</p>
+                    <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm">
+                        <div class="text-gray-400 mb-2">"express": "4.18.2"</div>
+                        <div class="space-y-1 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-green-400">4.18.2</span>
+                                <span class="text-gray-500">✓ (Exact match)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-times text-red-500"></i>
+                                <span class="text-red-400">4.18.3</span>
+                                <span class="text-gray-500">✗ (Any change)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-6 hover-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-xl font-bold text-green-400">
+                            *</div>
+                        <div>
+                            <h4 class="text-xl font-bold text-white">Latest (*)</h4>
+                            <p class="text-green-400 text-sm">Always newest</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">Installs the latest version available. Use with caution as it may
+                        introduce breaking changes.</p>
+                    <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm">
+                        <div class="text-gray-400 mb-2">"express": "*" or "latest"</div>
+                        <div class="space-y-1 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check text-green-500"></i>
+                                <span class="text-green-400">Latest</span>
+                                <span class="text-gray-500">✓ (Always newest)</span>
+                            </div>
+                            <div class="mt-2 text-yellow-500 text-xs">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Risky for production use
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-gray-900/50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded flex items-center justify-center">
+                    <i class="fab fa-node-js text-white text-lg"></i>
+                </div>
+                <span class="text-gray-400">Node.js & npm Reference Guide</span>
+            </div>
+            <div class="text-gray-500 text-sm">
+                Built for developers, by developers
+            </div>
+            <div class="flex gap-4">
+                <a href="https://github.com/dhruvil05" class="text-gray-400 hover:text-white transition-colors"><i
+                        class="fab fa-github text-xl"></i></a>
+                <!-- <a href="#" class="text-gray-400 hover:text-white transition-colors"><i
+                        class="fab fa-twitter text-xl"></i></a> -->
+                <a href="https://dhruvil05.github.io/node-npm/old-index.html" class="text-gray-400 hover:text-white transition-colors"><i
+                        class="fab fa-npm text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button onclick="scrollToTop()" id="backToTop"
+        class="fixed bottom-8 right-8 w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg shadow-green-500/30 flex items-center justify-center transition-all transform translate-y-20 opacity-0 z-50">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <script>
-        function toggleTopic(element) {
-            const content = element.querySelector('.topic-content');
-            const icon = element.querySelector('.toggle-icon');
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement.querySelector('code');
+            const text = codeBlock.innerText;
 
-            content.classList.toggle('active');
-            icon.classList.toggle('active');
+            navigator.clipboard.writeText(text).then(() => {
+                const tooltip = button.parentElement.querySelector('.tooltip');
+                tooltip.classList.add('show');
+                setTimeout(() => {
+                    tooltip.classList.remove('show');
+                }, 2000);
+            });
         }
+
+        // Toggle detail expansion
+        function toggleDetail(element) {
+            const detail = element.querySelector('.hidden, .block');
+            const icon = element.querySelector('.fa-chevron-down');
+
+            if (detail.classList.contains('hidden')) {
+                detail.classList.remove('hidden');
+                detail.classList.add('block');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                detail.classList.add('hidden');
+                detail.classList.remove('block');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            if (winScroll > 300) {
+                backToTop.classList.remove('translate-y-20', 'opacity-0');
+            } else {
+                backToTop.classList.add('translate-y-20', 'opacity-0');
+            }
+
+            // Navbar background
+            const navbar = document.getElementById('navbar');
+            if (winScroll > 50) {
+                navbar.classList.add('bg-gray-900/90');
+            } else {
+                navbar.classList.remove('bg-gray-900/90');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.hover-card').forEach((el) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Close mobile menu if open
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                }
+            });
+        });
     </script>
 </body>
 
