@@ -1,1536 +1,1115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete SQL Tutorial</title>
+    <title>SQL Mastery | Interactive Database Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            black: '#0a0a0f',
+                            dark: '#12121a',
+                            panel: '#1a1a2e',
+                            primary: '#00f5d4',
+                            secondary: '#ff006e',
+                            accent: '#8338ec',
+                            warning: '#ffbe0b',
+                            danger: '#fb5607'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #00f5d4, 0 0 10px #00f5d4' },
+                            '100%': { boxShadow: '0 0 20px #00f5d4, 0 0 30px #00f5d4' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #0a0a0f;
+            color: #e0e0e0;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            margin-bottom: 20px;
+        .code-block {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #00f5d433;
         }
 
-        .header {
-            text-align: center;
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
+        .neon-text {
+            text-shadow: 0 0 10px currentColor;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(0, 245, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 212, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+        .syntax-keyword {
+            color: #ff006e;
+            font-weight: bold;
         }
 
-        .sidebar {
-            position: fixed;
-            left: -300px;
-            top: 0;
-            width: 300px;
-            height: 100vh;
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            overflow-y: auto;
-            transition: left 0.3s ease;
-            z-index: 1000;
+        .syntax-function {
+            color: #00f5d4;
         }
 
-        .sidebar.active {
-            left: 0;
+        .syntax-string {
+            color: #ffbe0b;
         }
 
-        .sidebar h3 {
-            margin-bottom: 20px;
-            color: #3498db;
+        .syntax-comment {
+            color: #6c757d;
+            font-style: italic;
         }
 
-        .sidebar ul {
-            list-style: none;
+        .syntax-number {
+            color: #8338ec;
         }
 
-        .sidebar li {
-            margin-bottom: 5px;
-        }
-
-        .sidebar a {
-            color: #ecf0f1;
-            text-decoration: none;
-            display: block;
-            padding: 8px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background: #3498db;
-        }
-
-        .menu-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .overlay {
+        .progress-bar {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
+            height: 3px;
+            background: linear-gradient(90deg, #00f5d4, #8338ec);
+            z-index: 100;
+            transition: width 0.1s;
         }
 
-        .content {
-            margin-left: 0;
-            transition: margin-left 0.3s ease;
+        .table-visual {
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
-        .section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 5px solid #3498db;
+        .table-visual th {
+            background: rgba(0, 245, 212, 0.1);
+            border-bottom: 2px solid #00f5d4;
         }
 
-        .section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 2rem;
+        .table-visual td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .section h3 {
-            color: #3498db;
-            margin: 25px 0 15px 0;
-            font-size: 1.5rem;
+        .hover-row:hover td {
+            background: rgba(0, 245, 212, 0.05);
         }
 
-        .example {
-            background: #2c3e50;
-            color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
+        .interactive-card {
+            transition: all 0.3s ease;
         }
 
-        .example h4 {
-            color: #3498db;
-            margin-bottom: 10px;
-        }
-
-        .sql-code {
-            background: #34495e;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-size: 14px;
-            overflow-x: auto;
-        }
-
-        .result {
-            background: #27ae60;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .note {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-
-        .table-demo {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            background: white;
-        }
-
-        .table-demo th,
-        .table-demo td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-
-        .table-demo th {
-            background: #3498db;
-            color: white;
-        }
-
-        .table-demo tr:nth-child(even) {
-            background: #f2f2f2;
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #3498db;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .section {
-                padding: 20px;
-            }
-
-            .sidebar {
-                width: 250px;
-            }
-        }
-
-        .highlight {
-            background: yellow;
-            padding: 2px 4px;
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px -10px rgba(0, 245, 212, 0.3);
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
-    <div class="overlay" onclick="toggleSidebar()"></div>
+<body class="font-sans antialiased grid-bg">
 
-    <nav class="sidebar" id="sidebar">
-        <h3>SQL Tutorial</h3>
-        <input type="text" class="search-box" placeholder="Search topics..." onkeyup="searchTopics(this.value)">
-        <ul id="nav-list">
-            <li><a href="#introduction" onclick="scrollToSection('introduction')">Introduction</a></li>
-            <li><a href="#syntax" onclick="scrollToSection('syntax')">SQL Syntax</a></li>
-            <li><a href="#select" onclick="scrollToSection('select')">SELECT</a></li>
-            <li><a href="#where" onclick="scrollToSection('where')">WHERE</a></li>
-            <li><a href="#orderby" onclick="scrollToSection('orderby')">ORDER BY</a></li>
-            <li><a href="#insert" onclick="scrollToSection('insert')">INSERT</a></li>
-            <li><a href="#update" onclick="scrollToSection('update')">UPDATE</a></li>
-            <li><a href="#delete" onclick="scrollToSection('delete')">DELETE</a></li>
-            <li><a href="#joins" onclick="scrollToSection('joins')">JOINS</a></li>
-            <li><a href="#groupby" onclick="scrollToSection('groupby')">GROUP BY</a></li>
-            <li><a href="#having" onclick="scrollToSection('having')">HAVING</a></li>
-            <li><a href="#functions" onclick="scrollToSection('functions')">Functions</a></li>
-            <li><a href="#constraints" onclick="scrollToSection('constraints')">Constraints</a></li>
-            <li><a href="#indexes" onclick="scrollToSection('indexes')">Indexes</a></li>
-            <li><a href="#views" onclick="scrollToSection('views')">Views</a></li>
-            <li><a href="#procedures" onclick="scrollToSection('procedures')">Stored Procedures</a></li>
-            <li><a href="#datatypes" onclick="scrollToSection('datatypes')">Data Types</a></li>
-        </ul>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-cyber-black/90 backdrop-blur-md border-b border-cyber-primary/20 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyber-primary to-cyber-accent flex items-center justify-center animate-pulse-slow">
+                        <span class="text-cyber-black font-bold text-xl font-mono">SQL</span>
+                    </div>
+                    <span class="font-bold text-xl tracking-wider text-white">MASTERY</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="flex items-baseline space-x-8">
+                        <a href="#fundamentals"
+                            class="hover:text-cyber-primary transition-colors duration-300 text-sm font-mono" target="_self">01_FUNDAMENTALS</a>
+                        <a href="#queries"
+                            class="hover:text-cyber-primary transition-colors duration-300 text-sm font-mono" target="_self">02_QUERIES</a>
+                        <a href="#advanced"
+                            class="hover:text-cyber-primary transition-colors duration-300 text-sm font-mono" target="_self">03_ADVANCED</a>
+                        <a href="#playground"
+                            class="px-4 py-2 rounded-md bg-cyber-primary/10 border border-cyber-primary text-cyber-primary hover:bg-cyber-primary hover:text-cyber-black transition-all duration-300 text-sm font-mono" target="_self">PLAYGROUND</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <div class="content" id="content">
-        <div class="container">
-            <div class="header">
-                <h1>Complete SQL Tutorial</h1>
-                <p>Master SQL from basics to advanced concepts with practical examples</p>
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-cyber-primary/20 rounded-full blur-3xl animate-float">
+            </div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-cyber-accent/20 rounded-full blur-3xl animate-float"
+                style="animation-delay: 2s;"></div>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
+            <div
+                class="inline-block mb-4 px-4 py-1 rounded-full border border-cyber-primary/30 bg-cyber-primary/5 text-cyber-primary font-mono text-sm">
+                DATABASE QUERY LANGUAGE v2024
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                Master the Art of <br>
+                <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-primary via-cyber-accent to-cyber-secondary neon-text">Data
+                    Manipulation</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto font-light">
+                From basic SELECT statements to complex window functions.
+                Interactive, visual, and comprehensive SQL mastery guide.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#fundamentals"
+                    class="group relative px-8 py-4 bg-cyber-primary text-cyber-black font-bold rounded-lg overflow-hidden transition-all hover:scale-105" target="_self">
+                    <span class="relative z-10 flex items-center gap-2">
+                        START LEARNING
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </span>
+                    <div
+                        class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    </div>
+                </a>
+                <button onclick="document.getElementById('quick-ref').scrollIntoView({behavior: 'smooth'})"
+                    class="px-8 py-4 border border-cyber-panel bg-cyber-panel/50 hover:bg-cyber-panel text-white rounded-lg transition-all hover:border-cyber-primary/50">
+                    Quick Reference
+                </button>
             </div>
 
-            <section id="introduction" class="section">
-                <h2>1. Introduction to SQL</h2>
-                <p>SQL (Structured Query Language) is a standard language for managing and manipulating relational
-                    databases. It's used to store, retrieve, and manipulate data in database management systems like
-                    MySQL, PostgreSQL, SQL Server, Oracle, and SQLite.</p>
+            <!-- Stats -->
+            <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-cyber-primary font-mono">20+</div>
+                    <div class="text-sm text-gray-500 mt-1">Topics</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-cyber-secondary font-mono">100+</div>
+                    <div class="text-sm text-gray-500 mt-1">Examples</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-cyber-accent font-mono">∞</div>
+                    <div class="text-sm text-gray-500 mt-1">Possibilities</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-cyber-warning font-mono">0</div>
+                    <div class="text-sm text-gray-500 mt-1">Prior Knowledge</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <h3>What is SQL?</h3>
-                <ul>
-                    <li><strong>SQL</strong> stands for Structured Query Language</li>
-                    <li>SQL lets you access and manipulate databases</li>
-                    <li>SQL became a standard of the American National Standards Institute (ANSI) in 1986</li>
-                    <li>SQL became a standard of the International Organization for Standardization (ISO) in 1987</li>
-                </ul>
+    <!-- Quick Reference Card -->
+    <section id="quick-ref" class="py-20 bg-cyber-dark relative">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">
+                <span class="text-cyber-primary font-mono">></span> SQL Cheat Sheet Matrix
+            </h2>
 
-                <h3>What Can SQL Do?</h3>
-                <ul>
-                    <li>Execute queries against a database</li>
-                    <li>Retrieve data from a database</li>
-                    <li>Insert records in a database</li>
-                    <li>Update records in a database</li>
-                    <li>Delete records from a database</li>
-                    <li>Create new databases</li>
-                    <li>Create new tables in a database</li>
-                    <li>Create stored procedures in a database</li>
-                    <li>Create views in a database</li>
-                    <li>Set permissions on tables, procedures, and views</li>
-                </ul>
-
-                <h3>Database Structure</h3>
-                <p>A database contains one or more tables. Each table is identified by a name and contains records
-                    (rows) with data. Each record consists of multiple fields (columns).</p>
-
-                <table class="table-demo">
-                    <tr>
-                        <th>CustomerID</th>
-                        <th>CustomerName</th>
-                        <th>Country</th>
-                        <th>City</th>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>John Doe</td>
-                        <td>USA</td>
-                        <td>New York</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Jane Smith</td>
-                        <td>UK</td>
-                        <td>London</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Bob Johnson</td>
-                        <td>Canada</td>
-                        <td>Toronto</td>
-                    </tr>
-                </table>
-            </section>
-
-            <section id="syntax" class="section">
-                <h2>2. SQL Syntax</h2>
-                <p>SQL statements are composed of keywords, identifiers, and clauses. SQL is not case-sensitive, but
-                    it's common practice to write SQL keywords in uppercase.</p>
-
-                <div class="example">
-                    <h4>Basic Syntax Rules:</h4>
-                    <div class="sql-code">
-                        -- SQL statements end with a semicolon
-                        SELECT * FROM Customers;
-
-                        -- SQL is not case-sensitive
-                        select * from customers;
-                        SELECT * FROM CUSTOMERS;
-
-                        -- Comments start with --
-                        /* This is a multi-line comment */
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- DML Card -->
+                <div
+                    class="interactive-card bg-cyber-panel border border-cyber-primary/20 rounded-xl p-6 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-cyber-primary/5 rounded-full blur-2xl group-hover:bg-cyber-primary/10 transition-all">
                     </div>
+                    <h3 class="text-cyber-primary font-bold text-lg mb-4 font-mono">DATA MANIPULATION</h3>
+                    <ul class="space-y-3 font-mono text-sm">
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-secondary">SELECT</span>
+                            <span class="text-gray-500 text-xs">Read data</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-secondary">INSERT</span>
+                            <span class="text-gray-500 text-xs">Add records</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-secondary">UPDATE</span>
+                            <span class="text-gray-500 text-xs">Modify records</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-secondary">DELETE</span>
+                            <span class="text-gray-500 text-xs">Remove records</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="note">
-                    <strong>Note:</strong> Some database systems require a semicolon at the end of each SQL statement
-                    for execution.
-                </div>
-            </section>
-
-            <section id="select" class="section">
-                <h2>3. SELECT Statement</h2>
-                <p>The SELECT statement is used to select data from a database. The data returned is stored in a result
-                    table, called the result-set.</p>
-
-                <h3>Basic SELECT Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        -- Select all columns from a table
-                        SELECT * FROM table_name;
-
-                        -- Select specific columns
-                        SELECT column1, column2 FROM table_name;
+                <!-- DDL Card -->
+                <div
+                    class="interactive-card bg-cyber-panel border border-cyber-accent/20 rounded-xl p-6 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-cyber-accent/5 rounded-full blur-2xl group-hover:bg-cyber-accent/10 transition-all">
                     </div>
+                    <h3 class="text-cyber-accent font-bold text-lg mb-4 font-mono">DATA DEFINITION</h3>
+                    <ul class="space-y-3 font-mono text-sm">
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-warning">CREATE</span>
+                            <span class="text-gray-500 text-xs">New table/db</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-warning">ALTER</span>
+                            <span class="text-gray-500 text-xs">Modify structure</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-warning">DROP</span>
+                            <span class="text-gray-500 text-xs">Delete table</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-warning">TRUNCATE</span>
+                            <span class="text-gray-500 text-xs">Clear data</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <h3>SELECT Examples</h3>
-                <div class="example">
-                    <h4>Select all customers:</h4>
-                    <div class="sql-code">SELECT * FROM Customers;</div>
-
-                    <h4>Select specific columns:</h4>
-                    <div class="sql-code">SELECT CustomerName, City FROM Customers;</div>
-
-                    <h4>SELECT DISTINCT (unique values only):</h4>
-                    <div class="sql-code">SELECT DISTINCT Country FROM Customers;</div>
-                </div>
-
-                <h3>Column Aliases</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        SELECT CustomerName AS Name, City AS Location
-                        FROM Customers;
+                <!-- Query Modifiers -->
+                <div
+                    class="interactive-card bg-cyber-panel border border-cyber-secondary/20 rounded-xl p-6 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-cyber-secondary/5 rounded-full blur-2xl group-hover:bg-cyber-secondary/10 transition-all">
                     </div>
+                    <h3 class="text-cyber-secondary font-bold text-lg mb-4 font-mono">QUERY MODIFIERS</h3>
+                    <ul class="space-y-3 font-mono text-sm">
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-primary">WHERE</span>
+                            <span class="text-gray-500 text-xs">Filter rows</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-primary">JOIN</span>
+                            <span class="text-gray-500 text-xs">Combine tables</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-primary">GROUP BY</span>
+                            <span class="text-gray-500 text-xs">Aggregate</span>
+                        </li>
+                        <li class="flex justify-between items-center p-2 rounded bg-cyber-black/50">
+                            <span class="text-cyber-primary">ORDER BY</span>
+                            <span class="text-gray-500 text-xs">Sort results</span>
+                        </li>
+                    </ul>
                 </div>
-            </section>
+            </div>
+        </div>
+    </section>
 
-            <section id="where" class="section">
-                <h2>4. WHERE Clause</h2>
-                <p>The WHERE clause is used to filter records and extract only those that fulfill a specified condition.
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-20 space-y-32">
+
+        <!-- Section 1: Fundamentals -->
+        <section id="fundamentals" class="space-y-16">
+            <div class="border-l-4 border-cyber-primary pl-6">
+                <h2 class="text-4xl font-bold mb-4 text-white">01. Database Fundamentals</h2>
+                <p class="text-gray-400 text-lg">Understanding the foundation of relational databases and SQL syntax.
                 </p>
-
-                <h3>WHERE Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        SELECT column1, column2
-                        FROM table_name
-                        WHERE condition;
-                    </div>
-                </div>
-
-                <h3>Comparison Operators</h3>
-                <table class="table-demo">
-                    <tr>
-                        <th>Operator</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>=</td>
-                        <td>Equal</td>
-                        <td>WHERE City = 'London'</td>
-                    </tr>
-                    <tr>
-                        <td>!=</td>
-                        <td>Not equal</td>
-                        <td>WHERE City != 'London'</td>
-                    </tr>
-                    <tr>
-                        <td>></td>
-                        <td>Greater than</td>
-                        <td>WHERE Price > 20</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            << /td>
-                        <td>Less than</td>
-                        <td>WHERE Price < 20</td>
-                    </tr>
-                    <tr>
-                        <td>>=</td>
-                        <td>Greater than or equal</td>
-                        <td>WHERE Price >= 20</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <=< /td>
-                        <td>Less than or equal</td>
-                        <td>WHERE Price <= 20</td>
-                    </tr>
-                </table>
-
-                <h3>Logical Operators</h3>
-                <div class="example">
-                    <h4>AND Operator:</h4>
-                    <div class="sql-code">
-                        SELECT * FROM Customers
-                        WHERE Country = 'Germany' AND City = 'Berlin';
-                    </div>
-
-                    <h4>OR Operator:</h4>
-                    <div class="sql-code">
-                        SELECT * FROM Customers
-                        WHERE City = 'Berlin' OR City = 'London';
-                    </div>
-
-                    <h4>NOT Operator:</h4>
-                    <div class="sql-code">
-                        SELECT * FROM Customers
-                        WHERE NOT Country = 'Germany';
-                    </div>
-                </div>
-
-                <h3>Pattern Matching</h3>
-                <div class="example">
-                    <h4>LIKE Operator:</h4>
-                    <div class="sql-code">
-                        -- Names starting with 'A'
-                        SELECT * FROM Customers WHERE CustomerName LIKE 'A%';
-
-                        -- Names ending with 'a'
-                        SELECT * FROM Customers WHERE CustomerName LIKE '%a';
-
-                        -- Names containing 'or'
-                        SELECT * FROM Customers WHERE CustomerName LIKE '%or%';
-
-                        -- Names with 'a' as second character
-                        SELECT * FROM Customers WHERE CustomerName LIKE '_a%';
-                    </div>
-
-                    <h4>IN Operator:</h4>
-                    <div class="sql-code">
-                        SELECT * FROM Customers
-                        WHERE Country IN ('Germany', 'France', 'UK');
-                    </div>
-
-                    <h4>BETWEEN Operator:</h4>
-                    <div class="sql-code">
-                        SELECT * FROM Products
-                        WHERE Price BETWEEN 10 AND 20;
-                    </div>
-                </div>
-            </section>
-
-            <section id="orderby" class="section">
-                <h2>5. ORDER BY Clause</h2>
-                <p>The ORDER BY keyword is used to sort the result-set in ascending or descending order.</p>
-
-                <h3>ORDER BY Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        SELECT column1, column2
-                        FROM table_name
-                        ORDER BY column1 [ASC|DESC], column2 [ASC|DESC];
-                    </div>
-                </div>
-
-                <h3>ORDER BY Examples</h3>
-                <div class="example">
-                    <h4>Sort by one column (ascending by default):</h4>
-                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country;</div>
-
-                    <h4>Sort in descending order:</h4>
-                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country DESC;</div>
-
-                    <h4>Sort by multiple columns:</h4>
-                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country, CustomerName;</div>
-
-                    <h4>Mixed sorting:</h4>
-                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country ASC, CustomerName DESC;</div>
-                </div>
-            </section>
-
-            <section id="insert" class="section">
-                <h2>6. INSERT Statement</h2>
-                <p>The INSERT INTO statement is used to insert new records in a table.</p>
-
-                <h3>INSERT Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        -- Insert values for all columns
-                        INSERT INTO table_name
-                        VALUES (value1, value2, value3, ...);
-
-                        -- Insert values for specific columns
-                        INSERT INTO table_name (column1, column2, column3, ...)
-                        VALUES (value1, value2, value3, ...);
-                    </div>
-                </div>
-
-                <h3>INSERT Examples</h3>
-                <div class="example">
-                    <h4>Insert a complete record:</h4>
-                    <div class="sql-code">
-                        INSERT INTO Customers
-                        VALUES (1, 'John Doe', 'john@example.com', 'USA', 'New York');
-                    </div>
-
-                    <h4>Insert specific columns:</h4>
-                    <div class="sql-code">
-                        INSERT INTO Customers (CustomerName, City, Country)
-                        VALUES ('Jane Smith', 'London', 'UK');
-                    </div>
-
-                    <h4>Insert multiple records:</h4>
-                    <div class="sql-code">
-                        INSERT INTO Customers (CustomerName, City, Country)
-                        VALUES
-                        ('Bob Johnson', 'Toronto', 'Canada'),
-                        ('Alice Brown', 'Paris', 'France'),
-                        ('Charlie Davis', 'Sydney', 'Australia');
-                    </div>
-                </div>
-            </section>
-
-            <section id="update" class="section">
-                <h2>7. UPDATE Statement</h2>
-                <p>The UPDATE statement is used to modify existing records in a table.</p>
-
-                <h3>UPDATE Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        UPDATE table_name
-                        SET column1 = value1, column2 = value2, ...
-                        WHERE condition;
-                    </div>
-                </div>
-
-                <div class="note">
-                    <strong>Warning:</strong> Be careful when updating records! If you omit the WHERE clause, ALL
-                    records will be updated!
-                </div>
-
-                <h3>UPDATE Examples</h3>
-                <div class="example">
-                    <h4>Update a single column:</h4>
-                    <div class="sql-code">
-                        UPDATE Customers
-                        SET ContactName = 'Alfred Schmidt'
-                        WHERE CustomerID = 1;
-                    </div>
-
-                    <h4>Update multiple columns:</h4>
-                    <div class="sql-code">
-                        UPDATE Customers
-                        SET ContactName = 'Juan Carlos', City = 'Madrid'
-                        WHERE CustomerID = 2;
-                    </div>
-
-                    <h4>Update multiple records:</h4>
-                    <div class="sql-code">
-                        UPDATE Customers
-                        SET Country = 'United States'
-                        WHERE Country = 'USA';
-                    </div>
-                </div>
-            </section>
-
-            <section id="delete" class="section">
-                <h2>8. DELETE Statement</h2>
-                <p>The DELETE statement is used to delete existing records in a table.</p>
-
-                <h3>DELETE Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        DELETE FROM table_name
-                        WHERE condition;
-                    </div>
-                </div>
-
-                <div class="note">
-                    <strong>Warning:</strong> Be careful when deleting records! If you omit the WHERE clause, ALL
-                    records will be deleted!
-                </div>
-
-                <h3>DELETE Examples</h3>
-                <div class="example">
-                    <h4>Delete a specific record:</h4>
-                    <div class="sql-code">
-                        DELETE FROM Customers
-                        WHERE CustomerName = 'Alfreds Futterkiste';
-                    </div>
-
-                    <h4>Delete all records (but keep table structure):</h4>
-                    <div class="sql-code">DELETE FROM Customers;</div>
-
-                    <h4>Drop entire table:</h4>
-                    <div class="sql-code">DROP TABLE Customers;</div>
-                </div>
-            </section>
-
-            <section id="joins" class="section">
-                <h2>9. SQL JOINS</h2>
-                <p>A JOIN clause is used to combine rows from two or more tables, based on a related column between
-                    them.</p>
-
-                <h3>Types of JOINS</h3>
-                <ul>
-                    <li><strong>INNER JOIN:</strong> Returns records that have matching values in both tables</li>
-                    <li><strong>LEFT JOIN:</strong> Returns all records from the left table, and matched records from
-                        the right table</li>
-                    <li><strong>RIGHT JOIN:</strong> Returns all records from the right table, and matched records from
-                        the left table</li>
-                    <li><strong>FULL OUTER JOIN:</strong> Returns all records when there is a match in either left or
-                        right table</li>
-                </ul>
-
-                <h3>JOIN Examples</h3>
-                <div class="example">
-                    <h4>INNER JOIN:</h4>
-                    <div class="sql-code">
-                        SELECT Orders.OrderID, Customers.CustomerName
-                        FROM Orders
-                        INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
-                    </div>
-
-                    <h4>LEFT JOIN:</h4>
-                    <div class="sql-code">
-                        SELECT Customers.CustomerName, Orders.OrderID
-                        FROM Customers
-                        LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
-                    </div>
-
-                    <h4>RIGHT JOIN:</h4>
-                    <div class="sql-code">
-                        SELECT Orders.OrderID, Customers.CustomerName
-                        FROM Orders
-                        RIGHT JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
-                    </div>
-
-                    <h4>FULL OUTER JOIN:</h4>
-                    <div class="sql-code">
-                        SELECT Customers.CustomerName, Orders.OrderID
-                        FROM Customers
-                        FULL OUTER JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
-                    </div>
-                </div>
-
-                <h3>Self JOIN</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        -- Find customers from the same city
-                        SELECT A.CustomerName AS CustomerName1, B.CustomerName AS CustomerName2, A.City
-                        FROM Customers A, Customers B
-                        WHERE A.CustomerID != B.CustomerID AND A.City = B.City
-                        ORDER BY A.City;
-                    </div>
-                </div>
-            </section>
-
-            <section id="groupby" class="section">
-                <h2>10. GROUP BY Clause</h2>
-                <p>The GROUP BY statement groups rows that have the same values into summary rows. It is often used with
-                    aggregate functions (COUNT, MAX, MIN, SUM, AVG).</p>
-
-                <h3>GROUP BY Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        SELECT column_name(s)
-                        FROM table_name
-                        WHERE condition
-                        GROUP BY column_name(s)
-                        ORDER BY column_name(s);
-                    </div>
-                </div>
-
-                <h3>GROUP BY Examples</h3>
-                <div class="example">
-                    <h4>Count customers by country:</h4>
-                    <div class="sql-code">
-                        SELECT COUNT(CustomerID), Country
-                        FROM Customers
-                        GROUP BY Country;
-                    </div>
-
-                    <h4>Average price by category:</h4>
-                    <div class="sql-code">
-                        SELECT AVG(Price), CategoryID
-                        FROM Products
-                        GROUP BY CategoryID;
-                    </div>
-
-                    <h4>Total sales by employee:</h4>
-                    <div class="sql-code">
-                        SELECT SUM(OrderDetails.Quantity * OrderDetails.UnitPrice) AS TotalSales,
-                        Orders.EmployeeID
-                        FROM Orders
-                        INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
-                        GROUP BY Orders.EmployeeID;
-                    </div>
-                </div>
-            </section>
-
-            <section id="having" class="section">
-                <h2>11. HAVING Clause</h2>
-                <p>The HAVING clause was added to SQL because the WHERE keyword cannot be used with aggregate functions.
-                </p>
-
-                <h3>HAVING Syntax</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        SELECT column_name(s)
-                        FROM table_name
-                        WHERE condition
-                        GROUP BY column_name(s)
-                        HAVING condition
-                        ORDER BY column_name(s);
-                    </div>
-                </div>
-
-                <h3>HAVING Examples</h3>
-                <div class="example">
-                    <h4>Countries with more than 5 customers:</h4>
-                    <div class="sql-code">
-                        SELECT COUNT(CustomerID), Country
-                        FROM Customers
-                        GROUP BY Country
-                        HAVING COUNT(CustomerID) > 5;
-                    </div>
-
-                    <h4>Categories with average price > 20:</h4>
-                    <div class="sql-code">
-                        SELECT AVG(Price), CategoryID
-                        FROM Products
-                        GROUP BY CategoryID
-                        HAVING AVG(Price) > 20;
-                    </div>
-                </div>
-            </section>
-
-            <section id="functions" class="section">
-                <h2>12. SQL Functions</h2>
-                <p>SQL has many built-in functions for performing calculations on data.</p>
-
-                <h3>Aggregate Functions</h3>
-                <div class="example">
-                    <h4>Common Aggregate Functions:</h4>
-                    <div class="sql-code">
-                        -- Count total records
-                        SELECT COUNT(*) FROM Customers;
-
-                        -- Count non-null values
-                        SELECT COUNT(CustomerName) FROM Customers;
-
-                        -- Sum of all values
-                        SELECT SUM(Price) FROM Products;
-
-                        -- Average value
-                        SELECT AVG(Price) FROM Products;
-
-                        -- Maximum value
-                        SELECT MAX(Price) FROM Products;
-
-                        -- Minimum value
-                        SELECT MIN(Price) FROM Products;
-                    </div>
-                </div>
-
-                <h3>String Functions</h3>
-                <div class="example">
-                    <h4>String Manipulation:</h4>
-                    <div class="sql-code">
-                        -- Convert to uppercase
-                        SELECT UPPER(CustomerName) FROM Customers;
-
-                        -- Convert to lowercase
-                        SELECT LOWER(CustomerName) FROM Customers;
-
-                        -- Get string length
-                        SELECT LEN(CustomerName) FROM Customers;
-
-                        -- Extract substring
-                        SELECT SUBSTRING(CustomerName, 1, 5) FROM Customers;
-
-                        -- Concatenate strings
-                        SELECT CONCAT(CustomerName, ' - ', Country) FROM Customers;
-
-                        -- Replace text
-                        SELECT REPLACE(CustomerName, 'a', 'X') FROM Customers;
-                    </div>
-                </div>
-
-                <h3>Date Functions</h3>
-                <div class="example">
-                    <h4>Date Operations:</h4>
-                    <div class="sql-code">
-                        -- Current date and time
-                        SELECT NOW();
-
-                        -- Current date
-                        SELECT CURDATE();
-
-                        -- Extract year
-                        SELECT YEAR(OrderDate) FROM Orders;
-
-                        -- Extract month
-                        SELECT MONTH(OrderDate) FROM Orders;
-
-                        -- Extract day
-                        SELECT DAY(OrderDate) FROM Orders;
-
-                        -- Add days to date
-                        SELECT DATE_ADD(OrderDate, INTERVAL 30 DAY) FROM Orders;
-
-                        -- Date difference
-                        SELECT DATEDIFF(NOW(), OrderDate) FROM Orders;
-                    </div>
-                </div>
-
-                <h3>Mathematical Functions</h3>
-                <div class="example">
-                    <h4>Math Operations:</h4>
-                    <div class="sql-code">
-                        -- Round to 2 decimal places
-                        SELECT ROUND(Price, 2) FROM Products;
-
-                        -- Ceiling (round up)
-                        SELECT CEIL(Price) FROM Products;
-
-                        -- Floor (round down)
-                        SELECT FLOOR(Price) FROM Products;
-
-                        -- Absolute value
-                        SELECT ABS(-15);
-
-                        -- Square root
-                        SELECT SQRT(16);
-
-                        -- Power
-                        SELECT POWER(2, 3);
-                    </div>
-                </div>
-            </section>
-
-            <section id="constraints" class="section">
-                <h2>13. SQL Constraints</h2>
-                <p>Constraints are used to specify rules for data in a table. They ensure the accuracy and reliability
-                    of the data.</p>
-
-                <h3>Types of Constraints</h3>
-                <ul>
-                    <li><strong>NOT NULL:</strong> Ensures a column cannot have NULL value</li>
-                    <li><strong>UNIQUE:</strong> Ensures all values in a column are different</li>
-                    <li><strong>PRIMARY KEY:</strong> Uniquely identifies each record in a table</li>
-                    <li><strong>FOREIGN KEY:</strong> Links two tables together</li>
-                    <li><strong>CHECK:</strong> Ensures values satisfy a specific condition</li>
-                    <li><strong>DEFAULT:</strong> Sets a default value for a column</li>
-                </ul>
-
-                <h3>Constraint Examples</h3>
-                <div class="example">
-                    <h4>Create table with constraints:</h4>
-                    <div class="sql-code">
-                        CREATE TABLE Employees (
-                        EmployeeID int NOT NULL PRIMARY KEY,
-                        LastName varchar(255) NOT NULL,
-                        FirstName varchar(255),
-                        Age int CHECK (Age >= 18),
-                        Email varchar(255) UNIQUE,
-                        Salary decimal(10,2) DEFAULT 0,
-                        DepartmentID int,
-                        FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
-                        );
-                    </div>
-
-                    <h4>Add constraints to existing table:</h4>
-                    <div class="sql-code">
-                        -- Add NOT NULL constraint
-                        ALTER TABLE Employees
-                        MODIFY COLUMN FirstName varchar(255) NOT NULL;
-
-                        -- Add UNIQUE constraint
-                        ALTER TABLE Employees
-                        ADD CONSTRAINT UC_Employee_Email UNIQUE (Email);
-
-                        -- Add CHECK constraint
-                        ALTER TABLE Employees
-                        ADD CONSTRAINT CHK_Employee_Age CHECK (Age >= 18 AND Age <= 65); -- Add FOREIGN KEY constraint
-                            ALTER TABLE Employees ADD CONSTRAINT FK_Employee_Department FOREIGN KEY (DepartmentID)
-                            REFERENCES Departments(DepartmentID); </div>
-                    </div>
-            </section>
-
-            <section id="indexes" class="section">
-                <h2>14. SQL Indexes</h2>
-                <p>Indexes are used to retrieve data from the database more quickly. They create shortcuts to data,
-                    making queries faster.</p>
-
-                <h3>Index Types</h3>
-                <ul>
-                    <li><strong>Clustered Index:</strong> Sorts and stores data rows in the table based on key values
-                    </li>
-                    <li><strong>Non-Clustered Index:</strong> Contains pointers to data rows</li>
-                    <li><strong>Unique Index:</strong> Ensures no duplicate values</li>
-                    <li><strong>Composite Index:</strong> Created on multiple columns</li>
-                </ul>
-
-                <h3>Index Examples</h3>
-                <div class="example">
-                    <h4>Create indexes:</h4>
-                    <div class="sql-code">
-                        -- Create index on single column
-                        CREATE INDEX idx_lastname ON Employees (LastName);
-
-                        -- Create unique index
-                        CREATE UNIQUE INDEX idx_email ON Employees (Email);
-
-                        -- Create composite index
-                        CREATE INDEX idx_name ON Employees (LastName, FirstName);
-
-                        -- Create index with sorting
-                        CREATE INDEX idx_salary_desc ON Employees (Salary DESC);
-                    </div>
-
-                    <h4>Drop indexes:</h4>
-                    <div class="sql-code">
-                        -- Drop index
-                        DROP INDEX idx_lastname ON Employees;
-
-                        -- Drop index (SQL Server syntax)
-                        DROP INDEX Employees.idx_lastname;
-                    </div>
-                </div>
-
-                <div class="note">
-                    <strong>Note:</strong> While indexes speed up SELECT operations, they slow down INSERT, UPDATE, and
-                    DELETE operations as the indexes also need to be updated.
-                </div>
-            </section>
-
-            <section id="views" class="section">
-                <h2>15. SQL Views</h2>
-                <p>A view is a virtual table based on the result-set of an SQL statement. Views contain rows and columns
-                    just like a real table.</p>
-
-                <h3>View Benefits</h3>
-                <ul>
-                    <li>Security: Hide sensitive data from users</li>
-                    <li>Simplicity: Simplify complex queries</li>
-                    <li>Consistency: Ensure consistent data access</li>
-                    <li>Logic: Centralize business logic</li>
-                </ul>
-
-                <h3>View Examples</h3>
-                <div class="example">
-                    <h4>Create views:</h4>
-                    <div class="sql-code">
-                        -- Simple view
-                        CREATE VIEW CustomerView AS
-                        SELECT CustomerName, ContactName, Country
-                        FROM Customers
-                        WHERE Country = 'Germany';
-
-                        -- Complex view with JOIN
-                        CREATE VIEW OrderSummary AS
-                        SELECT c.CustomerName, COUNT(o.OrderID) as TotalOrders
-                        FROM Customers c
-                        LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
-                        GROUP BY c.CustomerName;
-
-                        -- View with calculations
-                        CREATE VIEW ProductPricing AS
-                        SELECT ProductName,
-                        Price,
-                        Price * 1.1 as PriceWithTax,
-                        CASE
-                        WHEN Price < 20 THEN 'Budget' WHEN Price < 50 THEN 'Standard' ELSE 'Premium' END as
-                            PriceCategory FROM Products; </div>
-
-                            <h4>Use views:</h4>
-                            <div class="sql-code">
-                                -- Query a view like a table
-                                SELECT * FROM CustomerView;
-
-                                -- Update view (if updatable)
-                                UPDATE CustomerView
-                                SET ContactName = 'New Name'
-                                WHERE CustomerName = 'Alfreds Futterkiste';
-                            </div>
-
-                            <h4>Drop views:</h4>
-                            <div class="sql-code">
-                                DROP VIEW CustomerView;
-                            </div>
-                    </div>
-            </section>
-
-            <section id="procedures" class="section">
-                <h2>16. Stored Procedures</h2>
-                <p>A stored procedure is a prepared SQL code that you can save and reuse. It can accept parameters and
-                    return results.</p>
-
-                <h3>Procedure Benefits</h3>
-                <ul>
-                    <li>Performance: Compiled once, executed many times</li>
-                    <li>Security: Prevent SQL injection attacks</li>
-                    <li>Maintainability: Centralize business logic</li>
-                    <li>Network Traffic: Reduce data transfer</li>
-                </ul>
-
-                <h3>Stored Procedure Examples</h3>
-                <div class="example">
-                    <h4>Simple stored procedure:</h4>
-                    <div class="sql-code">
-                        -- MySQL/SQL Server syntax
-                        DELIMITER //
-                        CREATE PROCEDURE GetCustomersByCountry(IN country_name VARCHAR(255))
-                        BEGIN
-                        SELECT CustomerName, City
-                        FROM Customers
-                        WHERE Country = country_name;
-                        END //
-                        DELIMITER ;
-
-                        -- Execute procedure
-                        CALL GetCustomersByCountry('Germany');
-                    </div>
-
-                    <h4>Procedure with multiple parameters:</h4>
-                    <div class="sql-code">
-                        DELIMITER //
-                        CREATE PROCEDURE GetCustomersByCountryAndCity(
-                        IN country_name VARCHAR(255),
-                        IN city_name VARCHAR(255)
-                        )
-                        BEGIN
-                        SELECT CustomerName, ContactName
-                        FROM Customers
-                        WHERE Country = country_name AND City = city_name;
-                        END //
-                        DELIMITER ;
-
-                        -- Execute with parameters
-                        CALL GetCustomersByCountryAndCity('Germany', 'Berlin');
-                    </div>
-
-                    <h4>Procedure with output parameter:</h4>
-                    <div class="sql-code">
-                        DELIMITER //
-                        CREATE PROCEDURE GetCustomerCount(
-                        IN country_name VARCHAR(255),
-                        OUT customer_count INT
-                        )
-                        BEGIN
-                        SELECT COUNT(*)
-                        INTO customer_count
-                        FROM Customers
-                        WHERE Country = country_name;
-                        END //
-                        DELIMITER ;
-
-                        -- Execute and get output
-                        CALL GetCustomerCount('Germany', @count);
-                        SELECT @count;
-                    </div>
-                </div>
-            </section>
-
-            <section id="datatypes" class="section">
-                <h2>17. SQL Data Types</h2>
-                <p>Data types specify what kind of data can be stored in a column. Different database systems have
-                    different data types.</p>
-
-                <h3>Numeric Data Types</h3>
-                <table class="table-demo">
-                    <tr>
-                        <th>Data Type</th>
-                        <th>Description</th>
-                        <th>Storage</th>
-                    </tr>
-                    <tr>
-                        <td>TINYINT</td>
-                        <td>Very small integer (-128 to 127)</td>
-                        <td>1 byte</td>
-                    </tr>
-                    <tr>
-                        <td>SMALLINT</td>
-                        <td>Small integer (-32,768 to 32,767)</td>
-                        <td>2 bytes</td>
-                    </tr>
-                    <tr>
-                        <td>INT</td>
-                        <td>Standard integer (-2B to 2B)</td>
-                        <td>4 bytes</td>
-                    </tr>
-                    <tr>
-                        <td>BIGINT</td>
-                        <td>Large integer</td>
-                        <td>8 bytes</td>
-                    </tr>
-                    <tr>
-                        <td>DECIMAL(p,s)</td>
-                        <td>Fixed precision and scale</td>
-                        <td>Variable</td>
-                    </tr>
-                    <tr>
-                        <td>FLOAT</td>
-                        <td>Floating point number</td>
-                        <td>4 bytes</td>
-                    </tr>
-                    <tr>
-                        <td>DOUBLE</td>
-                        <td>Double precision float</td>
-                        <td>8 bytes</td>
-                    </tr>
-                </table>
-
-                <h3>String Data Types</h3>
-                <table class="table-demo">
-                    <tr>
-                        <th>Data Type</th>
-                        <th>Description</th>
-                        <th>Max Length</th>
-                    </tr>
-                    <tr>
-                        <td>CHAR(n)</td>
-                        <td>Fixed length string</td>
-                        <td>255 characters</td>
-                    </tr>
-                    <tr>
-                        <td>VARCHAR(n)</td>
-                        <td>Variable length string</td>
-                        <td>65,535 characters</td>
-                    </tr>
-                    <tr>
-                        <td>TEXT</td>
-                        <td>Large text data</td>
-                        <td>65,535 characters</td>
-                    </tr>
-                    <tr>
-                        <td>LONGTEXT</td>
-                        <td>Very large text data</td>
-                        <td>4GB</td>
-                    </tr>
-                    <tr>
-                        <td>BINARY(n)</td>
-                        <td>Fixed length binary</td>
-                        <td>255 bytes</td>
-                    </tr>
-                    <tr>
-                        <td>VARBINARY(n)</td>
-                        <td>Variable length binary</td>
-                        <td>65,535 bytes</td>
-                    </tr>
-                </table>
-
-                <h3>Date and Time Data Types</h3>
-                <table class="table-demo">
-                    <tr>
-                        <th>Data Type</th>
-                        <th>Description</th>
-                        <th>Format</th>
-                    </tr>
-                    <tr>
-                        <td>DATE</td>
-                        <td>Date only</td>
-                        <td>YYYY-MM-DD</td>
-                    </tr>
-                    <tr>
-                        <td>TIME</td>
-                        <td>Time only</td>
-                        <td>HH:MM:SS</td>
-                    </tr>
-                    <tr>
-                        <td>DATETIME</td>
-                        <td>Date and time</td>
-                        <td>YYYY-MM-DD HH:MM:SS</td>
-                    </tr>
-                    <tr>
-                        <td>TIMESTAMP</td>
-                        <td>Unix timestamp</td>
-                        <td>YYYY-MM-DD HH:MM:SS</td>
-                    </tr>
-                    <tr>
-                        <td>YEAR</td>
-                        <td>Year only</td>
-                        <td>YYYY</td>
-                    </tr>
-                </table>
-
-                <h3>Data Type Examples</h3>
-                <div class="example">
-                    <h4>Table creation with data types:</h4>
-                    <div class="sql-code">
-                        CREATE TABLE Users (
-                        UserID INT AUTO_INCREMENT PRIMARY KEY,
-                        Username VARCHAR(50) NOT NULL UNIQUE,
-                        Email VARCHAR(100) NOT NULL,
-                        Password CHAR(64),
-                        Age TINYINT UNSIGNED,
-                        Salary DECIMAL(10,2),
-                        IsActive BOOLEAN DEFAULT TRUE,
-                        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        ProfilePicture LONGBLOB,
-                        Bio TEXT
-                        );
-                    </div>
-                </div>
-            </section>
-
-            <section class="section">
-                <h2>18. Advanced SQL Concepts</h2>
-
-                <h3>Window Functions</h3>
-                <div class="example">
-                    <h4>ROW_NUMBER, RANK, DENSE_RANK:</h4>
-                    <div class="sql-code">
-                        -- Row number within partition
-                        SELECT
-                        CustomerName,
-                        Country,
-                        ROW_NUMBER() OVER (PARTITION BY Country ORDER BY CustomerName) as RowNum,
-                        RANK() OVER (PARTITION BY Country ORDER BY CustomerName) as Rank,
-                        DENSE_RANK() OVER (PARTITION BY Country ORDER BY CustomerName) as DenseRank
-                        FROM Customers;
-
-                        -- Running totals
-                        SELECT
-                        OrderID,
-                        OrderDate,
-                        Amount,
-                        SUM(Amount) OVER (ORDER BY OrderDate) as RunningTotal
-                        FROM Orders;
-                    </div>
-                </div>
-
-                <h3>Common Table Expressions (CTE)</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        -- Simple CTE
-                        WITH CustomerOrders AS (
-                        SELECT CustomerID, COUNT(*) as OrderCount
-                        FROM Orders
-                        GROUP BY CustomerID
-                        )
-                        SELECT c.CustomerName, co.OrderCount
-                        FROM Customers c
-                        JOIN CustomerOrders co ON c.CustomerID = co.CustomerID;
-
-                        -- Recursive CTE (Employee hierarchy)
-                        WITH EmployeeHierarchy AS (
-                        -- Anchor member
-                        SELECT EmployeeID, ManagerID, FirstName, 0 as Level
-                        FROM Employees
-                        WHERE ManagerID IS NULL
-
-                        UNION ALL
-
-                        -- Recursive member
-                        SELECT e.EmployeeID, e.ManagerID, e.FirstName, eh.Level + 1
-                        FROM Employees e
-                        JOIN EmployeeHierarchy eh ON e.ManagerID = eh.EmployeeID
-                        )
-                        SELECT * FROM EmployeeHierarchy;
-                    </div>
-                </div>
-
-                <h3>CASE Statements</h3>
-                <div class="example">
-                    <div class="sql-code">
-                        -- Simple CASE
-                        SELECT
-                        ProductName,
-                        Price,
-                        CASE
-                        WHEN Price < 20 THEN 'Cheap' WHEN Price < 50 THEN 'Moderate' ELSE 'Expensive' END as
-                            PriceCategory FROM Products; -- CASE in WHERE clause SELECT * FROM Orders WHERE CASE WHEN
-                            YEAR(OrderDate)=2023 THEN ShipCountry='USA' ELSE ShipCountry IN ('UK', 'Germany' ) END;
-                            </div>
-                    </div>
-
-                    <h3>Subqueries</h3>
-                    <div class="example">
-                        <div class="sql-code">
-                            -- Scalar subquery
-                            SELECT CustomerName
-                            FROM Customers
-                            WHERE CustomerID = (
-                            SELECT CustomerID
-                            FROM Orders
-                            WHERE OrderID = 10248
-                            );
-
-                            -- EXISTS subquery
-                            SELECT CustomerName
-                            FROM Customers c
-                            WHERE EXISTS (
-                            SELECT 1
-                            FROM Orders o
-                            WHERE o.CustomerID = c.CustomerID
-                            );
-
-                            -- Correlated subquery
-                            SELECT CustomerName,
-                            (SELECT COUNT(*)
-                            FROM Orders o
-                            WHERE o.CustomerID = c.CustomerID) as OrderCount
-                            FROM Customers c;
+            </div>
+
+            <!-- What is SQL -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-primary flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-cyber-primary/20 flex items-center justify-center text-sm">01</span>
+                    What is SQL?
+                </h3>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4 text-gray-300 leading-relaxed">
+                        <p><strong class="text-white">SQL (Structured Query Language)</strong> is the standard language
+                            for communicating with relational databases. Think of it as the bridge between you and your
+                            data.</p>
+
+                        <div class="bg-cyber-panel/50 border-l-2 border-cyber-warning p-4 rounded-r-lg">
+                            <p class="text-sm text-cyber-warning font-mono mb-1">// PRO TIP</p>
+                            <p class="text-sm">SQL became an ANSI standard in 1986 and ISO standard in 1987. While
+                                implementations vary slightly between MySQL, PostgreSQL, and SQL Server, the core syntax
+                                remains universal.</p>
                         </div>
                     </div>
-            </section>
 
-            <section class="section">
-                <h2>19. SQL Best Practices</h2>
-                <ul>
-                    <li><strong>Use meaningful names:</strong> Choose descriptive table and column names</li>
-                    <li><strong>Normalize your database:</strong> Avoid data redundancy</li>
-                    <li><strong>Use primary keys:</strong> Every table should have a primary key</li>
-                    <li><strong>Index appropriately:</strong> Create indexes on frequently queried columns</li>
-                    <li><strong>Use constraints:</strong> Enforce data integrity with constraints</li>
-                    <li><strong>Avoid SELECT *:</strong> Specify only needed columns</li>
-                    <li><strong>Use parameterized queries:</strong> Prevent SQL injection</li>
-                    <li><strong>Comment your code:</strong> Document complex queries</li>
-                    <li><strong>Test with small data first:</strong> Validate queries before running on large datasets
-                    </li>
-                    <li><strong>Regular backups:</strong> Always backup your database</li>
-                </ul>
-
-                <div class="example">
-                    <h4>Good vs Bad SQL Examples:</h4>
-                    <div class="sql-code">
-                        -- Bad: SELECT *
-                        SELECT * FROM Customers WHERE Country = 'Germany';
-
-                        -- Good: Specify columns
-                        SELECT CustomerName, City, Email
-                        FROM Customers
-                        WHERE Country = 'Germany';
-
-                        -- Bad: No indexes on WHERE clause columns
-                        -- CREATE TABLE without indexes on frequently searched columns
-
-                        -- Good: Create appropriate indexes
-                        CREATE INDEX idx_country ON Customers(Country);
-                        CREATE INDEX idx_order_date ON Orders(OrderDate);
+                    <div class="code-block rounded-xl p-6 font-mono text-sm overflow-x-auto">
+                        <div class="flex items-center gap-2 mb-4 text-xs text-gray-500 border-b border-gray-700 pb-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-2">database_structure.sql</span>
+                        </div>
+                        <pre><span class="syntax-comment">-- Database > Tables > Records > Fields</span>
+<span class="syntax-keyword">DATABASE</span> ShopDB
+├── <span class="syntax-keyword">TABLE</span> Customers
+│   ├── <span class="syntax-keyword">COLUMN</span> CustomerID (INT)
+│   ├── <span class="syntax-keyword">COLUMN</span> Name (VARCHAR)
+│   └── <span class="syntax-keyword">COLUMN</span> Email (VARCHAR)
+└── <span class="syntax-keyword">TABLE</span> Orders
+    ├── <span class="syntax-keyword">COLUMN</span> OrderID (INT)
+    ├── <span class="syntax-keyword">COLUMN</span> CustomerID (INT)
+    └── <span class="syntax-keyword">COLUMN</span> Total (DECIMAL)</pre>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="section">
-                <h2>20. Summary</h2>
-                <p>You've now learned the fundamentals of SQL and some advanced concepts. SQL is a powerful language for
-                    managing relational databases. Key takeaways:</p>
+            <!-- Basic Syntax -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-primary flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-cyber-primary/20 flex items-center justify-center text-sm">02</span>
+                    Syntax Rules
+                </h3>
 
-                <ul>
-                    <li>Master the basic CRUD operations (CREATE, READ, UPDATE, DELETE)</li>
-                    <li>Understand how to filter and sort data effectively</li>
-                    <li>Learn to join tables to combine data from multiple sources</li>
-                    <li>Use aggregate functions and GROUP BY for data analysis</li>
-                    <li>Implement proper database design with constraints and indexes</li>
-                    <li>Utilize advanced features like views, stored procedures, and window functions</li>
-                    <li>Always follow best practices for security and performance</li>
-                </ul>
-
-                <div class="note">
-                    <strong>Next Steps:</strong> Practice with real databases, learn specific database system features
-                    (MySQL, PostgreSQL, SQL Server), and explore database administration topics.
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div
+                        class="bg-cyber-panel p-6 rounded-xl border border-gray-800 hover:border-cyber-primary/50 transition-colors">
+                        <div class="text-cyber-primary font-mono text-2xl mb-2">;</div>
+                        <h4 class="font-bold mb-2">Semicolon</h4>
+                        <p class="text-sm text-gray-400">Statements end with a semicolon. Some databases require it,
+                            others don't—but always use it for safety.</p>
+                    </div>
+                    <div
+                        class="bg-cyber-panel p-6 rounded-xl border border-gray-800 hover:border-cyber-primary/50 transition-colors">
+                        <div class="text-cyber-secondary font-mono text-2xl mb-2">Aa</div>
+                        <h4 class="font-bold mb-2">Case Sensitivity</h4>
+                        <p class="text-sm text-gray-400">SQL keywords are case-insensitive, but convention uses
+                            UPPERCASE for keywords, lowercase for identifiers.</p>
+                    </div>
+                    <div
+                        class="bg-cyber-panel p-6 rounded-xl border border-gray-800 hover:border-cyber-primary/50 transition-colors">
+                        <div class="text-cyber-accent font-mono text-2xl mb-2">--</div>
+                        <h4 class="font-bold mb-2">Comments</h4>
+                        <p class="text-sm text-gray-400">Single line with <code class="text-cyber-accent">--</code> or
+                            multi-line with <code class="text-cyber-accent">/* */</code></p>
+                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
+
+        <!-- Section 2: Queries -->
+        <section id="queries" class="space-y-16">
+            <div class="border-l-4 border-cyber-secondary pl-6">
+                <h2 class="text-4xl font-bold mb-4 text-white">02. Data Retrieval</h2>
+                <p class="text-gray-400 text-lg">Mastering SELECT statements, filtering, sorting, and table
+                    relationships.</p>
+            </div>
+
+            <!-- SELECT Visual -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-secondary flex items-center gap-3">
+                    <span
+                        class="w-8 h-8 rounded bg-cyber-secondary/20 flex items-center justify-center text-sm">03</span>
+                    The SELECT Statement
+                </h3>
+
+                <div class="bg-cyber-panel rounded-xl p-6 border border-cyber-secondary/20">
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <div class="flex-1 space-y-4 w-full">
+                            <div class="code-block rounded-lg p-4 font-mono text-sm">
+                                <pre><span class="syntax-keyword">SELECT</span> CustomerName, City 
+<span class="syntax-keyword">FROM</span> Customers
+<span class="syntax-keyword">WHERE</span> Country = <span class="syntax-string">'Germany'</span>
+<span class="syntax-keyword">ORDER BY</span> City <span class="syntax-keyword">DESC</span>;</pre>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono">
+                                <span class="px-2 py-1 rounded bg-cyber-secondary/20 text-cyber-secondary">SELECT</span>
+                                <span class="text-gray-500">→</span>
+                                <span class="px-2 py-1 rounded bg-cyber-primary/20 text-cyber-primary">FROM</span>
+                                <span class="text-gray-500">→</span>
+                                <span class="px-2 py-1 rounded bg-cyber-accent/20 text-cyber-accent">WHERE</span>
+                                <span class="text-gray-500">→</span>
+                                <span class="px-2 py-1 rounded bg-cyber-warning/20 text-cyber-warning">ORDER BY</span>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 w-full">
+                            <div class="bg-cyber-black rounded-lg overflow-hidden border border-gray-800">
+                                <div class="bg-gray-800 px-4 py-2 text-xs font-mono text-gray-400">Result Set</div>
+                                <table class="w-full text-sm">
+                                    <thead class="bg-cyber-secondary/10 text-cyber-secondary font-mono">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left">CustomerName</th>
+                                            <th class="px-4 py-2 text-left">City</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-800">
+                                        <tr class="hover-row">
+                                            <td class="px-4 py-2">Müller GmbH</td>
+                                            <td class="px-4 py-2 text-cyber-primary">Munich</td>
+                                        </tr>
+                                        <tr class="hover-row">
+                                            <td class="px-4 py-2">Berlin Tech</td>
+                                            <td class="px-4 py-2 text-cyber-primary">Berlin</td>
+                                        </tr>
+                                        <tr class="hover-row">
+                                            <td class="px-4 py-2">Hamburg Logistik</td>
+                                            <td class="px-4 py-2 text-cyber-primary">Hamburg</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHERE Clause Deep Dive -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-secondary flex items-center gap-3">
+                    <span
+                        class="w-8 h-8 rounded bg-cyber-secondary/20 flex items-center justify-center text-sm">04</span>
+                    Filtering with WHERE
+                </h3>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-cyber-accent">Comparison Operators</h4>
+                        <div class="code-block rounded-lg p-4 font-mono text-sm space-y-2">
+                            <div class="flex justify-between items-center p-2 hover:bg-white/5 rounded">
+                                <code class="syntax-keyword">=</code>
+                                <span class="text-gray-400 text-xs">Equal to</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 hover:bg-white/5 rounded">
+                                <code class="syntax-keyword">!=</code> or <code class="syntax-keyword"><></code>
+                                <span class="text-gray-400 text-xs">Not equal</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 hover:bg-white/5 rounded">
+                                <code class="syntax-keyword">></code> <code class="syntax-keyword"><</code>
+                                <span class="text-gray-400 text-xs">Greater/Less than</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 hover:bg-white/5 rounded">
+                                <code class="syntax-keyword">>=</code> <code class="syntax-keyword"><=</code>
+                                <span class="text-gray-400 text-xs">Greater/Less or equal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-cyber-accent">Logical Operators</h4>
+                        <div class="space-y-3">
+                            <div class="bg-cyber-panel p-4 rounded-lg border-l-2 border-cyber-primary">
+                                <code class="text-cyber-primary font-mono text-sm">AND</code>
+                                <p class="text-xs text-gray-400 mt-1">Both conditions must be true</p>
+                            </div>
+                            <div class="bg-cyber-panel p-4 rounded-lg border-l-2 border-cyber-secondary">
+                                <code class="text-cyber-secondary font-mono text-sm">OR</code>
+                                <p class="text-xs text-gray-400 mt-1">At least one condition true</p>
+                            </div>
+                            <div class="bg-cyber-panel p-4 rounded-lg border-l-2 border-cyber-warning">
+                                <code class="text-cyber-warning font-mono text-sm">NOT</code>
+                                <p class="text-xs text-gray-400 mt-1">Negates the condition</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pattern Matching -->
+                <div class="bg-gradient-to-r from-cyber-panel to-cyber-dark rounded-xl p-6 border border-gray-800">
+                    <h4 class="font-bold mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyber-warning animate-pulse"></span>
+                        Pattern Matching with LIKE
+                    </h4>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-3 font-mono text-sm">
+                            <div class="flex items-center gap-4 p-3 bg-cyber-black/50 rounded">
+                                <code class="text-cyber-warning">'A%'</code>
+                                <span class="text-gray-400 text-xs">Starts with A</span>
+                            </div>
+                            <div class="flex items-center gap-4 p-3 bg-cyber-black/50 rounded">
+                                <code class="text-cyber-warning">'%a'</code>
+                                <span class="text-gray-400 text-xs">Ends with a</span>
+                            </div>
+                            <div class="flex items-center gap-4 p-3 bg-cyber-black/50 rounded">
+                                <code class="text-cyber-warning">'%or%'</code>
+                                <span class="text-gray-400 text-xs">Contains 'or'</span>
+                            </div>
+                            <div class="flex items-center gap-4 p-3 bg-cyber-black/50 rounded">
+                                <code class="text-cyber-warning">'_a%'</code>
+                                <span class="text-gray-400 text-xs">Second char is 'a'</span>
+                            </div>
+                        </div>
+                        <div class="code-block rounded-lg p-4 font-mono text-sm">
+                            <pre><span class="syntax-comment">-- Find all emails from Gmail</span>
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> Users
+<span class="syntax-keyword">WHERE</span> Email <span class="syntax-keyword">LIKE</span> <span class="syntax-string">'%@gmail.com'</span>;
+
+<span class="syntax-comment">-- Find 5-letter names starting with J</span>
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> Customers
+<span class="syntax-keyword">WHERE</span> Name <span class="syntax-keyword">LIKE</span> <span class="syntax-string">'J____'</span>;</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JOINs Visualized -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-secondary flex items-center gap-3">
+                    <span
+                        class="w-8 h-8 rounded bg-cyber-secondary/20 flex items-center justify-center text-sm">05</span>
+                    JOIN Operations
+                </h3>
+
+                <p class="text-gray-400">Combining tables is where SQL power truly shines. Here are the 4 essential JOIN
+                    types:</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- INNER JOIN -->
+                    <div class="bg-cyber-panel rounded-xl p-6 border border-cyber-primary/30 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-cyber-primary/10 rounded-full blur-xl"></div>
+                        <h4 class="text-cyber-primary font-bold mb-3 font-mono">INNER JOIN</h4>
+                        <p class="text-sm text-gray-400 mb-4">Returns only matching records from both tables.</p>
+                        <div class="code-block rounded p-3 font-mono text-xs mb-4">
+                            <pre><span class="syntax-keyword">SELECT</span> Orders.OrderID, Customers.Name
+<span class="syntax-keyword">FROM</span> Orders
+<span class="syntax-keyword">INNER JOIN</span> Customers 
+  <span class="syntax-keyword">ON</span> Orders.CustomerID = Customers.CustomerID;</pre>
+                        </div>
+                        <div class="flex justify-center items-center gap-4 text-xs font-mono">
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-cyber-primary flex items-center justify-center bg-cyber-primary/20">
+                                A</div>
+                            <div class="text-cyber-primary">∩</div>
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-cyber-primary flex items-center justify-center bg-cyber-primary/20">
+                                B</div>
+                        </div>
+                    </div>
+
+                    <!-- LEFT JOIN -->
+                    <div class="bg-cyber-panel rounded-xl p-6 border border-cyber-accent/30 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-cyber-accent/10 rounded-full blur-xl"></div>
+                        <h4 class="text-cyber-accent font-bold mb-3 font-mono">LEFT JOIN</h4>
+                        <p class="text-sm text-gray-400 mb-4">All records from left table, matched records from right.
+                        </p>
+                        <div class="code-block rounded p-3 font-mono text-xs mb-4">
+                            <pre><span class="syntax-keyword">SELECT</span> Customers.Name, Orders.OrderID
+<span class="syntax-keyword">FROM</span> Customers
+<span class="syntax-keyword">LEFT JOIN</span> Orders 
+  <span class="syntax-keyword">ON</span> Customers.CustomerID = Orders.CustomerID;</pre>
+                        </div>
+                        <div class="flex justify-center items-center gap-0 text-xs font-mono">
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-cyber-accent flex items-center justify-center bg-cyber-accent/20 relative">
+                                A
+                                <div class="absolute inset-0 rounded-full border-2 border-cyber-accent/30 scale-75">
+                                </div>
+                            </div>
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-gray-600 flex items-center justify-center -ml-8 bg-cyber-black/50">
+                                B</div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT JOIN -->
+                    <div
+                        class="bg-cyber-panel rounded-xl p-6 border border-cyber-secondary/30 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-cyber-secondary/10 rounded-full blur-xl"></div>
+                        <h4 class="text-cyber-secondary font-bold mb-3 font-mono">RIGHT JOIN</h4>
+                        <p class="text-sm text-gray-400 mb-4">All records from right table, matched from left.</p>
+                        <div class="flex justify-center items-center gap-0 text-xs font-mono mt-8">
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-gray-600 flex items-center justify-center bg-cyber-black/50">
+                                A</div>
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-cyber-secondary flex items-center justify-center -ml-8 bg-cyber-secondary/20 relative">
+                                B
+                                <div class="absolute inset-0 rounded-full border-2 border-cyber-secondary/30 scale-75">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FULL OUTER -->
+                    <div class="bg-cyber-panel rounded-xl p-6 border border-cyber-warning/30 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-cyber-warning/10 rounded-full blur-xl"></div>
+                        <h4 class="text-cyber-warning font-bold mb-3 font-mono">FULL OUTER JOIN</h4>
+                        <p class="text-sm text-gray-400 mb-4">All records when there's a match in either table.</p>
+                        <div class="flex justify-center items-center gap-4 text-xs font-mono mt-8">
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-cyber-warning flex items-center justify-center bg-cyber-warning/20">
+                                A</div>
+                            <div class="text-cyber-warning">∪</div>
+                            <div
+                                class="w-16 h-16 rounded-full border-2 border-cyber-warning flex items-center justify-center bg-cyber-warning/20">
+                                B</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aggregation -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-secondary flex items-center gap-3">
+                    <span
+                        class="w-8 h-8 rounded bg-cyber-secondary/20 flex items-center justify-center text-sm">06</span>
+                    Aggregation & Grouping
+                </h3>
+
+                <div class="bg-cyber-panel rounded-xl p-8 border border-gray-800">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-cyber-primary mb-4">Aggregate Functions</h4>
+                            <div class="space-y-2 font-mono text-sm">
+                                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer group">
+                                    <span
+                                        class="w-2 h-2 rounded-full bg-cyber-primary group-hover:animate-pulse"></span>
+                                    <code class="text-cyber-primary">COUNT(*)</code>
+                                    <span class="text-gray-500 text-xs ml-auto">Count all rows</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer group">
+                                    <span
+                                        class="w-2 h-2 rounded-full bg-cyber-secondary group-hover:animate-pulse"></span>
+                                    <code class="text-cyber-secondary">SUM(column)</code>
+                                    <span class="text-gray-500 text-xs ml-auto">Total sum</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer group">
+                                    <span class="w-2 h-2 rounded-full bg-cyber-accent group-hover:animate-pulse"></span>
+                                    <code class="text-cyber-accent">AVG(column)</code>
+                                    <span class="text-gray-500 text-xs ml-auto">Average value</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer group">
+                                    <span
+                                        class="w-2 h-2 rounded-full bg-cyber-warning group-hover:animate-pulse"></span>
+                                    <code class="text-cyber-warning">MAX/MIN(column)</code>
+                                    <span class="text-gray-500 text-xs ml-auto">Extreme values</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="code-block rounded-lg p-4 font-mono text-sm">
+                            <pre><span class="syntax-comment">-- Sales by Country with filtering</span>
+<span class="syntax-keyword">SELECT</span> 
+    Country,
+    <span class="syntax-function">COUNT</span>(*) <span class="syntax-keyword">AS</span> TotalCustomers,
+    <span class="syntax-function">AVG</span>(Age) <span class="syntax-keyword">AS</span> AvgAge,
+    <span class="syntax-function">SUM</span>(Spending) <span class="syntax-keyword">AS</span> TotalRevenue
+<span class="syntax-keyword">FROM</span> Customers
+<span class="syntax-keyword">WHERE</span> Status = <span class="syntax-string">'Active'</span>
+<span class="syntax-keyword">GROUP BY</span> Country
+<span class="syntax-keyword">HAVING</span> <span class="syntax-function">COUNT</span>(*) > <span class="syntax-number">5</span>
+<span class="syntax-keyword">ORDER BY</span> TotalRevenue <span class="syntax-keyword">DESC</span>;</pre>
+                            <div
+                                class="mt-4 p-3 bg-cyber-warning/10 border border-cyber-warning/30 rounded text-xs text-cyber-warning">
+                                <strong>Note:</strong> HAVING filters groups after aggregation, WHERE filters rows
+                                before.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Advanced -->
+        <section id="advanced" class="space-y-16">
+            <div class="border-l-4 border-cyber-accent pl-6">
+                <h2 class="text-4xl font-bold mb-4 text-white">03. Advanced Concepts</h2>
+                <p class="text-gray-400 text-lg">Window functions, CTEs, constraints, and optimization techniques.</p>
+            </div>
+
+            <!-- Window Functions -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-accent flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-cyber-accent/20 flex items-center justify-center text-sm">07</span>
+                    Window Functions
+                </h3>
+
+                <p class="text-gray-400 mb-6">Perform calculations across sets of rows related to the current row
+                    without grouping.</p>
+
+                <div class="grid md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-cyber-panel p-4 rounded-lg border border-cyber-primary/20">
+                        <code class="text-cyber-primary font-mono text-sm">ROW_NUMBER()</code>
+                        <p class="text-xs text-gray-400 mt-2">Unique sequential numbers</p>
+                    </div>
+                    <div class="bg-cyber-panel p-4 rounded-lg border border-cyber-secondary/20">
+                        <code class="text-cyber-secondary font-mono text-sm">RANK()</code>
+                        <p class="text-xs text-gray-400 mt-2">Ranking with gaps</p>
+                    </div>
+                    <div class="bg-cyber-panel p-4 rounded-lg border border-cyber-accent/20">
+                        <code class="text-cyber-accent font-mono text-sm">DENSE_RANK()</code>
+                        <p class="text-xs text-gray-400 mt-2">Ranking without gaps</p>
+                    </div>
+                </div>
+
+                <div class="code-block rounded-xl p-6 font-mono text-sm overflow-x-auto">
+                    <pre><span class="syntax-comment">-- Running total and ranking in one query</span>
+<span class="syntax-keyword">SELECT</span>
+    EmployeeName,
+    Department,
+    Salary,
+    <span class="syntax-function">ROW_NUMBER</span>() <span class="syntax-keyword">OVER</span> (
+        <span class="syntax-keyword">PARTITION BY</span> Department 
+        <span class="syntax-keyword">ORDER BY</span> Salary <span class="syntax-keyword">DESC</span>
+    ) <span class="syntax-keyword">AS</span> DeptRank,
+    <span class="syntax-function">SUM</span>(Salary) <span class="syntax-keyword">OVER</span> (
+        <span class="syntax-keyword">ORDER BY</span> HireDate
+    ) <span class="syntax-keyword">AS</span> RunningPayroll
+<span class="syntax-keyword">FROM</span> Employees;</pre>
+                </div>
+            </div>
+
+            <!-- CTEs -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold text-cyber-accent flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-cyber-accent/20 flex items-center justify-center text-sm">08</span>
+                    Common Table Expressions (CTEs)
+                </h3>
+
+                <div
+                    class="bg-gradient-to-br from-cyber-panel to-cyber-dark rounded-xl p-6 border border-cyber-accent/30">
+                    <p class="text-gray-400 mb-4">Break complex queries into readable, reusable temporary result sets.
+                    </p>
+
+                    <div class="code-block rounded-lg p-4 font-mono text-sm">
+                        <pre><span class="syntax-keyword">WITH</span> RecursiveEmployeeCTE <span class="syntax-keyword">AS</span> (
+    <span class="syntax-comment">-- Anchor member: Top-level managers</span>
+    <span class="syntax-keyword">SELECT</span> 
+        EmployeeID, 
+        ManagerID, 
+        Name, 
+        <span class="syntax-number">0</span> <span class="syntax-keyword">AS</span> Level
+    <span class="syntax-keyword">FROM</span> Employees
+    <span class="syntax-keyword">WHERE</span> ManagerID <span class="syntax-keyword">IS NULL</span>
+    
+    <span class="syntax-keyword">UNION ALL</span>
+    
+    <span class="syntax-comment">-- Recursive member: Employees with managers</span>
+    <span class="syntax-keyword">SELECT</span> 
+        e.EmployeeID, 
+        e.ManagerID, 
+        e.Name, 
+        r.Level + <span class="syntax-number">1</span>
+    <span class="syntax-keyword">FROM</span> Employees e
+    <span class="syntax-keyword">INNER JOIN</span> RecursiveEmployeeCTE r
+        <span class="syntax-keyword">ON</span> e.ManagerID = r.EmployeeID
+)
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> RecursiveEmployeeCTE;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Constraints & Indexes -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold text-cyber-warning flex items-center gap-3">
+                        <span
+                            class="w-6 h-6 rounded bg-cyber-warning/20 flex items-center justify-center text-xs">09</span>
+                        Constraints
+                    </h3>
+                    <div class="bg-cyber-panel rounded-xl p-6 border border-cyber-warning/20 h-full">
+                        <ul class="space-y-3 font-mono text-sm">
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyber-warning mt-1">🔒</span>
+                                <div>
+                                    <code class="text-cyber-warning">PRIMARY KEY</code>
+                                    <p class="text-xs text-gray-400">Unique identifier, not null</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyber-primary mt-1">🔗</span>
+                                <div>
+                                    <code class="text-cyber-primary">FOREIGN KEY</code>
+                                    <p class="text-xs text-gray-400">Links to another table</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyber-secondary mt-1">✓</span>
+                                <div>
+                                    <code class="text-cyber-secondary">CHECK</code>
+                                    <p class="text-xs text-gray-400">Validates condition</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyber-accent mt-1">∅</span>
+                                <div>
+                                    <code class="text-cyber-accent">NOT NULL</code>
+                                    <p class="text-xs text-gray-400">Required value</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold text-cyber-primary flex items-center gap-3">
+                        <span
+                            class="w-6 h-6 rounded bg-cyber-primary/20 flex items-center justify-center text-xs">10</span>
+                        Indexing
+                    </h3>
+                    <div class="bg-cyber-panel rounded-xl p-6 border border-cyber-primary/20 h-full">
+                        <p class="text-sm text-gray-400 mb-4">Speed up queries at the cost of storage and write speed.
+                        </p>
+                        <div class="code-block rounded p-3 font-mono text-xs space-y-2">
+                            <pre><span class="syntax-comment">-- Create index</span>
+<span class="syntax-keyword">CREATE INDEX</span> idx_email 
+<span class="syntax-keyword">ON</span> Users(Email);
+
+<span class="syntax-comment">-- Composite index</span>
+<span class="syntax-keyword">CREATE INDEX</span> idx_name 
+<span class="syntax-keyword">ON</span> Users(LastName, FirstName);
+
+<span class="syntax-comment">-- Unique index</span>
+<span class="syntax-keyword">CREATE UNIQUE INDEX</span> idx_ssn 
+<span class="syntax-keyword">ON</span> Employees(SSN);</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Practices -->
+            <div
+                class="bg-gradient-to-r from-cyber-dark via-cyber-panel to-cyber-dark rounded-2xl p-8 border border-gray-800 relative overflow-hidden">
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber-primary via-cyber-secondary to-cyber-accent">
+                </div>
+                <h3 class="text-2xl font-bold mb-6 text-center">SQL Best Practices</h3>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-green-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="font-bold">DO</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-300 ml-8">
+                            <li>Use specific columns instead of <code class="text-cyber-warning">SELECT *</code></li>
+                            <li>Parameterize queries to prevent injection</li>
+                            <li>Use indexes on frequently queried columns</li>
+                            <li>Normalize data to reduce redundancy</li>
+                            <li>Use transactions for multi-step operations</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-red-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span class="font-bold">DON'T</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-300 ml-8">
+                            <li>Forget WHERE clause on UPDATE/DELETE</li>
+                            <li>Use cursors when set operations work</li>
+                            <li>Ignore NULL handling in comparisons</li>
+                            <li>Create too many indexes (slows writes)</li>
+                            <li>Use SELECT DISTINCT as a fix for bad joins</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Playground -->
+        <section id="playground" class="space-y-8">
+            <div class="border-l-4 border-cyber-warning pl-6">
+                <h2 class="text-4xl font-bold mb-4 text-white">04. Practice Playground</h2>
+                <p class="text-gray-400 text-lg">Test your knowledge with interactive examples.</p>
+            </div>
+
+            <div class="bg-cyber-panel rounded-2xl border border-cyber-warning/30 overflow-hidden">
+                <div class="bg-cyber-black/50 px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-4 font-mono text-sm text-gray-400">query_editor.sql</span>
+                    </div>
+                    <button onclick="runQuery()"
+                        class="px-4 py-2 bg-cyber-primary text-cyber-black font-bold rounded hover:bg-cyber-primary/80 transition-colors font-mono text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        RUN QUERY
+                    </button>
+                </div>
+
+                <div class="p-6 grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="code-block rounded-lg p-4 font-mono text-sm h-48 overflow-y-auto"
+                            contenteditable="true" id="sqlInput">
+                            <span class="syntax-keyword">SELECT</span> CustomerName, City, Country
+                            <span class="syntax-keyword">FROM</span> Customers
+                            <span class="syntax-keyword">WHERE</span> Country = <span
+                                class="syntax-string">'Germany'</span>
+                            <span class="syntax-keyword">ORDER BY</span> City;
+                        </div>
+                        <p class="text-xs text-gray-500">Edit the query above and click RUN to see results</p>
+                    </div>
+
+                    <div class="bg-cyber-black rounded-lg border border-gray-800 overflow-hidden">
+                        <div class="bg-gray-800 px-4 py-2 text-xs font-mono text-gray-400 flex justify-between">
+                            <span>Result Set (3 rows)</span>
+                            <span class="text-green-400">✓ 0.04s</span>
+                        </div>
+                        <div id="queryResult" class="p-4 font-mono text-sm">
+                            <table class="w-full text-left">
+                                <thead class="text-cyber-primary border-b border-gray-700">
+                                    <tr>
+                                        <th class="pb-2">CustomerName</th>
+                                        <th class="pb-2">City</th>
+                                        <th class="pb-2">Country</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-800 text-gray-300">
+                                    <tr>
+                                        <td class="py-2">Alfreds Futterkiste</td>
+                                        <td>Berlin</td>
+                                        <td>Germany</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Drachenblut Delikatessen</td>
+                                        <td>Aachen</td>
+                                        <td>Germany</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Frankenversand</td>
+                                        <td>München</td>
+                                        <td>Germany</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-cyber-black border-t border-gray-800 mt-32 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div
+                    class="w-8 h-8 rounded bg-gradient-to-br from-cyber-primary to-cyber-accent flex items-center justify-center">
+                    <span class="text-cyber-black font-bold font-mono">SQL</span>
+                </div>
+                <span class="font-bold text-xl tracking-wider">MASTERY</span>
+            </div>
+            <p class="text-gray-500 text-sm">Master the language of data. From basics to advanced optimization.</p>
+            <div class="mt-8 flex justify-center gap-6 text-sm font-mono text-gray-600">
+                <span>© 2024 SQL Mastery</span>
+                <span>•</span>
+                <span class="hover:text-cyber-primary cursor-pointer">Documentation</span>
+                <span>•</span>
+                <span class="hover:text-cyber-primary cursor-pointer"><a href="https://dhruvil05.github.io/db-sql/old-index.html" target="_blank"> Resources </a></span>
+            </div>
         </div>
-    </div>
+    </footer>
 
     <script>
-        // Navigation functionality
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.overlay');
-            const content = document.getElementById('content');
-
-            sidebar.classList.toggle('active');
-            overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
-        }
-
-        function scrollToSection(sectionId) {
-            const element = document.getElementById(sectionId);
-            const offset = 80;
-            const elementPosition = element.offsetTop;
-            const offsetPosition = elementPosition - offset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-
-            // Update active navigation
-            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            document.querySelector(`a[href="#${sectionId}"]`).classList.add('active');
-
-            // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
-            }
-        }
-
-        // Search functionality
-        function searchTopics(query) {
-            const navList = document.getElementById('nav-list');
-            const links = navList.querySelectorAll('li');
-
-            query = query.toLowerCase();
-
-            links.forEach(li => {
-                const link = li.querySelector('a');
-                const text = link.textContent.toLowerCase();
-
-                if (text.includes(query)) {
-                    li.style.display = 'block';
-                    if (query) {
-                        const regex = new RegExp(`(${query})`, 'gi');
-                        link.innerHTML = link.textContent.replace(regex, '<span class="highlight">$1</span>');
-                    } else {
-                        link.innerHTML = link.textContent;
-                    }
-                } else {
-                    li.style.display = 'none';
-                }
-            });
-        }
-
-        // Highlight current section while scrolling
-        window.addEventListener('scroll', function () {
-            const sections = document.querySelectorAll('.section[id]');
-            const navLinks = document.querySelectorAll('.sidebar a');
-
-            let current = '';
-            const scrollPos = window.pageYOffset + 100;
-
-            sections.forEach(section => {
-                if (section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('onclick').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
         });
 
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const menuToggle = document.querySelector('.menu-toggle');
+        // Interactive Query Runner Simulation
+        function runQuery() {
+            const resultDiv = document.getElementById('queryResult');
+            const input = document.getElementById('sqlInput').innerText.toLowerCase();
 
-            if (window.innerWidth <= 768 &&
-                !sidebar.contains(event.target) &&
-                !menuToggle.contains(event.target) &&
-                sidebar.classList.contains('active')) {
-                toggleSidebar();
+            // Simple simulation based on query content
+            let html = '';
+
+            if (input.includes('count')) {
+                html = `
+                    <table class="w-full text-left">
+                        <thead class="text-cyber-primary border-b border-gray-700">
+                            <tr><th class="pb-2">Count(*)</th></tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                            <tr><td class="py-2 text-2xl font-bold text-cyber-secondary">91</td></tr>
+                        </tbody>
+                    </table>`;
+            } else if (input.includes('join')) {
+                html = `
+                    <table class="w-full text-left text-xs">
+                        <thead class="text-cyber-primary border-b border-gray-700">
+                            <tr><th class="pb-2">OrderID</th><th class="pb-2">Customer</th><th class="pb-2">Amount</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-gray-300">
+                            <tr><td class="py-1">10248</td><td>Wilman Kala</td><td class="text-cyber-primary">$450.00</td></tr>
+                            <tr><td class="py-1">10249</td><td>Tradiçao Hipermercados</td><td class="text-cyber-primary">$1,230.50</td></tr>
+                            <tr><td class="py-1">10250</td><td>Hanari Carnes</td><td class="text-cyber-primary">$890.25</td></tr>
+                        </tbody>
+                    </table>`;
+            } else {
+                html = `
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-cyber-primary border-b border-gray-700">
+                            <tr><th class="pb-2">CustomerName</th><th class="pb-2">City</th><th class="pb-2">Country</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-gray-300">
+                            <tr><td class="py-2">Around the Horn</td><td>London</td><td>UK</td></tr>
+                            <tr><td class="py-2">B's Beverages</td><td>London</td><td>UK</td></tr>
+                            <tr><td class="py-2">Consolidated Holdings</td><td>London</td><td>UK</td></tr>
+                        </tbody>
+                    </table>`;
             }
-        });
 
-        // Handle window resize
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                document.querySelector('.overlay').style.display = 'none';
-                document.getElementById('sidebar').classList.remove('active');
-            }
-        });
+            resultDiv.innerHTML = '<div class="animate-pulse text-cyber-primary">Executing...</div>';
+            setTimeout(() => {
+                resultDiv.innerHTML = html;
+            }, 600);
+        }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function () {
-            // Set first link as active
-            document.querySelector('.sidebar a').classList.add('active');
+        // Add smooth reveal animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach((section) => {
+            section.style.opacity = "0";
+            section.style.transform = "translateY(30px)";
+            section.style.transition = "all 0.8s ease-out";
+            observer.observe(section);
         });
     </script>
 </body>

@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete SQL Tutorial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: #3498db;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #3498db;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .content {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .section h3 {
+            color: #3498db;
+            margin: 25px 0 15px 0;
+            font-size: 1.5rem;
+        }
+
+        .example {
+            background: #2c3e50;
+            color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .example h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .sql-code {
+            background: #34495e;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .result {
+            background: #27ae60;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .table-demo {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        .table-demo th,
+        .table-demo td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table-demo th {
+            background: #3498db;
+            color: white;
+        }
+
+        .table-demo tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .sidebar {
+                width: 250px;
+            }
+        }
+
+        .highlight {
+            background: yellow;
+            padding: 2px 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <h3>SQL Tutorial</h3>
+        <input type="text" class="search-box" placeholder="Search topics..." onkeyup="searchTopics(this.value)">
+        <ul id="nav-list">
+            <li><a href="#introduction" onclick="scrollToSection('introduction')">Introduction</a></li>
+            <li><a href="#syntax" onclick="scrollToSection('syntax')">SQL Syntax</a></li>
+            <li><a href="#select" onclick="scrollToSection('select')">SELECT</a></li>
+            <li><a href="#where" onclick="scrollToSection('where')">WHERE</a></li>
+            <li><a href="#orderby" onclick="scrollToSection('orderby')">ORDER BY</a></li>
+            <li><a href="#insert" onclick="scrollToSection('insert')">INSERT</a></li>
+            <li><a href="#update" onclick="scrollToSection('update')">UPDATE</a></li>
+            <li><a href="#delete" onclick="scrollToSection('delete')">DELETE</a></li>
+            <li><a href="#joins" onclick="scrollToSection('joins')">JOINS</a></li>
+            <li><a href="#groupby" onclick="scrollToSection('groupby')">GROUP BY</a></li>
+            <li><a href="#having" onclick="scrollToSection('having')">HAVING</a></li>
+            <li><a href="#functions" onclick="scrollToSection('functions')">Functions</a></li>
+            <li><a href="#constraints" onclick="scrollToSection('constraints')">Constraints</a></li>
+            <li><a href="#indexes" onclick="scrollToSection('indexes')">Indexes</a></li>
+            <li><a href="#views" onclick="scrollToSection('views')">Views</a></li>
+            <li><a href="#procedures" onclick="scrollToSection('procedures')">Stored Procedures</a></li>
+            <li><a href="#datatypes" onclick="scrollToSection('datatypes')">Data Types</a></li>
+        </ul>
+    </nav>
+
+    <div class="content" id="content">
+        <div class="container">
+            <div class="header">
+                <h1>Complete SQL Tutorial</h1>
+                <p>Master SQL from basics to advanced concepts with practical examples</p>
+            </div>
+
+            <section id="introduction" class="section">
+                <h2>1. Introduction to SQL</h2>
+                <p>SQL (Structured Query Language) is a standard language for managing and manipulating relational
+                    databases. It's used to store, retrieve, and manipulate data in database management systems like
+                    MySQL, PostgreSQL, SQL Server, Oracle, and SQLite.</p>
+
+                <h3>What is SQL?</h3>
+                <ul>
+                    <li><strong>SQL</strong> stands for Structured Query Language</li>
+                    <li>SQL lets you access and manipulate databases</li>
+                    <li>SQL became a standard of the American National Standards Institute (ANSI) in 1986</li>
+                    <li>SQL became a standard of the International Organization for Standardization (ISO) in 1987</li>
+                </ul>
+
+                <h3>What Can SQL Do?</h3>
+                <ul>
+                    <li>Execute queries against a database</li>
+                    <li>Retrieve data from a database</li>
+                    <li>Insert records in a database</li>
+                    <li>Update records in a database</li>
+                    <li>Delete records from a database</li>
+                    <li>Create new databases</li>
+                    <li>Create new tables in a database</li>
+                    <li>Create stored procedures in a database</li>
+                    <li>Create views in a database</li>
+                    <li>Set permissions on tables, procedures, and views</li>
+                </ul>
+
+                <h3>Database Structure</h3>
+                <p>A database contains one or more tables. Each table is identified by a name and contains records
+                    (rows) with data. Each record consists of multiple fields (columns).</p>
+
+                <table class="table-demo">
+                    <tr>
+                        <th>CustomerID</th>
+                        <th>CustomerName</th>
+                        <th>Country</th>
+                        <th>City</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>John Doe</td>
+                        <td>USA</td>
+                        <td>New York</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jane Smith</td>
+                        <td>UK</td>
+                        <td>London</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Bob Johnson</td>
+                        <td>Canada</td>
+                        <td>Toronto</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="syntax" class="section">
+                <h2>2. SQL Syntax</h2>
+                <p>SQL statements are composed of keywords, identifiers, and clauses. SQL is not case-sensitive, but
+                    it's common practice to write SQL keywords in uppercase.</p>
+
+                <div class="example">
+                    <h4>Basic Syntax Rules:</h4>
+                    <div class="sql-code">
+                        -- SQL statements end with a semicolon
+                        SELECT * FROM Customers;
+
+                        -- SQL is not case-sensitive
+                        select * from customers;
+                        SELECT * FROM CUSTOMERS;
+
+                        -- Comments start with --
+                        /* This is a multi-line comment */
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> Some database systems require a semicolon at the end of each SQL statement
+                    for execution.
+                </div>
+            </section>
+
+            <section id="select" class="section">
+                <h2>3. SELECT Statement</h2>
+                <p>The SELECT statement is used to select data from a database. The data returned is stored in a result
+                    table, called the result-set.</p>
+
+                <h3>Basic SELECT Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        -- Select all columns from a table
+                        SELECT * FROM table_name;
+
+                        -- Select specific columns
+                        SELECT column1, column2 FROM table_name;
+                    </div>
+                </div>
+
+                <h3>SELECT Examples</h3>
+                <div class="example">
+                    <h4>Select all customers:</h4>
+                    <div class="sql-code">SELECT * FROM Customers;</div>
+
+                    <h4>Select specific columns:</h4>
+                    <div class="sql-code">SELECT CustomerName, City FROM Customers;</div>
+
+                    <h4>SELECT DISTINCT (unique values only):</h4>
+                    <div class="sql-code">SELECT DISTINCT Country FROM Customers;</div>
+                </div>
+
+                <h3>Column Aliases</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        SELECT CustomerName AS Name, City AS Location
+                        FROM Customers;
+                    </div>
+                </div>
+            </section>
+
+            <section id="where" class="section">
+                <h2>4. WHERE Clause</h2>
+                <p>The WHERE clause is used to filter records and extract only those that fulfill a specified condition.
+                </p>
+
+                <h3>WHERE Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        SELECT column1, column2
+                        FROM table_name
+                        WHERE condition;
+                    </div>
+                </div>
+
+                <h3>Comparison Operators</h3>
+                <table class="table-demo">
+                    <tr>
+                        <th>Operator</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>=</td>
+                        <td>Equal</td>
+                        <td>WHERE City = 'London'</td>
+                    </tr>
+                    <tr>
+                        <td>!=</td>
+                        <td>Not equal</td>
+                        <td>WHERE City != 'London'</td>
+                    </tr>
+                    <tr>
+                        <td>></td>
+                        <td>Greater than</td>
+                        <td>WHERE Price > 20</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            << /td>
+                        <td>Less than</td>
+                        <td>WHERE Price < 20</td>
+                    </tr>
+                    <tr>
+                        <td>>=</td>
+                        <td>Greater than or equal</td>
+                        <td>WHERE Price >= 20</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <=< /td>
+                        <td>Less than or equal</td>
+                        <td>WHERE Price <= 20</td>
+                    </tr>
+                </table>
+
+                <h3>Logical Operators</h3>
+                <div class="example">
+                    <h4>AND Operator:</h4>
+                    <div class="sql-code">
+                        SELECT * FROM Customers
+                        WHERE Country = 'Germany' AND City = 'Berlin';
+                    </div>
+
+                    <h4>OR Operator:</h4>
+                    <div class="sql-code">
+                        SELECT * FROM Customers
+                        WHERE City = 'Berlin' OR City = 'London';
+                    </div>
+
+                    <h4>NOT Operator:</h4>
+                    <div class="sql-code">
+                        SELECT * FROM Customers
+                        WHERE NOT Country = 'Germany';
+                    </div>
+                </div>
+
+                <h3>Pattern Matching</h3>
+                <div class="example">
+                    <h4>LIKE Operator:</h4>
+                    <div class="sql-code">
+                        -- Names starting with 'A'
+                        SELECT * FROM Customers WHERE CustomerName LIKE 'A%';
+
+                        -- Names ending with 'a'
+                        SELECT * FROM Customers WHERE CustomerName LIKE '%a';
+
+                        -- Names containing 'or'
+                        SELECT * FROM Customers WHERE CustomerName LIKE '%or%';
+
+                        -- Names with 'a' as second character
+                        SELECT * FROM Customers WHERE CustomerName LIKE '_a%';
+                    </div>
+
+                    <h4>IN Operator:</h4>
+                    <div class="sql-code">
+                        SELECT * FROM Customers
+                        WHERE Country IN ('Germany', 'France', 'UK');
+                    </div>
+
+                    <h4>BETWEEN Operator:</h4>
+                    <div class="sql-code">
+                        SELECT * FROM Products
+                        WHERE Price BETWEEN 10 AND 20;
+                    </div>
+                </div>
+            </section>
+
+            <section id="orderby" class="section">
+                <h2>5. ORDER BY Clause</h2>
+                <p>The ORDER BY keyword is used to sort the result-set in ascending or descending order.</p>
+
+                <h3>ORDER BY Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        SELECT column1, column2
+                        FROM table_name
+                        ORDER BY column1 [ASC|DESC], column2 [ASC|DESC];
+                    </div>
+                </div>
+
+                <h3>ORDER BY Examples</h3>
+                <div class="example">
+                    <h4>Sort by one column (ascending by default):</h4>
+                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country;</div>
+
+                    <h4>Sort in descending order:</h4>
+                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country DESC;</div>
+
+                    <h4>Sort by multiple columns:</h4>
+                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country, CustomerName;</div>
+
+                    <h4>Mixed sorting:</h4>
+                    <div class="sql-code">SELECT * FROM Customers ORDER BY Country ASC, CustomerName DESC;</div>
+                </div>
+            </section>
+
+            <section id="insert" class="section">
+                <h2>6. INSERT Statement</h2>
+                <p>The INSERT INTO statement is used to insert new records in a table.</p>
+
+                <h3>INSERT Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        -- Insert values for all columns
+                        INSERT INTO table_name
+                        VALUES (value1, value2, value3, ...);
+
+                        -- Insert values for specific columns
+                        INSERT INTO table_name (column1, column2, column3, ...)
+                        VALUES (value1, value2, value3, ...);
+                    </div>
+                </div>
+
+                <h3>INSERT Examples</h3>
+                <div class="example">
+                    <h4>Insert a complete record:</h4>
+                    <div class="sql-code">
+                        INSERT INTO Customers
+                        VALUES (1, 'John Doe', 'john@example.com', 'USA', 'New York');
+                    </div>
+
+                    <h4>Insert specific columns:</h4>
+                    <div class="sql-code">
+                        INSERT INTO Customers (CustomerName, City, Country)
+                        VALUES ('Jane Smith', 'London', 'UK');
+                    </div>
+
+                    <h4>Insert multiple records:</h4>
+                    <div class="sql-code">
+                        INSERT INTO Customers (CustomerName, City, Country)
+                        VALUES
+                        ('Bob Johnson', 'Toronto', 'Canada'),
+                        ('Alice Brown', 'Paris', 'France'),
+                        ('Charlie Davis', 'Sydney', 'Australia');
+                    </div>
+                </div>
+            </section>
+
+            <section id="update" class="section">
+                <h2>7. UPDATE Statement</h2>
+                <p>The UPDATE statement is used to modify existing records in a table.</p>
+
+                <h3>UPDATE Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        UPDATE table_name
+                        SET column1 = value1, column2 = value2, ...
+                        WHERE condition;
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>Warning:</strong> Be careful when updating records! If you omit the WHERE clause, ALL
+                    records will be updated!
+                </div>
+
+                <h3>UPDATE Examples</h3>
+                <div class="example">
+                    <h4>Update a single column:</h4>
+                    <div class="sql-code">
+                        UPDATE Customers
+                        SET ContactName = 'Alfred Schmidt'
+                        WHERE CustomerID = 1;
+                    </div>
+
+                    <h4>Update multiple columns:</h4>
+                    <div class="sql-code">
+                        UPDATE Customers
+                        SET ContactName = 'Juan Carlos', City = 'Madrid'
+                        WHERE CustomerID = 2;
+                    </div>
+
+                    <h4>Update multiple records:</h4>
+                    <div class="sql-code">
+                        UPDATE Customers
+                        SET Country = 'United States'
+                        WHERE Country = 'USA';
+                    </div>
+                </div>
+            </section>
+
+            <section id="delete" class="section">
+                <h2>8. DELETE Statement</h2>
+                <p>The DELETE statement is used to delete existing records in a table.</p>
+
+                <h3>DELETE Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        DELETE FROM table_name
+                        WHERE condition;
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>Warning:</strong> Be careful when deleting records! If you omit the WHERE clause, ALL
+                    records will be deleted!
+                </div>
+
+                <h3>DELETE Examples</h3>
+                <div class="example">
+                    <h4>Delete a specific record:</h4>
+                    <div class="sql-code">
+                        DELETE FROM Customers
+                        WHERE CustomerName = 'Alfreds Futterkiste';
+                    </div>
+
+                    <h4>Delete all records (but keep table structure):</h4>
+                    <div class="sql-code">DELETE FROM Customers;</div>
+
+                    <h4>Drop entire table:</h4>
+                    <div class="sql-code">DROP TABLE Customers;</div>
+                </div>
+            </section>
+
+            <section id="joins" class="section">
+                <h2>9. SQL JOINS</h2>
+                <p>A JOIN clause is used to combine rows from two or more tables, based on a related column between
+                    them.</p>
+
+                <h3>Types of JOINS</h3>
+                <ul>
+                    <li><strong>INNER JOIN:</strong> Returns records that have matching values in both tables</li>
+                    <li><strong>LEFT JOIN:</strong> Returns all records from the left table, and matched records from
+                        the right table</li>
+                    <li><strong>RIGHT JOIN:</strong> Returns all records from the right table, and matched records from
+                        the left table</li>
+                    <li><strong>FULL OUTER JOIN:</strong> Returns all records when there is a match in either left or
+                        right table</li>
+                </ul>
+
+                <h3>JOIN Examples</h3>
+                <div class="example">
+                    <h4>INNER JOIN:</h4>
+                    <div class="sql-code">
+                        SELECT Orders.OrderID, Customers.CustomerName
+                        FROM Orders
+                        INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+                    </div>
+
+                    <h4>LEFT JOIN:</h4>
+                    <div class="sql-code">
+                        SELECT Customers.CustomerName, Orders.OrderID
+                        FROM Customers
+                        LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
+                    </div>
+
+                    <h4>RIGHT JOIN:</h4>
+                    <div class="sql-code">
+                        SELECT Orders.OrderID, Customers.CustomerName
+                        FROM Orders
+                        RIGHT JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+                    </div>
+
+                    <h4>FULL OUTER JOIN:</h4>
+                    <div class="sql-code">
+                        SELECT Customers.CustomerName, Orders.OrderID
+                        FROM Customers
+                        FULL OUTER JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
+                    </div>
+                </div>
+
+                <h3>Self JOIN</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        -- Find customers from the same city
+                        SELECT A.CustomerName AS CustomerName1, B.CustomerName AS CustomerName2, A.City
+                        FROM Customers A, Customers B
+                        WHERE A.CustomerID != B.CustomerID AND A.City = B.City
+                        ORDER BY A.City;
+                    </div>
+                </div>
+            </section>
+
+            <section id="groupby" class="section">
+                <h2>10. GROUP BY Clause</h2>
+                <p>The GROUP BY statement groups rows that have the same values into summary rows. It is often used with
+                    aggregate functions (COUNT, MAX, MIN, SUM, AVG).</p>
+
+                <h3>GROUP BY Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        SELECT column_name(s)
+                        FROM table_name
+                        WHERE condition
+                        GROUP BY column_name(s)
+                        ORDER BY column_name(s);
+                    </div>
+                </div>
+
+                <h3>GROUP BY Examples</h3>
+                <div class="example">
+                    <h4>Count customers by country:</h4>
+                    <div class="sql-code">
+                        SELECT COUNT(CustomerID), Country
+                        FROM Customers
+                        GROUP BY Country;
+                    </div>
+
+                    <h4>Average price by category:</h4>
+                    <div class="sql-code">
+                        SELECT AVG(Price), CategoryID
+                        FROM Products
+                        GROUP BY CategoryID;
+                    </div>
+
+                    <h4>Total sales by employee:</h4>
+                    <div class="sql-code">
+                        SELECT SUM(OrderDetails.Quantity * OrderDetails.UnitPrice) AS TotalSales,
+                        Orders.EmployeeID
+                        FROM Orders
+                        INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+                        GROUP BY Orders.EmployeeID;
+                    </div>
+                </div>
+            </section>
+
+            <section id="having" class="section">
+                <h2>11. HAVING Clause</h2>
+                <p>The HAVING clause was added to SQL because the WHERE keyword cannot be used with aggregate functions.
+                </p>
+
+                <h3>HAVING Syntax</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        SELECT column_name(s)
+                        FROM table_name
+                        WHERE condition
+                        GROUP BY column_name(s)
+                        HAVING condition
+                        ORDER BY column_name(s);
+                    </div>
+                </div>
+
+                <h3>HAVING Examples</h3>
+                <div class="example">
+                    <h4>Countries with more than 5 customers:</h4>
+                    <div class="sql-code">
+                        SELECT COUNT(CustomerID), Country
+                        FROM Customers
+                        GROUP BY Country
+                        HAVING COUNT(CustomerID) > 5;
+                    </div>
+
+                    <h4>Categories with average price > 20:</h4>
+                    <div class="sql-code">
+                        SELECT AVG(Price), CategoryID
+                        FROM Products
+                        GROUP BY CategoryID
+                        HAVING AVG(Price) > 20;
+                    </div>
+                </div>
+            </section>
+
+            <section id="functions" class="section">
+                <h2>12. SQL Functions</h2>
+                <p>SQL has many built-in functions for performing calculations on data.</p>
+
+                <h3>Aggregate Functions</h3>
+                <div class="example">
+                    <h4>Common Aggregate Functions:</h4>
+                    <div class="sql-code">
+                        -- Count total records
+                        SELECT COUNT(*) FROM Customers;
+
+                        -- Count non-null values
+                        SELECT COUNT(CustomerName) FROM Customers;
+
+                        -- Sum of all values
+                        SELECT SUM(Price) FROM Products;
+
+                        -- Average value
+                        SELECT AVG(Price) FROM Products;
+
+                        -- Maximum value
+                        SELECT MAX(Price) FROM Products;
+
+                        -- Minimum value
+                        SELECT MIN(Price) FROM Products;
+                    </div>
+                </div>
+
+                <h3>String Functions</h3>
+                <div class="example">
+                    <h4>String Manipulation:</h4>
+                    <div class="sql-code">
+                        -- Convert to uppercase
+                        SELECT UPPER(CustomerName) FROM Customers;
+
+                        -- Convert to lowercase
+                        SELECT LOWER(CustomerName) FROM Customers;
+
+                        -- Get string length
+                        SELECT LEN(CustomerName) FROM Customers;
+
+                        -- Extract substring
+                        SELECT SUBSTRING(CustomerName, 1, 5) FROM Customers;
+
+                        -- Concatenate strings
+                        SELECT CONCAT(CustomerName, ' - ', Country) FROM Customers;
+
+                        -- Replace text
+                        SELECT REPLACE(CustomerName, 'a', 'X') FROM Customers;
+                    </div>
+                </div>
+
+                <h3>Date Functions</h3>
+                <div class="example">
+                    <h4>Date Operations:</h4>
+                    <div class="sql-code">
+                        -- Current date and time
+                        SELECT NOW();
+
+                        -- Current date
+                        SELECT CURDATE();
+
+                        -- Extract year
+                        SELECT YEAR(OrderDate) FROM Orders;
+
+                        -- Extract month
+                        SELECT MONTH(OrderDate) FROM Orders;
+
+                        -- Extract day
+                        SELECT DAY(OrderDate) FROM Orders;
+
+                        -- Add days to date
+                        SELECT DATE_ADD(OrderDate, INTERVAL 30 DAY) FROM Orders;
+
+                        -- Date difference
+                        SELECT DATEDIFF(NOW(), OrderDate) FROM Orders;
+                    </div>
+                </div>
+
+                <h3>Mathematical Functions</h3>
+                <div class="example">
+                    <h4>Math Operations:</h4>
+                    <div class="sql-code">
+                        -- Round to 2 decimal places
+                        SELECT ROUND(Price, 2) FROM Products;
+
+                        -- Ceiling (round up)
+                        SELECT CEIL(Price) FROM Products;
+
+                        -- Floor (round down)
+                        SELECT FLOOR(Price) FROM Products;
+
+                        -- Absolute value
+                        SELECT ABS(-15);
+
+                        -- Square root
+                        SELECT SQRT(16);
+
+                        -- Power
+                        SELECT POWER(2, 3);
+                    </div>
+                </div>
+            </section>
+
+            <section id="constraints" class="section">
+                <h2>13. SQL Constraints</h2>
+                <p>Constraints are used to specify rules for data in a table. They ensure the accuracy and reliability
+                    of the data.</p>
+
+                <h3>Types of Constraints</h3>
+                <ul>
+                    <li><strong>NOT NULL:</strong> Ensures a column cannot have NULL value</li>
+                    <li><strong>UNIQUE:</strong> Ensures all values in a column are different</li>
+                    <li><strong>PRIMARY KEY:</strong> Uniquely identifies each record in a table</li>
+                    <li><strong>FOREIGN KEY:</strong> Links two tables together</li>
+                    <li><strong>CHECK:</strong> Ensures values satisfy a specific condition</li>
+                    <li><strong>DEFAULT:</strong> Sets a default value for a column</li>
+                </ul>
+
+                <h3>Constraint Examples</h3>
+                <div class="example">
+                    <h4>Create table with constraints:</h4>
+                    <div class="sql-code">
+                        CREATE TABLE Employees (
+                        EmployeeID int NOT NULL PRIMARY KEY,
+                        LastName varchar(255) NOT NULL,
+                        FirstName varchar(255),
+                        Age int CHECK (Age >= 18),
+                        Email varchar(255) UNIQUE,
+                        Salary decimal(10,2) DEFAULT 0,
+                        DepartmentID int,
+                        FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+                        );
+                    </div>
+
+                    <h4>Add constraints to existing table:</h4>
+                    <div class="sql-code">
+                        -- Add NOT NULL constraint
+                        ALTER TABLE Employees
+                        MODIFY COLUMN FirstName varchar(255) NOT NULL;
+
+                        -- Add UNIQUE constraint
+                        ALTER TABLE Employees
+                        ADD CONSTRAINT UC_Employee_Email UNIQUE (Email);
+
+                        -- Add CHECK constraint
+                        ALTER TABLE Employees
+                        ADD CONSTRAINT CHK_Employee_Age CHECK (Age >= 18 AND Age <= 65); -- Add FOREIGN KEY constraint
+                            ALTER TABLE Employees ADD CONSTRAINT FK_Employee_Department FOREIGN KEY (DepartmentID)
+                            REFERENCES Departments(DepartmentID); </div>
+                    </div>
+            </section>
+
+            <section id="indexes" class="section">
+                <h2>14. SQL Indexes</h2>
+                <p>Indexes are used to retrieve data from the database more quickly. They create shortcuts to data,
+                    making queries faster.</p>
+
+                <h3>Index Types</h3>
+                <ul>
+                    <li><strong>Clustered Index:</strong> Sorts and stores data rows in the table based on key values
+                    </li>
+                    <li><strong>Non-Clustered Index:</strong> Contains pointers to data rows</li>
+                    <li><strong>Unique Index:</strong> Ensures no duplicate values</li>
+                    <li><strong>Composite Index:</strong> Created on multiple columns</li>
+                </ul>
+
+                <h3>Index Examples</h3>
+                <div class="example">
+                    <h4>Create indexes:</h4>
+                    <div class="sql-code">
+                        -- Create index on single column
+                        CREATE INDEX idx_lastname ON Employees (LastName);
+
+                        -- Create unique index
+                        CREATE UNIQUE INDEX idx_email ON Employees (Email);
+
+                        -- Create composite index
+                        CREATE INDEX idx_name ON Employees (LastName, FirstName);
+
+                        -- Create index with sorting
+                        CREATE INDEX idx_salary_desc ON Employees (Salary DESC);
+                    </div>
+
+                    <h4>Drop indexes:</h4>
+                    <div class="sql-code">
+                        -- Drop index
+                        DROP INDEX idx_lastname ON Employees;
+
+                        -- Drop index (SQL Server syntax)
+                        DROP INDEX Employees.idx_lastname;
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> While indexes speed up SELECT operations, they slow down INSERT, UPDATE, and
+                    DELETE operations as the indexes also need to be updated.
+                </div>
+            </section>
+
+            <section id="views" class="section">
+                <h2>15. SQL Views</h2>
+                <p>A view is a virtual table based on the result-set of an SQL statement. Views contain rows and columns
+                    just like a real table.</p>
+
+                <h3>View Benefits</h3>
+                <ul>
+                    <li>Security: Hide sensitive data from users</li>
+                    <li>Simplicity: Simplify complex queries</li>
+                    <li>Consistency: Ensure consistent data access</li>
+                    <li>Logic: Centralize business logic</li>
+                </ul>
+
+                <h3>View Examples</h3>
+                <div class="example">
+                    <h4>Create views:</h4>
+                    <div class="sql-code">
+                        -- Simple view
+                        CREATE VIEW CustomerView AS
+                        SELECT CustomerName, ContactName, Country
+                        FROM Customers
+                        WHERE Country = 'Germany';
+
+                        -- Complex view with JOIN
+                        CREATE VIEW OrderSummary AS
+                        SELECT c.CustomerName, COUNT(o.OrderID) as TotalOrders
+                        FROM Customers c
+                        LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
+                        GROUP BY c.CustomerName;
+
+                        -- View with calculations
+                        CREATE VIEW ProductPricing AS
+                        SELECT ProductName,
+                        Price,
+                        Price * 1.1 as PriceWithTax,
+                        CASE
+                        WHEN Price < 20 THEN 'Budget' WHEN Price < 50 THEN 'Standard' ELSE 'Premium' END as
+                            PriceCategory FROM Products; </div>
+
+                            <h4>Use views:</h4>
+                            <div class="sql-code">
+                                -- Query a view like a table
+                                SELECT * FROM CustomerView;
+
+                                -- Update view (if updatable)
+                                UPDATE CustomerView
+                                SET ContactName = 'New Name'
+                                WHERE CustomerName = 'Alfreds Futterkiste';
+                            </div>
+
+                            <h4>Drop views:</h4>
+                            <div class="sql-code">
+                                DROP VIEW CustomerView;
+                            </div>
+                    </div>
+            </section>
+
+            <section id="procedures" class="section">
+                <h2>16. Stored Procedures</h2>
+                <p>A stored procedure is a prepared SQL code that you can save and reuse. It can accept parameters and
+                    return results.</p>
+
+                <h3>Procedure Benefits</h3>
+                <ul>
+                    <li>Performance: Compiled once, executed many times</li>
+                    <li>Security: Prevent SQL injection attacks</li>
+                    <li>Maintainability: Centralize business logic</li>
+                    <li>Network Traffic: Reduce data transfer</li>
+                </ul>
+
+                <h3>Stored Procedure Examples</h3>
+                <div class="example">
+                    <h4>Simple stored procedure:</h4>
+                    <div class="sql-code">
+                        -- MySQL/SQL Server syntax
+                        DELIMITER //
+                        CREATE PROCEDURE GetCustomersByCountry(IN country_name VARCHAR(255))
+                        BEGIN
+                        SELECT CustomerName, City
+                        FROM Customers
+                        WHERE Country = country_name;
+                        END //
+                        DELIMITER ;
+
+                        -- Execute procedure
+                        CALL GetCustomersByCountry('Germany');
+                    </div>
+
+                    <h4>Procedure with multiple parameters:</h4>
+                    <div class="sql-code">
+                        DELIMITER //
+                        CREATE PROCEDURE GetCustomersByCountryAndCity(
+                        IN country_name VARCHAR(255),
+                        IN city_name VARCHAR(255)
+                        )
+                        BEGIN
+                        SELECT CustomerName, ContactName
+                        FROM Customers
+                        WHERE Country = country_name AND City = city_name;
+                        END //
+                        DELIMITER ;
+
+                        -- Execute with parameters
+                        CALL GetCustomersByCountryAndCity('Germany', 'Berlin');
+                    </div>
+
+                    <h4>Procedure with output parameter:</h4>
+                    <div class="sql-code">
+                        DELIMITER //
+                        CREATE PROCEDURE GetCustomerCount(
+                        IN country_name VARCHAR(255),
+                        OUT customer_count INT
+                        )
+                        BEGIN
+                        SELECT COUNT(*)
+                        INTO customer_count
+                        FROM Customers
+                        WHERE Country = country_name;
+                        END //
+                        DELIMITER ;
+
+                        -- Execute and get output
+                        CALL GetCustomerCount('Germany', @count);
+                        SELECT @count;
+                    </div>
+                </div>
+            </section>
+
+            <section id="datatypes" class="section">
+                <h2>17. SQL Data Types</h2>
+                <p>Data types specify what kind of data can be stored in a column. Different database systems have
+                    different data types.</p>
+
+                <h3>Numeric Data Types</h3>
+                <table class="table-demo">
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                        <th>Storage</th>
+                    </tr>
+                    <tr>
+                        <td>TINYINT</td>
+                        <td>Very small integer (-128 to 127)</td>
+                        <td>1 byte</td>
+                    </tr>
+                    <tr>
+                        <td>SMALLINT</td>
+                        <td>Small integer (-32,768 to 32,767)</td>
+                        <td>2 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>INT</td>
+                        <td>Standard integer (-2B to 2B)</td>
+                        <td>4 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>BIGINT</td>
+                        <td>Large integer</td>
+                        <td>8 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>DECIMAL(p,s)</td>
+                        <td>Fixed precision and scale</td>
+                        <td>Variable</td>
+                    </tr>
+                    <tr>
+                        <td>FLOAT</td>
+                        <td>Floating point number</td>
+                        <td>4 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>DOUBLE</td>
+                        <td>Double precision float</td>
+                        <td>8 bytes</td>
+                    </tr>
+                </table>
+
+                <h3>String Data Types</h3>
+                <table class="table-demo">
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                        <th>Max Length</th>
+                    </tr>
+                    <tr>
+                        <td>CHAR(n)</td>
+                        <td>Fixed length string</td>
+                        <td>255 characters</td>
+                    </tr>
+                    <tr>
+                        <td>VARCHAR(n)</td>
+                        <td>Variable length string</td>
+                        <td>65,535 characters</td>
+                    </tr>
+                    <tr>
+                        <td>TEXT</td>
+                        <td>Large text data</td>
+                        <td>65,535 characters</td>
+                    </tr>
+                    <tr>
+                        <td>LONGTEXT</td>
+                        <td>Very large text data</td>
+                        <td>4GB</td>
+                    </tr>
+                    <tr>
+                        <td>BINARY(n)</td>
+                        <td>Fixed length binary</td>
+                        <td>255 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>VARBINARY(n)</td>
+                        <td>Variable length binary</td>
+                        <td>65,535 bytes</td>
+                    </tr>
+                </table>
+
+                <h3>Date and Time Data Types</h3>
+                <table class="table-demo">
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Description</th>
+                        <th>Format</th>
+                    </tr>
+                    <tr>
+                        <td>DATE</td>
+                        <td>Date only</td>
+                        <td>YYYY-MM-DD</td>
+                    </tr>
+                    <tr>
+                        <td>TIME</td>
+                        <td>Time only</td>
+                        <td>HH:MM:SS</td>
+                    </tr>
+                    <tr>
+                        <td>DATETIME</td>
+                        <td>Date and time</td>
+                        <td>YYYY-MM-DD HH:MM:SS</td>
+                    </tr>
+                    <tr>
+                        <td>TIMESTAMP</td>
+                        <td>Unix timestamp</td>
+                        <td>YYYY-MM-DD HH:MM:SS</td>
+                    </tr>
+                    <tr>
+                        <td>YEAR</td>
+                        <td>Year only</td>
+                        <td>YYYY</td>
+                    </tr>
+                </table>
+
+                <h3>Data Type Examples</h3>
+                <div class="example">
+                    <h4>Table creation with data types:</h4>
+                    <div class="sql-code">
+                        CREATE TABLE Users (
+                        UserID INT AUTO_INCREMENT PRIMARY KEY,
+                        Username VARCHAR(50) NOT NULL UNIQUE,
+                        Email VARCHAR(100) NOT NULL,
+                        Password CHAR(64),
+                        Age TINYINT UNSIGNED,
+                        Salary DECIMAL(10,2),
+                        IsActive BOOLEAN DEFAULT TRUE,
+                        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        ProfilePicture LONGBLOB,
+                        Bio TEXT
+                        );
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>18. Advanced SQL Concepts</h2>
+
+                <h3>Window Functions</h3>
+                <div class="example">
+                    <h4>ROW_NUMBER, RANK, DENSE_RANK:</h4>
+                    <div class="sql-code">
+                        -- Row number within partition
+                        SELECT
+                        CustomerName,
+                        Country,
+                        ROW_NUMBER() OVER (PARTITION BY Country ORDER BY CustomerName) as RowNum,
+                        RANK() OVER (PARTITION BY Country ORDER BY CustomerName) as Rank,
+                        DENSE_RANK() OVER (PARTITION BY Country ORDER BY CustomerName) as DenseRank
+                        FROM Customers;
+
+                        -- Running totals
+                        SELECT
+                        OrderID,
+                        OrderDate,
+                        Amount,
+                        SUM(Amount) OVER (ORDER BY OrderDate) as RunningTotal
+                        FROM Orders;
+                    </div>
+                </div>
+
+                <h3>Common Table Expressions (CTE)</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        -- Simple CTE
+                        WITH CustomerOrders AS (
+                        SELECT CustomerID, COUNT(*) as OrderCount
+                        FROM Orders
+                        GROUP BY CustomerID
+                        )
+                        SELECT c.CustomerName, co.OrderCount
+                        FROM Customers c
+                        JOIN CustomerOrders co ON c.CustomerID = co.CustomerID;
+
+                        -- Recursive CTE (Employee hierarchy)
+                        WITH EmployeeHierarchy AS (
+                        -- Anchor member
+                        SELECT EmployeeID, ManagerID, FirstName, 0 as Level
+                        FROM Employees
+                        WHERE ManagerID IS NULL
+
+                        UNION ALL
+
+                        -- Recursive member
+                        SELECT e.EmployeeID, e.ManagerID, e.FirstName, eh.Level + 1
+                        FROM Employees e
+                        JOIN EmployeeHierarchy eh ON e.ManagerID = eh.EmployeeID
+                        )
+                        SELECT * FROM EmployeeHierarchy;
+                    </div>
+                </div>
+
+                <h3>CASE Statements</h3>
+                <div class="example">
+                    <div class="sql-code">
+                        -- Simple CASE
+                        SELECT
+                        ProductName,
+                        Price,
+                        CASE
+                        WHEN Price < 20 THEN 'Cheap' WHEN Price < 50 THEN 'Moderate' ELSE 'Expensive' END as
+                            PriceCategory FROM Products; -- CASE in WHERE clause SELECT * FROM Orders WHERE CASE WHEN
+                            YEAR(OrderDate)=2023 THEN ShipCountry='USA' ELSE ShipCountry IN ('UK', 'Germany' ) END;
+                            </div>
+                    </div>
+
+                    <h3>Subqueries</h3>
+                    <div class="example">
+                        <div class="sql-code">
+                            -- Scalar subquery
+                            SELECT CustomerName
+                            FROM Customers
+                            WHERE CustomerID = (
+                            SELECT CustomerID
+                            FROM Orders
+                            WHERE OrderID = 10248
+                            );
+
+                            -- EXISTS subquery
+                            SELECT CustomerName
+                            FROM Customers c
+                            WHERE EXISTS (
+                            SELECT 1
+                            FROM Orders o
+                            WHERE o.CustomerID = c.CustomerID
+                            );
+
+                            -- Correlated subquery
+                            SELECT CustomerName,
+                            (SELECT COUNT(*)
+                            FROM Orders o
+                            WHERE o.CustomerID = c.CustomerID) as OrderCount
+                            FROM Customers c;
+                        </div>
+                    </div>
+            </section>
+
+            <section class="section">
+                <h2>19. SQL Best Practices</h2>
+                <ul>
+                    <li><strong>Use meaningful names:</strong> Choose descriptive table and column names</li>
+                    <li><strong>Normalize your database:</strong> Avoid data redundancy</li>
+                    <li><strong>Use primary keys:</strong> Every table should have a primary key</li>
+                    <li><strong>Index appropriately:</strong> Create indexes on frequently queried columns</li>
+                    <li><strong>Use constraints:</strong> Enforce data integrity with constraints</li>
+                    <li><strong>Avoid SELECT *:</strong> Specify only needed columns</li>
+                    <li><strong>Use parameterized queries:</strong> Prevent SQL injection</li>
+                    <li><strong>Comment your code:</strong> Document complex queries</li>
+                    <li><strong>Test with small data first:</strong> Validate queries before running on large datasets
+                    </li>
+                    <li><strong>Regular backups:</strong> Always backup your database</li>
+                </ul>
+
+                <div class="example">
+                    <h4>Good vs Bad SQL Examples:</h4>
+                    <div class="sql-code">
+                        -- Bad: SELECT *
+                        SELECT * FROM Customers WHERE Country = 'Germany';
+
+                        -- Good: Specify columns
+                        SELECT CustomerName, City, Email
+                        FROM Customers
+                        WHERE Country = 'Germany';
+
+                        -- Bad: No indexes on WHERE clause columns
+                        -- CREATE TABLE without indexes on frequently searched columns
+
+                        -- Good: Create appropriate indexes
+                        CREATE INDEX idx_country ON Customers(Country);
+                        CREATE INDEX idx_order_date ON Orders(OrderDate);
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>20. Summary</h2>
+                <p>You've now learned the fundamentals of SQL and some advanced concepts. SQL is a powerful language for
+                    managing relational databases. Key takeaways:</p>
+
+                <ul>
+                    <li>Master the basic CRUD operations (CREATE, READ, UPDATE, DELETE)</li>
+                    <li>Understand how to filter and sort data effectively</li>
+                    <li>Learn to join tables to combine data from multiple sources</li>
+                    <li>Use aggregate functions and GROUP BY for data analysis</li>
+                    <li>Implement proper database design with constraints and indexes</li>
+                    <li>Utilize advanced features like views, stored procedures, and window functions</li>
+                    <li>Always follow best practices for security and performance</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Next Steps:</strong> Practice with real databases, learn specific database system features
+                    (MySQL, PostgreSQL, SQL Server), and explore database administration topics.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.overlay');
+            const content = document.getElementById('content');
+
+            sidebar.classList.toggle('active');
+            overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+        }
+
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            const offset = 80;
+            const elementPosition = element.offsetTop;
+            const offsetPosition = elementPosition - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+
+            // Update active navigation
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`a[href="#${sectionId}"]`).classList.add('active');
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Search functionality
+        function searchTopics(query) {
+            const navList = document.getElementById('nav-list');
+            const links = navList.querySelectorAll('li');
+
+            query = query.toLowerCase();
+
+            links.forEach(li => {
+                const link = li.querySelector('a');
+                const text = link.textContent.toLowerCase();
+
+                if (text.includes(query)) {
+                    li.style.display = 'block';
+                    if (query) {
+                        const regex = new RegExp(`(${query})`, 'gi');
+                        link.innerHTML = link.textContent.replace(regex, '<span class="highlight">$1</span>');
+                    } else {
+                        link.innerHTML = link.textContent;
+                    }
+                } else {
+                    li.style.display = 'none';
+                }
+            });
+        }
+
+        // Highlight current section while scrolling
+        window.addEventListener('scroll', function () {
+            const sections = document.querySelectorAll('.section[id]');
+            const navLinks = document.querySelectorAll('.sidebar a');
+
+            let current = '';
+            const scrollPos = window.pageYOffset + 100;
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('onclick').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(event.target) &&
+                !menuToggle.contains(event.target) &&
+                sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                document.querySelector('.overlay').style.display = 'none';
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set first link as active
+            document.querySelector('.sidebar a').classList.add('active');
+        });
+    </script>
+</body>
+
+</html>
