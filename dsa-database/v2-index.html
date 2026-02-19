@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Handbook - Interactive Database Learning Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-50);
+        }
+
+        /* Header & Navigation */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-200);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: white !important;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            transition: all 0.2s !important;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 72px;
+            padding: 80px 24px;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--gray-900) 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(to right, white, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--gray-400);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .code-window {
+            background: var(--gray-900);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-700);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .code-header {
+            background: var(--gray-800);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red {
+            background: var(--danger);
+        }
+
+        .code-dot.yellow {
+            background: var(--warning);
+        }
+
+        .code-dot.green {
+            background: var(--success);
+        }
+
+        .code-content {
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .code-keyword {
+            color: #c084fc;
+        }
+
+        .code-function {
+            color: #60a5fa;
+        }
+
+        .code-string {
+            color: #4ade80;
+        }
+
+        .code-comment {
+            color: #64748b;
+        }
+
+        /* Search Bar */
+        .search-section {
+            padding: 40px 24px;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px 16px 56px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 48px;
+            padding: 48px 24px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 96px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-right: 16px;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        .toc-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            padding-left: 12px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            margin-bottom: 4px;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+        }
+
+        .toc-link:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .toc-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 500;
+        }
+
+        .toc-section {
+            margin-top: 24px;
+        }
+
+        /* Content Area */
+        .content {
+            max-width: 800px;
+        }
+
+        .section {
+            margin-bottom: 64px;
+            scroll-margin-top: 96px;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .section-subtitle {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 40px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 32px 0 12px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--gray-600);
+            line-height: 1.7;
+        }
+
+        /* Cards */
+        .concept-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .concept-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .concept-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e293b;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .code-header-bar {
+            background: #0f172a;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .code-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #94a3b8;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+            color: white;
+        }
+
+        pre {
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--gray-100);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--primary);
+        }
+
+        .code-block code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: var(--gray-50);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        tr:hover {
+            background: var(--gray-50);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border-left: 4px solid;
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            background: white;
+        }
+
+        .info-box.tip {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+
+        .info-box.warning {
+            border-color: var(--warning);
+            background: #fffbeb;
+        }
+
+        .info-box.danger {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .info-box.info {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .info-box-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box.tip .info-box-title {
+            color: var(--success);
+        }
+
+        .info-box.warning .info-box-title {
+            color: var(--warning);
+        }
+
+        .info-box.danger .info-box-title {
+            color: var(--danger);
+        }
+
+        .info-box.info .info-box-title {
+            color: var(--primary);
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--gray-600);
+        }
+
+        /* Interactive Elements */
+        .try-it {
+            background: linear-gradient(135deg, var(--primary-light), #ede9fe);
+            border: 2px dashed var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .try-it h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .try-it p {
+            margin-bottom: 16px;
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 1001;
+            transition: width 0.1s;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 64px 24px 32px;
+            margin-top: 80px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+        }
+
+        .footer-desc {
+            color: var(--gray-400);
+            line-height: 1.6;
+        }
+
+        .footer-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 48px auto 0;
+            padding-top: 32px;
+            border-top: 1px solid var(--gray-800);
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+                position: fixed;
+                top: 72px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                z-index: 999;
+                height: calc(100vh - 72px);
+                padding: 24px;
+            }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-brand {
+                max-width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Syntax Highlighting Colors */
+        .syntax-keyword {
+            color: #c084fc;
+        }
+
+        .syntax-string {
+            color: #4ade80;
+        }
+
+        .syntax-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .syntax-function {
+            color: #60a5fa;
+        }
+
+        .syntax-number {
+            color: #fbbf24;
+        }
+
+        .syntax-operator {
+            color: #f472b6;
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">📊</div>
+                <span>SQL Handbook</span>
+            </a>
+
+            <nav>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#basics">Basics</a></li>
+                    <li><a href="#advanced">Advanced</a></li>
+                    <li><a href="#practice">Practice</a></li>
+                    <li><a href="https://dhruvil05.github.io/dsa-database/index.html" class="nav-cta">Main Site</a></li>
+                </ul>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Master SQL & Database Management</h1>
+                <p>Your comprehensive guide to SQL, from basic queries to advanced database optimization. Interactive,
+                    beginner-friendly, and completely free.</p>
+                <div class="hero-buttons">
+                    <a href="#introduction" class="btn btn-primary">
+                        <span>Start Learning</span>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                    <a href="#practice" class="btn btn-secondary">
+                        <span>Try Interactive Demo</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-dot red"></div>
+                        <div class="code-dot yellow"></div>
+                        <div class="code-dot green"></div>
+                        <span style="margin-left: 8px; color: #64748b; font-size: 0.875rem;">example.sql</span>
+                    </div>
+                    <div class="code-content">
+                        <div><span class="code-keyword">SELECT</span> <span class="code-string">name</span>, <span
+                                class="code-string">email</span></div>
+                        <div><span class="code-keyword">FROM</span> <span class="code-function">users</span></div>
+                        <div><span class="code-keyword">WHERE</span> <span class="code-string">status</span> = <span
+                                class="code-string">'active'</span></div>
+                        <div><span class="code-keyword">ORDER BY</span> <span class="code-string">created_at</span>
+                            <span class="code-keyword">DESC</span></div>
+                        <div><span class="code-keyword">LIMIT</span> <span class="code-function">10</span>;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="search-container">
+            <svg class="search-icon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" class="search-input" id="searchInput"
+                placeholder="Search topics, commands, or concepts...">
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="toc-title">On this page</div>
+            <ul class="toc-list">
+                <li class="toc-item"><a href="#introduction" class="toc-link">Introduction to Databases</a></li>
+                <li class="toc-item"><a href="#what-is-db" class="toc-link">What is a Database?</a></li>
+                <li class="toc-item"><a href="#why-databases" class="toc-link">Why Do We Need Databases?</a></li>
+                <li class="toc-item"><a href="#what-is-sql" class="toc-link">What is SQL?</a></li>
+                <li class="toc-item"><a href="#crud-operations" class="toc-link">CRUD Operations</a></li>
+                <li class="toc-item"><a href="#comparison" class="toc-link">SQL vs Excel</a></li>
+                <li class="toc-item"><a href="#types" class="toc-link">Relational vs Non-relational</a></li>
+
+                <li class="toc-section">
+                    <div class="toc-title">Getting Started</div>
+                </li>
+                <li class="toc-item"><a href="#dbms" class="toc-link">What is DBMS?</a></li>
+                <li class="toc-item"><a href="#mysql-intro" class="toc-link">Introduction to MySQL</a></li>
+                <li class="toc-item"><a href="#creating-db" class="toc-link">Creating Databases</a></li>
+                <li class="toc-item"><a href="#creating-tables" class="toc-link">Creating Tables</a></li>
+                <li class="toc-item"><a href="#data-types" class="toc-link">Data Types</a></li>
+                <li class="toc-item"><a href="#constraints" class="toc-link">Constraints</a></li>
+
+                <li class="toc-section">
+                    <div class="toc-title">Data Operations</div>
+                </li>
+                <li class="toc-item"><a href="#modifying-tables" class="toc-link">Modifying Tables</a></li>
+                <li class="toc-item"><a href="#inserting-data" class="toc-link">Inserting Data</a></li>
+                <li class="toc-item"><a href="#selecting-data" class="toc-link">Selecting Data</a></li>
+                <li class="toc-item"><a href="#updating-data" class="toc-link">Updating Data</a></li>
+                <li class="toc-item"><a href="#deleting-data" class="toc-link">Deleting Data</a></li>
+
+                <li class="toc-section">
+                    <div class="toc-title">Advanced Topics</div>
+                </li>
+                <li class="toc-item"><a href="#transactions" class="toc-link">Transactions</a></li>
+                <li class="toc-item"><a href="#joins" class="toc-link">Joins</a></li>
+                <li class="toc-item"><a href="#group-by" class="toc-link">GROUP BY</a></li>
+                <li class="toc-item"><a href="#subqueries" class="toc-link">Subqueries</a></li>
+                <li class="toc-item"><a href="#indexes" class="toc-link">Indexes</a></li>
+                <li class="toc-item"><a href="#views" class="toc-link">Views</a></li>
+                <li class="toc-item"><a href="#procedures" class="toc-link">Stored Procedures</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <!-- Introduction Section -->
+            <section class="section" id="introduction">
+                <div class="section-header">
+                    <h1 class="section-title">
+                        <div class="section-icon">📚</div>
+                        Introduction to Databases
+                    </h1>
+                    <p class="section-subtitle">Understanding the fundamentals of data storage and management</p>
+                </div>
+
+                <div class="concept-card" id="what-is-db">
+                    <h3>What is a Database?</h3>
+                    <p>A Database is an organized collection of structured information or data, typically stored
+                        electronically in a computer system. It's a way to store data in a format that is easily
+                        accessible, manageable, and updatable.</p>
+                    <p><strong>Real-world analogy:</strong> Think of a library where books are organized by topic,
+                        author, and title – that's essentially what a database does with data, but with much more
+                        powerful search and retrieval capabilities.</p>
+                </div>
+
+                <div id="why-databases">
+                    <h2>Why Do We Need Databases?</h2>
+                    <ul>
+                        <li>To store, manage, and retrieve large amounts of data efficiently</li>
+                        <li>To prevent data duplication and maintain data integrity</li>
+                        <li>To allow multiple users to access and manipulate data simultaneously</li>
+                        <li>To enforce data security and access control</li>
+                        <li>To maintain consistency across complex data relationships</li>
+                    </ul>
+                </div>
+
+                <div id="what-is-sql">
+                    <h2>What is SQL?</h2>
+                    <p>SQL (Structured Query Language) is the standard programming language used to communicate with and
+                        manipulate databases. It provides a standardized way to interact with relational databases
+                        regardless of the specific database system being used.</p>
+
+                    <div class="info-box info">
+                        <div class="info-box-title">💡 Did you know?</div>
+                        <p>SQL was developed at IBM in the 1970s and has become the standard language for relational
+                            database management systems (RDBMS).</p>
+                    </div>
+                </div>
+
+                <div id="crud-operations">
+                    <h2>Common Operations (CRUD)</h2>
+                    <p>CRUD represents the four basic operations you can perform on data:</p>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operation</th>
+                                    <th>SQL Command</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Create</strong></td>
+                                    <td><code>INSERT</code></td>
+                                    <td>Add new records to a table</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Read</strong></td>
+                                    <td><code>SELECT</code></td>
+                                    <td>Retrieve data from one or more tables</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Update</strong></td>
+                                    <td><code>UPDATE</code></td>
+                                    <td>Modify existing data in a table</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Delete</strong></td>
+                                    <td><code>DELETE</code></td>
+                                    <td>Remove records from a table</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="comparison">
+                    <h2>Comparison with Excel</h2>
+                    <p>While Excel is great for small datasets and quick analysis, databases offer significant
+                        advantages for larger applications:</p>
+
+                    <ul>
+                        <li>In Excel, a sheet is like a table in a database</li>
+                        <li>Each row in the sheet is similar to a record (or entry) in a database table</li>
+                        <li>Each column in Excel corresponds to a field (or attribute) in a table</li>
+                        <li>Excel stores all data in one file, whereas a database can contain multiple related tables
+                        </li>
+                        <li>In databases, you can define strict data types and rules, which Excel doesn't enforce</li>
+                        <li>Unlike Excel, databases allow complex querying, relationships between tables, and secure
+                            multi-user access</li>
+                    </ul>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Think of it this way</div>
+                        <p>A database is a more powerful, structured, and scalable version of Excel for data management.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="types">
+                    <h2>Relational vs Non-relational Databases</h2>
+                    <p>Understanding the difference between SQL (Relational) and NoSQL (Non-relational) databases is
+                        crucial for choosing the right tool for your project.</p>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Relational (SQL)</th>
+                                    <th>Non-relational (NoSQL)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Structure</td>
+                                    <td>Tables (rows & columns)</td>
+                                    <td>Documents, Key-Value, Graphs</td>
+                                </tr>
+                                <tr>
+                                    <td>Language</td>
+                                    <td>SQL</td>
+                                    <td>Varies (Mongo Query, etc.)</td>
+                                </tr>
+                                <tr>
+                                    <td>Schema</td>
+                                    <td>Fixed schema</td>
+                                    <td>Flexible schema</td>
+                                </tr>
+                                <tr>
+                                    <td>Examples</td>
+                                    <td>MySQL, PostgreSQL, Oracle</td>
+                                    <td>MongoDB, Firebase, Redis</td>
+                                </tr>
+                                <tr>
+                                    <td>Best For</td>
+                                    <td>Complex queries, ACID compliance</td>
+                                    <td>Big data, real-time applications</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Getting Started Section -->
+            <section class="section" id="basics">
+                <div class="section-header">
+                    <h1 class="section-title">
+                        <div class="section-icon">🚀</div>
+                        Getting Started with MySQL
+                    </h1>
+                    <p class="section-subtitle">Setting up your database environment</p>
+                </div>
+
+                <div id="dbms">
+                    <h2>What is DBMS?</h2>
+                    <p>A Database Management System (DBMS) is software that interacts with users, applications, and the
+                        database itself to capture and analyze data.</p>
+
+                    <ul>
+                        <li><strong>Examples:</strong> MySQL, PostgreSQL, Oracle Database, SQLite, Microsoft SQL Server
+                        </li>
+                        <li><strong>Functions:</strong> Data storage, retrieval, security, backup, and recovery</li>
+                        <li><strong>Interfaces:</strong> Command line, GUI tools, and API connections</li>
+                    </ul>
+                </div>
+
+                <div id="mysql-intro">
+                    <h2>What is MySQL?</h2>
+                    <p>MySQL is an open-source relational database management system (RDBMS) that uses SQL. It's one of
+                        the most popular database systems in the world.</p>
+
+                    <div class="concept-card">
+                        <h3>Key Features</h3>
+                        <ul>
+                            <li>Widely used in web development (LAMP stack: Linux, Apache, MySQL, PHP/Python/Perl)</li>
+                            <li>High performance and reliability</li>
+                            <li>Powers platforms like WordPress, Facebook (early architecture), and YouTube</li>
+                            <li>Strong community support and extensive documentation</li>
+                        </ul>
+                    </div>
+
+                    <h3>Real-World Use Cases</h3>
+                    <ul>
+                        <li><strong>E-commerce:</strong> Storing customer orders, product listings, and inventory</li>
+                        <li><strong>Banking:</strong> Handling transactions securely with ACID compliance</li>
+                        <li><strong>Social Networks:</strong> Managing user data, messages, and relationships</li>
+                        <li><strong>Content Management:</strong> WordPress, Drupal, and Joomla all use MySQL</li>
+                    </ul>
+                </div>
+
+                <div id="creating-db">
+                    <h2>Creating a Database</h2>
+                    <p>Let's start by creating your first database. Open your MySQL client and run the following
+                        commands:</p>
+
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-comment">-- Create a new database</span>
+<span class="syntax-keyword">CREATE DATABASE</span> database_name;
+
+<span class="syntax-comment">-- Example: Create a student database</span>
+<span class="syntax-keyword">CREATE DATABASE</span> student_db;</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Best Practices</div>
+                        <ul style="margin: 0;">
+                            <li>Database names should be unique within the server</li>
+                            <li>Avoid using spaces or special characters</li>
+                            <li>Use lowercase and underscores for better readability (e.g.,
+                                <code>employee_records</code>)</li>
+                            <li>Be descriptive but concise</li>
+                        </ul>
+                    </div>
+
+                    <h3>Viewing All Databases</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-comment">-- List all databases</span>
+<span class="syntax-keyword">SHOW DATABASES</span>;</code></pre>
+                    </div>
+
+                    <h3>Switching to a Database</h3>
+                    <p>Before working with tables, you must select the database:</p>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">USE</span> student_db;</code></pre>
+                    </div>
+
+                    <h3>Dropping a Database</h3>
+                    <div class="info-box danger">
+                        <div class="info-box-title">⚠️ Warning</div>
+                        <p>This action is irreversible! This will permanently delete all data and tables in the
+                            database.</p>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">DROP DATABASE</span> database_name;
+
+<span class="syntax-comment">-- Example</span>
+<span class="syntax-keyword">DROP DATABASE</span> student_db;</code></pre>
+                    </div>
+                </div>
+
+                <div id="creating-tables">
+                    <h2>Creating Tables</h2>
+                    <p>Tables are the foundation of relational databases. Each table consists of columns (fields) and
+                        rows (records).</p>
+
+                    <h3>Basic Syntax</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">CREATE TABLE</span> table_name (
+    column1 datatype constraints,
+    column2 datatype constraints,
+    ...
+);</code></pre>
+                    </div>
+
+                    <h3>Example: Creating a Students Table</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">CREATE TABLE</span> students (
+    id <span class="syntax-keyword">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    name <span class="syntax-keyword">VARCHAR</span>(<span class="syntax-number">100</span>) <span class="syntax-keyword">NOT NULL DEFAULT</span> <span class="syntax-string">'No Name'</span>,
+    age <span class="syntax-keyword">INT</span>,
+    email <span class="syntax-keyword">VARCHAR</span>(<span class="syntax-number">100</span>) <span class="syntax-keyword">UNIQUE</span>,
+    admission_date <span class="syntax-keyword">DATE</span>
+);</code></pre>
+                    </div>
+
+                    <div class="concept-card">
+                        <h4>Explanation:</h4>
+                        <ul>
+                            <li><code>id INT AUTO_INCREMENT PRIMARY KEY</code> – A unique identifier for each student
+                                that auto-increments</li>
+                            <li><code>name VARCHAR(100) NOT NULL</code> – Name must be provided (cannot be NULL)</li>
+                            <li><code>age INT</code> – Stores numeric values for age</li>
+                            <li><code>email VARCHAR(100) UNIQUE</code> – Each email must be different across all records
+                            </li>
+                            <li><code>admission_date DATE</code> – Stores the date of admission</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="data-types">
+                    <h2>Commonly Used Data Types</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data Type</th>
+                                    <th>Description</th>
+                                    <th>Example Usage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>INT</code></td>
+                                    <td>Whole numbers</td>
+                                    <td>age, quantity, id</td>
+                                </tr>
+                                <tr>
+                                    <td><code>VARCHAR(n)</code></td>
+                                    <td>Variable-length string (max n characters)</td>
+                                    <td>names, emails, addresses</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TEXT</code></td>
+                                    <td>Long text strings</td>
+                                    <td>descriptions, comments, articles</td>
+                                </tr>
+                                <tr>
+                                    <td><code>DATE</code></td>
+                                    <td>Date values (YYYY-MM-DD)</td>
+                                    <td>birth dates, appointment dates</td>
+                                </tr>
+                                <tr>
+                                    <td><code>DATETIME</code></td>
+                                    <td>Date and time values</td>
+                                    <td>timestamps, event logs</td>
+                                </tr>
+                                <tr>
+                                    <td><code>BOOLEAN</code></td>
+                                    <td>TRUE or FALSE</td>
+                                    <td>flags, status indicators</td>
+                                </tr>
+                                <tr>
+                                    <td><code>DECIMAL(p,s)</code></td>
+                                    <td>Exact precision numbers</td>
+                                    <td>prices, financial data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="constraints">
+                    <h2>SQL Constraints</h2>
+                    <p>Constraints are rules applied to table columns to enforce data integrity, consistency, and
+                        validity.</p>
+
+                    <h3>Why Use Constraints?</h3>
+                    <ul>
+                        <li>Ensure data quality and reliability</li>
+                        <li>Prevent invalid, duplicate, or null data</li>
+                        <li>Maintain business rules directly in the database layer</li>
+                        <li>Reduce application-side validation complexity</li>
+                    </ul>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Constraint</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>NOT NULL</code></td>
+                                    <td>Disallow null values</td>
+                                    <td><code>name VARCHAR(100) NOT NULL</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>UNIQUE</code></td>
+                                    <td>Disallow duplicate values</td>
+                                    <td><code>email VARCHAR(100) UNIQUE</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>DEFAULT</code></td>
+                                    <td>Set default value if none given</td>
+                                    <td><code>status VARCHAR(20) DEFAULT 'active'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>CHECK</code></td>
+                                    <td>Enforce value conditions</td>
+                                    <td><code>age INT CHECK (age >= 0)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>PRIMARY KEY</code></td>
+                                    <td>Uniquely identify each record</td>
+                                    <td><code>id INT PRIMARY KEY</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>FOREIGN KEY</code></td>
+                                    <td>Establish relationships between tables</td>
+                                    <td><code>FOREIGN KEY (dept_id) REFERENCES departments(id)</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Operations Section -->
+            <section class="section" id="advanced">
+                <div class="section-header">
+                    <h1 class="section-title">
+                        <div class="section-icon">⚡</div>
+                        Data Operations
+                    </h1>
+                    <p class="section-subtitle">Mastering CRUD operations and data manipulation</p>
+                </div>
+
+                <div id="modifying-tables">
+                    <h2>Modifying Tables</h2>
+                    <p>As your application evolves, you'll need to modify existing table structures. Use the
+                        <code>ALTER TABLE</code> command.</p>
+
+                    <h3>Renaming a Table</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">RENAME TABLE</span> old_table_name <span class="syntax-keyword">TO</span> new_table_name;</code></pre>
+                    </div>
+
+                    <h3>Adding a Column</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">ALTER TABLE</span> table_name
+<span class="syntax-keyword">ADD COLUMN</span> column_name datatype constraints;
+
+<span class="syntax-comment">-- Example</span>
+<span class="syntax-keyword">ALTER TABLE</span> students
+<span class="syntax-keyword">ADD COLUMN</span> gender <span class="syntax-keyword">VARCHAR</span>(<span class="syntax-number">10</span>);</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Tip</div>
+                        <p>Always review changes on production databases carefully. Use <code>DESCRIBE table_name</code>
+                            to verify structure before and after modifications.</p>
+                    </div>
+                </div>
+
+                <div id="inserting-data">
+                    <h2>Inserting Data</h2>
+
+                    <h3>Insert One Row</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">INSERT INTO</span> student (id, name, age, grade, date_of_birth)
+<span class="syntax-keyword">VALUES</span> (<span class="syntax-number">1</span>, <span class="syntax-string">'Ayesha Khan'</span>, <span class="syntax-number">16</span>, <span class="syntax-string">'10th'</span>, <span class="syntax-string">'2007-05-15'</span>);</code></pre>
+                    </div>
+
+                    <h3>Insert Multiple Rows at Once</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">INSERT INTO</span> student (id, name, age, grade) <span class="syntax-keyword">VALUES</span>
+(<span class="syntax-number">15</span>, <span class="syntax-string">'Ayesha Khan'</span>, <span class="syntax-number">16</span>, <span class="syntax-string">'10th'</span>),
+(<span class="syntax-number">25</span>, <span class="syntax-string">'Ravi Sharma'</span>, <span class="syntax-number">17</span>, <span class="syntax-string">'11th'</span>),
+(<span class="syntax-number">35</span>, <span class="syntax-string">'Meena Joshi'</span>, <span class="syntax-number">15</span>, <span class="syntax-string">'9th'</span>),
+(<span class="syntax-number">45</span>, <span class="syntax-string">'Arjun Verma'</span>, <span class="syntax-number">18</span>, <span class="syntax-string">'12th'</span>),
+(<span class="syntax-number">55</span>, <span class="syntax-string">'Sara Ali'</span>, <span class="syntax-number">16</span>, <span class="syntax-string">'10th'</span>);</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Performance Tip</div>
+                        <p>Inserting multiple rows at once is more efficient than inserting them one by one, as it
+                            reduces network round trips.</p>
+                    </div>
+                </div>
+
+                <div id="selecting-data">
+                    <h2>Selecting Data</h2>
+
+                    <h3>Basic SELECT Statement</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-comment">-- Select all columns</span>
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> student;
+
+<span class="syntax-comment">-- Select specific columns</span>
+<span class="syntax-keyword">SELECT</span> name, grade <span class="syntax-keyword">FROM</span> student;</code></pre>
+                    </div>
+
+                    <h3>Using WHERE Clause</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> student
+<span class="syntax-keyword">WHERE</span> grade = <span class="syntax-string">'10th'</span>;
+
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> student
+<span class="syntax-keyword">WHERE</span> age > <span class="syntax-number">16</span>;</code></pre>
+                    </div>
+
+                    <h3>Comparison Operators</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Operator</th>
+                                    <th>Description</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>=</code></td>
+                                    <td>Equals</td>
+                                    <td><code>WHERE age = 16</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>!=</code> or <code><></code></td>
+                                    <td>Not equal to</td>
+                                    <td><code>WHERE grade != '12th'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>></code></td>
+                                    <td>Greater than</td>
+                                    <td><code>WHERE age > 16</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code><</code></td>
+                                    <td>Less than</td>
+                                    <td><code>WHERE age < 17</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>>=</code></td>
+                                    <td>Greater than or equal</td>
+                                    <td><code>WHERE age >= 16</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code><=</code></td>
+                                    <td>Less than or equal</td>
+                                    <td><code>WHERE age <= 18</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>BETWEEN</code></td>
+                                    <td>Within a range (inclusive)</td>
+                                    <td><code>WHERE age BETWEEN 15 AND 17</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>IN</code></td>
+                                    <td>Matches any in a list</td>
+                                    <td><code>WHERE grade IN ('10th', '12th')</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>LIKE</code></td>
+                                    <td>Pattern matching</td>
+                                    <td><code>WHERE name LIKE 'A%'</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Common Mistake</div>
+                        <p><code>WHERE grade = NULL</code> will NOT work! Use <code>IS NULL</code> or
+                            <code>IS NOT NULL</code> instead.</p>
+                    </div>
+
+                    <h3>Sorting Results</h3>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-comment">-- Ascending order (default)</span>
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> student
+<span class="syntax-keyword">ORDER BY</span> age <span class="syntax-keyword">ASC</span>;
+
+<span class="syntax-comment">-- Descending order</span>
+<span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span> student
+<span class="syntax-keyword">ORDER BY</span> name <span class="syntax-keyword">DESC</span>;</code></pre>
+                    </div>
+                </div>
+
+                <div id="updating-data">
+                    <h2>Updating Data</h2>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-comment">-- Update a single row</span>
+<span class="syntax-keyword">UPDATE</span> student
+<span class="syntax-keyword">SET</span> grade = <span class="syntax-string">'12th'</span>
+<span class="syntax-keyword">WHERE</span> id = <span class="syntax-number">2</span>;
+
+<span class="syntax-comment">-- Update multiple columns</span>
+<span class="syntax-keyword">UPDATE</span> student
+<span class="syntax-keyword">SET</span> age = <span class="syntax-number">17</span>, grade = <span class="syntax-string">'10th'</span>
+<span class="syntax-keyword">WHERE</span> id = <span class="syntax-number">3</span>;</code></pre>
+                    </div>
+
+                    <div class="info-box danger">
+                        <div class="info-box-title">⚠️ Warning</div>
+                        <p>If you omit the WHERE clause, all rows in the table will be updated! Always double-check your
+                            WHERE conditions.</p>
+                    </div>
+                </div>
+
+                <div id="deleting-data">
+                    <h2>Deleting Data</h2>
+                    <div class="code-block">
+                        <div class="code-header-bar">
+                            <span class="code-label">SQL</span>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre><code><span class="syntax-comment">-- Delete specific rows</span>
+<span class="syntax-keyword">DELETE FROM</span> student
+<span class="syntax-keyword">WHERE</span> id = <span class="syntax-number">2</span>;
+
+<span class="syntax-comment">-- Delete based on conditions</span>
+<span class="syntax-keyword">DELETE FROM</span> student
+<span class="syntax-keyword">WHERE</span> grade = <span class="syntax-string">'9th'</span>;</code></pre>
+                    </div>
+
+                    <div class="info-box danger">
+                        <div class="info-box-title">⚠️ Important</div>
+                        <p>If you omit the WHERE clause, all rows in the table will be deleted permanently!</p>
+                    </div>
+
+                    <h3>DELETE vs DROP vs TRUNCATE</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Command</th>
+                                    <th>What it does</th>
+                                    <th>Can rollback?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>DELETE</code></td>
+                                    <td>Removes specific rows (or all if no WHERE)</td>
+                                    <td>Yes (if in transaction)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>TRUNCATE</code></td>
+                                    <td>Removes all rows, resets auto-increment</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td><code>DROP TABLE</code></td>
+                                    <td>Removes table structure and data</td>
+                                    <td>No</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Advanced Topics -->
+            <section class="section" id="transactions">
+                <div class="section-header">
+                    <h1 class="section-title">
+                        <div class="section-icon">🔒</div>
+                        Transactions & Advanced Topics
+                    </h1>
+                    <p class="section-subtitle">Ensuring data integrity and complex operations</p>
+                </div>
+
+                <h2>Transactions: ACID Properties</h2>
+                <p>A transaction is a sequence of one or more SQL statements executed as a single unit. Transactions
+                    ensure data integrity through ACID properties:</p>
+
+                <div class="concept-card">
+                    <ul>
+                        <li><strong>Atomicity:</strong> All operations complete successfully or none do (all-or-nothing)
+                        </li>
+                        <li><strong>Consistency:</strong> Database remains in a valid state before and after transaction
+                        </li>
+                        <li><strong>Isolation:</strong> Concurrent transactions do not interfere with each other</li>
+                        <li><strong>Durability:</strong> Committed changes persist even after system failure</li>
+                    </ul>
+                </div>
+
+                <h3>Using Transactions</h3>
+                <div class="code-block">
+                    <div class="code-header-bar">
+                        <span class="code-label">SQL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code><span class="syntax-keyword">START TRANSACTION</span>;
+
+<span class="syntax-comment">-- Transfer $100 from account 1 to account 2</span>
+<span class="syntax-keyword">UPDATE</span> accounts <span class="syntax-keyword">SET</span> balance = balance - <span class="syntax-number">100</span> <span class="syntax-keyword">WHERE</span> id = <span class="syntax-number">1</span>;
+<span class="syntax-keyword">UPDATE</span> accounts <span class="syntax-keyword">SET</span> balance = balance + <span class="syntax-number">100</span> <span class="syntax-keyword">WHERE</span> id = <span class="syntax-number">2</span>;
+
+<span class="syntax-comment">-- If both succeed, commit the changes</span>
+<span class="syntax-keyword">COMMIT</span>;
+
+<span class="syntax-comment">-- If something goes wrong, rollback</span>
+<span class="syntax-comment">-- ROLLBACK;</span></code></pre>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Best Practices</div>
+                    <ul style="margin: 0;">
+                        <li>Always use transactions when performing multiple related operations</li>
+                        <li>Keep transactions as short as possible to avoid locking issues</li>
+                        <li>Test your transactions thoroughly before running on production data</li>
+                        <li>Use appropriate isolation levels based on your consistency requirements</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section" id="joins">
+                <h2>MySQL Joins</h2>
+                <p>Joins are used to combine data from multiple tables based on a related column.</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Join Type</th>
+                                <th>Description</th>
+                                <th>Use When</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>INNER JOIN</code></td>
+                                <td>Returns only matching rows from both tables</td>
+                                <td>You only want data that exists in both tables</td>
+                            </tr>
+                            <tr>
+                                <td><code>LEFT JOIN</code></td>
+                                <td>Returns all rows from left table, matched rows from right</td>
+                                <td>You want all records from main table, even without matches</td>
+                            </tr>
+                            <tr>
+                                <td><code>RIGHT JOIN</code></td>
+                                <td>Returns all rows from right table, matched rows from left</td>
+                                <td>Rarely used; usually just switch table order</td>
+                            </tr>
+                            <tr>
+                                <td><code>CROSS JOIN</code></td>
+                                <td>Returns all combinations of rows from both tables</td>
+                                <td>You need a Cartesian product</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header-bar">
+                        <span class="code-label">SQL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code><span class="syntax-comment">-- INNER JOIN example</span>
+<span class="syntax-keyword">SELECT</span> students.name, marks.subject, marks.score
+<span class="syntax-keyword">FROM</span> students
+<span class="syntax-keyword">INNER JOIN</span> marks <span class="syntax-keyword">ON</span> students.id = marks.student_id;
+
+<span class="syntax-comment">-- LEFT JOIN example</span>
+<span class="syntax-keyword">SELECT</span> students.name, marks.subject, marks.score
+<span class="syntax-keyword">FROM</span> students
+<span class="syntax-keyword">LEFT JOIN</span> marks <span class="syntax-keyword">ON</span> students.id = marks.student_id;</code></pre>
+                </div>
+            </section>
+
+            <section class="section" id="group-by">
+                <h2>GROUP BY & Aggregation</h2>
+                <p>The GROUP BY clause groups rows that have the same values in specified columns, typically used with
+                    aggregate functions.</p>
+
+                <div class="code-block">
+                    <div class="code-header-bar">
+                        <span class="code-label">SQL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code><span class="syntax-comment">-- Count employees per department</span>
+<span class="syntax-keyword">SELECT</span> department, <span class="syntax-function">COUNT</span>(*) <span class="syntax-keyword">AS</span> total_employees
+<span class="syntax-keyword">FROM</span> employees
+<span class="syntax-keyword">GROUP BY</span> department;
+
+<span class="syntax-comment">-- HAVING filters groups (like WHERE filters rows)</span>
+<span class="syntax-keyword">SELECT</span> department, <span class="syntax-function">AVG</span>(salary) <span class="syntax-keyword">AS</span> avg_salary
+<span class="syntax-keyword">FROM</span> employees
+<span class="syntax-keyword">GROUP BY</span> department
+<span class="syntax-keyword">HAVING</span> <span class="syntax-function">AVG</span>(salary) > <span class="syntax-number">50000</span>;</code></pre>
+                </div>
+            </section>
+
+            <section class="section" id="indexes">
+                <h2>MySQL Indexes</h2>
+                <p>An index is a data structure that improves the speed of data retrieval operations on a database
+                    table.</p>
+
+                <div class="concept-card">
+                    <h4>When to Use Indexes:</h4>
+                    <ul>
+                        <li>Columns frequently used in WHERE, JOIN, or ORDER BY clauses</li>
+                        <li>Searching by unique fields like email or username</li>
+                        <li>Large tables where scan performance matters</li>
+                    </ul>
+
+                    <h4>When NOT to Use Indexes:</h4>
+                    <ul>
+                        <li>Small tables (MySQL can scan quickly anyway)</li>
+                        <li>Columns that are rarely queried</li>
+                        <li>Tables with frequent INSERT/UPDATE operations (indexes slow down writes)</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header-bar">
+                        <span class="code-label">SQL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code><span class="syntax-comment">-- Create an index</span>
+<span class="syntax-keyword">CREATE INDEX</span> idx_email <span class="syntax-keyword">ON</span> users(email);
+
+<span class="syntax-comment">-- Create a composite index</span>
+<span class="syntax-keyword">CREATE INDEX</span> idx_name_city <span class="syntax-keyword">ON</span> users(name, city);
+
+<span class="syntax-comment">-- View indexes on a table</span>
+<span class="syntax-keyword">SHOW INDEX FROM</span> users;</code></pre>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Warning</div>
+                    <p>Overusing indexes or indexing the wrong columns can hurt performance. Use them wisely based on
+                        query patterns.</p>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="try-it" id="practice">
+                <h4>Ready to Practice?</h4>
+                <p>Try running these queries in your local MySQL environment or use an online SQL playground like DB
+                    Fiddle or SQLFiddle.</p>
+                <a href="https://www.db-fiddle.com/" target="_blank" class="btn btn-primary" style="margin-top: 8px;">
+                    Open Online SQL Editor
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" />
+                    </svg>
+                </a>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-icon">📊</div>
+                    <span>SQL Handbook</span>
+                </div>
+                <p class="footer-desc">A comprehensive, interactive guide to learning SQL and database management. Free,
+                    open-source, and always up-to-date.</p>
+            </div>
+
+            <div>
+                <h4 class="footer-title">Learn</h4>
+                <ul class="footer-links">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#basics">Basics</a></li>
+                    <li><a href="#advanced">Advanced Topics</a></li>
+                    <li><a href="#practice">Practice</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-title">Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="https://dev.mysql.com/doc/" target="_blank">MySQL Docs</a></li>
+                    <li><a href="https://www.w3schools.com/sql/" target="_blank">W3Schools SQL</a></li>
+                    <li><a href="https://sqlbolt.com/" target="_blank">SQLBolt</a></li>
+                    <li><a href="https://leetcode.com/problemset/database/" target="_blank">LeetCode SQL</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-title">Connect</h4>
+                <ul class="footer-links">
+                    <li><a href="https://github.com/dhruvil05" target="_blank">GitHub</a></li>
+                    <li><a href="#" target="_blank">Twitter</a></li>
+                    <li><a href="#" target="_blank">LinkedIn</a></li>
+                    <li><a href="mailto:contact@example.com">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 SQL Handbook. Built for learners, by learners. Open source under MIT License.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Copy code functionality
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block').querySelector('code');
+            const text = codeBlock.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6 9 17l-5-5"/>
+                    </svg>
+                    Copied!
+                `;
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+
+            // Header shadow on scroll
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Active section highlighting in sidebar
+        const sections = document.querySelectorAll('.section');
+        const tocLinks = document.querySelectorAll('.toc-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        tocLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const content = document.querySelectorAll('.section, .concept-card, .code-block');
+
+            content.forEach(element => {
+                const text = element.innerText.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    element.style.opacity = '1';
+                    element.style.display = 'block';
+                } else {
+                    if (searchTerm.length > 0) {
+                        element.style.opacity = '0.3';
+                    } else {
+                        element.style.opacity = '1';
+                    }
+                }
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
