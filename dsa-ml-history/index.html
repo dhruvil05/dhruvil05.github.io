@@ -1,27 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Learning Explained</title>
+    <title>Machine Learning | Natural Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0f;
-            --surface: rgba(255, 255, 255, 0.03);
-            --surface-hover: rgba(255, 255, 255, 0.06);
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.6);
-            --accent-1: #6366f1; /* Indigo */
-            --accent-2: #06b6d4; /* Cyan */
-            --accent-3: #f59e0b; /* Amber */
-            --accent-4: #10b981; /* Emerald */
-            --glow-1: rgba(99, 102, 241, 0.5);
-            --glow-2: rgba(6, 182, 212, 0.5);
-            --glow-3: rgba(245, 158, 11, 0.5);
+            --forest-dark: #1a2f1a;
+            --forest-mid: #2d4a2d;
+            --forest-light: #4a6b4a;
+            --moss: #6b8e6b;
+            --sage: #9db89d;
+            --leaf: #b8d4b8;
+            --fern: #d4e8d4;
+            --cream: #f5f7f5;
+            --bark: #3d2914;
+            --earth: #5c4033;
+            --sunlight: #f4e4bc;
+            --water: #a8c8ec;
+            --accent-grow: #22c55e;
+            --accent-branch: #84cc16;
         }
 
         * {
@@ -31,15 +35,15 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+            font-family: 'Outfit', sans-serif;
+            background: var(--cream);
+            color: var(--forest-dark);
+            line-height: 1.7;
             overflow-x: hidden;
         }
 
-        /* Animated Background Grid */
-        .bg-grid {
+        /* Organic Background Shapes */
+        .organic-bg {
             position: fixed;
             top: 0;
             left: 0;
@@ -48,35 +52,74 @@
             pointer-events: none;
             z-index: -1;
             opacity: 0.4;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: gridMove 20s linear infinite;
         }
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(60px, 60px); }
+        .blob-shape {
+            position: absolute;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            filter: blur(60px);
+            animation: morph 15s ease-in-out infinite;
         }
 
-        /* Floating Orbs */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--sage);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--leaf);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--fern);
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
             opacity: 0.3;
+        }
+
+        @keyframes morph {
+
+            0%,
+            100% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+
+            25% {
+                border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+            }
+
+            50% {
+                border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
+            }
+
+            75% {
+                border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%;
+            }
+        }
+
+        /* Leaf Pattern Overlay */
+        .leaf-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             z-index: -1;
-        }
-
-        .orb-1 { width: 400px; height: 400px; background: var(--accent-1); top: -100px; left: -100px; animation: float 8s ease-in-out infinite; }
-        .orb-2 { width: 300px; height: 300px; background: var(--accent-2); bottom: -50px; right: -50px; animation: float 10s ease-in-out infinite reverse; }
-        .orb-3 { width: 250px; height: 250px; background: var(--accent-3); top: 50%; left: 50%; animation: float 12s ease-in-out infinite; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, -30px); }
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 Q40 20 30 35 Q20 20 30 5' fill='none' stroke='%231a2f1a' stroke-width='1'/%3E%3C/svg%3E");
         }
 
         /* Navigation */
@@ -85,9 +128,9 @@
             top: 0;
             width: 100%;
             padding: 20px 40px;
-            background: rgba(10, 10, 15, 0.8);
+            background: rgba(245, 247, 245, 0.9);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--sage);
             z-index: 1000;
             display: flex;
             justify-content: space-between;
@@ -95,12 +138,18 @@
         }
 
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            color: var(--forest-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: '🌿';
+            font-size: 1.8rem;
         }
 
         .nav-links {
@@ -110,27 +159,29 @@
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--forest-mid);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
+            padding: 5px 0;
         }
 
         .nav-links a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            background: var(--accent-grow);
             transition: width 0.3s ease;
+            border-radius: 2px;
         }
 
         .nav-links a:hover {
-            color: var(--text);
+            color: var(--forest-dark);
         }
 
         .nav-links a:hover::after {
@@ -139,7 +190,7 @@
 
         /* Main Container */
         main {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 120px 40px 40px;
         }
@@ -152,62 +203,118 @@
         }
 
         .hero h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            font-weight: 700;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 600;
+            line-height: 1.2;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--forest-dark);
+        }
+
+        .hero h1 span {
+            font-style: italic;
+            color: var(--forest-light);
         }
 
         .hero p {
             font-size: 1.25rem;
-            color: var(--text-secondary);
+            color: var(--forest-mid);
             max-width: 600px;
             margin: 0 auto 40px;
         }
 
-        .hero-visual {
+        /* Growing Tree Animation */
+        .tree-visual {
             width: 100%;
-            max-width: 800px;
+            max-width: 600px;
             margin: 60px auto;
-            height: 300px;
+            height: 350px;
             position: relative;
         }
 
-        /* Animated Network Graph */
-        .network-svg {
+        .tree-svg {
             width: 100%;
             height: 100%;
+            overflow: visible;
         }
 
-        .node {
-            fill: var(--surface);
-            stroke: var(--accent-1);
-            stroke-width: 2;
-            animation: pulse 2s ease-in-out infinite;
+        .trunk {
+            fill: none;
+            stroke: var(--bark);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: growTrunk 2s ease forwards;
         }
 
-        .node:nth-child(2) { animation-delay: 0.5s; stroke: var(--accent-2); }
-        .node:nth-child(3) { animation-delay: 1s; stroke: var(--accent-3); }
-        .node:nth-child(4) { animation-delay: 1.5s; stroke: var(--accent-4); }
-
-        @keyframes pulse {
-            0%, 100% { r: 20; opacity: 0.6; }
-            50% { r: 25; opacity: 1; }
+        .branch {
+            fill: none;
+            stroke: var(--earth);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 150;
+            stroke-dashoffset: 150;
+            animation: growBranch 1.5s ease forwards;
+            animation-delay: 1.5s;
         }
 
-        .connection {
-            stroke: var(--border);
-            stroke-width: 1;
-            stroke-dasharray: 5,5;
-            animation: dash 20s linear infinite;
+        .leaf-node {
+            fill: var(--accent-grow);
+            opacity: 0;
+            animation: popLeaf 0.5s ease forwards;
         }
 
-        @keyframes dash {
-            to { stroke-dashoffset: -100; }
+        .leaf-node:nth-child(3) {
+            animation-delay: 2.5s;
+        }
+
+        .leaf-node:nth-child(4) {
+            animation-delay: 2.7s;
+        }
+
+        .leaf-node:nth-child(5) {
+            animation-delay: 2.9s;
+        }
+
+        .leaf-node:nth-child(6) {
+            animation-delay: 3.1s;
+        }
+
+        .leaf-node:nth-child(7) {
+            animation-delay: 3.3s;
+        }
+
+        .leaf-node:nth-child(8) {
+            animation-delay: 3.5s;
+        }
+
+        @keyframes growTrunk {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes growBranch {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes popLeaf {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* Section Styling */
@@ -218,10 +325,21 @@
             animation: fadeInUp 0.8s ease forwards;
         }
 
-        section:nth-child(2) { animation-delay: 0.1s; }
-        section:nth-child(3) { animation-delay: 0.2s; }
-        section:nth-child(4) { animation-delay: 0.3s; }
-        section:nth-child(5) { animation-delay: 0.4s; }
+        section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        section:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        section:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        section:nth-child(5) {
+            animation-delay: 0.4s;
+        }
 
         @keyframes fadeInUp {
             to {
@@ -237,55 +355,69 @@
             margin-bottom: 30px;
         }
 
-        .section-number {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--accent-1);
-            border: 1px solid var(--accent-1);
-            padding: 5px 12px;
-            border-radius: 20px;
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--leaf);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         h2 {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
+            font-weight: 600;
+            color: var(--forest-dark);
         }
 
         h3 {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
             font-weight: 600;
             margin: 30px 0 15px;
-            color: var(--text);
+            color: var(--forest-mid);
         }
 
         p {
-            color: var(--text-secondary);
+            color: var(--forest-mid);
             font-size: 1.1rem;
             line-height: 1.8;
             margin-bottom: 20px;
         }
 
-        /* Cards */
+        /* Organic Cards */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin: 40px 0;
         }
 
         .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
+            background: white;
+            border-radius: 30px 30px 30px 5px;
             padding: 30px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(26, 47, 26, 0.08);
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--fern);
         }
 
         .card::before {
@@ -293,66 +425,68 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.1) 0%, transparent 50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .card:hover::before {
-            opacity: 1;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-grow), var(--accent-branch));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: translateY(-5px) rotate(1deg);
+            box-shadow: 0 12px 40px rgba(26, 47, 26, 0.12);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
         }
 
         .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 60px;
+            height: 60px;
+            background: var(--fern);
+            border-radius: 20px 20px 20px 5px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            transition: transform 0.3s ease;
         }
 
-        .card-indigo { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); }
-        .card-cyan { background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); }
-        .card-amber { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .card:hover .card-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
 
         .card h4 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
             margin-bottom: 10px;
+            color: var(--forest-dark);
         }
 
         .card p {
             font-size: 0.95rem;
             margin: 0;
+            color: var(--forest-mid);
         }
 
-        /* Timeline */
+        /* Timeline - Growing Vine */
         .timeline {
             position: relative;
-            padding-left: 30px;
+            padding-left: 40px;
             margin: 40px 0;
         }
 
         .timeline::before {
             content: '';
             position: absolute;
-            left: 0;
+            left: 15px;
             top: 0;
             bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, var(--accent-1), var(--accent-2), var(--accent-3));
+            width: 3px;
+            background: linear-gradient(to bottom, var(--accent-grow), var(--sage), var(--earth));
+            border-radius: 3px;
         }
 
         .timeline-item {
@@ -364,41 +498,57 @@
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -36px;
+            left: -33px;
             top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--bg);
-            border: 2px solid var(--accent-1);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid var(--accent-grow);
+            border-radius: 50% 50% 50% 5px;
+            transform: rotate(-45deg);
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
         }
 
         .timeline-item:hover::before {
-            transform: scale(1.2);
-            box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.3);
+            transform: rotate(-45deg) scale(1.2);
+            background: var(--accent-grow);
         }
 
         .timeline-year {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.875rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--accent-1);
+            color: var(--accent-grow);
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-year::before {
+            content: '🌱';
         }
 
         .timeline-content {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            background: white;
+            border-radius: 20px 20px 20px 5px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(26, 47, 26, 0.06);
+            border: 1px solid var(--fern);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 30px rgba(26, 47, 26, 0.1);
         }
 
         .timeline-content h4 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
             margin-bottom: 8px;
+            color: var(--forest-dark);
         }
 
         .timeline-content p {
@@ -408,58 +558,91 @@
 
         /* Visual Explanations */
         .visual-explanation {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            background: white;
+            border-radius: 40px 40px 40px 10px;
             padding: 40px;
             margin: 40px 0;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(26, 47, 26, 0.08);
+            border: 1px solid var(--fern);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-explanation::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: var(--fern);
+            border-radius: 50%;
+            opacity: 0.3;
         }
 
         .visual-svg {
             width: 100%;
-            max-width: 400px;
-            height: 200px;
+            max-width: 500px;
+            height: 220px;
             margin: 0 auto;
         }
 
         /* Interactive Demo */
         .demo-container {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            background: white;
+            border-radius: 30px 30px 30px 10px;
             padding: 40px;
             margin: 40px 0;
+            box-shadow: 0 4px 20px rgba(26, 47, 26, 0.08);
+            border: 1px solid var(--fern);
         }
 
         .demo-tabs {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--fern);
             padding-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .demo-tab {
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 25px;
             border: none;
-            background: transparent;
-            color: var(--text-secondary);
+            background: var(--cream);
+            color: var(--forest-mid);
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-weight: 500;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-tab::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--accent-grow);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+            opacity: 0.1;
+        }
+
+        .demo-tab:hover::before {
+            width: 100px;
+            height: 100px;
         }
 
         .demo-tab.active {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--accent-1);
-        }
-
-        .demo-tab:hover {
-            color: var(--text);
-            background: var(--surface-hover);
+            background: var(--accent-grow);
+            color: white;
         }
 
         .demo-content {
@@ -468,126 +651,202 @@
 
         .demo-content.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: growIn 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes growIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         /* Comparison Table */
         .comparison-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0;
+            border-spacing: 0 10px;
             margin: 30px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border);
         }
 
         .comparison-table th,
         .comparison-table td {
             padding: 20px;
             text-align: left;
-            border-bottom: 1px solid var(--border);
         }
 
         .comparison-table th {
-            background: rgba(255,255,255,0.03);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
+            background: var(--forest-dark);
+            color: var(--cream);
+            font-weight: 500;
         }
 
-        .comparison-table tr:hover td {
-            background: var(--surface-hover);
+        .comparison-table th:first-child {
+            border-radius: 15px 0 0 15px;
+        }
+
+        .comparison-table th:last-child {
+            border-radius: 0 15px 15px 0;
         }
 
         .comparison-table td {
-            color: var(--text-secondary);
+            background: white;
+            border-top: 1px solid var(--fern);
+            border-bottom: 1px solid var(--fern);
             transition: all 0.3s ease;
+        }
+
+        .comparison-table td:first-child {
+            border-left: 1px solid var(--fern);
+            border-radius: 15px 0 0 15px;
+        }
+
+        .comparison-table td:last-child {
+            border-right: 1px solid var(--fern);
+            border-radius: 0 15px 15px 0;
+        }
+
+        .comparison-table tr:hover td {
+            background: var(--cream);
+            transform: scale(1.02);
         }
 
         .tag {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 6px 16px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
         }
 
-        .tag-indigo { background: rgba(99, 102, 241, 0.1); color: var(--accent-1); }
-        .tag-cyan { background: rgba(6, 182, 212, 0.1); color: var(--accent-2); }
-        .tag-amber { background: rgba(245, 158, 11, 0.1); color: var(--accent-3); }
+        .tag-grow {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-grow);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .tag-water {
+            background: rgba(168, 200, 236, 0.3);
+            color: #2563eb;
+            border: 1px solid rgba(168, 200, 236, 0.5);
+        }
+
+        .tag-sun {
+            background: rgba(244, 228, 188, 0.5);
+            color: #b45309;
+            border: 1px solid rgba(244, 228, 188, 0.8);
+        }
 
         /* Quiz */
         .quiz-item {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            background: white;
+            border-radius: 20px 20px 20px 5px;
+            padding: 25px;
             margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
+            border: 1px solid var(--fern);
             position: relative;
             overflow: hidden;
+        }
+
+        .quiz-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-grow);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .quiz-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(26, 47, 26, 0.1);
+        }
+
+        .quiz-item:hover::before {
+            transform: scaleY(1);
         }
 
         .quiz-item::after {
             content: '→';
             position: absolute;
-            right: 20px;
+            right: 25px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
+            color: var(--sage);
             transition: all 0.3s ease;
         }
 
-        .quiz-item:hover {
-            border-color: rgba(255,255,255,0.2);
-            padding-right: 40px;
-        }
-
         .quiz-item:hover::after {
-            right: 15px;
-            color: var(--accent-1);
+            right: 20px;
+            color: var(--accent-grow);
         }
 
         .quiz-answer {
             display: none;
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid var(--border);
-            color: var(--accent-1);
+            border-top: 1px dashed var(--fern);
+            color: var(--accent-grow);
             font-weight: 600;
         }
 
         .quiz-item.active .quiz-answer {
             display: block;
-            animation: slideDown 0.3s ease;
+            animation: unfold 0.4s ease;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes unfold {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Footer */
         footer {
             text-align: center;
             padding: 60px 40px;
-            border-top: 1px solid var(--border);
             margin-top: 100px;
+            background: var(--forest-dark);
+            color: var(--cream);
+            border-radius: 50px 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: var(--moss);
+            border-radius: 50%;
+            opacity: 0.2;
         }
 
         footer p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--sage);
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         /* Responsive */
@@ -616,74 +875,143 @@
                 grid-template-columns: 1fr;
             }
 
-            .demo-tabs {
-                flex-wrap: wrap;
+            .visual-explanation,
+            .demo-container {
+                padding: 25px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 15px;
+                font-size: 0.9rem;
             }
         }
 
-        /* Scroll Progress */
-        .progress-bar {
+        /* Scroll Progress - Vine Growing */
+        .progress-vine {
             position: fixed;
             top: 0;
             left: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-grow), var(--accent-branch));
             z-index: 1001;
             transition: width 0.1s;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Floating Leaves Decoration */
+        .floating-leaf {
+            position: fixed;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.2;
+            animation: floatLeaf 15s ease-in-out infinite;
+        }
+
+        .floating-leaf:nth-child(1) {
+            top: 20%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-leaf:nth-child(2) {
+            top: 60%;
+            right: 5%;
+            animation-delay: -5s;
+        }
+
+        .floating-leaf:nth-child(3) {
+            top: 80%;
+            left: 10%;
+            animation-delay: -10s;
+        }
+
+        @keyframes floatLeaf {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(20px, -30px) rotate(90deg);
+            }
+
+            50% {
+                transform: translate(-10px, -60px) rotate(180deg);
+            }
+
+            75% {
+                transform: translate(30px, -30px) rotate(270deg);
+            }
         }
     </style>
-<base target="_blank">
+    <base target="_blank">
 </head>
+
 <body>
-    <div class="progress-bar" id="progressBar"></div>
-    <div class="bg-grid"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+    <div class="progress-vine" id="progressBar"></div>
+    <div class="organic-bg">
+        <div class="blob-shape blob-1"></div>
+        <div class="blob-shape blob-2"></div>
+        <div class="blob-shape blob-3"></div>
+    </div>
+    <div class="leaf-pattern"></div>
+    <div class="floating-leaf">🍃</div>
+    <div class="floating-leaf">🌿</div>
+    <div class="floating-leaf">🌱</div>
 
     <nav>
-        <div class="logo">ML Explained</div>
+        <div class="logo">Natural Intelligence</div>
         <ul class="nav-links">
-            <li><a href="#history">History</a></li>
-            <li><a href="#supervised">Supervised</a></li>
-            <li><a href="#unsupervised">Unsupervised</a></li>
-            <li><a href="#reinforcement">Reinforcement</a></li>
-            <li><a href="#compare">Compare</a></li>
+            <li><a href="#history">Roots</a></li>
+            <li><a href="#supervised">Growth</a></li>
+            <li><a href="#unsupervised">Discovery</a></li>
+            <li><a href="#reinforcement">Adaptation</a></li>
+            <li><a href="#compare">Ecosystem</a></li>
+            <li><a href="https://dhruvil05.github.io/dsa-ml-history/v1-index.html">v1</a></li>
         </ul>
     </nav>
 
     <main>
         <!-- Hero Section -->
         <section class="hero">
-            <h1>Machine Learning<br>Visualized</h1>
-            <p>Understanding how machines learn, through interactive visualizations and clear explanations.</p>
-            
-            <div class="hero-visual">
-                <svg class="network-svg" viewBox="0 0 800 300">
-                    <!-- Connections -->
-                    <line class="connection" x1="100" y1="150" x2="250" y2="100" />
-                    <line class="connection" x1="100" y1="150" x2="250" y2="150" />
-                    <line class="connection" x1="100" y1="150" x2="250" y2="200" />
-                    <line class="connection" x1="250" y1="100" x2="400" y2="150" />
-                    <line class="connection" x1="250" y1="150" x2="400" y2="150" />
-                    <line class="connection" x1="250" y1="200" x2="400" y2="150" />
-                    <line class="connection" x1="400" y1="150" x2="550" y2="100" />
-                    <line class="connection" x1="400" y1="150" x2="550" y2="150" />
-                    <line class="connection" x1="400" y1="150" x2="550" y2="200" />
-                    <line class="connection" x1="550" y1="100" x2="700" y2="150" />
-                    <line class="connection" x1="550" y1="150" x2="700" y2="150" />
-                    <line class="connection" x1="550" y1="200" x2="700" y2="150" />
-                    
-                    <!-- Nodes -->
-                    <circle class="node" cx="100" cy="150" r="20" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="2" />
-                    <circle class="node" cx="250" cy="100" r="20" fill="rgba(6,182,212,0.2)" stroke="#06b6d4" stroke-width="2" />
-                    <circle class="node" cx="250" cy="150" r="20" fill="rgba(6,182,212,0.2)" stroke="#06b6d4" stroke-width="2" />
-                    <circle class="node" cx="250" cy="200" r="20" fill="rgba(6,182,212,0.2)" stroke="#06b6d4" stroke-width="2" />
-                    <circle class="node" cx="400" cy="150" r="25" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" />
-                    <circle class="node" cx="550" cy="100" r="20" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2" />
-                    <circle class="node" cx="550" cy="150" r="20" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2" />
-                    <circle class="node" cx="550" cy="200" r="20" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2" />
-                    <circle class="node" cx="700" cy="150" r="20" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" stroke-width="2" />
+            <h1>Machine Learning as <span>Natural Growth</span></h1>
+            <p>Understanding artificial intelligence through the patterns of nature—how algorithms learn and evolve like
+                living systems.</p>
+
+            <div class="tree-visual">
+                <svg class="tree-svg" viewBox="0 0 600 350">
+                    <!-- Roots -->
+                    <path class="trunk" d="M300 350 Q300 300 300 250" />
+                    <path class="branch" d="M300 350 Q280 320 260 300" />
+                    <path class="branch" d="M300 350 Q320 320 340 300" />
+
+                    <!-- Trunk -->
+                    <path class="trunk" d="M300 250 Q300 200 300 150" />
+
+                    <!-- Branches -->
+                    <path class="branch" d="M300 200 Q250 180 200 160" />
+                    <path class="branch" d="M300 200 Q350 180 400 160" />
+                    <path class="branch" d="M300 150 Q240 130 180 110" />
+                    <path class="branch" d="M300 150 Q360 130 420 110" />
+                    <path class="branch" d="M300 150 Q300 100 300 80" />
+
+                    <!-- Leaves -->
+                    <circle class="leaf-node" cx="200" cy="160" r="12" />
+                    <circle class="leaf-node" cx="400" cy="160" r="12" />
+                    <circle class="leaf-node" cx="180" cy="110" r="10" />
+                    <circle class="leaf-node" cx="420" cy="110" r="10" />
+                    <circle class="leaf-node" cx="300" cy="80" r="14" />
+                    <circle class="leaf-node" cx="260" cy="300" r="8" />
+                    <circle class="leaf-node" cx="340" cy="300" r="8" />
+
+                    <!-- Data flowing -->
+                    <circle cx="300" cy="350" r="4" fill="#22c55e" opacity="0.6">
+                        <animate attributeName="cy" from="350" to="80" dur="3s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite" />
+                    </circle>
                 </svg>
             </div>
         </section>
@@ -691,64 +1019,73 @@
         <!-- History Section -->
         <section id="history">
             <div class="section-header">
-                <span class="section-number">01</span>
-                <h2>The Journey</h2>
+                <div class="section-icon">🌱</div>
+                <h2>The Roots of Intelligence</h2>
             </div>
-            <p>From theoretical concepts to practical intelligence—the evolution of machine learning.</p>
+            <p>From theoretical seeds to flourishing algorithms—the evolution of machine learning mirrors natural
+                growth.</p>
 
             <div class="timeline">
                 <div class="timeline-item">
                     <div class="timeline-year">1936</div>
                     <div class="timeline-content">
-                        <h4>The Turing Machine</h4>
-                        <p>Alan Turing conceptualizes a hypothetical machine that could simulate any algorithm, laying the foundation for computational thinking.</p>
+                        <h4>The Seed of Computation</h4>
+                        <p>Alan Turing plants the first seed—a theoretical machine that could simulate any algorithm,
+                            establishing the roots of computational thinking.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-year">1950</div>
                     <div class="timeline-content">
-                        <h4>The Turing Test</h4>
-                        <p>"Can machines think?" Turing proposes that if a machine can convince a human it's human during conversation, it possesses intelligence.</p>
+                        <h4>The First Sprout</h4>
+                        <p>The Turing Test emerges—asking if machines can think. Like a seedling breaking through soil,
+                            AI enters collective consciousness.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-year">1957</div>
                     <div class="timeline-content">
-                        <h4>The Perceptron</h4>
-                        <p>Frank Rosenblatt creates the first algorithm that learns from data—a machine that improves itself based on experience.</p>
+                        <h4>Learning to Grow</h4>
+                        <p>The Perceptron—Frank Rosenblatt's creation that learns from data. The first algorithm to
+                            adapt and improve, like a plant turning toward light.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-year">1986</div>
                     <div class="timeline-content">
-                        <h4>Neural Networks Revival</h4>
-                        <p>Researchers revive neural networks. This time, they recognize handwriting and predict trends. The machines learn for real.</p>
+                        <h4>Neural Networks Bloom</h4>
+                        <p>After a winter of discontent, neural networks flower again. Pattern recognition
+                            emerges—handwriting, trends, predictions.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-year">1997</div>
                     <div class="timeline-content">
-                        <h4>Deep Blue</h4>
-                        <p>IBM's Deep Blue defeats world chess champion Garry Kasparov. The question shifts from "Can machines think?" to "What will they do next?"</p>
+                        <h4>Deep Blue Fruits</h4>
+                        <p>IBM's Deep Blue defeats Kasparov. The tree bears fruit—machine learning proves itself in the
+                            wild.</p>
                     </div>
                 </div>
             </div>
 
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon card-indigo">📊</div>
-                    <h4>Supervised Learning</h4>
-                    <p>Learning with a teacher—using labeled examples to make predictions.</p>
+                    <div class="card-icon">🌾</div>
+                    <h4>Supervised Growth</h4>
+                    <p>Like a gardener tending crops with guides and labels—learning from examples with known outcomes.
+                    </p>
                 </div>
                 <div class="card">
-                    <div class="card-icon card-cyan">🔍</div>
-                    <h4>Unsupervised Learning</h4>
-                    <p>Finding hidden patterns without guidance—discovering structure in chaos.</p>
+                    <div class="card-icon">🍄</div>
+                    <h4>Unsupervised Discovery</h4>
+                    <p>Fungi exploring forest floors without maps—finding patterns and clusters in the dark earth of
+                        unlabeled data.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon card-amber">🎮</div>
-                    <h4>Reinforcement Learning</h4>
-                    <p>Learning through trial and error—optimizing actions for rewards.</p>
+                    <div class="card-icon">🌳</div>
+                    <h4>Reinforcement Adaptation</h4>
+                    <p>Trees growing toward sunlight through trial and error—optimizing actions through environmental
+                        feedback.</p>
                 </div>
             </div>
         </section>
@@ -756,100 +1093,120 @@
         <!-- Supervised Learning -->
         <section id="supervised">
             <div class="section-header">
-                <span class="section-number">02</span>
-                <h2>Supervised Learning</h2>
+                <div class="section-icon">🌾</div>
+                <h2>Cultivated Growth</h2>
             </div>
-            <p>Like a student with flashcards—learning from examples with known answers.</p>
+            <p>Like agriculture—planting with intention, nurturing with knowledge, harvesting predictable results.</p>
 
             <div class="visual-explanation">
-                <svg class="visual-svg" viewBox="0 0 400 200">
-                    <!-- Input -->
-                    <rect x="20" y="70" width="80" height="60" rx="8" fill="rgba(99,102,241,0.1)" stroke="#6366f1" stroke-width="2"/>
-                    <text x="60" y="105" text-anchor="middle" fill="#fff" font-size="12">Input</text>
-                    <text x="60" y="120" text-anchor="middle" fill="#6366f1" font-size="10">🐱 Image</text>
-                    
+                <svg class="visual-svg" viewBox="0 0 500 220">
+                    <!-- Garden bed -->
+                    <rect x="50" y="150" width="400" height="60" rx="10" fill="#e8f5e9" stroke="#4a6b4a"
+                        stroke-width="2" />
+
+                    <!-- Seed/Input -->
+                    <circle cx="100" cy="120" r="15" fill="#6b8e6b" />
+                    <text x="100" y="125" text-anchor="middle" fill="white" font-size="10">In</text>
+
+                    <!-- Stem/Process -->
+                    <path d="M100 135 Q100 170 100 180" stroke="#22c55e" stroke-width="3" fill="none" />
+                    <path d="M100 150 Q120 160 140 150" stroke="#22c55e" stroke-width="2" fill="none" />
+
+                    <!-- Label sign -->
+                    <rect x="130" y="100" width="60" height="30" rx="5" fill="#f4e4bc" stroke="#b45309"
+                        stroke-width="1" />
+                    <text x="160" y="120" text-anchor="middle" fill="#b45309" font-size="11">Label</text>
+
                     <!-- Arrow -->
-                    <path d="M 110 100 L 140 100" stroke="rgba(255,255,255,0.3)" stroke-width="2" marker-end="url(#arrowhead)"/>
-                    
-                    <!-- Model -->
-                    <rect x="150" y="50" width="100" height="100" rx="12" fill="rgba(6,182,212,0.1)" stroke="#06b6d4" stroke-width="2"/>
-                    <text x="200" y="105" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Model</text>
-                    
-                    <!-- Arrow -->
-                    <path d="M 260 100 L 290 100" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-                    
-                    <!-- Output -->
-                    <rect x="300" y="70" width="80" height="60" rx="8" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="2"/>
-                    <text x="340" y="105" text-anchor="middle" fill="#fff" font-size="12">Output</text>
-                    <text x="340" y="120" text-anchor="middle" fill="#10b981" font-size="10">"Cat" ✅</text>
-                    
-                    <!-- Label -->
-                    <rect x="150" y="170" width="100" height="30" rx="6" fill="rgba(245,158,11,0.1)" stroke="#f59e0b" stroke-width="1"/>
-                    <text x="200" y="190" text-anchor="middle" fill="#f59e0b" font-size="11">Label: "Cat"</text>
-                    
-                    <!-- Connection -->
-                    <line x1="200" y1="150" x2="200" y2="170" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4"/>
+                    <path d="M160 130 L160 145" stroke="#b45309" stroke-width="1" stroke-dasharray="3" />
+
+                    <!-- Plant/Model -->
+                    <g transform="translate(250, 100)">
+                        <path d="M0 80 Q0 40 0 20" stroke="#22c55e" stroke-width="4" fill="none" />
+                        <ellipse cx="-15" cy="40" rx="12" ry="8" fill="#84cc16" transform="rotate(-30)" />
+                        <ellipse cx="15" cy="50" rx="12" ry="8" fill="#84cc16" transform="rotate(30)" />
+                        <ellipse cx="0" cy="20" rx="8" ry="12" fill="#22c55e" />
+                    </g>
+
+                    <!-- Flower/Output -->
+                    <g transform="translate(400, 90)">
+                        <circle cx="0" cy="0" r="20" fill="#f472b6" opacity="0.8" />
+                        <circle cx="0" cy="0" r="8" fill="#fde047" />
+                        <text x="0" y="45" text-anchor="middle" fill="#22c55e" font-size="12"
+                            font-weight="600">Result</text>
+                    </g>
+
+                    <!-- Connection lines -->
+                    <path d="M115 120 Q180 120 235 120" stroke="#6b8e6b" stroke-width="2" stroke-dasharray="5,3"
+                        marker-end="url(#arrowhead)" />
+                    <path d="M265 120 Q330 120 380 100" stroke="#6b8e6b" stroke-width="2" stroke-dasharray="5,3"
+                        marker-end="url(#arrowhead)" />
+
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#6b8e6b" />
+                        </marker>
+                    </defs>
                 </svg>
-                <p style="margin-top: 20px; font-size: 0.9rem;">The model learns from input-label pairs, then predicts labels for new inputs.</p>
+                <p style="margin-top: 20px; font-size: 0.95rem; color: var(--forest-mid);">Input + Label → Model learns
+                    → Predicts output for new inputs</p>
             </div>
 
             <div class="demo-container">
                 <div class="demo-tabs">
-                    <button class="demo-tab active" onclick="showDemo('spam')">Spam Filter</button>
-                    <button class="demo-tab" onclick="showDemo('price')">Price Prediction</button>
-                    <button class="demo-tab" onclick="showDemo('medical')">Medical Diagnosis</button>
+                    <button class="demo-tab active" onclick="showDemo('crop')">Crop Selection</button>
+                    <button class="demo-tab" onclick="showDemo('weather')">Weather Prediction</button>
+                    <button class="demo-tab" onclick="showDemo('soil')">Soil Analysis</button>
                 </div>
-                
-                <div id="spam" class="demo-content active">
-                    <h4>Email Classification</h4>
-                    <p>100 emails labeled as "spam" or "not spam". The model learns patterns:</p>
-                    <ul style="margin: 20px 0; padding-left: 20px; color: var(--text-secondary);">
-                        <li>Spam often says "Congratulations!"</li>
-                        <li>Excessive exclamation marks!!!</li>
-                        <li>Requests for money or personal info</li>
+
+                <div id="crop" class="demo-content active">
+                    <h4>🌽 Crop Classification</h4>
+                    <p>1000 images of plants labeled by species:</p>
+                    <ul style="margin: 20px 0; padding-left: 20px; color: var(--forest-mid);">
+                        <li>Corn has broad leaves, grows vertically</li>
+                        <li>Wheat has narrow blades, golden when ripe</li>
+                        <li>Soybeans have three leaflets per leaf</li>
                     </ul>
-                    <p>New emails are automatically classified based on learned patterns.</p>
+                    <p>New images automatically identified based on learned patterns—like an experienced farmer
+                        recognizing crops at a glance.</p>
                 </div>
-                
-                <div id="price" class="demo-content">
-                    <h4>House Price Prediction</h4>
-                    <p>Historical data with features and prices:</p>
-                    <ul style="margin: 20px 0; padding-left: 20px; color: var(--text-secondary);">
-                        <li>Square footage → Price</li>
-                        <li>Location → Price</li>
-                        <li>Bedrooms → Price</li>
+
+                <div id="weather" class="demo-content">
+                    <h4>🌦️ Harvest Forecasting</h4>
+                    <p>Historical weather data with outcomes:</p>
+                    <ul style="margin: 20px 0; padding-left: 20px; color: var(--forest-mid);">
+                        <li>Temperature + Humidity → Rain probability</li>
+                        <li>Pressure trends → Storm approaching</li>
+                        <li>Seasonal patterns → Optimal planting time</li>
                     </ul>
-                    <p>Predicts prices for new houses based on learned relationships.</p>
+                    <p>Predicts ideal conditions for sowing and harvesting, protecting yields from unexpected weather.
+                    </p>
                 </div>
-                
-                <div id="medical" class="demo-content">
-                    <h4>X-Ray Analysis</h4>
-                    <p>Doctors label X-rays as "healthy" or "diseased":</p>
-                    <ul style="margin: 20px 0; padding-left: 20px; color: var(--text-secondary);">
-                        <li>Pattern recognition in images</li>
-                        <li>Anomaly detection</li>
-                        <li>Assisting diagnosis</li>
+
+                <div id="soil" class="demo-content">
+                    <h4>🧪 Nutrient Deficiency Detection</h4>
+                    <p>Leaf images labeled with deficiencies:</p>
+                    <ul style="margin: 20px 0; padding-left: 20px; color: var(--forest-mid);">
+                        <li>Yellowing between veins → Iron deficiency</li>
+                        <li>Purple edges → Phosphorus lack</li>
+                        <li>Brown spots → Fungal infection</li>
                     </ul>
-                    <p>Helps identify potential issues in new scans.</p>
+                    <p>Diagnoses plant health from visual symptoms, recommending precise treatments.</p>
                 </div>
             </div>
 
             <div class="card-grid">
                 <div class="card">
                     <h4>Linear Regression</h4>
-                    <p>Predicts continuous numbers (prices, temperatures)</p>
-                </div>
-                <div class="card">
-                    <h4>Logistic Regression</h4>
-                    <p>Classifies into categories (yes/no, spam/ham)</p>
+                    <p>Predicting continuous growth—yield estimates based on rainfall and sunlight.</p>
                 </div>
                 <div class="card">
                     <h4>Decision Trees</h4>
-                    <p>Flowchart-like decisions based on features</p>
+                    <p>Branching choices like a field guide—if-then logic for classification.</p>
                 </div>
                 <div class="card">
                     <h4>Neural Networks</h4>
-                    <p>Complex pattern recognition in images, text, audio</p>
+                    <p>Root systems of interconnected neurons—complex pattern recognition.</p>
                 </div>
             </div>
         </section>
@@ -857,74 +1214,99 @@
         <!-- Unsupervised Learning -->
         <section id="unsupervised">
             <div class="section-header">
-                <span class="section-number">03</span>
-                <h2>Unsupervised Learning</h2>
+                <div class="section-icon">🍄</div>
+                <h2>Wild Discovery</h2>
             </div>
-            <p>Like exploring a new city without a map—finding structure without guidance.</p>
+            <p>Like foraging in unknown forests—finding patterns without maps, discovering clusters in the wilderness of
+                data.</p>
 
             <div class="visual-explanation">
-                <svg class="visual-svg" viewBox="0 0 400 200">
-                    <!-- Scattered points -->
-                    <circle cx="80" cy="60" r="6" fill="#6366f1" opacity="0.6"/>
-                    <circle cx="95" cy="55" r="6" fill="#6366f1" opacity="0.6"/>
-                    <circle cx="85" cy="75" r="6" fill="#6366f1" opacity="0.6"/>
-                    <circle cx="100" cy="70" r="6" fill="#6366f1" opacity="0.6"/>
-                    
-                    <circle cx="200" cy="80" r="6" fill="#06b6d4" opacity="0.6"/>
-                    <circle cx="220" cy="85" r="6" fill="#06b6d4" opacity="0.6"/>
-                    <circle cx="210" cy="95" r="6" fill="#06b6d4" opacity="0.6"/>
-                    <circle cx="230" cy="90" r="6" fill="#06b6d4" opacity="0.6"/>
-                    
-                    <circle cx="320" cy="140" r="6" fill="#f59e0b" opacity="0.6"/>
-                    <circle cx="340" cy="135" r="6" fill="#f59e0b" opacity="0.6"/>
-                    <circle cx="330" cy="155" r="6" fill="#f59e0b" opacity="0.6"/>
-                    <circle cx="350" cy="150" r="6" fill="#f59e0b" opacity="0.6"/>
-                    
-                    <!-- Clusters -->
-                    <ellipse cx="90" cy="65" rx="35" ry="30" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="5,5" opacity="0.5"/>
-                    <ellipse cx="215" cy="88" rx="40" ry="30" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="5,5" opacity="0.5"/>
-                    <ellipse cx="335" cy="145" rx="40" ry="30" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5" opacity="0.5"/>
-                    
+                <svg class="visual-svg" viewBox="0 0 500 220">
+                    <!-- Forest floor -->
+                    <ellipse cx="250" cy="200" rx="220" ry="40" fill="#d4e8d4" opacity="0.5" />
+
+                    <!-- Scattered mushrooms/data points -->
+                    <g opacity="0.6">
+                        <circle cx="100" cy="150" r="8" fill="#8b5cf6" />
+                        <circle cx="120" cy="140" r="7" fill="#8b5cf6" />
+                        <circle cx="95" cy="130" r="9" fill="#8b5cf6" />
+                        <circle cx="115" cy="160" r="6" fill="#8b5cf6" />
+                    </g>
+
+                    <g opacity="0.6">
+                        <circle cx="250" cy="120" r="8" fill="#06b6d4" />
+                        <circle cx="270" cy="110" r="7" fill="#06b6d4" />
+                        <circle cx="240" cy="100" r="9" fill="#06b6d4" />
+                        <circle cx="260" cy="130" r="6" fill="#06b6d4" />
+                    </g>
+
+                    <g opacity="0.6">
+                        <circle cx="400" cy="160" r="8" fill="#f59e0b" />
+                        <circle cx="420" cy="150" r="7" fill="#f59e0b" />
+                        <circle cx="390" cy="140" r="9" fill="#f59e0b" />
+                        <circle cx="410" cy="170" r="6" fill="#f59e0b" />
+                    </g>
+
+                    <!-- Cluster rings -->
+                    <ellipse cx="108" cy="145" rx="45" ry="35" fill="none" stroke="#8b5cf6" stroke-width="2"
+                        stroke-dasharray="5,5" opacity="0.6" />
+                    <ellipse cx="255" cy="115" rx="45" ry="35" fill="none" stroke="#06b6d4" stroke-width="2"
+                        stroke-dasharray="5,5" opacity="0.6" />
+                    <ellipse cx="405" cy="155" rx="45" ry="35" fill="none" stroke="#f59e0b" stroke-width="2"
+                        stroke-dasharray="5,5" opacity="0.6" />
+
                     <!-- Labels -->
-                    <text x="90" y="35" text-anchor="middle" fill="#6366f1" font-size="12">Cluster A</text>
-                    <text x="215" y="58" text-anchor="middle" fill="#06b6d4" font-size="12">Cluster B</text>
-                    <text x="335" y="115" text-anchor="middle" fill="#f59e0b" font-size="12">Cluster C</text>
+                    <text x="108" y="80" text-anchor="middle" fill="#8b5cf6" font-size="12" font-weight="600">Cluster
+                        A</text>
+                    <text x="255" y="50" text-anchor="middle" fill="#06b6d4" font-size="12" font-weight="600">Cluster
+                        B</text>
+                    <text x="405" y="90" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="600">Cluster
+                        C</text>
+
+                    <!-- Forager -->
+                    <circle cx="60" cy="180" r="15" fill="#fcd34d" />
+                    <text x="60" y="185" text-anchor="middle" font-size="12">🧑‍🌾</text>
                 </svg>
-                <p style="margin-top: 20px; font-size: 0.9rem;">The algorithm discovers natural groupings in unlabeled data.</p>
+                <p style="margin-top: 20px; font-size: 0.95rem; color: var(--forest-mid);">The algorithm discovers
+                    natural groupings without prior knowledge—like a forager identifying mushroom species by
+                    observation.</p>
             </div>
 
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon card-indigo">👥</div>
+                    <div class="card-icon">🐝</div>
                     <h4>Customer Segmentation</h4>
-                    <p>Groups customers by behavior: bargain hunters, big spenders, window shoppers.</p>
+                    <p>Like bees identifying flower types—grouping customers by behavior: browsers, buyers, bargain
+                        hunters.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon card-cyan">🔎</div>
+                    <div class="card-icon">🦋</div>
                     <h4>Anomaly Detection</h4>
-                    <p>Finds outliers—fraudulent transactions or equipment failures.</p>
+                    <p>Spotting the invasive species—fraudulent transactions, equipment failures, outliers in the
+                        ecosystem.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon card-amber">🧬</div>
+                    <div class="card-icon">🕸️</div>
                     <h4>Dimensionality Reduction</h4>
-                    <p>Compresses complex data into simpler forms while preserving patterns.</p>
+                    <p>Simplifying complex webs—compressing data while preserving essential patterns like a spider's
+                        efficient silk.</p>
                 </div>
             </div>
 
             <div class="demo-container">
-                <h4 style="margin-bottom: 20px;">Common Algorithms</h4>
+                <h4 style="margin-bottom: 20px; color: var(--forest-mid);">Forest Ecosystem Algorithms</h4>
                 <div class="card-grid" style="margin: 0;">
                     <div class="card" style="margin: 0;">
                         <h4>K-Means Clustering</h4>
-                        <p>Groups data into K clusters based on similarity.</p>
+                        <p>Dividing the forest into clearings—grouping by similarity.</p>
                     </div>
                     <div class="card" style="margin: 0;">
                         <h4>Hierarchical Clustering</h4>
-                        <p>Builds a tree of clusters—like a family tree of data.</p>
+                        <p>Family trees of species—nested relationships from kingdom to genus.</p>
                     </div>
                     <div class="card" style="margin: 0;">
                         <h4>PCA</h4>
-                        <p>Reduces dimensions while keeping important information.</p>
+                        <p>Finding the main trail through dense undergrowth—reducing complexity.</p>
                     </div>
                 </div>
             </div>
@@ -933,93 +1315,109 @@
         <!-- Reinforcement Learning -->
         <section id="reinforcement">
             <div class="section-header">
-                <span class="section-number">04</span>
-                <h2>Reinforcement Learning</h2>
+                <div class="section-icon">🌳</div>
+                <h2>Adaptive Evolution</h2>
             </div>
-            <p>Like training a pet with treats—learning through trial, error, and rewards.</p>
+            <p>Like trees growing toward sunlight—learning through environmental feedback, optimizing for survival and
+                reward.</p>
 
             <div class="visual-explanation">
-                <svg class="visual-svg" viewBox="0 0 400 200">
-                    <!-- Agent -->
-                    <rect x="30" y="80" width="60" height="40" rx="8" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="2"/>
-                    <text x="60" y="105" text-anchor="middle" fill="#fff" font-size="12">Agent</text>
-                    
+                <svg class="visual-svg" viewBox="0 0 500 220">
+                    <!-- Sun/Reward -->
+                    <circle cx="400" cy="50" r="30" fill="#fde047" opacity="0.8" />
+                    <circle cx="400" cy="50" r="20" fill="#fbbf24" />
+                    <text x="400" y="100" text-anchor="middle" fill="#b45309" font-size="12"
+                        font-weight="600">Reward</text>
+
+                    <!-- Tree/Agent -->
+                    <g transform="translate(150, 120)">
+                        <!-- Trunk -->
+                        <path d="M0 80 Q0 40 0 20" stroke="#8b4513" stroke-width="8" fill="none" />
+                        <!-- Branches reaching -->
+                        <path d="M0 50 Q20 30 40 20" stroke="#8b4513" stroke-width="4" fill="none" />
+                        <path d="M0 40 Q-15 25 -30 15" stroke="#8b4513" stroke-width="3" fill="none" />
+                        <!-- Leaves seeking sun -->
+                        <ellipse cx="40" cy="20" rx="12" ry="8" fill="#22c55e" transform="rotate(-20)" />
+                        <ellipse cx="-30" cy="15" rx="10" ry="7" fill="#84cc16" transform="rotate(20)" />
+                        <ellipse cx="0" cy="20" rx="8" ry="10" fill="#22c55e" />
+                    </g>
+
                     <!-- Environment -->
-                    <rect x="150" y="40" width="200" height="120" rx="12" fill="rgba(6,182,212,0.05)" stroke="#06b6d4" stroke-width="2" stroke-dasharray="5,5"/>
-                    <text x="250" y="65" text-anchor="middle" fill="#06b6d4" font-size="14" font-weight="600">Environment</text>
-                    
-                    <!-- Action arrow -->
-                    <path d="M 95 100 L 140 100" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowhead)"/>
-                    <text x="115" y="95" text-anchor="middle" fill="#6366f1" font-size="10">Action</text>
-                    
-                    <!-- State -->
-                    <circle cx="180" cy="100" r="15" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2"/>
-                    <text x="180" y="105" text-anchor="middle" fill="#f59e0b" font-size="10">S</text>
-                    
-                    <!-- Reward arrow -->
-                    <path d="M 200 130 Q 150 150 95 120" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
-                    <text x="150" y="155" text-anchor="middle" fill="#10b981" font-size="10">Reward/Penalty</text>
-                    
-                    <!-- Goal -->
-                    <rect x="300" y="85" width="30" height="30" rx="4" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2"/>
-                    <text x="315" y="105" text-anchor="middle" fill="#10b981" font-size="12">Goal</text>
-                    
-                    <!-- Path -->
-                    <path d="M 195 100 L 280 100" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
-                    
-                    <!-- Markers -->
+                    <rect x="50" y="150" width="400" height="60" rx="10" fill="#e8f5e9" stroke="#4a6b4a"
+                        stroke-width="1" opacity="0.3" />
+
+                    <!-- Action arrows -->
+                    <path d="M190 100 Q250 70 370 60" stroke="#22c55e" stroke-width="2" fill="none"
+                        stroke-dasharray="5,3" marker-end="url(#arrowhead)" />
+                    <text x="280" y="75" text-anchor="middle" fill="#22c55e" font-size="11">Action: Grow toward
+                        light</text>
+
+                    <!-- Feedback loop -->
+                    <path d="M370 80 Q300 120 200 130" stroke="#f59e0b" stroke-width="2" fill="none"
+                        stroke-dasharray="3,3" marker-end="url(#arrowhead2)" />
+                    <text x="290" y="115" text-anchor="middle" fill="#f59e0b" font-size="11">Feedback: More
+                        energy!</text>
+
                     <defs>
                         <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                            <polygon points="0 0, 10 3, 0 6" fill="#6366f1"/>
+                            <polygon points="0 0, 10 3, 0 6" fill="#22c55e" />
                         </marker>
                         <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                            <polygon points="0 0, 10 3, 0 6" fill="#10b981"/>
+                            <polygon points="0 0, 10 3, 0 6" fill="#f59e0b" />
                         </marker>
                     </defs>
                 </svg>
-                <p style="margin-top: 20px; font-size: 0.9rem;">The agent takes actions, receives rewards/penalties, and learns optimal strategies.</p>
+                <p style="margin-top: 20px; font-size: 0.95rem; color: var(--forest-mid);">Agent takes actions →
+                    Environment responds with rewards/penalties → Policy adapts to maximize future rewards</p>
             </div>
 
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon card-indigo">🚗</div>
-                    <h4>Self-Driving Cars</h4>
-                    <p>Learn safe driving through millions of simulated scenarios.</p>
+                    <div class="card-icon">🚗</div>
+                    <h4>Autonomous Navigation</h4>
+                    <p>Self-driving cars learning safe paths through millions of simulated journeys—like animals
+                        learning territory.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon card-cyan">♟️</div>
-                    <h4>Game AI</h4>
-                    <p>AlphaGo defeated the world champion by playing millions of games against itself.</p>
+                    <div class="card-icon">🎮</div>
+                    <h4>Game Mastery</h4>
+                    <p>AlphaGo defeated champions by playing millions of games against itself—evolution through
+                        competition.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon card-amber">🤖</div>
+                    <div class="card-icon">🦿</div>
                     <h4>Robotics</h4>
-                    <p>Teach robots to walk, grasp objects, or navigate terrain.</p>
+                    <p>Robots learning to walk, grasp, adapt—each stumble teaches, each success reinforces.</p>
                 </div>
             </div>
 
             <div class="demo-container">
-                <h4 style="margin-bottom: 20px;">Key Concepts</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
-                    <div style="text-align: center; padding: 20px; background: rgba(99,102,241,0.05); border-radius: 12px; border: 1px solid rgba(99,102,241,0.2);">
-                        <div style="font-size: 2rem; margin-bottom: 10px;">🎯</div>
-                        <strong style="color: var(--accent-1); display: block; margin-bottom: 5px;">Agent</strong>
-                        <span style="font-size: 0.9rem; color: var(--text-secondary);">The learner</span>
+                <h4 style="margin-bottom: 20px; color: var(--forest-mid);">Ecosystem Components</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px;">
+                    <div
+                        style="text-align: center; padding: 20px; background: rgba(34, 197, 94, 0.1); border-radius: 20px; border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🌱</div>
+                        <strong style="color: var(--accent-grow); display: block; margin-bottom: 5px;">Agent</strong>
+                        <span style="font-size: 0.85rem; color: var(--forest-mid);">The organism learning</span>
                     </div>
-                    <div style="text-align: center; padding: 20px; background: rgba(6,182,212,0.05); border-radius: 12px; border: 1px solid rgba(6,182,212,0.2);">
+                    <div
+                        style="text-align: center; padding: 20px; background: rgba(132, 204, 22, 0.1); border-radius: 20px; border: 1px solid rgba(132, 204, 22, 0.3);">
                         <div style="font-size: 2rem; margin-bottom: 10px;">🌍</div>
-                        <strong style="color: var(--accent-2); display: block; margin-bottom: 5px;">Environment</strong>
-                        <span style="font-size: 0.9rem; color: var(--text-secondary);">The world</span>
+                        <strong
+                            style="color: var(--accent-branch); display: block; margin-bottom: 5px;">Environment</strong>
+                        <span style="font-size: 0.85rem; color: var(--forest-mid);">The ecosystem</span>
                     </div>
-                    <div style="text-align: center; padding: 20px; background: rgba(245,158,11,0.05); border-radius: 12px; border: 1px solid rgba(245,158,11,0.2);">
+                    <div
+                        style="text-align: center; padding: 20px; background: rgba(168, 200, 236, 0.3); border-radius: 20px; border: 1px solid rgba(168, 200, 236, 0.5);">
                         <div style="font-size: 2rem; margin-bottom: 10px;">⚡</div>
-                        <strong style="color: var(--accent-3); display: block; margin-bottom: 5px;">Action</strong>
-                        <span style="font-size: 0.9rem; color: var(--text-secondary);">What to do</span>
+                        <strong style="color: #2563eb; display: block; margin-bottom: 5px;">Action</strong>
+                        <span style="font-size: 0.85rem; color: var(--forest-mid);">Behavior taken</span>
                     </div>
-                    <div style="text-align: center; padding: 20px; background: rgba(16,185,129,0.05); border-radius: 12px; border: 1px solid rgba(16,185,129,0.2);">
-                        <div style="font-size: 2rem; margin-bottom: 10px;">🏆</div>
-                        <strong style="color: var(--accent-4); display: block; margin-bottom: 5px;">Reward</strong>
-                        <span style="font-size: 0.9rem; color: var(--text-secondary);">Feedback signal</span>
+                    <div
+                        style="text-align: center; padding: 20px; background: rgba(244, 228, 188, 0.5); border-radius: 20px; border: 1px solid rgba(244, 228, 188, 0.8);">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">☀️</div>
+                        <strong style="color: #b45309; display: block; margin-bottom: 5px;">Reward</strong>
+                        <span style="font-size: 0.85rem; color: var(--forest-mid);">Feedback signal</span>
                     </div>
                 </div>
             </div>
@@ -1028,81 +1426,85 @@
         <!-- Comparison -->
         <section id="compare">
             <div class="section-header">
-                <span class="section-number">05</span>
-                <h2>Compare & Choose</h2>
+                <div class="section-icon">🌍</div>
+                <h2>Ecosystem Balance</h2>
             </div>
-            <p>Select the right approach based on your data and goals.</p>
+            <p>Each learning type occupies its niche in the AI ecosystem—choose the right approach for your environment.
+            </p>
 
             <table class="comparison-table">
                 <thead>
                     <tr>
                         <th>Type</th>
+                        <th>Like Nature...</th>
                         <th>Data Needed</th>
                         <th>Best For</th>
-                        <th>Example</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><span class="tag tag-indigo">Supervised</span></td>
+                        <td><span class="tag tag-grow">Supervised</span></td>
+                        <td>Cultivated agriculture</td>
                         <td>Labeled examples</td>
-                        <td>Prediction & classification</td>
-                        <td>Spam detection</td>
+                        <td>Prediction, classification</td>
                     </tr>
                     <tr>
-                        <td><span class="tag tag-cyan">Unsupervised</span></td>
+                        <td><span class="tag tag-water">Unsupervised</span></td>
+                        <td>Foraging wild forests</td>
                         <td>Unlabeled data</td>
-                        <td>Pattern discovery</td>
-                        <td>Customer segments</td>
+                        <td>Discovery, clustering</td>
                     </tr>
                     <tr>
-                        <td><span class="tag tag-amber">Reinforcement</span></td>
-                        <td>Environment & rewards</td>
+                        <td><span class="tag tag-sun">Reinforcement</span></td>
+                        <td>Evolution & adaptation</td>
+                        <td>Environment feedback</td>
                         <td>Sequential decisions</td>
-                        <td>Game playing robots</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h3 style="margin-top: 40px;">Quick Quiz</h3>
-            <p>Click to reveal the answer:</p>
+            <h3 style="margin-top: 40px;">Identify the Species</h3>
+            <p>Click to reveal which learning type matches each scenario:</p>
 
             <div class="quiz-item" onclick="this.classList.toggle('active')">
-                <strong>Predict tomorrow's weather based on historical data?</strong>
-                <div class="quiz-answer">Supervised Learning — uses past weather labels to predict future.</div>
+                <strong>Predicting crop yield based on historical weather and soil data?</strong>
+                <div class="quiz-answer">🌾 Supervised Learning — uses labeled historical outcomes to predict future
+                    results.</div>
             </div>
             <div class="quiz-item" onclick="this.classList.toggle('active')">
-                <strong>Group customers by purchasing behavior without predefined categories?</strong>
-                <div class="quiz-answer">Unsupervised Learning — discovers natural clusters.</div>
+                <strong>Discovering new insect species by grouping similar specimens?</strong>
+                <div class="quiz-answer">🍄 Unsupervised Learning — finds natural clusters without predefined
+                    categories.</div>
             </div>
             <div class="quiz-item" onclick="this.classList.toggle('active')">
-                <strong>Train a robot to walk without explicit instructions?</strong>
-                <div class="quiz-answer">Reinforcement Learning — learns through trial and error.</div>
+                <strong>Training a drone to navigate through forests avoiding obstacles?</strong>
+                <div class="quiz-answer">🌳 Reinforcement Learning — learns optimal paths through trial and
+                    environmental feedback.</div>
             </div>
             <div class="quiz-item" onclick="this.classList.toggle('active')">
-                <strong>Identify if an email is spam or not?</strong>
-                <div class="quiz-answer">Supervised Learning — trained on labeled spam/ham examples.</div>
+                <strong>Detecting diseased plants from leaf images?</strong>
+                <div class="quiz-answer">🌾 Supervised Learning — trained on labeled healthy/diseased examples.</div>
             </div>
         </section>
 
         <footer>
-            <p>From Alan Turing's question in 1936 — "Can machines think?" — to a world where machines learn, adapt, and surpass human capabilities in specific domains.</p>
-            <p style="margin-top: 10px; opacity: 0.5;">The journey continues.</p>
+            <p style="font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 10px;">From Turing's
+                seed to the forest of AI</p>
+            <p>Like nature, machine learning grows, adapts, and evolves. The question is no longer whether machines can
+                think, but how we nurture their growth.</p>
+            <p style="margin-top: 30px; opacity: 0.7; font-size: 0.9rem;">🌿 Cultivated with care 🌿</p>
         </footer>
     </main>
 
     <script>
         // Demo tabs
         function showDemo(demoId) {
-            // Hide all demos
             document.querySelectorAll('.demo-content').forEach(demo => {
                 demo.classList.remove('active');
             });
-            // Remove active from tabs
             document.querySelectorAll('.demo-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            // Show selected
             document.getElementById(demoId).classList.add('active');
             event.target.classList.add('active');
         }
@@ -1113,17 +1515,6 @@
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
             document.getElementById('progressBar').style.width = scrolled + '%';
-        });
-
-        // Card hover effect
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                card.style.setProperty('--mouse-x', x + '%');
-                card.style.setProperty('--mouse-y', y + '%');
-            });
         });
 
         // Smooth scroll
@@ -1139,6 +1530,16 @@
                 }
             });
         });
+
+        // Parallax effect for blobs
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.blob-shape').forEach((blob, index) => {
+                const speed = 0.5 + (index * 0.2);
+                blob.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
     </script>
 </body>
+
 </html>
