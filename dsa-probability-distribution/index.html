@@ -1,684 +1,1301 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Probability Distributions Guide</title>
+    <title>Probability Distributions Explorer | Interactive Data Science Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#ec4899',
+                        accent: '#8b5cf6',
+                        dark: '#0f172a',
+                        'dark-light': '#1e293b',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #fafafa;
-            --card: #fff;
-            --text: #1a1a2e;
-            --muted: #666;
-            --accent: #4361ee;
-            --accent-light: #e8ecff;
-            --border: #e5e5e5;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #e2e8f0;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 24px 16px;
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        header {
-            text-align: center;
-            padding: 48px 0 32px;
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        header h1 {
-            font-size: clamp(1.8rem, 5vw, 2.4rem);
-            font-weight: 700;
-            margin-bottom: 8px;
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
         }
 
-        header p {
-            color: var(--muted);
-            font-size: 1rem;
+        .slider-thumb::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #818cf8;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #c084fc;
         }
 
-        nav {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        .distribution-card {
+            transition: all 0.3s ease;
         }
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+        .distribution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
         }
 
-        nav a {
-            display: block;
-            padding: 8px 16px;
-            background: var(--accent-light);
-            color: var(--accent);
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
+        .math-formula {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(15, 23, 42, 0.8);
+            border-left: 3px solid #818cf8;
         }
 
-        nav a:hover {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        section {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 32px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        h2::before {
-            content: '';
+        .particle {
+            position: absolute;
             width: 4px;
-            height: 28px;
-            background: var(--accent);
-            border-radius: 2px;
-        }
-
-        h3 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 24px 0 12px;
-            color: var(--text);
-        }
-
-        p {
-            margin-bottom: 16px;
-        }
-
-        .highlight {
-            background: var(--accent-light);
-            padding: 16px 20px;
-            border-radius: 8px;
-            margin: 16px 0;
-            border-left: 3px solid var(--accent);
-        }
-
-        .formula {
-            background: #f8f9fa;
-            padding: 16px 20px;
-            border-radius: 8px;
-            margin: 16px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            overflow-x: auto;
-        }
-
-        .example {
-            background: #f0fdf4;
-            padding: 16px 20px;
-            border-radius: 8px;
-            margin: 16px 0;
-            border-left: 3px solid #22c55e;
-        }
-
-        .example-title {
-            font-weight: 600;
-            color: #16a34a;
-            margin-bottom: 8px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin: 16px 0;
-        }
-
-        .grid-item {
-            background: #f8f9fa;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .grid-item strong {
-            display: block;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0;
-            font-size: 0.95rem;
-        }
-
-        th,
-        td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-        }
-
-        .tag {
-            display: inline-block;
-            background: var(--accent-light);
-            color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin: 4px 4px 4px 0;
-        }
-
-        .viz {
-            background: #f8f9fa;
-            padding: 24px;
-            border-radius: 8px;
-            margin: 16px 0;
-            text-align: center;
-        }
-
-        .bar-chart {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 8px;
-            height: 120px;
-            margin: 16px 0;
-        }
-
-        .bar {
-            width: 40px;
-            background: var(--accent);
-            border-radius: 4px 4px 0 0;
-            transition: height 0.3s;
-        }
-
-        .bar span {
-            display: block;
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: var(--muted);
-        }
-
-        .bell-curve {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .rule-box {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 16px 0;
-        }
-
-        .rule-item {
-            background: linear-gradient(135deg, var(--accent-light), #fff);
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .rule-item .percent {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .rule-item .label {
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        footer {
-            text-align: center;
-            padding: 32px 0;
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 600px) {
-            section {
-                padding: 24px 16px;
-            }
-
-            .rule-box {
-                grid-template-columns: 1fr;
-            }
-
-            nav ul {
-                flex-direction: column;
-            }
-
-            nav a {
-                text-align: center;
-            }
+            height: 4px;
+            background: rgba(129, 140, 248, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
         }
     </style>
+    <base target="_blank">
 </head>
 
-<body>
-    <div class="container">
-        <header>
-            <h1>Probability Distributions</h1>
-            <p>A beginner-friendly guide for Data Science</p>
-        </header>
+<body class="min-h-screen overflow-x-hidden">
 
-        <nav>
-            <ul>
-                <li><a href="#intro">Introduction</a></li>
-                <li><a href="#uniform">Uniform</a></li>
-                <li><a href="#binomial">Binomial</a></li>
-                <li><a href="#normal">Normal</a></li>
-                <li><a href="#clt">Central Limit Theorem</a></li>
-            </ul>
-        </nav>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">P</span>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Prob<span class="text-primary">Dist</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#intro" class="hover:text-primary transition-colors" target="_self">Introduction</a>
+                    <a href="#uniform" class="hover:text-primary transition-colors" target="_self">Uniform</a>
+                    <a href="#binomial" class="hover:text-primary transition-colors" target="_self">Binomial</a>
+                    <a href="#normal" class="hover:text-primary transition-colors" target="_self">Normal</a>
+                    <a href="#clt" class="hover:text-primary transition-colors" target="_self">CLT</a>
+                    <a href="https://dhruvil05.github.io/dsa-probability-distribution/old-index.html" class="hover:text-primary transition-colors" target="_blank">Old Version</a>
+                </div>
+                <button onclick="scrollToTop()" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
 
-        <section id="intro">
-            <h2>What is a Probability Distribution?</h2>
-            <p>When you analyze real-world data—sales figures, weather patterns, website clicks, or people's
-                heights—you'll notice something interesting: some values appear more often than others. There's a
-                pattern to how data spreads out. This pattern is what we call a <strong>probability
-                    distribution</strong>.</p>
+    <!-- Hero Section -->
+    <section id="intro" class="relative pt-32 pb-20 px-4 overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-slow">
+            </div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse-slow"
+                style="animation-delay: 2s;"></div>
+        </div>
 
-            <div class="highlight">
-                <strong>Simply put:</strong> A probability distribution tells you how likely different outcomes are.
-                It's a mathematical function that assigns probabilities to all possible results of a random process.
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Understanding <span class="gradient-text">Probability</span><br>
+                    Distributions
+                </h1>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+                    An interactive journey through the fundamental patterns that govern randomness in data science.
+                    Visualize, experiment, and master the distributions that shape our world.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="document.getElementById('uniform').scrollIntoView({behavior: 'smooth'})"
+                        class="px-8 py-3 bg-primary hover:bg-primary/80 rounded-full font-semibold transition-all transform hover:scale-105">
+                        Start Exploring
+                    </button>
+                    <button onclick="toggleOverview()"
+                        class="px-8 py-3 glass-panel hover:bg-white/10 rounded-full font-semibold transition-all">
+                        Quick Overview
+                    </button>
+                </div>
             </div>
 
-            <h3>Two Types of Distributions</h3>
-            <div class="grid">
-                <div class="grid-item">
-                    <strong>Discrete</strong>
-                    <p>For outcomes you can count</p>
-                    <span class="tag">Coin tosses</span>
-                    <span class="tag">Dice rolls</span>
+            <!-- Distribution Type Cards -->
+            <div class="grid md:grid-cols-2 gap-6 mb-16">
+                <div class="glass-panel rounded-2xl p-8 distribution-card cursor-pointer"
+                    onclick="document.getElementById('discrete-section').scrollIntoView({behavior: 'smooth'})">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold">Discrete</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Countable outcomes like coin flips, dice rolls, or success counts.</p>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">Uniform</span>
+                        <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">Binomial</span>
+                    </div>
                 </div>
-                <div class="grid-item">
-                    <strong>Continuous</strong>
-                    <p>For outcomes in a range</p>
-                    <span class="tag">Height</span>
-                    <span class="tag">Temperature</span>
+
+                <div class="glass-panel rounded-2xl p-8 distribution-card cursor-pointer"
+                    onclick="document.getElementById('continuous-section').scrollIntoView({behavior: 'smooth'})">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold">Continuous</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Measurements across a range like height, temperature, or time.</p>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Normal</span>
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">Continuous
+                            Uniform</span>
+                    </div>
                 </div>
             </div>
 
-            <h3>A Simple Analogy</h3>
-            <p><strong>Rolling a die:</strong> The outcomes are {1, 2, 3, 4, 5, 6}, and each has a probability of 1/6.
-                This is a discrete uniform distribution—every outcome is equally likely.</p>
-            <p><strong>Measuring heights:</strong> You don't get fixed values. Instead, most people cluster around an
-                average height, with fewer being very short or very tall. This forms a bell-shaped curve—a continuous
-                normal distribution.</p>
-
-            <h3>Why Are Distributions Important in Data Science?</h3>
-            <p>Understanding distributions helps you model real-world randomness (user behavior, measurement errors),
-                make predictions (will a customer buy?), run simulations, and choose the right statistical methods for
-                your analysis.</p>
-
-            <table>
-                <tr>
-                    <th>Type</th>
-                    <th>Examples</th>
-                    <th>Used For</th>
-                </tr>
-                <tr>
-                    <td>Discrete</td>
-                    <td>Binomial, Poisson</td>
-                    <td>Counting events</td>
-                </tr>
-                <tr>
-                    <td>Continuous</td>
-                    <td>Normal, Uniform</td>
-                    <td>Measuring quantities</td>
-                </tr>
-            </table>
-        </section>
-
-        <section id="uniform">
-            <h2>Uniform Distribution</h2>
-            <p>A uniform distribution is the simplest case: every outcome is equally likely. Think of it as "perfect
-                fairness" in probability.</p>
-
-            <h3>Discrete Uniform: Rolling a Fair Die</h3>
-            <p>When you roll a fair 6-sided die, each number (1 through 6) has exactly the same chance of appearing: 1/6
-                or about 16.67%.</p>
-
-            <div class="viz">
-                <div class="bar-chart">
-                    <div>
-                        <div class="bar" style="height:60px"></div><span>1</span>
+            <!-- Why Distributions Matter -->
+            <div class="glass-panel rounded-2xl p-8 mb-16">
+                <h2 class="text-3xl font-bold mb-6 gradient-text">Why Distributions Matter</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-lg">Model Reality</h4>
+                        <p class="text-sm text-gray-400">Capture patterns in sales, weather, and user behavior</p>
                     </div>
-                    <div>
-                        <div class="bar" style="height:60px"></div><span>2</span>
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-lg">Make Predictions</h4>
+                        <p class="text-sm text-gray-400">Forecast customer conversions and risk probabilities</p>
                     </div>
-                    <div>
-                        <div class="bar" style="height:60px"></div><span>3</span>
-                    </div>
-                    <div>
-                        <div class="bar" style="height:60px"></div><span>4</span>
-                    </div>
-                    <div>
-                        <div class="bar" style="height:60px"></div><span>5</span>
-                    </div>
-                    <div>
-                        <div class="bar" style="height:60px"></div><span>6</span>
+                    <div class="space-y-2">
+                        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center mb-2">
+                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-semibold text-lg">Statistical Testing</h4>
+                        <p class="text-sm text-gray-400">Choose correct methods for hypothesis testing</p>
                     </div>
                 </div>
-                <p style="color:var(--muted);font-size:0.9rem;margin-top:12px">Each outcome has equal probability (1/6)
+            </div>
+        </div>
+    </section>
+
+    <!-- Uniform Distribution Section -->
+    <section id="uniform" class="py-20 px-4 relative">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-12">
+                <span class="text-primary font-mono text-sm tracking-wider">DISTRIBUTION 01</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-4">Uniform Distribution</h2>
+                <p class="text-xl text-gray-400 max-w-3xl">
+                    The simplest case: every outcome is equally likely. Perfect fairness in probability.
                 </p>
             </div>
 
-            <div class="formula">
-                <strong>Discrete Formula:</strong> P(X = x) = 1 / n<br>
-                Where n = number of possible outcomes
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <!-- Interactive Die Roller -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                        Discrete: Fair Die Simulator
+                    </h3>
+                    <div class="chart-container mb-4" style="height: 250px;">
+                        <canvas id="uniformDiscreteChart"></canvas>
+                    </div>
+                    <div class="flex gap-4 mb-4">
+                        <button onclick="rollDie()"
+                            class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition-colors">
+                            Roll Die (×1)
+                        </button>
+                        <button onclick="rollDie(100)"
+                            class="flex-1 py-3 bg-blue-600/50 hover:bg-blue-500/50 rounded-lg font-semibold transition-colors">
+                            Roll 100×
+                        </button>
+                        <button onclick="resetDie()"
+                            class="px-4 py-3 glass-panel hover:bg-white/10 rounded-lg transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-400 font-mono">
+                        <span>Total Rolls: <span id="totalRolls" class="text-white">0</span></span>
+                        <span>Expected: <span class="text-blue-400">16.67%</span> each</span>
+                    </div>
+                </div>
+
+                <!-- Continuous Uniform -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
+                        Continuous: Random Range
+                    </h3>
+                    <div class="chart-container mb-4" style="height: 250px;">
+                        <canvas id="uniformContinuousChart"></canvas>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-center">
+                            <label class="text-sm text-gray-400 w-12">Min:</label>
+                            <input type="range" id="uniformMin" min="0" max="10" value="0"
+                                class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateUniformContinuous()">
+                            <span id="uniformMinVal" class="text-sm font-mono w-8">0</span>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <label class="text-sm text-gray-400 w-12">Max:</label>
+                            <input type="range" id="uniformMax" min="1" max="20" value="10"
+                                class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateUniformContinuous()">
+                            <span id="uniformMaxVal" class="text-sm font-mono w-8">10</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-black/30 rounded-lg font-mono text-sm">
+                        f(x) = 1/(b-a) = <span id="uniformDensity" class="text-purple-400">0.10</span>
+                    </div>
+                </div>
             </div>
 
-            <h3>Continuous Uniform: Random Numbers</h3>
-            <p>When picking a random number between 0 and 1, every value in that range is equally likely. The
-                probability "density" is constant across the entire interval.</p>
-
-            <div class="formula">
-                <strong>Continuous Formula:</strong> f(x) = 1 / (b - a) for values between a and b<br>
-                Outside this range, probability is 0
+            <!-- Formula & Explanation -->
+            <div class="glass-panel rounded-2xl p-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-blue-400">Discrete Formula</h4>
+                        <div class="math-formula p-4 rounded-lg mb-4">
+                            P(X = x) = 1/n
+                        </div>
+                        <p class="text-gray-400 text-sm">Where n = number of possible outcomes. Each outcome has exactly
+                            the same probability.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-purple-400">Continuous Formula</h4>
+                        <div class="math-formula p-4 rounded-lg mb-4">
+                            f(x) = 1/(b-a) for a ≤ x ≤ b
+                        </div>
+                        <p class="text-gray-400 text-sm">Probability density is constant across the entire interval [a,
+                            b].</p>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t border-white/10">
+                    <h4 class="font-bold mb-2">Real-World Applications</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-white/5 rounded-full text-sm">Random Number Generation</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-full text-sm">Lottery Systems</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-full text-sm">Monte Carlo Simulations</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-full text-sm">Cryptography</span>
+                    </div>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="example">
-                <div class="example-title">Example</div>
-                <p>If you randomly select a number between 0 and 10, the probability of getting any specific range (say
-                    2 to 4) is simply the length of that range divided by the total range: (4-2)/(10-0) = 0.2 or 20%.
+    <!-- Binomial Distribution Section -->
+    <section id="binomial" class="py-20 px-4 bg-black/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-12">
+                <span class="text-secondary font-mono text-sm tracking-wider">DISTRIBUTION 02</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-4">Binomial Distribution</h2>
+                <p class="text-xl text-gray-400 max-w-3xl">
+                    Counting successes in fixed trials. The probability of getting exactly k successes in n independent
+                    yes/no experiments.
                 </p>
             </div>
 
-            <h3>Real-World Applications</h3>
-            <p>Uniform distributions model pure randomness and are used in random number generation, simulations,
-                lottery systems, and as a starting point when no prior information suggests one outcome over another.
-            </p>
-        </section>
+            <div class="glass-panel rounded-2xl p-6 mb-8">
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- Controls -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Trials (n)</label>
+                            <input type="range" id="binomialN" min="1" max="50" value="10"
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateBinomial()">
+                            <div class="flex justify-between text-sm text-gray-400 mt-1">
+                                <span>1</span>
+                                <span id="binomialNVal" class="text-secondary font-bold">10</span>
+                                <span>50</span>
+                            </div>
+                        </div>
 
-        <section id="binomial">
-            <h2>Binomial Distribution</h2>
-            <p>The binomial distribution answers a specific question: <em>In a fixed number of yes/no trials, how many
-                    successes will occur?</em></p>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Success Probability
+                                (p)</label>
+                            <input type="range" id="binomialP" min="0" max="100" value="50"
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateBinomial()">
+                            <div class="flex justify-between text-sm text-gray-400 mt-1">
+                                <span>0%</span>
+                                <span id="binomialPVal" class="text-secondary font-bold">0.5</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
 
-            <div class="highlight">
-                <strong>Classic Example:</strong> Flip a coin 10 times. What's the probability of getting exactly 6
-                heads?
-            </div>
+                        <div class="p-4 bg-black/30 rounded-lg">
+                            <div class="text-sm text-gray-400 mb-1">Expected Value</div>
+                            <div class="text-2xl font-bold text-secondary" id="binomialMean">5.0</div>
+                            <div class="text-xs text-gray-500">μ = n × p</div>
+                        </div>
 
-            <h3>Key Ingredients</h3>
-            <div class="grid">
-                <div class="grid-item">
-                    <strong>n</strong>
-                    <p>Number of trials (e.g., 10 tosses)</p>
+                        <button onclick="simulateBinomialExperiment()"
+                            class="w-full py-3 bg-secondary hover:bg-secondary/80 rounded-lg font-semibold transition-colors">
+                            Run Simulation
+                        </button>
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="lg:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="binomialChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="grid-item">
-                    <strong>p</strong>
-                    <p>Probability of success (e.g., 0.5 for heads)</p>
+            </div>
+
+            <!-- Interactive Example -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-panel rounded-2xl p-6">
+                    <h4 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Coin Flip Example
+                    </h4>
+                    <p class="text-gray-400 mb-4">Flip a fair coin 10 times. Probability of exactly 6 heads:</p>
+                    <div class="math-formula p-4 rounded-lg text-sm mb-4">
+                        C(10,6) × 0.5⁶ × 0.5⁴ = 210 × 0.015625 × 0.0625 ≈ 20.5%
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <strong>Requirements:</strong> Independent trials, two outcomes, constant probability
+                    </div>
                 </div>
-                <div class="grid-item">
-                    <strong>x</strong>
-                    <p>Number of successes (e.g., 6 heads)</p>
+
+                <div class="glass-panel rounded-2xl p-6">
+                    <h4 class="font-bold text-lg mb-4">Use Cases</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-start gap-2">
+                            <span class="text-secondary mt-1">•</span>
+                            <span><strong>Quality Control:</strong> Defective items in a batch</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-secondary mt-1">•</span>
+                            <span><strong>A/B Testing:</strong> Click-through rates</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-secondary mt-1">•</span>
+                            <span><strong>Medical Trials:</strong> Treatment success rates</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-secondary mt-1">•</span>
+                            <span><strong>Survey Analysis:</strong> Yes/no responses</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <h3>Requirements for Binomial Distribution</h3>
-            <p>Each trial must be independent (one outcome doesn't affect others), there are only two possible results
-                per trial (success or failure), and the probability of success stays the same for every trial.</p>
-
-            <div class="formula">
-                <strong>Formula:</strong> P(X = x) = C(n, x) × p<sup>x</sup> × (1 - p)<sup>(n - x)</sup><br><br>
-                Where C(n, x) = n! / (x! × (n-x)!) is "n choose x" — the number of ways to arrange x successes in n
-                trials
-            </div>
-
-            <div class="example">
-                <div class="example-title">Worked Example: 6 Heads in 10 Tosses</div>
-                <p>n = 10 trials, x = 6 successes, p = 0.5</p>
-                <p>C(10, 6) = 210 (there are 210 ways to get 6 heads in 10 tosses)</p>
-                <p>P(6 heads) = 210 × 0.5<sup>6</sup> × 0.5<sup>4</sup> = 210 × 0.015625 × 0.0625 ≈ <strong>0.205
-                        (20.5%)</strong></p>
-            </div>
-
-            <h3>Real-World Applications</h3>
-            <p><strong>Email campaigns:</strong> Out of 100 recipients, how many will click the link?<br>
-                <strong>Quality control:</strong> In a batch of 50 products, how many might be defective?<br>
-                <strong>A/B testing:</strong> If 200 visitors see your new webpage, how many will convert?<br>
-                <strong>Medical trials:</strong> What's the probability that a treatment works for 8 out of 10 patients?
-            </p>
-        </section>
-
-        <section id="normal">
-            <h2>Normal Distribution</h2>
-            <p>The normal distribution (also called Gaussian distribution) is perhaps the most important distribution in
-                statistics. It creates the famous "bell curve" that appears everywhere in nature.</p>
-
-            <div class="viz">
-                <svg class="bell-curve" viewBox="0 0 400 200">
-                    <defs>
-                        <linearGradient id="bellGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#4361ee;stop-opacity:0.3" />
-                            <stop offset="100%" style="stop-color:#4361ee;stop-opacity:0.1" />
-                        </linearGradient>
-                    </defs>
-                    <path
-                        d="M20,180 Q50,178 80,170 Q110,155 140,120 Q170,60 200,30 Q230,60 260,120 Q290,155 320,170 Q350,178 380,180 L380,180 L20,180 Z"
-                        fill="url(#bellGrad)" stroke="#4361ee" stroke-width="2" />
-                    <line x1="200" y1="180" x2="200" y2="25" stroke="#4361ee" stroke-width="1" stroke-dasharray="4" />
-                    <text x="200" y="195" text-anchor="middle" fill="#666" font-size="12">μ (mean)</text>
-                </svg>
-                <p style="color:var(--muted);font-size:0.9rem;margin-top:8px">Bell-shaped and symmetric around the mean
+    <!-- Normal Distribution Section -->
+    <section id="normal" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-12">
+                <span class="text-accent font-mono text-sm tracking-wider">DISTRIBUTION 03</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-4">Normal Distribution</h2>
+                <p class="text-xl text-gray-400 max-w-3xl">
+                    The famous Bell Curve. Nature's favorite pattern for continuous measurements like height, IQ, and
+                    measurement errors.
                 </p>
             </div>
 
-            <h3>Understanding Mean (μ)</h3>
-            <p>The mean is the average of all values—add them up and divide by the count. It represents the center of
-                the distribution.</p>
-            <div class="formula">
-                mean = (x₁ + x₂ + x₃ + ... + xₙ) / n
-            </div>
+            <div class="glass-panel rounded-2xl p-6 mb-8">
+                <div class="grid lg:grid-cols-4 gap-6">
+                    <!-- Controls -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Mean (μ)</label>
+                            <input type="range" id="normalMean" min="-10" max="10" value="0" step="0.5"
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateNormal()">
+                            <div class="text-center text-accent font-bold mt-1" id="normalMeanVal">0</div>
+                        </div>
 
-            <h3>Understanding Standard Deviation (σ)</h3>
-            <p>Standard deviation measures how spread out the data is from the mean. A small σ means data clusters
-                tightly around the mean; a large σ means data is more spread out.</p>
-            <div class="formula">
-                σ = √[ (1/n) × Σ(xᵢ - mean)² ]
-            </div>
-            <p>Steps: (1) Find the mean, (2) Subtract mean from each value and square it, (3) Average those squared
-                differences (this is variance), (4) Take the square root.</p>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Std Dev (σ)</label>
+                            <input type="range" id="normalStd" min="0.5" max="5" value="1" step="0.1"
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateNormal()">
+                            <div class="text-center text-accent font-bold mt-1" id="normalStdVal">1</div>
+                        </div>
 
-            <h3>Key Properties of Normal Distribution</h3>
-            <p>The curve is perfectly symmetric around the mean. The mean, median, and mode are all equal. As you move
-                away from the center, values become increasingly rare.</p>
+                        <div class="p-4 bg-black/30 rounded-lg space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">68% within:</span>
+                                <span class="text-accent font-mono" id="range68">±1σ</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">95% within:</span>
+                                <span class="text-accent font-mono" id="range95">±2σ</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">99.7% within:</span>
+                                <span class="text-accent font-mono" id="range99">±3σ</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <h3>The 68-95-99.7 Rule</h3>
-            <p>This rule (also called the Empirical Rule or Three Sigma Rule) tells you how data spreads in a normal
-                distribution:</p>
-
-            <div class="rule-box">
-                <div class="rule-item">
-                    <div class="percent">68%</div>
-                    <div class="label">within ±1σ</div>
-                </div>
-                <div class="rule-item">
-                    <div class="percent">95%</div>
-                    <div class="label">within ±2σ</div>
-                </div>
-                <div class="rule-item">
-                    <div class="percent">99.7%</div>
-                    <div class="label">within ±3σ</div>
-                </div>
-            </div>
-
-            <div class="example">
-                <div class="example-title">Example: Test Scores</div>
-                <p>If exam scores follow a normal distribution with mean = 70 and σ = 10:</p>
-                <p>• 68% of students score between 60 and 80<br>
-                    • 95% score between 50 and 90<br>
-                    • 99.7% score between 40 and 100</p>
-            </div>
-
-            <div class="formula">
-                <strong>PDF Formula:</strong> f(x) = (1 / (σ√2π)) × e<sup>-(x-μ)²/(2σ²)</sup>
-            </div>
-
-            <h3>Real-World Examples</h3>
-            <p>Human heights, IQ scores, measurement errors, blood pressure readings, and exam scores all tend to follow
-                normal distributions. Many machine learning algorithms assume data is normally distributed, making this
-                concept essential for data science.</p>
-        </section>
-
-        <section id="clt">
-            <h2>Central Limit Theorem</h2>
-            <p>The Central Limit Theorem (CLT) is one of the most powerful ideas in statistics. It explains why the
-                normal distribution appears so frequently in the real world.</p>
-
-            <div class="highlight">
-                <strong>The Big Idea:</strong> If you take many random samples from ANY population and calculate their
-                means, those means will form a normal distribution—regardless of what the original population looks
-                like.
-            </div>
-
-            <h3>Breaking It Down</h3>
-            <p>Imagine you want to find the average height of all students at a university. Measuring everyone would
-                take forever. Instead:</p>
-            <p>1. Take a random sample of 30 students and calculate their average height<br>
-                2. Repeat this many times with different random samples<br>
-                3. Plot all these sample averages</p>
-            <p>The CLT says this plot of averages will form a bell curve, even if the original heights weren't normally
-                distributed!</p>
-
-            <h3>Key Requirements</h3>
-            <div class="grid">
-                <div class="grid-item">
-                    <strong>Sample Size ≥ 30</strong>
-                    <p>Generally, 30+ observations per sample is considered "large enough"</p>
-                </div>
-                <div class="grid-item">
-                    <strong>Independence</strong>
-                    <p>Each sample must be randomly selected</p>
-                </div>
-                <div class="grid-item">
-                    <strong>Finite Variance</strong>
-                    <p>The population must have a defined spread</p>
+                    <!-- Chart -->
+                    <div class="lg:col-span-3">
+                        <div class="chart-container">
+                            <canvas id="normalChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <h3>Mathematical Expression</h3>
-            <p>If X₁, X₂, ..., Xₙ are independent random variables with mean μ and standard deviation σ, then the
-                sampling distribution of the sample mean (X̄) approaches a normal distribution with:</p>
-
-            <div class="formula">
-                <strong>Mean of sample means:</strong> μ (same as population mean)<br><br>
-                <strong>Standard deviation of sample means:</strong> σ / √n<br>
-                (This is called the "Standard Error")
+            <!-- Empirical Rule Visualization -->
+            <div class="glass-panel rounded-2xl p-8 mb-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">The 68-95-99.7 Rule</h3>
+                <div class="relative h-32 bg-black/30 rounded-lg overflow-hidden mb-4">
+                    <canvas id="empiricalChart" class="w-full h-full"></canvas>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="p-4 rounded-lg bg-white/5">
+                        <div class="text-3xl font-bold text-accent mb-1">68%</div>
+                        <div class="text-sm text-gray-400">Within 1σ of mean</div>
+                    </div>
+                    <div class="p-4 rounded-lg bg-white/5">
+                        <div class="text-3xl font-bold text-accent mb-1">95%</div>
+                        <div class="text-sm text-gray-400">Within 2σ of mean</div>
+                    </div>
+                    <div class="p-4 rounded-lg bg-white/5">
+                        <div class="text-3xl font-bold text-accent mb-1">99.7%</div>
+                        <div class="text-sm text-gray-400">Within 3σ of mean</div>
+                    </div>
+                </div>
             </div>
 
-            <p>Notice something important: as sample size (n) increases, the standard error decreases. Larger samples
-                give more precise estimates!</p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="math-formula p-6 rounded-xl">
+                    <h4 class="font-bold mb-3 text-accent">Probability Density Function</h4>
+                    <div class="text-lg mb-4 overflow-x-auto">
+                        f(x) = (1/σ√2π) × e^-(x-μ)²/(2σ²)
+                    </div>
+                    <p class="text-sm text-gray-400">Where μ is the mean and σ is the standard deviation. The curve is
+                        perfectly symmetric around the mean.</p>
+                </div>
+                <div class="glass-panel rounded-2xl p-6">
+                    <h4 class="font-bold text-lg mb-4">Properties</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>• Symmetric around the mean (skewness = 0)</li>
+                        <li>• Mean = Median = Mode</li>
+                        <li>• Follows the Empirical Rule</li>
+                        <li>• Area under curve = 1 (100% probability)</li>
+                        <li>• Extends infinitely in both directions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <div class="example">
-                <div class="example-title">Example: Rolling Dice</div>
-                <p>A single die roll gives uniform probabilities (1/6 for each number). But if you:</p>
-                <p>• Roll 30 dice and calculate the average<br>
-                    • Repeat this 1000 times<br>
-                    • Plot all 1000 averages</p>
-                <p>You'll see a beautiful bell curve centered around 3.5 (the true average of a die roll), even though
-                    individual rolls are uniformly distributed!</p>
+    <!-- Central Limit Theorem Section -->
+    <section id="clt" class="py-20 px-4 bg-black/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-12">
+                <span class="text-green-400 font-mono text-sm tracking-wider">FUNDAMENTAL THEOREM</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-4">Central Limit Theorem</h2>
+                <p class="text-xl text-gray-400 max-w-3xl">
+                    Why the normal distribution appears everywhere. The mathematical miracle that makes statistics work.
+                </p>
             </div>
 
-            <h3>Why CLT Matters</h3>
-            <p><strong>Statistical inference:</strong> We can make conclusions about populations using sample data, even
-                without knowing the population's distribution.</p>
-            <p><strong>Hypothesis testing:</strong> Most statistical tests assume normality. CLT justifies using these
-                tests with large samples.</p>
-            <p><strong>Confidence intervals:</strong> We can estimate how precise our sample statistics are.</p>
-            <p><strong>Quality control:</strong> Manufacturing processes use CLT to monitor product consistency.</p>
-            <p><strong>Machine learning:</strong> Many algorithms rely on CLT for making inferences about model
-                performance.</p>
+            <div class="glass-panel rounded-2xl p-8 mb-8">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">The Big Idea</h3>
+                    <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                        Take many random samples from <strong>any</strong> population, calculate their means,
+                        and those means will form a normal distribution—regardless of the original population's shape!
+                    </p>
+                </div>
 
-            <div class="highlight">
-                <strong>Key Takeaway:</strong> The CLT is why averages and sums of random variables tend toward normal
-                distributions in nature—explaining everything from measurement errors to why so many natural phenomena
-                follow bell curves.
+                <div class="grid lg:grid-cols-3 gap-6 mb-8">
+                    <div class="text-center p-6 glass-panel rounded-xl">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center text-2xl">
+                            1</div>
+                        <h4 class="font-bold mb-2">Sample</h4>
+                        <p class="text-sm text-gray-400">Take n random samples from population (n ≥ 30)</p>
+                    </div>
+                    <div class="text-center p-6 glass-panel rounded-xl">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center text-2xl">
+                            2</div>
+                        <h4 class="font-bold mb-2">Calculate Mean</h4>
+                        <p class="text-sm text-gray-400">Compute the average of each sample</p>
+                    </div>
+                    <div class="text-center p-6 glass-panel rounded-xl">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center text-2xl">
+                            3</div>
+                        <h4 class="font-bold mb-2">Observe Distribution</h4>
+                        <p class="text-sm text-gray-400">Plot all sample means → Bell curve!</p>
+                    </div>
+                </div>
+
+                <!-- CLT Simulation -->
+                <div class="glass-panel rounded-xl p-6 bg-black/30">
+                    <div class="flex flex-wrap gap-4 mb-6 items-end">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-semibold mb-2">Population Distribution</label>
+                            <select id="cltPopulation" onchange="updateCLT()"
+                                class="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                                <option value="uniform">Uniform (Die Roll)</option>
+                                <option value="exponential">Exponential</option>
+                                <option value="bimodal">Bimodal</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-semibold mb-2">Sample Size (n)</label>
+                            <input type="range" id="cltSampleSize" min="1" max="100" value="30"
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateCLT()">
+                            <div class="text-center text-sm text-green-400 font-bold" id="cltSampleSizeVal">30</div>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-semibold mb-2">Number of Samples</label>
+                            <input type="range" id="cltNumSamples" min="100" max="5000" value="1000" step="100"
+                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                oninput="updateCLT()">
+                            <div class="text-center text-sm text-green-400 font-bold" id="cltNumSamplesVal">1000</div>
+                        </div>
+                        <button onclick="runCLTSimulation()"
+                            class="px-6 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-semibold transition-colors">
+                            Run Simulation
+                        </button>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="text-sm font-semibold text-gray-400 mb-2 text-center">Original Population</h5>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="cltPopulationChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-semibold text-gray-400 mb-2 text-center">Distribution of Sample
+                                Means</h5>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="cltSampleMeansChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-black/50 rounded-lg">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+                            <div>
+                                <div class="text-gray-400">Population Mean</div>
+                                <div class="text-xl font-bold text-white" id="cltPopMean">3.5</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400">Sample Means Avg</div>
+                                <div class="text-xl font-bold text-green-400" id="cltSampleMean">3.5</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400">Standard Error</div>
+                                <div class="text-xl font-bold text-blue-400" id="cltStdError">0.53</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400">σ/√n</div>
+                                <div class="text-xl font-bold text-purple-400" id="cltTheoreticalSE">0.53</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
 
-        <section>
-            <h2>Quick Reference Summary</h2>
-            <table>
-                <tr>
-                    <th>Distribution</th>
-                    <th>Type</th>
-                    <th>Key Use Case</th>
-                    <th>Shape</th>
-                </tr>
-                <tr>
-                    <td>Uniform</td>
-                    <td>Discrete/Continuous</td>
-                    <td>Equal probability outcomes</td>
-                    <td>Flat</td>
-                </tr>
-                <tr>
-                    <td>Binomial</td>
-                    <td>Discrete</td>
-                    <td>Count successes in trials</td>
-                    <td>Symmetric or skewed</td>
-                </tr>
-                <tr>
-                    <td>Normal</td>
-                    <td>Continuous</td>
-                    <td>Natural measurements</td>
-                    <td>Bell curve</td>
-                </tr>
-            </table>
+            <div class="glass-panel rounded-2xl p-6">
+                <h4 class="font-bold text-lg mb-4">Why CLT Matters</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="font-semibold text-green-400 mb-2">Statistical Inference</h5>
+                        <p class="text-gray-400 text-sm mb-4">We can make conclusions about populations using sample
+                            data, even without knowing the population's distribution.</p>
 
-            <h3>When to Use Each</h3>
-            <p><strong>Uniform:</strong> Use when all outcomes are equally likely (random selection, fair games).</p>
-            <p><strong>Binomial:</strong> Use when counting successes in a fixed number of independent yes/no trials.
-            </p>
-            <p><strong>Normal:</strong> Use for continuous data that clusters around a mean with symmetric spread.</p>
-            <p><strong>CLT:</strong> Apply when working with sample means—they'll be normally distributed for large
-                samples.</p>
-        </section>
+                        <h5 class="font-semibold text-green-400 mb-2">Hypothesis Testing</h5>
+                        <p class="text-gray-400 text-sm">Most statistical tests assume normality. CLT justifies using
+                            these tests with large samples.</p>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold text-green-400 mb-2">Confidence Intervals</h5>
+                        <p class="text-gray-400 text-sm mb-4">We can estimate how precise our sample statistics are
+                            using the normal distribution.</p>
 
-        <footer>
-            <p>Probability Distributions Guide • Data Science Fundamentals</p>
-        </footer>
-    </div>
+                        <h5 class="font-semibold text-green-400 mb-2">Quality Control</h5>
+                        <p class="text-gray-400 text-sm">Manufacturing processes use CLT to monitor product consistency
+                            and detect anomalies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Reference -->
+    <section class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center">Quick Reference Guide</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full glass-panel rounded-2xl overflow-hidden">
+                    <thead class="bg-white/5">
+                        <tr>
+                            <th class="p-4 text-left">Distribution</th>
+                            <th class="p-4 text-left">Type</th>
+                            <th class="p-4 text-left">When to Use</th>
+                            <th class="p-4 text-left">Key Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-semibold text-blue-400">Uniform</td>
+                            <td class="p-4 text-gray-400">Discrete/Continuous</td>
+                            <td class="p-4">Equal probability outcomes</td>
+                            <td class="p-4 font-mono text-sm">a (min), b (max)</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-semibold text-secondary">Binomial</td>
+                            <td class="p-4 text-gray-400">Discrete</td>
+                            <td class="p-4">Counting successes in n trials</td>
+                            <td class="p-4 font-mono text-sm">n (trials), p (prob)</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-semibold text-accent">Normal</td>
+                            <td class="p-4 text-gray-400">Continuous</td>
+                            <td class="p-4">Natural measurements, errors</td>
+                            <td class="p-4 font-mono text-sm">μ (mean), σ (std dev)</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-semibold text-green-400">CLT</td>
+                            <td class="p-4 text-gray-400">Theorem</td>
+                            <td class="p-4">Sample means from any population</td>
+                            <td class="p-4 font-mono text-sm">n ≥ 30</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-white/10">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-gray-500 mb-4">Interactive Probability Distributions Guide</p>
+            <p class="text-sm text-gray-600">Built for Data Science Education</p>
+        </div>
+    </footer>
+
+    <script>
+        // Global Chart Instances
+        let uniformDiscreteChart, uniformContinuousChart, binomialChart, normalChart, empiricalChart, cltPopulationChart, cltSampleMeansChart;
+
+        // Data storage for simulations
+        let dieRolls = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+        let totalRolls = 0;
+
+        // Initialize Charts on Load
+        document.addEventListener('DOMContentLoaded', function () {
+            initUniformDiscrete();
+            initUniformContinuous();
+            initBinomial();
+            initNormal();
+            initEmpirical();
+            initCLT();
+        });
+
+        // Uniform Discrete (Die Roller)
+        function initUniformDiscrete() {
+            const ctx = document.getElementById('uniformDiscreteChart').getContext('2d');
+            uniformDiscreteChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1', '2', '3', '4', '5', '6'],
+                    datasets: [{
+                        label: 'Observed Frequency',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Expected (16.67%)',
+                        data: [0, 0, 0, 0, 0, 0],
+                        type: 'line',
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#e2e8f0' } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function rollDie(times = 1) {
+            for (let i = 0; i < times; i++) {
+                const result = Math.floor(Math.random() * 6) + 1;
+                dieRolls[result]++;
+                totalRolls++;
+            }
+            updateDieChart();
+        }
+
+        function updateDieChart() {
+            const data = Object.values(dieRolls);
+            const expected = totalRolls > 0 ? Array(6).fill(totalRolls / 6) : Array(6).fill(0);
+
+            uniformDiscreteChart.data.datasets[0].data = data;
+            uniformDiscreteChart.data.datasets[1].data = expected;
+            uniformDiscreteChart.update();
+
+            document.getElementById('totalRolls').textContent = totalRolls;
+        }
+
+        function resetDie() {
+            dieRolls = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+            totalRolls = 0;
+            updateDieChart();
+        }
+
+        // Uniform Continuous
+        function initUniformContinuous() {
+            const ctx = document.getElementById('uniformContinuousChart').getContext('2d');
+            uniformContinuousChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Probability Density',
+                        data: [],
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        fill: true,
+                        stepped: true,
+                        tension: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 0.5,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            updateUniformContinuous();
+        }
+
+        function updateUniformContinuous() {
+            const min = parseInt(document.getElementById('uniformMin').value);
+            const max = parseInt(document.getElementById('uniformMax').value);
+
+            if (min >= max) {
+                document.getElementById('uniformMax').value = min + 1;
+                return updateUniformContinuous();
+            }
+
+            document.getElementById('uniformMinVal').textContent = min;
+            document.getElementById('uniformMaxVal').textContent = max;
+
+            const density = 1 / (max - min);
+            document.getElementById('uniformDensity').textContent = density.toFixed(3);
+
+            const labels = [];
+            const data = [];
+
+            for (let i = min - 2; i <= max + 2; i += 0.5) {
+                labels.push(i.toFixed(1));
+                if (i >= min && i < max) {
+                    data.push(density);
+                } else {
+                    data.push(0);
+                }
+            }
+
+            uniformContinuousChart.data.labels = labels;
+            uniformContinuousChart.data.datasets[0].data = data;
+            uniformContinuousChart.update();
+        }
+
+        // Binomial Distribution
+        function initBinomial() {
+            const ctx = document.getElementById('binomialChart').getContext('2d');
+            binomialChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Probability Mass',
+                        data: [],
+                        backgroundColor: 'rgba(236, 72, 153, 0.6)',
+                        borderColor: 'rgba(236, 72, 153, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return 'P(X=' + context.label + ') = ' + (context.parsed.y * 100).toFixed(2) + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function (value) {
+                                    return (value * 100).toFixed(0) + '%';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            updateBinomial();
+        }
+
+        function updateBinomial() {
+            const n = parseInt(document.getElementById('binomialN').value);
+            const p = parseInt(document.getElementById('binomialP').value) / 100;
+
+            document.getElementById('binomialNVal').textContent = n;
+            document.getElementById('binomialPVal').textContent = p;
+            document.getElementById('binomialMean').textContent = (n * p).toFixed(1);
+
+            const labels = [];
+            const data = [];
+
+            for (let k = 0; k <= n; k++) {
+                labels.push(k);
+                data.push(binomialProbability(n, k, p));
+            }
+
+            binomialChart.data.labels = labels;
+            binomialChart.data.datasets[0].data = data;
+            binomialChart.update();
+        }
+
+        function binomialProbability(n, k, p) {
+            return combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+        }
+
+        function combination(n, k) {
+            let result = 1;
+            for (let i = 0; i < k; i++) {
+                result *= (n - i) / (i + 1);
+            }
+            return result;
+        }
+
+        function simulateBinomialExperiment() {
+            const n = parseInt(document.getElementById('binomialN').value);
+            const p = parseInt(document.getElementById('binomialP').value) / 100;
+
+            let successes = 0;
+            for (let i = 0; i < n; i++) {
+                if (Math.random() < p) successes++;
+            }
+
+            // Highlight the bar temporarily
+            const chart = binomialChart;
+            const colors = Array(n + 1).fill('rgba(236, 72, 153, 0.6)');
+            colors[successes] = 'rgba(255, 255, 0, 0.8)';
+            chart.data.datasets[0].backgroundColor = colors;
+            chart.update();
+
+            setTimeout(() => {
+                chart.data.datasets[0].backgroundColor = 'rgba(236, 72, 153, 0.6)';
+                chart.update();
+            }, 1000);
+        }
+
+        // Normal Distribution
+        function initNormal() {
+            const ctx = document.getElementById('normalChart').getContext('2d');
+            normalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Probability Density',
+                        data: [],
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        annotation: {
+                            annotations: {}
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            updateNormal();
+        }
+
+        function updateNormal() {
+            const mean = parseFloat(document.getElementById('normalMean').value);
+            const std = parseFloat(document.getElementById('normalStd').value);
+
+            document.getElementById('normalMeanVal').textContent = mean;
+            document.getElementById('normalStdVal').textContent = std;
+
+            document.getElementById('range68').textContent = (mean - std).toFixed(1) + ' to ' + (mean + std).toFixed(1);
+            document.getElementById('range95').textContent = (mean - 2 * std).toFixed(1) + ' to ' + (mean + 2 * std).toFixed(1);
+            document.getElementById('range99').textContent = (mean - 3 * std).toFixed(1) + ' to ' + (mean + 3 * std).toFixed(1);
+
+            const labels = [];
+            const data = [];
+
+            for (let x = mean - 4 * std; x <= mean + 4 * std; x += std / 10) {
+                labels.push(x.toFixed(1));
+                data.push(normalPDF(x, mean, std));
+            }
+
+            normalChart.data.labels = labels;
+            normalChart.data.datasets[0].data = data;
+            normalChart.update();
+
+            updateEmpiricalChart(mean, std);
+        }
+
+        function normalPDF(x, mean, std) {
+            return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / std, 2));
+        }
+
+        // Empirical Rule Chart
+        function initEmpiricalChart() {
+            const ctx = document.getElementById('empiricalChart').getContext('2d');
+            empiricalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateEmpiricalChart(mean = 0, std = 1) {
+            if (!empiricalChart) initEmpiricalChart();
+
+            const labels = [];
+            const data = [];
+
+            for (let x = mean - 4 * std; x <= mean + 4 * std; x += 0.1) {
+                labels.push(x);
+                data.push(normalPDF(x, mean, std));
+            }
+
+            empiricalChart.data.labels = labels;
+            empiricalChart.data.datasets[0].data = data;
+            empiricalChart.update();
+        }
+
+        // Central Limit Theorem
+        function initCLT() {
+            const popCtx = document.getElementById('cltPopulationChart').getContext('2d');
+            cltPopulationChart = new Chart(popCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Population',
+                        data: [],
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            const sampleCtx = document.getElementById('cltSampleMeansChart').getContext('2d');
+            cltSampleMeansChart = new Chart(sampleCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Sample Means Distribution',
+                        data: [],
+                        backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            updateCLT();
+        }
+
+        function updateCLT() {
+            const type = document.getElementById('cltPopulation').value;
+            const sampleSize = parseInt(document.getElementById('cltSampleSize').value);
+            const numSamples = parseInt(document.getElementById('cltNumSamples').value);
+
+            document.getElementById('cltSampleSizeVal').textContent = sampleSize;
+            document.getElementById('cltNumSamplesVal').textContent = numSamples;
+
+            // Generate population data
+            const populationData = generatePopulation(type);
+            cltPopulationChart.data.labels = populationData.labels;
+            cltPopulationChart.data.datasets[0].data = populationData.values;
+            cltPopulationChart.update();
+
+            document.getElementById('cltPopMean').textContent = populationData.mean.toFixed(2);
+
+            // Calculate theoretical standard error
+            const theoreticalSE = populationData.std / Math.sqrt(sampleSize);
+            document.getElementById('cltTheoreticalSE').textContent = theoreticalSE.toFixed(3);
+        }
+
+        function generatePopulation(type) {
+            const values = [];
+            let mean = 0;
+            let std = 0;
+
+            if (type === 'uniform') {
+                // Die roll (1-6)
+                for (let i = 1; i <= 6; i++) values.push(1);
+                mean = 3.5;
+                std = 1.707;
+                return { labels: ['1', '2', '3', '4', '5', '6'], values: values, mean: mean, std: std };
+            } else if (type === 'exponential') {
+                for (let i = 0; i < 20; i++) values.push(Math.exp(-i / 5) * 10);
+                mean = 5;
+                std = 5;
+                return { labels: Array.from({ length: 20 }, (_, i) => i), values: values, mean: mean, std: std };
+            } else if (type === 'bimodal') {
+                for (let i = 0; i < 20; i++) {
+                    if (i < 8) values.push(8 - i);
+                    else values.push(i - 8);
+                }
+                mean = 10;
+                std = 4;
+                return { labels: Array.from({ length: 20 }, (_, i) => i), values: values, mean: mean, std: std };
+            }
+        }
+
+        function runCLTSimulation() {
+            const type = document.getElementById('cltPopulation').value;
+            const n = parseInt(document.getElementById('cltSampleSize').value);
+            const numSamples = parseInt(document.getElementById('cltNumSamples').value);
+
+            const sampleMeans = [];
+            let sumMeans = 0;
+
+            for (let i = 0; i < numSamples; i++) {
+                let sum = 0;
+                for (let j = 0; j < n; j++) {
+                    if (type === 'uniform') {
+                        sum += Math.floor(Math.random() * 6) + 1;
+                    } else if (type === 'exponential') {
+                        sum += -Math.log(Math.random()) * 5;
+                    } else {
+                        sum += Math.random() > 0.5 ? 5 + Math.random() * 5 : 15 + Math.random() * 5;
+                    }
+                }
+                const mean = sum / n;
+                sampleMeans.push(mean);
+                sumMeans += mean;
+            }
+
+            // Create histogram
+            const min = Math.min(...sampleMeans);
+            const max = Math.max(...sampleMeans);
+            const bins = 20;
+            const binWidth = (max - min) / bins;
+            const histogram = new Array(bins).fill(0);
+            const labels = [];
+
+            sampleMeans.forEach(mean => {
+                const binIndex = Math.min(Math.floor((mean - min) / binWidth), bins - 1);
+                histogram[binIndex]++;
+            });
+
+            for (let i = 0; i < bins; i++) {
+                labels.push((min + i * binWidth).toFixed(1));
+            }
+
+            cltSampleMeansChart.data.labels = labels;
+            cltSampleMeansChart.data.datasets[0].data = histogram;
+            cltSampleMeansChart.update();
+
+            document.getElementById('cltSampleMean').textContent = (sumMeans / numSamples).toFixed(2);
+
+            // Calculate actual standard error from samples
+            const meanOfMeans = sumMeans / numSamples;
+            const variance = sampleMeans.reduce((acc, val) => acc + Math.pow(val - meanOfMeans, 2), 0) / numSamples;
+            document.getElementById('cltStdError').textContent = Math.sqrt(variance).toFixed(3);
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleOverview() {
+            document.getElementById('uniform').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
 </body>
 
 </html>

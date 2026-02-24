@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probability Distributions Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #fafafa;
+            --card: #fff;
+            --text: #1a1a2e;
+            --muted: #666;
+            --accent: #4361ee;
+            --accent-light: #e8ecff;
+            --border: #e5e5e5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        header {
+            text-align: center;
+            padding: 48px 0 32px;
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        nav {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        nav a {
+            display: block;
+            padding: 8px 16px;
+            background: var(--accent-light);
+            color: var(--accent);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '';
+            width: 4px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        .highlight {
+            background: var(--accent-light);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            border-left: 3px solid var(--accent);
+        }
+
+        .formula {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+        }
+
+        .example {
+            background: #f0fdf4;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            border-left: 3px solid #22c55e;
+        }
+
+        .example-title {
+            font-weight: 600;
+            color: #16a34a;
+            margin-bottom: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .grid-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .grid-item strong {
+            display: block;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 4px 4px 4px 0;
+        }
+
+        .viz {
+            background: #f8f9fa;
+            padding: 24px;
+            border-radius: 8px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+            height: 120px;
+            margin: 16px 0;
+        }
+
+        .bar {
+            width: 40px;
+            background: var(--accent);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s;
+        }
+
+        .bar span {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .bell-curve {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .rule-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .rule-item {
+            background: linear-gradient(135deg, var(--accent-light), #fff);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rule-item .percent {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .rule-item .label {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            section {
+                padding: 24px 16px;
+            }
+
+            .rule-box {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav a {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Probability Distributions</h1>
+            <p>A beginner-friendly guide for Data Science</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#uniform">Uniform</a></li>
+                <li><a href="#binomial">Binomial</a></li>
+                <li><a href="#normal">Normal</a></li>
+                <li><a href="#clt">Central Limit Theorem</a></li>
+            </ul>
+        </nav>
+
+        <section id="intro">
+            <h2>What is a Probability Distribution?</h2>
+            <p>When you analyze real-world data—sales figures, weather patterns, website clicks, or people's
+                heights—you'll notice something interesting: some values appear more often than others. There's a
+                pattern to how data spreads out. This pattern is what we call a <strong>probability
+                    distribution</strong>.</p>
+
+            <div class="highlight">
+                <strong>Simply put:</strong> A probability distribution tells you how likely different outcomes are.
+                It's a mathematical function that assigns probabilities to all possible results of a random process.
+            </div>
+
+            <h3>Two Types of Distributions</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <strong>Discrete</strong>
+                    <p>For outcomes you can count</p>
+                    <span class="tag">Coin tosses</span>
+                    <span class="tag">Dice rolls</span>
+                </div>
+                <div class="grid-item">
+                    <strong>Continuous</strong>
+                    <p>For outcomes in a range</p>
+                    <span class="tag">Height</span>
+                    <span class="tag">Temperature</span>
+                </div>
+            </div>
+
+            <h3>A Simple Analogy</h3>
+            <p><strong>Rolling a die:</strong> The outcomes are {1, 2, 3, 4, 5, 6}, and each has a probability of 1/6.
+                This is a discrete uniform distribution—every outcome is equally likely.</p>
+            <p><strong>Measuring heights:</strong> You don't get fixed values. Instead, most people cluster around an
+                average height, with fewer being very short or very tall. This forms a bell-shaped curve—a continuous
+                normal distribution.</p>
+
+            <h3>Why Are Distributions Important in Data Science?</h3>
+            <p>Understanding distributions helps you model real-world randomness (user behavior, measurement errors),
+                make predictions (will a customer buy?), run simulations, and choose the right statistical methods for
+                your analysis.</p>
+
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Examples</th>
+                    <th>Used For</th>
+                </tr>
+                <tr>
+                    <td>Discrete</td>
+                    <td>Binomial, Poisson</td>
+                    <td>Counting events</td>
+                </tr>
+                <tr>
+                    <td>Continuous</td>
+                    <td>Normal, Uniform</td>
+                    <td>Measuring quantities</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="uniform">
+            <h2>Uniform Distribution</h2>
+            <p>A uniform distribution is the simplest case: every outcome is equally likely. Think of it as "perfect
+                fairness" in probability.</p>
+
+            <h3>Discrete Uniform: Rolling a Fair Die</h3>
+            <p>When you roll a fair 6-sided die, each number (1 through 6) has exactly the same chance of appearing: 1/6
+                or about 16.67%.</p>
+
+            <div class="viz">
+                <div class="bar-chart">
+                    <div>
+                        <div class="bar" style="height:60px"></div><span>1</span>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:60px"></div><span>2</span>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:60px"></div><span>3</span>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:60px"></div><span>4</span>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:60px"></div><span>5</span>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:60px"></div><span>6</span>
+                    </div>
+                </div>
+                <p style="color:var(--muted);font-size:0.9rem;margin-top:12px">Each outcome has equal probability (1/6)
+                </p>
+            </div>
+
+            <div class="formula">
+                <strong>Discrete Formula:</strong> P(X = x) = 1 / n<br>
+                Where n = number of possible outcomes
+            </div>
+
+            <h3>Continuous Uniform: Random Numbers</h3>
+            <p>When picking a random number between 0 and 1, every value in that range is equally likely. The
+                probability "density" is constant across the entire interval.</p>
+
+            <div class="formula">
+                <strong>Continuous Formula:</strong> f(x) = 1 / (b - a) for values between a and b<br>
+                Outside this range, probability is 0
+            </div>
+
+            <div class="example">
+                <div class="example-title">Example</div>
+                <p>If you randomly select a number between 0 and 10, the probability of getting any specific range (say
+                    2 to 4) is simply the length of that range divided by the total range: (4-2)/(10-0) = 0.2 or 20%.
+                </p>
+            </div>
+
+            <h3>Real-World Applications</h3>
+            <p>Uniform distributions model pure randomness and are used in random number generation, simulations,
+                lottery systems, and as a starting point when no prior information suggests one outcome over another.
+            </p>
+        </section>
+
+        <section id="binomial">
+            <h2>Binomial Distribution</h2>
+            <p>The binomial distribution answers a specific question: <em>In a fixed number of yes/no trials, how many
+                    successes will occur?</em></p>
+
+            <div class="highlight">
+                <strong>Classic Example:</strong> Flip a coin 10 times. What's the probability of getting exactly 6
+                heads?
+            </div>
+
+            <h3>Key Ingredients</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <strong>n</strong>
+                    <p>Number of trials (e.g., 10 tosses)</p>
+                </div>
+                <div class="grid-item">
+                    <strong>p</strong>
+                    <p>Probability of success (e.g., 0.5 for heads)</p>
+                </div>
+                <div class="grid-item">
+                    <strong>x</strong>
+                    <p>Number of successes (e.g., 6 heads)</p>
+                </div>
+            </div>
+
+            <h3>Requirements for Binomial Distribution</h3>
+            <p>Each trial must be independent (one outcome doesn't affect others), there are only two possible results
+                per trial (success or failure), and the probability of success stays the same for every trial.</p>
+
+            <div class="formula">
+                <strong>Formula:</strong> P(X = x) = C(n, x) × p<sup>x</sup> × (1 - p)<sup>(n - x)</sup><br><br>
+                Where C(n, x) = n! / (x! × (n-x)!) is "n choose x" — the number of ways to arrange x successes in n
+                trials
+            </div>
+
+            <div class="example">
+                <div class="example-title">Worked Example: 6 Heads in 10 Tosses</div>
+                <p>n = 10 trials, x = 6 successes, p = 0.5</p>
+                <p>C(10, 6) = 210 (there are 210 ways to get 6 heads in 10 tosses)</p>
+                <p>P(6 heads) = 210 × 0.5<sup>6</sup> × 0.5<sup>4</sup> = 210 × 0.015625 × 0.0625 ≈ <strong>0.205
+                        (20.5%)</strong></p>
+            </div>
+
+            <h3>Real-World Applications</h3>
+            <p><strong>Email campaigns:</strong> Out of 100 recipients, how many will click the link?<br>
+                <strong>Quality control:</strong> In a batch of 50 products, how many might be defective?<br>
+                <strong>A/B testing:</strong> If 200 visitors see your new webpage, how many will convert?<br>
+                <strong>Medical trials:</strong> What's the probability that a treatment works for 8 out of 10 patients?
+            </p>
+        </section>
+
+        <section id="normal">
+            <h2>Normal Distribution</h2>
+            <p>The normal distribution (also called Gaussian distribution) is perhaps the most important distribution in
+                statistics. It creates the famous "bell curve" that appears everywhere in nature.</p>
+
+            <div class="viz">
+                <svg class="bell-curve" viewBox="0 0 400 200">
+                    <defs>
+                        <linearGradient id="bellGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4361ee;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#4361ee;stop-opacity:0.1" />
+                        </linearGradient>
+                    </defs>
+                    <path
+                        d="M20,180 Q50,178 80,170 Q110,155 140,120 Q170,60 200,30 Q230,60 260,120 Q290,155 320,170 Q350,178 380,180 L380,180 L20,180 Z"
+                        fill="url(#bellGrad)" stroke="#4361ee" stroke-width="2" />
+                    <line x1="200" y1="180" x2="200" y2="25" stroke="#4361ee" stroke-width="1" stroke-dasharray="4" />
+                    <text x="200" y="195" text-anchor="middle" fill="#666" font-size="12">μ (mean)</text>
+                </svg>
+                <p style="color:var(--muted);font-size:0.9rem;margin-top:8px">Bell-shaped and symmetric around the mean
+                </p>
+            </div>
+
+            <h3>Understanding Mean (μ)</h3>
+            <p>The mean is the average of all values—add them up and divide by the count. It represents the center of
+                the distribution.</p>
+            <div class="formula">
+                mean = (x₁ + x₂ + x₃ + ... + xₙ) / n
+            </div>
+
+            <h3>Understanding Standard Deviation (σ)</h3>
+            <p>Standard deviation measures how spread out the data is from the mean. A small σ means data clusters
+                tightly around the mean; a large σ means data is more spread out.</p>
+            <div class="formula">
+                σ = √[ (1/n) × Σ(xᵢ - mean)² ]
+            </div>
+            <p>Steps: (1) Find the mean, (2) Subtract mean from each value and square it, (3) Average those squared
+                differences (this is variance), (4) Take the square root.</p>
+
+            <h3>Key Properties of Normal Distribution</h3>
+            <p>The curve is perfectly symmetric around the mean. The mean, median, and mode are all equal. As you move
+                away from the center, values become increasingly rare.</p>
+
+            <h3>The 68-95-99.7 Rule</h3>
+            <p>This rule (also called the Empirical Rule or Three Sigma Rule) tells you how data spreads in a normal
+                distribution:</p>
+
+            <div class="rule-box">
+                <div class="rule-item">
+                    <div class="percent">68%</div>
+                    <div class="label">within ±1σ</div>
+                </div>
+                <div class="rule-item">
+                    <div class="percent">95%</div>
+                    <div class="label">within ±2σ</div>
+                </div>
+                <div class="rule-item">
+                    <div class="percent">99.7%</div>
+                    <div class="label">within ±3σ</div>
+                </div>
+            </div>
+
+            <div class="example">
+                <div class="example-title">Example: Test Scores</div>
+                <p>If exam scores follow a normal distribution with mean = 70 and σ = 10:</p>
+                <p>• 68% of students score between 60 and 80<br>
+                    • 95% score between 50 and 90<br>
+                    • 99.7% score between 40 and 100</p>
+            </div>
+
+            <div class="formula">
+                <strong>PDF Formula:</strong> f(x) = (1 / (σ√2π)) × e<sup>-(x-μ)²/(2σ²)</sup>
+            </div>
+
+            <h3>Real-World Examples</h3>
+            <p>Human heights, IQ scores, measurement errors, blood pressure readings, and exam scores all tend to follow
+                normal distributions. Many machine learning algorithms assume data is normally distributed, making this
+                concept essential for data science.</p>
+        </section>
+
+        <section id="clt">
+            <h2>Central Limit Theorem</h2>
+            <p>The Central Limit Theorem (CLT) is one of the most powerful ideas in statistics. It explains why the
+                normal distribution appears so frequently in the real world.</p>
+
+            <div class="highlight">
+                <strong>The Big Idea:</strong> If you take many random samples from ANY population and calculate their
+                means, those means will form a normal distribution—regardless of what the original population looks
+                like.
+            </div>
+
+            <h3>Breaking It Down</h3>
+            <p>Imagine you want to find the average height of all students at a university. Measuring everyone would
+                take forever. Instead:</p>
+            <p>1. Take a random sample of 30 students and calculate their average height<br>
+                2. Repeat this many times with different random samples<br>
+                3. Plot all these sample averages</p>
+            <p>The CLT says this plot of averages will form a bell curve, even if the original heights weren't normally
+                distributed!</p>
+
+            <h3>Key Requirements</h3>
+            <div class="grid">
+                <div class="grid-item">
+                    <strong>Sample Size ≥ 30</strong>
+                    <p>Generally, 30+ observations per sample is considered "large enough"</p>
+                </div>
+                <div class="grid-item">
+                    <strong>Independence</strong>
+                    <p>Each sample must be randomly selected</p>
+                </div>
+                <div class="grid-item">
+                    <strong>Finite Variance</strong>
+                    <p>The population must have a defined spread</p>
+                </div>
+            </div>
+
+            <h3>Mathematical Expression</h3>
+            <p>If X₁, X₂, ..., Xₙ are independent random variables with mean μ and standard deviation σ, then the
+                sampling distribution of the sample mean (X̄) approaches a normal distribution with:</p>
+
+            <div class="formula">
+                <strong>Mean of sample means:</strong> μ (same as population mean)<br><br>
+                <strong>Standard deviation of sample means:</strong> σ / √n<br>
+                (This is called the "Standard Error")
+            </div>
+
+            <p>Notice something important: as sample size (n) increases, the standard error decreases. Larger samples
+                give more precise estimates!</p>
+
+            <div class="example">
+                <div class="example-title">Example: Rolling Dice</div>
+                <p>A single die roll gives uniform probabilities (1/6 for each number). But if you:</p>
+                <p>• Roll 30 dice and calculate the average<br>
+                    • Repeat this 1000 times<br>
+                    • Plot all 1000 averages</p>
+                <p>You'll see a beautiful bell curve centered around 3.5 (the true average of a die roll), even though
+                    individual rolls are uniformly distributed!</p>
+            </div>
+
+            <h3>Why CLT Matters</h3>
+            <p><strong>Statistical inference:</strong> We can make conclusions about populations using sample data, even
+                without knowing the population's distribution.</p>
+            <p><strong>Hypothesis testing:</strong> Most statistical tests assume normality. CLT justifies using these
+                tests with large samples.</p>
+            <p><strong>Confidence intervals:</strong> We can estimate how precise our sample statistics are.</p>
+            <p><strong>Quality control:</strong> Manufacturing processes use CLT to monitor product consistency.</p>
+            <p><strong>Machine learning:</strong> Many algorithms rely on CLT for making inferences about model
+                performance.</p>
+
+            <div class="highlight">
+                <strong>Key Takeaway:</strong> The CLT is why averages and sums of random variables tend toward normal
+                distributions in nature—explaining everything from measurement errors to why so many natural phenomena
+                follow bell curves.
+            </div>
+        </section>
+
+        <section>
+            <h2>Quick Reference Summary</h2>
+            <table>
+                <tr>
+                    <th>Distribution</th>
+                    <th>Type</th>
+                    <th>Key Use Case</th>
+                    <th>Shape</th>
+                </tr>
+                <tr>
+                    <td>Uniform</td>
+                    <td>Discrete/Continuous</td>
+                    <td>Equal probability outcomes</td>
+                    <td>Flat</td>
+                </tr>
+                <tr>
+                    <td>Binomial</td>
+                    <td>Discrete</td>
+                    <td>Count successes in trials</td>
+                    <td>Symmetric or skewed</td>
+                </tr>
+                <tr>
+                    <td>Normal</td>
+                    <td>Continuous</td>
+                    <td>Natural measurements</td>
+                    <td>Bell curve</td>
+                </tr>
+            </table>
+
+            <h3>When to Use Each</h3>
+            <p><strong>Uniform:</strong> Use when all outcomes are equally likely (random selection, fair games).</p>
+            <p><strong>Binomial:</strong> Use when counting successes in a fixed number of independent yes/no trials.
+            </p>
+            <p><strong>Normal:</strong> Use for continuous data that clusters around a mean with symmetric spread.</p>
+            <p><strong>CLT:</strong> Apply when working with sample means—they'll be normally distributed for large
+                samples.</p>
+        </section>
+
+        <footer>
+            <p>Probability Distributions Guide • Data Science Fundamentals</p>
+        </footer>
+    </div>
+</body>
+
+</html>
