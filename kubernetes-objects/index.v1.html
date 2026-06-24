@@ -1,0 +1,2444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Objects — Enterprise Declarative Reference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a1220;
+            --bg2: #0f1d30;
+            --bg3: #162236;
+            --panel: #1a2a40;
+            --border: #1e3a5f;
+            --border2: #2a4f7a;
+            --gold: #f0a500;
+            --gold-dim: rgba(240, 165, 0, 0.12);
+            --gold-glow: rgba(240, 165, 0, 0.25);
+            --text: #c8d8e8;
+            --text-dim: #6b8aaa;
+            --text-bright: #e8f2ff;
+            --cyan: #38bdf8;
+            --green: #4ade80;
+            --red: #f87171;
+            --purple: #a78bfa;
+            --amber: #fbbf24;
+            --pink: #f472b6;
+            --teal: #2dd4bf;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --display: 'Syne', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.65;
+            overflow-x: hidden
+        }
+
+        /* ─── NOISE TEXTURE OVERLAY ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: .5;
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: rgba(10, 18, 32, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            height: 56px;
+        }
+
+        .nav-brand {
+            font-family: var(--display);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-bright);
+            letter-spacing: .02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-badge {
+            background: var(--gold-dim);
+            border: 1px solid rgba(240, 165, 0, .3);
+            color: var(--gold);
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: .06em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.75rem;
+            list-style: none
+        }
+
+        .nav-links a {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: var(--mono);
+            letter-spacing: .03em;
+            transition: color .2s
+        }
+
+        .nav-links a:hover {
+            color: var(--gold)
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            position: relative;
+            padding: 5rem 2.5rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: var(--gold-dim);
+            border: 1px solid rgba(240, 165, 0, .25);
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 1.75rem;
+        }
+
+        .hero h1 {
+            font-family: var(--display);
+            font-size: clamp(2.2rem, 5.5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text-bright);
+            margin-bottom: 1.25rem;
+            letter-spacing: -.02em;
+        }
+
+        .hero h1 em {
+            color: var(--gold);
+            font-style: normal
+        }
+
+        .hero-sub {
+            font-size: 16px;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.75;
+        }
+
+        /* ─── OBJECT MAP (SVG canvas) ─── */
+        .map-wrap {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto 1.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            text-align: left;
+            margin-bottom: 1rem;
+            letter-spacing: .05em;
+        }
+
+        #obj-map {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer
+        }
+
+        /* ─── STATS STRIP ─── */
+        .stats-strip {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            max-width: 700px;
+            margin: 0 auto 4rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .stat {
+            flex: 1;
+            padding: 1.1rem .75rem;
+            text-align: center;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+        }
+
+        .stat:last-child {
+            border-right: none
+        }
+
+        .stat-n {
+            display: block;
+            font-family: var(--display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .stat-l {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-family: var(--mono);
+            margin-top: 2px
+        }
+
+        /* ─── SECTION ─── */
+        .section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem 5rem
+        }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sec-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .sec-title {
+            font-family: var(--display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-bright)
+        }
+
+        .sec-desc {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-left: auto;
+            font-family: var(--mono);
+            white-space: nowrap
+        }
+
+        /* ─── OBJECT CARD ─── */
+        .obj-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: border-color .25s;
+        }
+
+        .obj-card:hover {
+            border-color: var(--border2)
+        }
+
+        .obj-card-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            background: var(--bg3);
+            user-select: none;
+        }
+
+        .obj-kind {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 6px;
+            letter-spacing: .04em;
+        }
+
+        .obj-name {
+            font-family: var(--display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+
+        .obj-use {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-left: auto;
+            max-width: 300px;
+            text-align: right
+        }
+
+        .chevron {
+            margin-left: 12px;
+            color: var(--text-dim);
+            font-size: 14px;
+            transition: transform .25s;
+            flex-shrink: 0;
+        }
+
+        .obj-card.open .chevron {
+            transform: rotate(180deg)
+        }
+
+        .obj-body {
+            display: none;
+            padding: 1.25rem
+        }
+
+        .obj-card.open .obj-body {
+            display: block
+        }
+
+        .obj-body-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 1rem
+        }
+
+        @media(max-width:700px) {
+            .obj-body-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* ─── INFO PANE ─── */
+        .info-pane {}
+
+        .info-pane h4 {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-dim);
+            margin-bottom: .75rem;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            margin-bottom: .6rem;
+            font-size: 13px;
+        }
+
+        .info-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .info-text {
+            color: var(--text);
+            line-height: 1.5
+        }
+
+        .info-text strong {
+            color: var(--text-bright);
+            font-weight: 600
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: .75rem
+        }
+
+        .tag {
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 5px;
+            border: 1px solid;
+        }
+
+        /* ─── YAML PANE ─── */
+        .yaml-pane {
+            position: relative
+        }
+
+        .yaml-wrap {
+            background: #060e1a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .yaml-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 12px;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .yaml-filename {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim)
+        }
+
+        .copy-yaml {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 5px;
+            background: transparent;
+            border: 1px solid var(--border2);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .copy-yaml:hover {
+            border-color: var(--gold);
+            color: var(--gold)
+        }
+
+        .copy-yaml.ok {
+            border-color: var(--green);
+            color: var(--green)
+        }
+
+        .yaml-code {
+            padding: 1rem 1.1rem;
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-x: auto;
+            white-space: pre;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .yaml-code::-webkit-scrollbar {
+            width: 4px;
+            height: 4px
+        }
+
+        .yaml-code::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        .yaml-code::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 2px
+        }
+
+        /* ─── YAML SYNTAX ─── */
+        .yk {
+            color: #7dd3fc
+        }
+
+        /* key */
+        .yv {
+            color: #86efac
+        }
+
+        /* string value */
+        .yn {
+            color: #fdba74
+        }
+
+        /* number */
+        .yb {
+            color: #c084fc
+        }
+
+        /* boolean/special */
+        .yc {
+            color: #475569
+        }
+
+        /* comment */
+        .yd {
+            color: #f472b6
+        }
+
+        /* apiVersion/kind */
+        .ya {
+            color: #2dd4bf
+        }
+
+        /* anchor */
+
+        /* ─── ARCH DIAGRAM ─── */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .arch-node {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: border-color .2s;
+        }
+
+        .arch-node:hover {
+            border-color: var(--border2)
+        }
+
+        .arch-node-icon {
+            font-size: 20px
+        }
+
+        .arch-node-title {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-bright);
+        }
+
+        .arch-node-desc {
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.5
+        }
+
+        /* ─── FLOW DIAGRAM ─── */
+        .flow-wrap {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        #flow-svg {
+            min-width: 800px;
+            width: 100%;
+            height: auto;
+            display: block
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        footer span {
+            color: var(--gold)
+        }
+
+        @media(max-width:600px) {
+            .nav-links {
+                display: none
+            }
+
+            .stats-strip {
+                flex-direction: column
+            }
+
+            .stat {
+                border-right: none;
+                border-bottom: 1px solid var(--border)
+            }
+
+            .stat:last-child {
+                border-bottom: none
+            }
+
+            .hero {
+                padding: 3rem 1rem 2rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-brand">
+            ⎈ KubeObjects
+            <span class="nav-badge">Enterprise</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#workload" target="_self">Workload</a></li>
+            <li><a href="#network" target="_self">Network</a></li>
+            <li><a href="#config" target="_self">Config</a></li>
+            <li><a href="#storage" target="_self">Storage</a></li>
+            <li><a href="#security" target="_self">Security</a></li>
+            <li><a href="#autoscale" target="_self">Scale</a></li>
+            <li><a href="#observe" target="_self">Observe</a></li>
+            <li><a href="#flow" target="_self">Lifecycle</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-eyebrow">⎈ Declarative Infrastructure Reference</div>
+        <h1>Kubernetes Objects<br>for <em>Enterprise</em> Scale</h1>
+        <p class="hero-sub">Every K8s object a global product company needs — with production-grade YAML, real resource
+            limits, multi-region patterns, and declarative best practices.</p>
+
+        <div class="map-wrap">
+            <div class="map-label">// object relationship map — click any node to jump</div>
+            <svg id="obj-map" viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg" role="img"
+                aria-label="Kubernetes object relationship diagram">
+                <defs>
+                    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#1e3a5f" />
+                    </marker>
+                    <marker id="arr-gold" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#f0a500" />
+                    </marker>
+                </defs>
+                <!-- connectors -->
+                <g stroke="#1e3a5f" stroke-width="1.5" fill="none" marker-end="url(#arr)">
+                    <line x1="430" y1="78" x2="175" y2="128" />
+                    <line x1="430" y1="78" x2="430" y2="128" />
+                    <line x1="430" y1="78" x2="685" y2="128" />
+                    <line x1="175" y1="158" x2="105" y2="208" />
+                    <line x1="175" y1="158" x2="245" y2="208" />
+                    <line x1="430" y1="158" x2="360" y2="208" />
+                    <line x1="430" y1="158" x2="500" y2="208" />
+                    <line x1="685" y1="158" x2="615" y2="208" />
+                    <line x1="685" y1="158" x2="755" y2="208" />
+                    <line x1="105" y1="238" x2="105" y2="284" />
+                    <line x1="245" y1="238" x2="245" y2="284" />
+                    <line x1="360" y1="238" x2="360" y2="284" />
+                    <line x1="500" y1="238" x2="500" y2="284" />
+                    <line x1="615" y1="238" x2="615" y2="284" />
+                    <line x1="755" y1="238" x2="755" y2="284" />
+                </g>
+                <!-- cluster top node -->
+                <g id="mn-cluster" onclick="scrollTo2('cluster')" style="cursor:pointer">
+                    <rect x="330" y="38" width="200" height="40" rx="8" fill="#0f1d30" stroke="#f0a500"
+                        stroke-width="1.5" />
+                    <text x="430" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13"
+                        fill="#f0a500" font-weight="600">Cluster / Namespace</text>
+                </g>
+                <!-- mid row -->
+                <g id="mn-workload" onclick="scrollTo2('workload')" style="cursor:pointer">
+                    <rect x="105" y="128" width="140" height="30" rx="7" fill="#0f1d30" stroke="#38bdf8"
+                        stroke-width="1" />
+                    <text x="175" y="148" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11"
+                        fill="#38bdf8">Workload</text>
+                </g>
+                <g id="mn-config" onclick="scrollTo2('config')" style="cursor:pointer">
+                    <rect x="360" y="128" width="140" height="30" rx="7" fill="#0f1d30" stroke="#a78bfa"
+                        stroke-width="1" />
+                    <text x="430" y="148" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11"
+                        fill="#a78bfa">Config &amp; Secrets</text>
+                </g>
+                <g id="mn-network" onclick="scrollTo2('network')" style="cursor:pointer">
+                    <rect x="615" y="128" width="140" height="30" rx="7" fill="#0f1d30" stroke="#4ade80"
+                        stroke-width="1" />
+                    <text x="685" y="148" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11"
+                        fill="#4ade80">Networking</text>
+                </g>
+                <!-- bottom row -->
+                <g onclick="scrollTo2('workload')" style="cursor:pointer">
+                    <rect x="42" y="208" width="126" height="26" rx="6" fill="#162236" stroke="#1e3a5f" /><text x="105"
+                        y="225" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10"
+                        fill="#7dd3fc">Deployment</text>
+                </g>
+                <g onclick="scrollTo2('workload')" style="cursor:pointer">
+                    <rect x="182" y="208" width="126" height="26" rx="6" fill="#162236" stroke="#1e3a5f" /><text x="245"
+                        y="225" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10"
+                        fill="#7dd3fc">StatefulSet</text>
+                </g>
+                <g onclick="scrollTo2('config')" style="cursor:pointer">
+                    <rect x="297" y="208" width="126" height="26" rx="6" fill="#162236" stroke="#1e3a5f" /><text x="360"
+                        y="225" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10"
+                        fill="#c084fc">ConfigMap</text>
+                </g>
+                <g onclick="scrollTo2('security')" style="cursor:pointer">
+                    <rect x="437" y="208" width="126" height="26" rx="6" fill="#162236" stroke="#1e3a5f" /><text x="500"
+                        y="225" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10"
+                        fill="#c084fc">Secret</text>
+                </g>
+                <g onclick="scrollTo2('network')" style="cursor:pointer">
+                    <rect x="552" y="208" width="126" height="26" rx="6" fill="#162236" stroke="#1e3a5f" /><text x="615"
+                        y="225" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10"
+                        fill="#86efac">Service</text>
+                </g>
+                <g onclick="scrollTo2('network')" style="cursor:pointer">
+                    <rect x="692" y="208" width="126" height="26" rx="6" fill="#162236" stroke="#1e3a5f" /><text x="755"
+                        y="225" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10"
+                        fill="#86efac">Ingress</text>
+                </g>
+                <!-- leaf row -->
+                <g onclick="scrollTo2('autoscale')" style="cursor:pointer">
+                    <rect x="50" y="284" width="110" height="22" rx="5" fill="#0f1d30" stroke="#1e3a5f" /><text x="105"
+                        y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9"
+                        fill="#fbbf24">HPA / VPA</text>
+                </g>
+                <g onclick="scrollTo2('storage')" style="cursor:pointer">
+                    <rect x="190" y="284" width="110" height="22" rx="5" fill="#0f1d30" stroke="#1e3a5f" /><text x="245"
+                        y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9"
+                        fill="#fbbf24">PVC</text>
+                </g>
+                <g onclick="scrollTo2('observe')" style="cursor:pointer">
+                    <rect x="305" y="284" width="110" height="22" rx="5" fill="#0f1d30" stroke="#1e3a5f" /><text x="360"
+                        y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9"
+                        fill="#fbbf24">PodDisruptBudget</text>
+                </g>
+                <g onclick="scrollTo2('security')" style="cursor:pointer">
+                    <rect x="445" y="284" width="110" height="22" rx="5" fill="#0f1d30" stroke="#1e3a5f" /><text x="500"
+                        y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9"
+                        fill="#fbbf24">RBAC</text>
+                </g>
+                <g onclick="scrollTo2('network')" style="cursor:pointer">
+                    <rect x="560" y="284" width="110" height="22" rx="5" fill="#0f1d30" stroke="#1e3a5f" /><text x="615"
+                        y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9"
+                        fill="#fbbf24">NetworkPolicy</text>
+                </g>
+                <g onclick="scrollTo2('observe')" style="cursor:pointer">
+                    <rect x="700" y="284" width="110" height="22" rx="5" fill="#0f1d30" stroke="#1e3a5f" /><text x="755"
+                        y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9"
+                        fill="#fbbf24">ServiceMonitor</text>
+                </g>
+            </svg>
+        </div>
+
+        <div class="stats-strip">
+            <div class="stat"><span class="stat-n">14</span><span class="stat-lbl">objects covered</span></div>
+            <div class="stat"><span class="stat-n">14</span><span class="stat-lbl">prod-grade YAMLs</span></div>
+            <div class="stat"><span class="stat-n">6</span><span class="stat-lbl">categories</span></div>
+            <div class="stat"><span class="stat-n">MNC</span><span class="stat-lbl">scale patterns</span></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- WORKLOAD OBJECTS -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="section" id="workload">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#0c2035;">🚀</div>
+            <span class="sec-title">Workload Objects</span>
+            <span class="sec-desc">pods · deployments · statefulsets · daemonsets · jobs</span>
+        </div>
+
+        <!-- Namespace -->
+        <div class="obj-card" id="cluster">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(240,165,0,.12);color:var(--gold);border:1px solid rgba(240,165,0,.3)">Namespace</span>
+                <span class="obj-name">globalcorp-production</span>
+                <span class="obj-use">Tenant isolation for multi-region, multi-team cluster</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// why it matters</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Scope boundary</strong> — every resource lives inside a
+                                namespace. MNCs use one namespace per team/env/region.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>LimitRange</strong> — set default CPU/memory so any pod
+                                without requests gets sane defaults.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>ResourceQuota</strong> — cap total CPU, memory, and object
+                                count per team/namespace.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Labels</strong> — used by RBAC, NetworkPolicy, and cost
+                                allocation tools (e.g. Kubecost).</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag" style="color:var(--gold);border-color:rgba(240,165,0,.3)">isolation</span>
+                            <span class="tag" style="color:var(--cyan);border-color:rgba(56,189,248,.3)">quota</span>
+                            <span class="tag"
+                                style="color:var(--green);border-color:rgba(74,222,128,.3)">multi-team</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">namespace.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">Namespace</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">team</span><span class="yk">:</span> <span class="yv">platform</span>
+                                <span class="yk">env</span><span class="yk">:</span> <span class="yv">production</span>
+                                <span class="yk">cost-center</span><span class="yk">:</span> <span
+                                    class="yv">eng-001</span>
+                                <span class="yk">region</span><span class="yk">:</span> <span class="yv">us-east</span>
+                                <span class="yk">annotations</span><span class="yk">:</span>
+                                <span class="yk">owner</span><span class="yk">:</span> <span
+                                    class="yv">platform-team@globalcorp.com</span>
+                                <span class="yc">---</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">ResourceQuota</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">production-quota</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">hard</span><span class="yk">:</span>
+                                <span class="yk">requests.cpu</span><span class="yk">:</span> <span
+                                    class="yv">"100"</span>
+                                <span class="yk">requests.memory</span><span class="yk">:</span> <span
+                                    class="yv">200Gi</span>
+                                <span class="yk">limits.cpu</span><span class="yk">:</span> <span
+                                    class="yv">"200"</span>
+                                <span class="yk">limits.memory</span><span class="yk">:</span> <span
+                                    class="yv">400Gi</span>
+                                <span class="yk">pods</span><span class="yk">:</span> <span class="yn">"500"</span>
+                                <span class="yk">services</span><span class="yk">:</span> <span class="yn">"50"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deployment -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(56,189,248,.1);color:var(--cyan);border:1px solid rgba(56,189,248,.3)">Deployment</span>
+                <span class="obj-name">payment-service</span>
+                <span class="obj-use">Stateless service with rolling updates and resource limits</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// enterprise patterns</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Rolling update</strong> — maxSurge 25% / maxUnavailable 0
+                                ensures zero downtime deploys for SLA-critical services.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Pod affinity</strong> — spread replicas across AZs using
+                                topologySpreadConstraints for HA.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Resource limits</strong> — always set both requests and
+                                limits. Payment services use Guaranteed QoS (requests = limits).</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Probes</strong> — liveness restarts crashed containers;
+                                readiness gates traffic until warm.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--cyan);border-color:rgba(56,189,248,.3)">stateless</span>
+                            <span class="tag"
+                                style="color:var(--green);border-color:rgba(74,222,128,.3)">rolling-update</span>
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">Guaranteed
+                                QoS</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">deployment-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">apps/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">Deployment</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">version</span><span class="yk">:</span> <span class="yv">v3.2.1</span>
+                                <span class="yk">tier</span><span class="yk">:</span> <span class="yv">backend</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">replicas</span><span class="yk">:</span> <span class="yn">6</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">strategy</span><span class="yk">:</span>
+                                <span class="yk">type</span><span class="yk">:</span> <span
+                                    class="yv">RollingUpdate</span>
+                                <span class="yk">rollingUpdate</span><span class="yk">:</span>
+                                <span class="yk">maxSurge</span><span class="yk">:</span> <span class="yv">25%</span>
+                                <span class="yk">maxUnavailable</span><span class="yk">:</span> <span
+                                    class="yn">0</span>
+                                <span class="yk">template</span><span class="yk">:</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">topologySpreadConstraints</span><span class="yk">:</span>
+                                <span class="yk">- maxSkew</span><span class="yk">:</span> <span class="yn">1</span>
+                                <span class="yk">topologyKey</span><span class="yk">:</span> <span
+                                    class="yv">topology.kubernetes.io/zone</span>
+                                <span class="yk">whenUnsatisfiable</span><span class="yk">:</span> <span
+                                    class="yv">DoNotSchedule</span>
+                                <span class="yk">labelSelector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">containers</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">image</span><span class="yk">:</span> <span
+                                    class="yv">gcr.io/globalcorp/payment-service:v3.2.1</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- containerPort</span><span class="yk">:</span> <span
+                                    class="yn">8080</span>
+                                <span class="yk">resources</span><span class="yk">:</span>
+                                <span class="yk">requests</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">500m</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">512Mi</span>
+                                <span class="yk">limits</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">500m</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">512Mi</span>
+                                <span class="yk">livenessProbe</span><span class="yk">:</span>
+                                <span class="yk">httpGet</span><span class="yk">:</span>
+                                <span class="yk">path</span><span class="yk">:</span> <span class="yv">/healthz</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">8080</span>
+                                <span class="yk">initialDelaySeconds</span><span class="yk">:</span> <span
+                                    class="yn">15</span>
+                                <span class="yk">periodSeconds</span><span class="yk">:</span> <span
+                                    class="yn">10</span>
+                                <span class="yk">readinessProbe</span><span class="yk">:</span>
+                                <span class="yk">httpGet</span><span class="yk">:</span>
+                                <span class="yk">path</span><span class="yk">:</span> <span class="yv">/ready</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">8080</span>
+                                <span class="yk">initialDelaySeconds</span><span class="yk">:</span> <span
+                                    class="yn">5</span>
+                                <span class="yk">periodSeconds</span><span class="yk">:</span> <span class="yn">5</span>
+                                <span class="yk">envFrom</span><span class="yk">:</span>
+                                <span class="yk">- configMapRef</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-config</span>
+                                <span class="yk">- secretRef</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-secrets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- StatefulSet -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(56,189,248,.1);color:var(--cyan);border:1px solid rgba(56,189,248,.3)">StatefulSet</span>
+                <span class="obj-name">postgres-cluster</span>
+                <span class="obj-use">Ordered, stable-identity pods for stateful databases</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// key differences from Deployment</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Stable network identity</strong> — pods get deterministic
+                                names (postgres-0, postgres-1) used by primary/replica replication.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Ordered startup</strong> — postgres-0 starts before
+                                postgres-1 ensuring primary is ready before replicas.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>volumeClaimTemplates</strong> — each pod gets its own PVC
+                                that persists across restarts.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--purple);border-color:rgba(167,139,250,.3)">stateful</span>
+                            <span class="tag"
+                                style="color:var(--teal);border-color:rgba(45,212,191,.3)">persistent</span>
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">ordered</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">statefulset-postgres.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">apps/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">StatefulSet</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">postgres-cluster</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">serviceName</span><span class="yk">:</span> <span
+                                    class="yv">postgres-headless</span>
+                                <span class="yk">replicas</span><span class="yk">:</span> <span class="yn">3</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span class="yv">postgres</span>
+                                <span class="yk">template</span><span class="yk">:</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span class="yv">postgres</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">containers</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span class="yv">postgres</span>
+                                <span class="yk">image</span><span class="yk">:</span> <span
+                                    class="yv">postgres:15-alpine</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- containerPort</span><span class="yk">:</span> <span
+                                    class="yn">5432</span>
+                                <span class="yk">resources</span><span class="yk">:</span>
+                                <span class="yk">requests</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">2</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">4Gi</span>
+                                <span class="yk">limits</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">4</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">8Gi</span>
+                                <span class="yk">volumeMounts</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span
+                                    class="yv">postgres-data</span>
+                                <span class="yk">mountPath</span><span class="yk">:</span> <span
+                                    class="yv">/var/lib/postgresql/data</span>
+                                <span class="yk">env</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span
+                                    class="yv">POSTGRES_PASSWORD</span>
+                                <span class="yk">valueFrom</span><span class="yk">:</span>
+                                <span class="yk">secretKeyRef</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">postgres-secret</span>
+                                <span class="yk">key</span><span class="yk">:</span> <span class="yv">password</span>
+                                <span class="yk">volumeClaimTemplates</span><span class="yk">:</span>
+                                <span class="yk">- metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">postgres-data</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">accessModes</span><span class="yk">:</span> <span
+                                    class="yb">["ReadWriteOnce"]</span>
+                                <span class="yk">storageClassName</span><span class="yk">:</span> <span
+                                    class="yv">gp3-encrypted</span>
+                                <span class="yk">resources</span><span class="yk">:</span>
+                                <span class="yk">requests</span><span class="yk">:</span>
+                                <span class="yk">storage</span><span class="yk">:</span> <span class="yv">100Gi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DaemonSet -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(56,189,248,.1);color:var(--cyan);border:1px solid rgba(56,189,248,.3)">DaemonSet</span>
+                <span class="obj-name">log-collector</span>
+                <span class="obj-use">One pod per node — logging, monitoring, security agents</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// use cases</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Log forwarding</strong> — Fluentd/Fluent Bit collects
+                                container logs from each node's /var/log.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Node monitoring</strong> — Prometheus node-exporter runs as
+                                DaemonSet for hardware metrics.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Security scanning</strong> — Falco or Datadog agent runs on
+                                every node for runtime threat detection.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag" style="color:var(--teal);border-color:rgba(45,212,191,.3)">per-node</span>
+                            <span class="tag"
+                                style="color:var(--cyan);border-color:rgba(56,189,248,.3)">observability</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">daemonset-log-collector.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">apps/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">DaemonSet</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">log-collector</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">log-collector</span>
+                                <span class="yk">template</span><span class="yk">:</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">log-collector</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">tolerations</span><span class="yk">:</span>
+                                <span class="yk">- key</span><span class="yk">:</span> <span
+                                    class="yv">node-role.kubernetes.io/control-plane</span>
+                                <span class="yk">effect</span><span class="yk">:</span> <span
+                                    class="yv">NoSchedule</span>
+                                <span class="yk">containers</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span
+                                    class="yv">fluent-bit</span>
+                                <span class="yk">image</span><span class="yk">:</span> <span
+                                    class="yv">fluent/fluent-bit:2.1</span>
+                                <span class="yk">resources</span><span class="yk">:</span>
+                                <span class="yk">requests</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">100m</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">128Mi</span>
+                                <span class="yk">limits</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">200m</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">256Mi</span>
+                                <span class="yk">volumeMounts</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span class="yv">varlog</span>
+                                <span class="yk">mountPath</span><span class="yk">:</span> <span
+                                    class="yv">/var/log</span>
+                                <span class="yk">readOnly</span><span class="yk">:</span> <span class="yb">true</span>
+                                <span class="yk">volumes</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span class="yv">varlog</span>
+                                <span class="yk">hostPath</span><span class="yk">:</span>
+                                <span class="yk">path</span><span class="yk">:</span> <span class="yv">/var/log</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CronJob -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(56,189,248,.1);color:var(--cyan);border:1px solid rgba(56,189,248,.3)">CronJob</span>
+                <span class="obj-name">invoice-batch-processor</span>
+                <span class="obj-use">Scheduled financial batch jobs across regions and time zones</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// enterprise scheduling</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>concurrencyPolicy: Forbid</strong> — prevents invoice
+                                double-processing if a batch run overruns.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>startingDeadlineSeconds</strong> — if cluster was down during
+                                scheduled time, skip the missed run.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>backoffLimit</strong> — retry failed jobs exactly N times
+                                before marking as Failed.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--amber);border-color:rgba(251,191,36,.3)">scheduled</span>
+                            <span class="tag" style="color:var(--green);border-color:rgba(74,222,128,.3)">batch</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">cronjob-invoice.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">batch/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">CronJob</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">invoice-batch-processor</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">schedule</span><span class="yk">:</span> <span class="yv">"0 2 * *
+                                    *"</span> <span class="yc"># 2am UTC daily</span>
+                                <span class="yk">concurrencyPolicy</span><span class="yk">:</span> <span
+                                    class="yv">Forbid</span>
+                                <span class="yk">startingDeadlineSeconds</span><span class="yk">:</span> <span
+                                    class="yn">3600</span>
+                                <span class="yk">successfulJobsHistoryLimit</span><span class="yk">:</span> <span
+                                    class="yn">3</span>
+                                <span class="yk">failedJobsHistoryLimit</span><span class="yk">:</span> <span
+                                    class="yn">5</span>
+                                <span class="yk">jobTemplate</span><span class="yk">:</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">backoffLimit</span><span class="yk">:</span> <span class="yn">2</span>
+                                <span class="yk">activeDeadlineSeconds</span><span class="yk">:</span> <span
+                                    class="yn">7200</span>
+                                <span class="yk">template</span><span class="yk">:</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">restartPolicy</span><span class="yk">:</span> <span
+                                    class="yv">OnFailure</span>
+                                <span class="yk">serviceAccountName</span><span class="yk">:</span> <span
+                                    class="yv">invoice-processor-sa</span>
+                                <span class="yk">containers</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span
+                                    class="yv">invoice-processor</span>
+                                <span class="yk">image</span><span class="yk">:</span> <span
+                                    class="yv">gcr.io/globalcorp/invoice-processor:latest</span>
+                                <span class="yk">command</span><span class="yk">:</span> <span class="yb">["python",
+                                    "-m", "invoice.batch"]</span>
+                                <span class="yk">resources</span><span class="yk">:</span>
+                                <span class="yk">requests</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">2</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">4Gi</span>
+                                <span class="yk">limits</span><span class="yk">:</span>
+                                <span class="yk">cpu</span><span class="yk">:</span> <span class="yv">4</span>
+                                <span class="yk">memory</span><span class="yk">:</span> <span class="yv">8Gi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- NETWORKING -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="section" id="network">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#0c2018;">🌐</div>
+            <span class="sec-title">Networking Objects</span>
+            <span class="sec-desc">service · ingress · networkpolicy · gateway</span>
+        </div>
+
+        <!-- Service -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3)">Service</span>
+                <span class="obj-name">payment-service-svc</span>
+                <span class="obj-use">Stable DNS + load balancing for internal and external traffic</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// service types</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>ClusterIP</strong> (default) — internal-only stable IP. Use
+                                for service-to-service calls.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>LoadBalancer</strong> — provisions cloud LB. Use for external
+                                entry points requiring raw TCP/UDP (e.g. gRPC at edge).</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Headless (clusterIP: None)</strong> — direct pod DNS for
+                                StatefulSets like Kafka, Postgres.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--green);border-color:rgba(74,222,128,.3)">ClusterIP</span>
+                            <span class="tag" style="color:var(--teal);border-color:rgba(45,212,191,.3)">stable
+                                DNS</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">service-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">Service</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-svc</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">annotations</span><span class="yk">:</span>
+                                <span class="yk">service.beta.kubernetes.io/aws-load-balancer-type</span><span
+                                    class="yk">:</span> <span class="yv">nlb</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">type</span><span class="yk">:</span> <span class="yv">ClusterIP</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span class="yv">http</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">80</span>
+                                <span class="yk">targetPort</span><span class="yk">:</span> <span class="yn">8080</span>
+                                <span class="yk">protocol</span><span class="yk">:</span> <span class="yv">TCP</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span class="yv">grpc</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">9090</span>
+                                <span class="yk">targetPort</span><span class="yk">:</span> <span class="yn">9090</span>
+                                <span class="yk">protocol</span><span class="yk">:</span> <span class="yv">TCP</span>
+                                <span class="yk">sessionAffinity</span><span class="yk">:</span> <span
+                                    class="yv">None</span>
+                                <span class="yc">---</span>
+                                <span class="yc"># Headless service for StatefulSet DNS</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">Service</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">postgres-headless</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">clusterIP</span><span class="yk">:</span> <span class="yv">None</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span class="yv">postgres</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- port</span><span class="yk">:</span> <span class="yn">5432</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingress -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3)">Ingress</span>
+                <span class="obj-name">globalcorp-ingress</span>
+                <span class="obj-use">TLS termination, host-based routing, canary annotations</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// production ingress essentials</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>TLS termination</strong> — cert-manager automatically
+                                provisions and renews Let's Encrypt or internal CA certs.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Path-based routing</strong> — /api → backend; /app → frontend
+                                SPA; /webhooks → event-processor.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Rate limiting annotations</strong> — nginx limits req/s per
+                                IP to prevent abuse at edge.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag" style="color:var(--green);border-color:rgba(74,222,128,.3)">TLS</span>
+                            <span class="tag" style="color:var(--cyan);border-color:rgba(56,189,248,.3)">routing</span>
+                            <span class="tag"
+                                style="color:var(--amber);border-color:rgba(251,191,36,.3)">rate-limit</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">ingress-globalcorp.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">networking.k8s.io/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">Ingress</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-ingress</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">annotations</span><span class="yk">:</span>
+                                <span class="yk">kubernetes.io/ingress.class</span><span class="yk">:</span> <span
+                                    class="yv">nginx</span>
+                                <span class="yk">cert-manager.io/cluster-issuer</span><span class="yk">:</span> <span
+                                    class="yv">letsencrypt-prod</span>
+                                <span class="yk">nginx.ingress.kubernetes.io/rate-limit</span><span class="yk">:</span>
+                                <span class="yv">"200"</span>
+                                <span class="yk">nginx.ingress.kubernetes.io/ssl-redirect</span><span
+                                    class="yk">:</span> <span class="yv">"true"</span>
+                                <span class="yk">nginx.ingress.kubernetes.io/proxy-body-size</span><span
+                                    class="yk">:</span> <span class="yv">10m</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">tls</span><span class="yk">:</span>
+                                <span class="yk">- hosts</span><span class="yk">:</span>
+                                <span class="yk">- api.globalcorp.com</span>
+                                <span class="yk">- app.globalcorp.com</span>
+                                <span class="yk">secretName</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-tls</span>
+                                <span class="yk">rules</span><span class="yk">:</span>
+                                <span class="yk">- host</span><span class="yk">:</span> <span
+                                    class="yv">api.globalcorp.com</span>
+                                <span class="yk">http</span><span class="yk">:</span>
+                                <span class="yk">paths</span><span class="yk">:</span>
+                                <span class="yk">- path</span><span class="yk">:</span> <span class="yv">/payment</span>
+                                <span class="yk">pathType</span><span class="yk">:</span> <span class="yv">Prefix</span>
+                                <span class="yk">backend</span><span class="yk">:</span>
+                                <span class="yk">service</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-svc</span>
+                                <span class="yk">port</span><span class="yk">:</span>
+                                <span class="yk">number</span><span class="yk">:</span> <span class="yn">80</span>
+                                <span class="yk">- path</span><span class="yk">:</span> <span class="yv">/user</span>
+                                <span class="yk">pathType</span><span class="yk">:</span> <span class="yv">Prefix</span>
+                                <span class="yk">backend</span><span class="yk">:</span>
+                                <span class="yk">service</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">user-service-svc</span>
+                                <span class="yk">port</span><span class="yk">:</span>
+                                <span class="yk">number</span><span class="yk">:</span> <span class="yn">80</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NetworkPolicy -->
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3)">NetworkPolicy</span>
+                <span class="obj-name">payment-isolation-policy</span>
+                <span class="obj-use">Zero-trust pod-to-pod firewall rules for PCI-DSS compliance</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// compliance patterns</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Default-deny</strong> — apply a deny-all policy first, then
+                                selectively allow. Required for PCI-DSS and SOC2.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Ingress rules</strong> — only api-gateway pods on port 8080
+                                can reach payment pods.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Egress rules</strong> — payment pods can only egress to
+                                postgres and external payment processors.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag" style="color:var(--red);border-color:rgba(248,113,113,.3)">PCI-DSS</span>
+                            <span class="tag"
+                                style="color:var(--amber);border-color:rgba(251,191,36,.3)">zero-trust</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">networkpolicy-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">networking.k8s.io/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">NetworkPolicy</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-isolation-policy</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">podSelector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">policyTypes</span><span class="yk">:</span>
+                                <span class="yk">- Ingress</span>
+                                <span class="yk">- Egress</span>
+                                <span class="yk">ingress</span><span class="yk">:</span>
+                                <span class="yk">- from</span><span class="yk">:</span>
+                                <span class="yk">- podSelector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span class="yv">api-gateway</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- protocol</span><span class="yk">:</span> <span class="yv">TCP</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">8080</span>
+                                <span class="yk">egress</span><span class="yk">:</span>
+                                <span class="yk">- to</span><span class="yk">:</span>
+                                <span class="yk">- podSelector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span class="yv">postgres</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- protocol</span><span class="yk">:</span> <span class="yv">TCP</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">5432</span>
+                                <span class="yk">- to</span><span class="yk">:</span> <span class="yc"># external
+                                    payment processor</span>
+                                <span class="yk">- ipBlock</span><span class="yk">:</span>
+                                <span class="yk">cidr</span><span class="yk">:</span> <span class="yv">0.0.0.0/0</span>
+                                <span class="yk">except</span><span class="yk">:</span>
+                                <span class="yk">- 10.0.0.0/8</span>
+                                <span class="yk">ports</span><span class="yk">:</span>
+                                <span class="yk">- protocol</span><span class="yk">:</span> <span class="yv">TCP</span>
+                                <span class="yk">port</span><span class="yk">:</span> <span class="yn">443</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIG & SECRETS -->
+    <div class="section" id="config">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#1a1535;">⚙️</div>
+            <span class="sec-title">Configuration Objects</span>
+            <span class="sec-desc">configmap · secret · externalSecret</span>
+        </div>
+
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.3)">ConfigMap</span>
+                <span class="obj-name">payment-config</span>
+                <span class="obj-use">Non-sensitive environment config, feature flags, and runtime tuning</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// best practices</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Never store secrets here</strong> — ConfigMaps are plaintext.
+                                Use Secret or ExternalSecret for credentials.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Mount as file or env</strong> — large config files
+                                (nginx.conf, app.properties) mount as volumes; small values as envFrom.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Immutable: true</strong> — prevents accidental live edits in
+                                production. Requires rollout to change.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--purple);border-color:rgba(167,139,250,.3)">non-sensitive</span>
+                            <span class="tag" style="color:var(--green);border-color:rgba(74,222,128,.3)">feature
+                                flags</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">configmap-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">ConfigMap</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-config</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">immutable</span><span class="yk">:</span> <span class="yb">true</span>
+                                <span class="yk">data</span><span class="yk">:</span>
+                                <span class="yk">ENVIRONMENT</span><span class="yk">:</span> <span
+                                    class="yv">production</span>
+                                <span class="yk">LOG_LEVEL</span><span class="yk">:</span> <span class="yv">info</span>
+                                <span class="yk">PAYMENT_TIMEOUT_MS</span><span class="yk">:</span> <span
+                                    class="yv">"5000"</span>
+                                <span class="yk">MAX_RETRY_COUNT</span><span class="yk">:</span> <span
+                                    class="yv">"3"</span>
+                                <span class="yk">FEATURE_3DS_ENABLED</span><span class="yk">:</span> <span
+                                    class="yv">"true"</span>
+                                <span class="yk">FEATURE_BNPL_ENABLED</span><span class="yk">:</span> <span
+                                    class="yv">"false"</span>
+                                <span class="yk">REGION</span><span class="yk">:</span> <span
+                                    class="yv">us-east-1</span>
+                                <span class="yk">DB_POOL_SIZE</span><span class="yk">:</span> <span
+                                    class="yv">"20"</span>
+                                <span class="yk">OTEL_EXPORTER_ENDPOINT</span><span class="yk">:</span> <span
+                                    class="yv">http://otel-collector:4317</span>
+                                <span class="yk">app.properties</span><span class="yk">:</span> <span
+                                    class="yb">|</span>
+                                <span class="yv">spring.datasource.pool-size=20</span>
+                                <span class="yv">spring.cache.type=redis</span>
+                                <span class="yv">management.endpoints.web.exposure.include=*</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.3)">Secret</span>
+                <span class="obj-name">payment-secrets</span>
+                <span class="obj-use">Base64 credentials + ExternalSecret from AWS Secrets Manager</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// enterprise secret management</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>External Secrets Operator</strong> — syncs secrets from AWS
+                                Secrets Manager, Vault, or GCP Secret Manager. Never commit secrets to Git.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Sealed Secrets</strong> — encrypt secrets in Git using
+                                Bitnami Sealed Secrets for GitOps workflows.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>RBAC restriction</strong> — only the service's ServiceAccount
+                                can read its own secret.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--red);border-color:rgba(248,113,113,.3)">sensitive</span>
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">ESO</span>
+                            <span class="tag" style="color:var(--purple);border-color:rgba(167,139,250,.3)">vault</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">externalsecret-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yc"># External Secrets Operator — syncs from AWS</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">external-secrets.io/v1beta1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">ExternalSecret</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-secrets</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">refreshInterval</span><span class="yk">:</span> <span
+                                    class="yv">1h</span>
+                                <span class="yk">secretStoreRef</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">aws-secrets-manager</span>
+                                <span class="yk">kind</span><span class="yk">:</span> <span
+                                    class="yv">ClusterSecretStore</span>
+                                <span class="yk">target</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-secrets</span>
+                                <span class="yk">creationPolicy</span><span class="yk">:</span> <span
+                                    class="yv">Owner</span>
+                                <span class="yk">data</span><span class="yk">:</span>
+                                <span class="yk">- secretKey</span><span class="yk">:</span> <span
+                                    class="yv">DB_PASSWORD</span>
+                                <span class="yk">remoteRef</span><span class="yk">:</span>
+                                <span class="yk">key</span><span class="yk">:</span> <span
+                                    class="yv">prod/payment/db</span>
+                                <span class="yk">property</span><span class="yk">:</span> <span
+                                    class="yv">password</span>
+                                <span class="yk">- secretKey</span><span class="yk">:</span> <span
+                                    class="yv">STRIPE_API_KEY</span>
+                                <span class="yk">remoteRef</span><span class="yk">:</span>
+                                <span class="yk">key</span><span class="yk">:</span> <span
+                                    class="yv">prod/payment/stripe</span>
+                                <span class="yk">property</span><span class="yk">:</span> <span
+                                    class="yv">api-key</span>
+                                <span class="yk">- secretKey</span><span class="yk">:</span> <span
+                                    class="yv">JWT_SECRET</span>
+                                <span class="yk">remoteRef</span><span class="yk">:</span>
+                                <span class="yk">key</span><span class="yk">:</span> <span
+                                    class="yv">prod/auth/jwt</span>
+                                <span class="yk">property</span><span class="yk">:</span> <span
+                                    class="yv">signing-key</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STORAGE -->
+    <div class="section" id="storage">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#0d2010;">💾</div>
+            <span class="sec-title">Storage Objects</span>
+            <span class="sec-desc">pvc · storageclass · pv</span>
+        </div>
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.3)">PersistentVolumeClaim</span>
+                <span class="obj-name">media-storage-pvc</span>
+                <span class="obj-use">Encrypted, retain-policy storage for media and document uploads</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// storage patterns</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>StorageClass gp3-encrypted</strong> — custom class using AWS
+                                EBS gp3 with KMS encryption. Required for GDPR data at rest.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>reclaimPolicy: Retain</strong> — don't auto-delete PVs when
+                                PVC is deleted. Protects production data.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>ReadWriteMany</strong> — use EFS (AWS) or Filestore (GCP) for
+                                shared storage across pods.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--teal);border-color:rgba(45,212,191,.3)">encrypted</span>
+                            <span class="tag" style="color:var(--green);border-color:rgba(74,222,128,.3)">GDPR</span>
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">retain</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">pvc-and-storageclass.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">storage.k8s.io/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">StorageClass</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">gp3-encrypted</span>
+                                <span class="yk">annotations</span><span class="yk">:</span>
+                                <span class="yk">storageclass.kubernetes.io/is-default-class</span><span
+                                    class="yk">:</span> <span class="yv">"true"</span>
+                                <span class="yk">provisioner</span><span class="yk">:</span> <span
+                                    class="yv">ebs.csi.aws.com</span>
+                                <span class="yk">reclaimPolicy</span><span class="yk">:</span> <span
+                                    class="yv">Retain</span>
+                                <span class="yk">volumeBindingMode</span><span class="yk">:</span> <span
+                                    class="yv">WaitForFirstConsumer</span>
+                                <span class="yk">allowVolumeExpansion</span><span class="yk">:</span> <span
+                                    class="yb">true</span>
+                                <span class="yk">parameters</span><span class="yk">:</span>
+                                <span class="yk">type</span><span class="yk">:</span> <span class="yv">gp3</span>
+                                <span class="yk">encrypted</span><span class="yk">:</span> <span
+                                    class="yv">"true"</span>
+                                <span class="yk">kmsKeyId</span><span class="yk">:</span> <span
+                                    class="yv">arn:aws:kms:us-east-1:123456:key/abc-xyz</span>
+                                <span class="yc">---</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">PersistentVolumeClaim</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">media-storage-pvc</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">data-classification</span><span class="yk">:</span> <span
+                                    class="yv">confidential</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">accessModes</span><span class="yk">:</span>
+                                <span class="yk">- ReadWriteOnce</span>
+                                <span class="yk">storageClassName</span><span class="yk">:</span> <span
+                                    class="yv">gp3-encrypted</span>
+                                <span class="yk">resources</span><span class="yk">:</span>
+                                <span class="yk">requests</span><span class="yk">:</span>
+                                <span class="yk">storage</span><span class="yk">:</span> <span class="yv">500Gi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECURITY / RBAC -->
+    <div class="section" id="security">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#1e1010;">🔐</div>
+            <span class="sec-title">Security &amp; RBAC</span>
+            <span class="sec-desc">serviceaccount · role · clusterrole · rolebinding · podsecurity</span>
+        </div>
+
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.3)">RBAC</span>
+                <span class="obj-name">payment-service-rbac</span>
+                <span class="obj-use">Least-privilege service account with scoped role and binding</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// least privilege principle</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Dedicated ServiceAccount</strong> — never use the default SA.
+                                Each service gets its own identity with minimal permissions.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Role (namespaced)</strong> — prefer Role over ClusterRole
+                                unless the service genuinely needs cluster-wide access.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Workload Identity</strong> — bind SA to cloud IAM (AWS IRSA /
+                                GCP Workload Identity) for cloud API access without static keys.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--red);border-color:rgba(248,113,113,.3)">least-privilege</span>
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">IRSA</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">rbac-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">ServiceAccount</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-sa</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">annotations</span><span class="yk">:</span>
+                                <span class="yc"># AWS IRSA — maps SA to IAM role</span>
+                                <span class="yk">eks.amazonaws.com/role-arn</span><span class="yk">:</span> <span
+                                    class="yv">arn:aws:iam::123456:role/payment-service-role</span>
+                                <span class="yc">---</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">rbac.authorization.k8s.io/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span class="yv">Role</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-role</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">rules</span><span class="yk">:</span>
+                                <span class="yk">- apiGroups</span><span class="yk">:</span> <span
+                                    class="yb">[""]</span>
+                                <span class="yk">resources</span><span class="yk">:</span> <span
+                                    class="yb">["secrets"]</span>
+                                <span class="yk">resourceNames</span><span class="yk">:</span> <span
+                                    class="yb">["payment-secrets"]</span>
+                                <span class="yk">verbs</span><span class="yk">:</span> <span class="yb">["get"]</span>
+                                <span class="yk">- apiGroups</span><span class="yk">:</span> <span
+                                    class="yb">[""]</span>
+                                <span class="yk">resources</span><span class="yk">:</span> <span
+                                    class="yb">["configmaps"]</span>
+                                <span class="yk">resourceNames</span><span class="yk">:</span> <span
+                                    class="yb">["payment-config"]</span>
+                                <span class="yk">verbs</span><span class="yk">:</span> <span class="yb">["get",
+                                    "list"]</span>
+                                <span class="yc">---</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">rbac.authorization.k8s.io/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">RoleBinding</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-rb</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">subjects</span><span class="yk">:</span>
+                                <span class="yk">- kind</span><span class="yk">:</span> <span
+                                    class="yv">ServiceAccount</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-sa</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">roleRef</span><span class="yk">:</span>
+                                <span class="yk">apiGroup</span><span class="yk">:</span> <span
+                                    class="yv">rbac.authorization.k8s.io</span>
+                                <span class="yk">kind</span><span class="yk">:</span> <span class="yv">Role</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service-role</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTOSCALING -->
+    <div class="section" id="autoscale">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#1a1a0d;">📈</div>
+            <span class="sec-title">Autoscaling Objects</span>
+            <span class="sec-desc">hpa · vpa · pdb · keda</span>
+        </div>
+
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.3)">HorizontalPodAutoscaler</span>
+                <span class="obj-name">payment-hpa</span>
+                <span class="obj-use">Scale pods on CPU, memory, and custom Prometheus metrics</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// scale strategies</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>CPU + memory</strong> — dual-metric HPA. Scale out when
+                                either threshold is crossed; scale in only when both drop.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>KEDA</strong> — event-driven autoscaler for queue-depth-based
+                                scaling (Kafka lag, SQS queue length).</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>stabilizationWindowSeconds</strong> — prevents flapping by
+                                requiring metrics to stabilize before scaling in.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">HPA v2</span>
+                            <span class="tag"
+                                style="color:var(--green);border-color:rgba(74,222,128,.3)">anti-flap</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">hpa-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">autoscaling/v2</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">HorizontalPodAutoscaler</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-hpa</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">scaleTargetRef</span><span class="yk">:</span>
+                                <span class="yk">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">apps/v1</span>
+                                <span class="yk">kind</span><span class="yk">:</span> <span class="yv">Deployment</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">minReplicas</span><span class="yk">:</span> <span class="yn">6</span>
+                                <span class="yk">maxReplicas</span><span class="yk">:</span> <span class="yn">50</span>
+                                <span class="yk">metrics</span><span class="yk">:</span>
+                                <span class="yk">- type</span><span class="yk">:</span> <span class="yv">Resource</span>
+                                <span class="yk">resource</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span class="yv">cpu</span>
+                                <span class="yk">target</span><span class="yk">:</span>
+                                <span class="yk">type</span><span class="yk">:</span> <span
+                                    class="yv">Utilization</span>
+                                <span class="yk">averageUtilization</span><span class="yk">:</span> <span
+                                    class="yn">60</span>
+                                <span class="yk">- type</span><span class="yk">:</span> <span class="yv">Resource</span>
+                                <span class="yk">resource</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span class="yv">memory</span>
+                                <span class="yk">target</span><span class="yk">:</span>
+                                <span class="yk">type</span><span class="yk">:</span> <span
+                                    class="yv">Utilization</span>
+                                <span class="yk">averageUtilization</span><span class="yk">:</span> <span
+                                    class="yn">70</span>
+                                <span class="yk">behavior</span><span class="yk">:</span>
+                                <span class="yk">scaleDown</span><span class="yk">:</span>
+                                <span class="yk">stabilizationWindowSeconds</span><span class="yk">:</span> <span
+                                    class="yn">300</span>
+                                <span class="yk">policies</span><span class="yk">:</span>
+                                <span class="yk">- type</span><span class="yk">:</span> <span class="yv">Pods</span>
+                                <span class="yk">value</span><span class="yk">:</span> <span class="yn">2</span>
+                                <span class="yk">periodSeconds</span><span class="yk">:</span> <span
+                                    class="yn">60</span>
+                                <span class="yk">scaleUp</span><span class="yk">:</span>
+                                <span class="yk">stabilizationWindowSeconds</span><span class="yk">:</span> <span
+                                    class="yn">30</span>
+                                <span class="yk">policies</span><span class="yk">:</span>
+                                <span class="yk">- type</span><span class="yk">:</span> <span class="yv">Percent</span>
+                                <span class="yk">value</span><span class="yk">:</span> <span class="yn">100</span>
+                                <span class="yk">periodSeconds</span><span class="yk">:</span> <span
+                                    class="yn">15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.3)">PodDisruptionBudget</span>
+                <span class="obj-name">payment-pdb</span>
+                <span class="obj-use">Guarantee minimum availability during node drains and upgrades</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// why PDB matters</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Node drains</strong> — without PDB, cluster autoscaler or
+                                kubectl drain can take down too many payment pods simultaneously.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>minAvailable: 80%</strong> — at least 80% of pods must be
+                                running during any voluntary disruption.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Required with HPA</strong> — if minReplicas changes, PDB
+                                ensures you never dip below a safe floor.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag" style="color:var(--green);border-color:rgba(74,222,128,.3)">HA</span>
+                            <span class="tag" style="color:var(--amber);border-color:rgba(251,191,36,.3)">SLA</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">pdb-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">policy/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">PodDisruptionBudget</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-pdb</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">minAvailable</span><span class="yk">:</span> <span
+                                    class="yv">"80%"</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OBSERVABILITY -->
+    <div class="section" id="observe">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#0a1a2a;">🔭</div>
+            <span class="sec-title">Observability Objects</span>
+            <span class="sec-desc">servicemonitor · prometheusrule · podmonitor</span>
+        </div>
+        <div class="obj-card">
+            <div class="obj-card-head" onclick="toggle(this)">
+                <span class="obj-kind"
+                    style="background:rgba(56,189,248,.1);color:var(--cyan);border:1px solid rgba(56,189,248,.3)">ServiceMonitor</span>
+                <span class="obj-name">payment-metrics</span>
+                <span class="obj-use">Prometheus scrape config for golden signals + SLO alerting</span>
+                <span class="chevron">▾</span>
+            </div>
+            <div class="obj-body">
+                <div class="obj-body-grid">
+                    <div class="info-pane">
+                        <h4>// observability stack</h4>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>ServiceMonitor</strong> — tells kube-prometheus-stack which
+                                services to scrape. Requires a /metrics endpoint.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>PrometheusRule</strong> — defines SLO alerts. Payment latency
+                                p99 &gt; 500ms fires a PagerDuty alert.</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-dot"></div>
+                            <div class="info-text"><strong>Golden signals</strong> — monitor latency, traffic, errors,
+                                and saturation per Google SRE book for every service.</div>
+                        </div>
+                        <div class="tag-row">
+                            <span class="tag"
+                                style="color:var(--cyan);border-color:rgba(56,189,248,.3)">prometheus</span>
+                            <span class="tag" style="color:var(--purple);border-color:rgba(167,139,250,.3)">SLO</span>
+                            <span class="tag" style="color:var(--green);border-color:rgba(74,222,128,.3)">grafana</span>
+                        </div>
+                    </div>
+                    <div class="yaml-pane">
+                        <div class="yaml-wrap">
+                            <div class="yaml-bar"><span class="yaml-filename">servicemonitor-payment.yaml</span><button
+                                    class="copy-yaml" onclick="copyYaml(this)">copy</button></div>
+                            <div class="yaml-code"><span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">monitoring.coreos.com/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">ServiceMonitor</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-metrics</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">team</span><span class="yk">:</span> <span class="yv">payments</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">selector</span><span class="yk">:</span>
+                                <span class="yk">matchLabels</span><span class="yk">:</span>
+                                <span class="yk">app</span><span class="yk">:</span> <span
+                                    class="yv">payment-service</span>
+                                <span class="yk">endpoints</span><span class="yk">:</span>
+                                <span class="yk">- port</span><span class="yk">:</span> <span class="yv">http</span>
+                                <span class="yk">path</span><span class="yk">:</span> <span class="yv">/metrics</span>
+                                <span class="yk">interval</span><span class="yk">:</span> <span class="yv">15s</span>
+                                <span class="yk">scrapeTimeout</span><span class="yk">:</span> <span
+                                    class="yv">10s</span>
+                                <span class="yc">---</span>
+                                <span class="yd">apiVersion</span><span class="yk">:</span> <span
+                                    class="yv">monitoring.coreos.com/v1</span>
+                                <span class="yd">kind</span><span class="yk">:</span> <span
+                                    class="yv">PrometheusRule</span>
+                                <span class="yk">metadata</span><span class="yk">:</span>
+                                <span class="yk">name</span><span class="yk">:</span> <span
+                                    class="yv">payment-slo-alerts</span>
+                                <span class="yk">namespace</span><span class="yk">:</span> <span
+                                    class="yv">globalcorp-production</span>
+                                <span class="yk">spec</span><span class="yk">:</span>
+                                <span class="yk">groups</span><span class="yk">:</span>
+                                <span class="yk">- name</span><span class="yk">:</span> <span
+                                    class="yv">payment.slo</span>
+                                <span class="yk">rules</span><span class="yk">:</span>
+                                <span class="yk">- alert</span><span class="yk">:</span> <span
+                                    class="yv">PaymentLatencyHigh</span>
+                                <span class="yk">expr</span><span class="yk">:</span> <span class="yb">|</span>
+                                <span class="yv">histogram_quantile(0.99,</span>
+                                <span class="yv">rate(http_request_duration_seconds_bucket</span>
+                                <span class="yv">{app="payment-service"}[5m])) > 0.5</span>
+                                <span class="yk">for</span><span class="yk">:</span> <span class="yv">2m</span>
+                                <span class="yk">labels</span><span class="yk">:</span>
+                                <span class="yk">severity</span><span class="yk">:</span> <span
+                                    class="yv">critical</span>
+                                <span class="yk">team</span><span class="yk">:</span> <span class="yv">payments</span>
+                                <span class="yk">annotations</span><span class="yk">:</span>
+                                <span class="yk">summary</span><span class="yk">:</span> <span class="yv">Payment p99
+                                    latency exceeds 500ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEPLOYMENT LIFECYCLE FLOW -->
+    <div class="section" id="flow">
+        <div class="sec-header">
+            <div class="sec-icon" style="background:#0f1d30;">🔄</div>
+            <span class="sec-title">Enterprise Deployment Lifecycle</span>
+            <span class="sec-desc">from commit to production</span>
+        </div>
+        <div class="flow-wrap">
+            <svg id="flow-svg" viewBox="0 0 960 180" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="farr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L8,3 z" fill="#1e3a5f" />
+                    </marker>
+                </defs>
+                <!-- connecting lines -->
+                <g stroke="#1e3a5f" stroke-width="1.5" fill="none" marker-end="url(#farr)">
+                    <line x1="140" y1="90" x2="185" y2="90" />
+                    <line x1="285" y1="90" x2="330" y2="90" />
+                    <line x1="430" y1="90" x2="475" y2="90" />
+                    <line x1="575" y1="90" x2="620" y2="90" />
+                    <line x1="720" y1="90" x2="765" y2="90" />
+                    <line x1="865" y1="90" x2="910" y2="90" />
+                </g>
+                <!-- step boxes -->
+                <g>
+                    <rect x="20" y="60" width="120" height="60" rx="8" fill="#0f1d30" stroke="#f0a500"
+                        stroke-width="1.5" />
+                    <text x="80" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="10"
+                        fill="#f0a500">Git Commit</text>
+                    <text x="80" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">Helm / Kustomize</text>
+                    <text x="80" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">manifest updated</text>
+                </g>
+                <g>
+                    <rect x="185" y="60" width="100" height="60" rx="8" fill="#0f1d30" stroke="#38bdf8"
+                        stroke-width="1" />
+                    <text x="235" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="10"
+                        fill="#38bdf8">CI Pipeline</text>
+                    <text x="235" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">build · test</text>
+                    <text x="235" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">image push</text>
+                </g>
+                <g>
+                    <rect x="330" y="60" width="100" height="60" rx="8" fill="#0f1d30" stroke="#38bdf8"
+                        stroke-width="1" />
+                    <text x="380" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="10"
+                        fill="#38bdf8">ArgoCD Sync</text>
+                    <text x="380" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">GitOps apply</text>
+                    <text x="380" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">to staging</text>
+                </g>
+                <g>
+                    <rect x="475" y="60" width="100" height="60" rx="8" fill="#0f1d30" stroke="#a78bfa"
+                        stroke-width="1" />
+                    <text x="525" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="10"
+                        fill="#a78bfa">Rolling Deploy</text>
+                    <text x="525" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">Deployment</text>
+                    <text x="525" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">strategy</text>
+                </g>
+                <g>
+                    <rect x="620" y="60" width="100" height="60" rx="8" fill="#0f1d30" stroke="#4ade80"
+                        stroke-width="1" />
+                    <text x="670" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="10"
+                        fill="#4ade80">Readiness Gate</text>
+                    <text x="670" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">probes pass</text>
+                    <text x="670" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">HPA active</text>
+                </g>
+                <g>
+                    <rect x="765" y="60" width="100" height="60" rx="8" fill="#0f1d30" stroke="#fbbf24"
+                        stroke-width="1" />
+                    <text x="815" y="86" text-anchor="middle" font-family="JetBrains Mono" font-size="10"
+                        fill="#fbbf24">SLO Monitor</text>
+                    <text x="815" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">Prometheus</text>
+                    <text x="815" y="114" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#6b8aaa">alert if breach</text>
+                </g>
+                <g>
+                    <rect x="910" y="60" width="30" height="60" rx="8" fill="#0f1d30" stroke="#f0a500"
+                        stroke-width="1.5" />
+                    <text x="925" y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                        fill="#f0a500">✓</text>
+                </g>
+                <!-- labels below -->
+                <text x="80" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#475569">1.
+                    Declarative</text>
+                <text x="235" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#475569">2.
+                    Build</text>
+                <text x="380" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#475569">3.
+                    GitOps</text>
+                <text x="525" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#475569">4.
+                    Deploy</text>
+                <text x="670" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#475569">5.
+                    Health</text>
+                <text x="815" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#475569">6.
+                    Observe</text>
+                <text x="925" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="9"
+                    fill="#475569">Live</text>
+            </svg>
+        </div>
+
+        <!-- Object summary grid -->
+        <div class="arch-grid">
+            <div class="arch-node">
+                <div class="arch-node-icon">📦</div>
+                <div class="arch-node-title">Namespace</div>
+                <div class="arch-node-desc">Team + env isolation, quota enforcement</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🚀</div>
+                <div class="arch-node-title">Deployment</div>
+                <div class="arch-node-desc">Stateless workloads, rolling updates</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">💽</div>
+                <div class="arch-node-title">StatefulSet</div>
+                <div class="arch-node-desc">Databases, message brokers, stable IDs</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">👁</div>
+                <div class="arch-node-title">DaemonSet</div>
+                <div class="arch-node-desc">Per-node agents, log collectors</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">⏰</div>
+                <div class="arch-node-title">CronJob</div>
+                <div class="arch-node-desc">Scheduled batch, financial processing</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🌐</div>
+                <div class="arch-node-title">Service</div>
+                <div class="arch-node-desc">Stable DNS, load balancing, ClusterIP</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🔀</div>
+                <div class="arch-node-title">Ingress</div>
+                <div class="arch-node-desc">TLS, routing, rate-limiting at edge</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🧱</div>
+                <div class="arch-node-title">NetworkPolicy</div>
+                <div class="arch-node-desc">Pod firewall, PCI-DSS zero-trust</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">📋</div>
+                <div class="arch-node-title">ConfigMap</div>
+                <div class="arch-node-desc">Feature flags, runtime config</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🔑</div>
+                <div class="arch-node-title">ExternalSecret</div>
+                <div class="arch-node-desc">Vault / AWS Secrets Manager sync</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">💾</div>
+                <div class="arch-node-title">PVC + StorageClass</div>
+                <div class="arch-node-desc">Encrypted persistent volumes, GDPR</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🔐</div>
+                <div class="arch-node-title">RBAC</div>
+                <div class="arch-node-desc">Least-privilege, IRSA, Workload Identity</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">📈</div>
+                <div class="arch-node-title">HPA + PDB</div>
+                <div class="arch-node-desc">Autoscale + disruption protection</div>
+            </div>
+            <div class="arch-node">
+                <div class="arch-node-icon">🔭</div>
+                <div class="arch-node-title">ServiceMonitor</div>
+                <div class="arch-node-desc">Prometheus scrape, SLO alerting</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Kubernetes Objects — Enterprise Declarative Reference · <span>⎈ globalcorp.com</span></p>
+        <p style="margin-top:8px;font-size:11px;color:#2a4f7a;">Production patterns for multinational scale · All YAMLs
+            follow Kubernetes best practices v1.29+</p>
+    </footer>
+
+    <script>
+        function toggle(head) {
+            const card = head.closest('.obj-card');
+            card.classList.toggle('open');
+        }
+        function scrollTo2(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function copyYaml(btn) {
+            const code = btn.closest('.yaml-wrap').querySelector('.yaml-code');
+            const text = code.innerText || code.textContent;
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                btn.textContent = 'copied!'; btn.classList.add('ok');
+                setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 1800);
+            });
+        }
+        // Auto-open first card in each section on load
+        document.querySelectorAll('.section').forEach(sec => {
+            const first = sec.querySelector('.obj-card');
+            if (first) first.classList.add('open');
+        });
+    </script>
+</body>
+
+</html>
